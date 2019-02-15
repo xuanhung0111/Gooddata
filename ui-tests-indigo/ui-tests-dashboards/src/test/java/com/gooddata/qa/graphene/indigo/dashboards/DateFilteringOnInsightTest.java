@@ -39,7 +39,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     private static String SNAPSHOT = "Snapshot";
     private static String DATE_SNAPSHOT = "Date (Snapshot)";
     private static String DATE_SNAPSHOT_RENAMED = "Date (Snapshot)_Renamed";
-    private static String TEST_INSIGHT = "Test-Insight";
+    private final String TEST_INSIGHT = "Test-Insight" + generateHashString();
     private IndigoRestRequest indigoRestRequest;
 
     @Override
@@ -72,7 +72,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void rememberLastSettingAfterSelectingAnotherInsight()
             throws ParseException, JSONException, IOException {
-        String anotherInsight = "Another-Insight";
+        String anotherInsight = "Another-Insight" + generateHashString();
         String anotherInsightUri = createInsightWidget(
                 new InsightMDConfiguration(anotherInsight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_LOST_OPPS)))));
@@ -83,7 +83,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                     TEST_INSIGHT);
 
-            indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
+            indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
             assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(),
                     DATE_DATASET_CREATED);
 
@@ -91,7 +91,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                     anotherInsight);
 
             indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
+            assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
 
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(anotherInsightUri);
@@ -103,7 +103,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
 
-        ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
+        ConfigurationPanel panel = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel();
         assertTrue(panel.isDateDataSetDropdownVisible(), "Default state of date filter is not enabled");
 
         panel.disableDateFilter();
@@ -119,7 +119,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             initIndigoDashboardsPageWithWidgets().switchToEditMode()
                     .selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
 
-            ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
+            ConfigurationPanel panel = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel();
             assertTrue(panel.getFilterByDateFilter().isChecked(), "Default state of date filter item is not checked");
 
             panel.disableDateFilter();
@@ -139,7 +139,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
 
-        ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
+        ConfigurationPanel panel = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
         assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "Date filter is not disabled");
 
@@ -152,9 +152,9 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     public void changeFilterOnAddedInsight() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
-        indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
+        indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
         takeScreenshot(browser, "Change-Filter-On-Added-Insight", getClass());
-        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
+        assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
                 "Date fillter is not applied");
 
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
@@ -164,7 +164,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void rememberDisabledDateFilterAfterSaving() throws JSONException, IOException {
-        String insight = "Disabled-Date-Filter-Insight";
+        String insight = "Disabled-Date-Filter-Insight" + generateHashString();
         String insightUri = indigoRestRequest.createInsight(
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
@@ -177,7 +177,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
         try {
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, insight);
-            assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
+            assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not disabled");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -187,20 +187,20 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void rememberEnabledDateFilterAfterSaving() throws JSONException, IOException {
-        String insight = "Enabled-Date-Filter-Insight";
+        String insight = "Enabled-Date-Filter-Insight" + generateHashString();
         String insightUri = indigoRestRequest.createInsight(
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading();
         // this test should not depend on default state of date filter
-        indigoDashboardsPage.getConfigurationPanel().disableDateFilter().enableDateFilter();
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(), "Date filter is not enabled");
+        indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().disableDateFilter().enableDateFilter();
+        assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(), "Date filter is not enabled");
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         try {
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, insight);
-            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
+            assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not enabled");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -218,13 +218,13 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_DATASET_CREATED);
+            indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_DATASET_CREATED);
 
             assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(),
                     DATE_DATASET_CREATED);
 
             indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
+            assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(widgetUri);
         }
@@ -242,7 +242,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(SNAPSHOT);
+            indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().enableDateFilter().selectDateDataSetByName(SNAPSHOT);
             indigoDashboardsPage.saveEditModeWithWidgets();
 
             initManagePage();
@@ -253,7 +253,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             Sleeper.sleepTightInSeconds(1);
 
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
+            ConfigurationPanel panel = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel();
             takeScreenshot(browser, "Renamed-Date-Filter-Test", getClass());
             assertEquals(panel.getSelectedDataSet(), DATE_SNAPSHOT_RENAMED,
                     "New name is not applied to the insight");
@@ -267,7 +267,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     public void deleteDateUsedOnDateFilterInsight() throws JSONException, IOException {
         // currently, we can't create a new date value, so we will use 1 existing date for tests
         // which need to modified date in order to narrow affected area
-        String insight = "Insight-Containing-Date-Filter";
+        String insight = "Insight-Containing-Date-Filter" + generateHashString();
         String widgetUri =
                 createInsightWidget(new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
@@ -276,7 +276,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            indigoDashboardsPage.getConfigurationPanel().enableDateFilter()
+            indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().enableDateFilter()
                     .selectDateDataSetByName(DATE_SNAPSHOT_RENAMED);
             indigoDashboardsPage.saveEditModeWithWidgets();
 
