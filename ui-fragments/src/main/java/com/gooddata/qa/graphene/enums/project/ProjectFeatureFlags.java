@@ -22,7 +22,8 @@ public enum ProjectFeatureFlags {
     ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault"),
     REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled"),
     ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter"),
-    ENABLE_PIVOT_TABLE("enablePivot");
+    ENABLE_PIVOT_TABLE("enablePivot"),
+    ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker");
 
 
     private final String featureFlag;

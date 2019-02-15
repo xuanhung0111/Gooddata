@@ -43,6 +43,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.eventing.VisualizationMeasureA
 import com.gooddata.qa.graphene.indigo.dashboards.ApplyColorPaletteOnAnalyzePageTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiApplyColorPaletteTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ReportPageApplyColorPaletteTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ColorPalettePickerBasicInsightAndKPITest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -60,6 +61,7 @@ public class UITestsRegistry {
             EventingWidgetDrillToDashboardTest.class,
             ApplyColorPaletteOnAnalyzePageTest.class,
             KpiApplyColorPaletteTest.class,
+            ColorPalettePickerBasicInsightAndKPITest.class,
             "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-SplashScreen.xml"
@@ -126,6 +128,7 @@ public class UITestsRegistry {
             ApplyColorPaletteOnAnalyzePageTest.class,
             ReportPageApplyColorPaletteTest.class,
             KpiApplyColorPaletteTest.class,
+            ColorPalettePickerBasicInsightAndKPITest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

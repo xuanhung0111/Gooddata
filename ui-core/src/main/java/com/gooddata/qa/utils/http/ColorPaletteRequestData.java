@@ -87,7 +87,10 @@ public class ColorPaletteRequestData {
         YELLOW(255, 255, 0),
         CYAN(20, 178, 226),
         LIME_GREEN(0, 193, 141),
-        LIGHT_RED(255, 153, 153);
+        LIGHT_RED(255, 153, 153),
+        BRIGHT_RED(229, 77, 66),
+        PURE_ORANGE(241, 134, 0),
+        SOFT_RED(245, 184, 179);
 
         private int red;
         private int green;
@@ -118,6 +121,16 @@ public class ColorPaletteRequestData {
 
         public int getBlue() {
             return blue;
+        }
+
+        /**
+         * This method convert RGB color to Hex color
+         * Return string hex color
+         * For example : rgb(255,0,0) -> #FF0000
+         */
+
+        public String getHexColor() {
+            return String.format("#%02X%02X%02X", red, green, blue);
         }
     }
 }
