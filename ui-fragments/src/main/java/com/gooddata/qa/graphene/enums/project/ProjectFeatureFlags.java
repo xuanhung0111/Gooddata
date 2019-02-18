@@ -23,8 +23,8 @@ public enum ProjectFeatureFlags {
     REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled"),
     ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter"),
     ENABLE_PIVOT_TABLE("enablePivot"),
-    ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker");
-
+    ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker"),
+    ENABLE_DUAL_AXIS("enableDualAxes");
 
     private final String featureFlag;
 

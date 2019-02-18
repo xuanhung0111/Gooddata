@@ -2,15 +2,28 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import org.openqa.selenium.WebElement;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.openqa.selenium.By.cssSelector;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
 public class ConfigurationPanelBucket extends AbstractBucket {
+
+    @FindBy(className = "adi-bucket-item")
+    protected List<ItemConfiguration> itemsConfiguration;
+
+    public List<String> getItemNames() {
+        return waitForCollectionIsNotEmpty(itemsConfiguration).stream()
+                .map(ItemConfiguration::getHeader)
+                .collect(toList());
+    }
 
     public ConfigurationPanelBucket expandConfigurationPanel() {
         if (isConfigurationPanelCollapsed()) {
@@ -64,5 +77,13 @@ public class ConfigurationPanelBucket extends AbstractBucket {
 
     private boolean isConfigurationPanelCollapsed() {
         return getRoot().getAttribute("class").contains("bucket-collapsed");
+    }
+
+    public class ItemConfiguration extends AbstractFragment {
+
+        @FindBy(className = "adi-bucket-item-header")
+        private WebElement header;
+
+        public String getHeader() { return waitForElementVisible(header).getText(); }
     }
 }
