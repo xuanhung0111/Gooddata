@@ -14,10 +14,12 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
@@ -65,8 +67,10 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         // creating insight which is set date filter via REST is not recommended in these tests
-        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(TEST_INSIGHT)
-                .waitForWidgetsLoading().saveEditModeWithWidgets();
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(TEST_INSIGHT)
+                .waitForWidgetsLoading();
+        Graphene.waitGui().until(browser -> !indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet().contains("is-loading"));
+        indigoDashboardsPage.saveEditModeWithWidgets();
     }
 
     @Test(dependsOnGroups = {"createProject"})
