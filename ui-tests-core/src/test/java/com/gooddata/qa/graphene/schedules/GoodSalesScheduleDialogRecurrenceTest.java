@@ -90,8 +90,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
 
     @Test(dependsOnGroups = {"createProject"})
     public void testRecurrences() throws IllegalArgumentException, JSONException {
-        logout();
-        signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
+        logoutAndLoginAs(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
         initDashboardsPage();
         dashboardsPage.addSampleTextToDashboard();
         dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();

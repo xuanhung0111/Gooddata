@@ -163,8 +163,7 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
                     .rows("Chi2", "10100000", "2015-09-01")
                     .saveToDisc(testParams.getCsvFolder());
 
-            logout();
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
             updateCsvDataset(DATASET_NAME, updateCsvFilePath);
 

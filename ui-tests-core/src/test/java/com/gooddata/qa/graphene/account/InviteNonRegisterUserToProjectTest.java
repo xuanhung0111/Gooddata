@@ -149,8 +149,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         assertEquals(waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).getText(),
                 registrationForm.getFirstName() + " " + registrationForm.getLastName());
 
-        logout();
-        signIn(false, UserRoles.ADMIN);
+        logoutAndLoginAs(false, UserRoles.ADMIN);
 
         String invitationLink = doActionWithImapClient(imapClient ->
                 initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient, projectTitle + " Invitation",

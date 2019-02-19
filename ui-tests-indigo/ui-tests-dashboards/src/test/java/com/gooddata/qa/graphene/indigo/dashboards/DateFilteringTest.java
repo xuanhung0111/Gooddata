@@ -175,8 +175,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
         takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
-        logout();
-        signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
         dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
 

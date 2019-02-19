@@ -102,8 +102,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"admin-tests"}, groups = {"editor-tests"})
     public void editorVerifyFolderListTest() throws ParseException, IOException, JSONException {
-        logout();
-        signIn(false, UserRoles.EDITOR);
+        logoutAndLoginAs(false, UserRoles.EDITOR);
         for (String page : PAGES) {
             initDataPage(page).getObjectFolder().checkEditorViewFolderList(page, getFolderList(page));
         }
@@ -144,8 +143,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"editor-tests"})
     public void finalTest() throws JSONException {
-        logout();
-        signIn(false, UserRoles.ADMIN);
+        logoutAndLoginAs(false, UserRoles.ADMIN);
     }
 
     @Override

@@ -100,8 +100,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTiTle(),
                     REPORT_TOP_SALES_REPS_BY_WON_AND_LOST);
         } finally {
-            logout();
-            signIn(true, UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
@@ -121,8 +120,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
             assertFalse(drillingConfigPanel.isValueOnRightButton(PRIVATE_DASHBOARD, DrillingGroup.DASHBOARDS.getName()),
                     PRIVATE_DASHBOARD + " is on setting panel");
         } finally {
-            logout();
-            signIn(true, UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 

@@ -462,18 +462,15 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     "Attribute values are incorrrect " + attributeValues);
             assertEquals(metricValues, Arrays.asList(3.4506136E7f, 8632501.0f, 3.8943492E7f, 3.4543328E7f),
                     "Metric values are incorrrect");
-            logout();
-
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
             UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
                     new RestClient(getProfile(DOMAIN)), testParams.getProjectId());
             dashboardRequest.addMufToUser(userManagementRestRequest.getUserProfileUri(
                     testParams.getUserDomain(), testParams.getEditorUser()), mufUri);
-            logout();
 
-            signInAtUI(testParams.getEditorUser(), testParams.getPassword());
+            logoutAndLoginAs(false, UserRoles.EDITOR);
             initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
@@ -486,8 +483,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             assertEquals(metricValues, Arrays.asList(1.797468E7f, 6844677.5f, 3.1002138E7f, 2.4959828E7f),
                     "Metric values are incorrrect");
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 
