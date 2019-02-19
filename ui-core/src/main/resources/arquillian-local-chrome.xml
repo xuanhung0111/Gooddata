@@ -11,6 +11,7 @@
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
         <property name="chromeArguments">${chromeDriverArguments}</property>
         <property name="chromePrintOptions">true</property>
+        <property name="loggingPrefs">browser=ALL</property>
         <property name="chromeExperimentalOption">
             {"prefs": {"download.default_directory": "${browserDownloadFolder}", "download.prompt_for_download": "false"}}
         </property>
