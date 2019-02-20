@@ -83,9 +83,9 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String inputStream;
             while ((inputStream = reader.readLine()) != null) {
-                System.out.print(inputStream);
+                System.out.println(inputStream);
             }
-            System.out.print("Created a new file: " + file.getAbsolutePath());
+            log.info("Created a new file: " + file.getAbsolutePath());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("there is an error while creating catalog.json", e);
         }
