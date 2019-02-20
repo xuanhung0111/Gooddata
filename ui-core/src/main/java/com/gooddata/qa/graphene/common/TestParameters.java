@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.common;
 import com.gooddata.project.Environment;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -38,6 +40,11 @@ public class TestParameters {
     // (e.g. set hostProxy=staging3.intgdc.com if host is localhost:8443 and proxied to staging3)
     private String hostProxy;
     private String languageCode;
+    // variables of SDK
+    private String reactFolder;
+    private String reactProjectTitle;
+    private String localhostSDK;
+
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -62,6 +69,9 @@ public class TestParameters {
         hostProxy = loadProperty("hostProxy");
         languageCode = loadProperty("language");
         userDomain = loadProperty("user.domain");
+        reactFolder = loadProperty("reactFolder");
+        reactProjectTitle = loadProperty("reactProjectTitle");
+        localhostSDK = loadProperty("localhostSDK");
     }
 
     /**
@@ -241,5 +251,43 @@ public class TestParameters {
 
     public void setDashboardOnlyUser(String dashboardOnlyUser) {
         this.dashboardOnlyUser = dashboardOnlyUser;
+    }
+
+    public String getReactFolder() {
+        return reactFolder;
+    }
+
+    public String getReactProjectTitle() {
+        return reactProjectTitle;
+    }
+
+    public String getLocalhostSDK() {
+        return localhostSDK;
+    }
+
+    public Pair<String, String> getInfoUser(UserRoles userRole) {
+        String user;
+        String password;
+        switch (userRole) {
+            case ADMIN:
+                user = getUser();
+                password = getPassword();
+                break;
+            case EDITOR:
+                user = getEditorUser();
+                password = getPassword();
+                break;
+            case VIEWER:
+                user = getViewerUser();
+                password = getPassword();
+                break;
+            case DASHBOARD_ONLY:
+                user = getDashboardOnlyUser();
+                password = getPassword();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown user role " + userRole);
+        }
+        return Pair.of(user, password);
     }
 }
