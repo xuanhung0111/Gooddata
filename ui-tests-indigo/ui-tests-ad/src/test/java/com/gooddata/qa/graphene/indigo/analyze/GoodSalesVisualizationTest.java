@@ -191,7 +191,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
             assertTrue(report.getTrackersCount() >= 1, "Trackers should display");
             assertEquals(report.getLegends(), singletonList("true"));
 
-            assertEquals(report.getTooltipTextOnTrackerByIndex(0),
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
                     asList(asList(ATTR_IS_WON, "true"), asList("true", "<script> alert('test')")));
         } finally {
             dashboardRequest.changeMetricFormat(uri, oldFormat);

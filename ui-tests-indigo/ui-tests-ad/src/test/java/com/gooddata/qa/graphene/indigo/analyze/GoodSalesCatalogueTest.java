@@ -158,7 +158,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
             assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(xssAttribute));
             assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute),
                     xssAttribute + "filter should display");
-            assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
+            assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0, 0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
             initAttributePage()
