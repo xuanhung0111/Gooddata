@@ -244,4 +244,14 @@ public class ChartReport extends AbstractFragment {
                         ".highcharts-series-%s.highcharts-tracker path", groupIndex, groupIndex))));
         return list.get(index);
     }
+
+    public String checkColorColumn(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        String getColorColumn = webElement.getAttribute("fill");
+        return getColorColumn;
+    }
+
+    public boolean hasColorLegend() {
+       return waitForCollectionIsNotEmpty(tracker).size() > 1 ;
+    }
 }

@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -52,6 +54,21 @@ public final class ElementUtils {
 
     public static void scrollElementIntoView(WebElement element, WebDriver browser) {
         BrowserUtils.runScript(browser, "arguments[0].scrollIntoView(true);", element);
+    }
+
+    public static boolean scrollElementIntoView(By viewLocator, By keyLocator, WebDriver browser, int scrollRangeInPixels) {
+        long startTime = System.currentTimeMillis();
+        int scrollTop = 0;
+        while ((System.currentTimeMillis() - startTime) < 60000) {
+            sleepTight(500);
+            if (isElementVisible(keyLocator, browser)) {
+                return true;
+            }
+            scrollTop += scrollRangeInPixels;
+            BrowserUtils.runScript(browser, "arguments[0].scrollTop = arguments[1];",
+                    browser.findElement(viewLocator), scrollTop);
+        }
+        throw new TimeoutException("Tried for 60 second(s), element doesn't find by selector " + keyLocator);
     }
 
     /**

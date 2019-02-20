@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -14,6 +15,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
@@ -24,6 +26,7 @@ import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -95,6 +98,19 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "navigation-add-dashboard")
     private WebElement addDashboard;
 
+    @FindBy(css = ".highcharts-series")
+    private List<WebElement> trackers;
+
+    @FindBy(css = LEGEND_ITEM_ICON)
+    private List<WebElement> legendIcons;
+
+    @FindBy(className = ".dash-item-action-delete")
+    protected WebElement deleteInsightItemButton;
+
+    public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
+    public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
+    private static final String LEGEND_COLOR_ATTRIBUTE = "style";
+
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
@@ -113,6 +129,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
 
+    /* This snippet get value from background-color to a semicolon ";"
+     *  For example : "background-color: rgb(255, 0, 0);"  ->  " rgb(255, 0, 0)"
+     */
+    private static final String ATTRIBUTE_COLOR_REGEX = ".*background-color: ([^;]*);.*";
+
     public static final String MAIN_ID = "app-dashboards";
 
     public static final IndigoDashboardsPage getInstance(SearchContext context) {
@@ -123,6 +144,32 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementVisible(addDashboard).click();
         waitForElementVisible(cancelButton);
         getInsightSelectionPanel().waitForLoading();
+        return this;
+    }
+
+    public String checkColorColumn(int xAxis, int yAxis) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
+                .findElements(By.cssSelector(String.format(".gd-base-visualization .highcharts-series-%s rect", xAxis))));
+        String columnColor = list.get(yAxis).getAttribute("fill");
+        return columnColor;
+    }
+
+    /*Set value from "ATTRIBUTE_COLOR_REGEX" to "$1" and remove space value by replace method
+     * For Example : " rgb(255, 0, 0)" -> "rgb(255, 0, 0)"
+     */
+    public List<String> getKpiLegendColors() {
+        return waitForCollectionIsNotEmpty(legendIcons).stream()
+                .map(e -> e.getAttribute(LEGEND_COLOR_ATTRIBUTE))
+                .map(e -> e.replaceAll(ATTRIBUTE_COLOR_REGEX, "$1").replace(" ", ""))
+                .collect(toList());
+    }
+
+    public boolean hasColorLegend() {
+        return waitForCollectionIsNotEmpty(trackers).size() > 1;
+    }
+
+    public IndigoDashboardsPage deleteInsightItem() {
+        waitForElementVisible(deleteInsightItemButton).click();
         return this;
     }
 

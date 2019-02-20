@@ -95,13 +95,15 @@ public class EtlProcessRestRequest extends CommonRestRequest {
                     put("component", new JSONObject() {{
                         put("name", processType.getValue());
                         put("version", version);
-                        put("configLocation", new JSONObject() {{
-                            put("s3", new JSONObject() {{
-                                put("path", s3ConfigurationPath);
-                                put("accessKey", s3AccessKey);
-                                put("secretKey", s3SecretKey);
+                        if (processType != DeployProcessForm.ProcessType.SQL_EXECUTOR) {
+                            put("configLocation", new JSONObject() {{
+                                put("s3", new JSONObject() {{
+                                    put("path", s3ConfigurationPath);
+                                    put("accessKey", s3AccessKey);
+                                    put("secretKey", s3SecretKey);
+                                }});
                             }});
-                        }});
+                        }
                     }});
                 }});
             }}.toString();

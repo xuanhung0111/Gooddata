@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -28,6 +29,10 @@ public abstract class AbstractBucket extends AbstractFragment {
 
     public WebElement getInvitation() {
         return waitForElementPresent(BY_BUCKET_INVITATION, getRoot());
+    }
+
+    public boolean isInvitationVisible() {
+        return isElementVisible(BY_BUCKET_INVITATION, getRoot());
     }
 
     public boolean isEmpty() {

@@ -8,10 +8,8 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WATERFALL_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
@@ -84,17 +82,20 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         projectTitle = "GoodSales schedule dashboard test";
     }
 
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
+        externalUser = createDynamicUserFrom(testParams.getUser());
+    }
+
     @Override
     protected void customizeProject() throws Throwable {
         disableHideDashboardScheduleFlag();
         enableDashboardScheduleRecipientsFlag();
 
-        // need time for system apply feature flags setting
-        sleepTightInSeconds(3);
-
-
         getReportCreator().createActivitiesByTypeReport();
-
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
             dash.setName(DASHBOARD_HAVING_MANY_TABS);
             tabNames.forEach(name -> dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(name)).build()));
@@ -112,8 +113,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     // prepare viewer user and login
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
     public void createDashboardSchedule() throws JSONException {
+        logoutAndLoginAs(true, UserRoles.VIEWER);
         try {
-            loginAs(UserRoles.VIEWER);
             RestClient restClient = new RestClient(
                     new RestProfile(testParams.getHost(), testParams.getViewerUser(), testParams.getPassword(), true));
             String userUri = restClient.getAccountService().getCurrent().getUri();
@@ -138,7 +139,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                     "Update of Tabs is not reflected in subject.");
             dashboardScheduleDialog.selectTime(1);
             String expectedRegularExpression = String.format(SCHEDULE_INFO, testParams.getViewerUser())
-                                                    .replaceAll("\\+", "\\\\+");
+                    .replaceAll("\\+", "\\\\+");
             String infoText = dashboardScheduleDialog.getInfoText();
             assertTrue(infoText.matches(expectedRegularExpression),
                     "Custom time is in info message, expected regular expression: " +
@@ -148,11 +149,11 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog", this.getClass());
             dashboardScheduleDialog.schedule();
             // check dashboard schedule at manage page
-            loginAs(UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(CUSTOM_SUBJECT, userUri, CUSTOM_RECIPIENTS);
         } finally {
-            loginAs(UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
@@ -178,7 +179,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
     public void verifyRecipientsOfSchedule() throws JSONException, ParseException, IOException {
-        loginAs(UserRoles.ADMIN);
         initEmailSchedulesPage();
 
         // get schedules via api, dashboard-based are not visible on manage page
@@ -191,7 +191,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         JSONObject scheduledMailContent = schedule.getJSONObject("scheduledMail").getJSONObject("content");
 
         JSONArray toJson = scheduledMailContent.getJSONArray("to");
-        Set<String> to = new HashSet<String>();
+        Set<String> to = new HashSet<>();
         for (int i = 0; i < toJson.length(); i++) {
             to.add(toJson.getString(i));
         }
@@ -204,7 +204,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         JSONArray tabs = attachment.getJSONObject("dashboardAttachment").getJSONArray("tabs");
 
         JSONArray recipientsJson = scheduledMailContent.getJSONArray("bcc");
-        Set<String> recipients = new HashSet<String>();
+        Set<String> recipients = new HashSet<>();
         for (int i = 0; i < recipientsJson.length(); i++) {
             recipients.add(recipientsJson.getString(i));
         }
@@ -217,25 +217,22 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         // verify bcc
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-mdObject", this.getClass());
 
-        assertEquals(to, new HashSet<String>(asList(testParams.getViewerUser())), "Current user is in 'To' field");
+        assertEquals(to, new HashSet<>(asList(testParams.getViewerUser())), "Current user is in 'To' field");
         assertEquals(subject, CUSTOM_SUBJECT, "Custom subject is in 'Subject' input field.");
         assertEquals(body, CUSTOM_MESSAGE, "Custom message is in 'Message' input field.");
         assertEquals(tabs.length(), SCHEDULED_TABS.size(), "Expecting two tabs to be attached to the scheduled mail");
 
-        assertEquals(recipients, new HashSet<String>(CUSTOM_RECIPIENTS), "Recipients do not match.");
+        assertEquals(recipients, new HashSet<>(CUSTOM_RECIPIENTS), "Recipients do not match.");
         assertEquals(tz.getStandardOffset(System.currentTimeMillis()), tzFromObj.getStandardOffset(System.currentTimeMillis()), "Timezones do not match");
     }
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
     public void verifyScheduleButtonPresenceOnEmbeddedDashboard() throws JSONException {
-        // get embed link as admin (not accessible for viewer)
-        loginAs(UserRoles.ADMIN);
         initDashboardsPage();
         EmbedDashboardDialog ded = dashboardsPage.openEmbedDashboardDialog();
         String embeddedDashboardUri = ded.getPreviewURI();
-
+        logoutAndLoginAs(true, UserRoles.VIEWER);
         try {
-            loginAs(UserRoles.VIEWER);
             this.browser.get(embeddedDashboardUri);
 
             // wait for embedded dashboard to be fully loaded before checking
@@ -243,13 +240,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             assertTrue(dashboardsPage.isScheduleButtonVisible(), "Schedule button should be visible");
 
             checkScheduleButtonStatusThroughTabs();
-
-            // re-login as admin for successfull project wipe; get to non-embedded to logout first
-            initDashboardsPage();
-            loginAs(UserRoles.ADMIN);
-            Screenshots.takeScreenshot(browser, "Goodsales-schedules-embedded-dashboard", this.getClass());
         } finally {
-            loginAs(UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
@@ -257,13 +249,13 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     public void preparePublicAndPrivateSchedules() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
-        createDashboardSchedule(SCHEDULE_WITHOUT_RECIPIENTS, Collections.<String>emptyList());
+        createDashboardSchedule(SCHEDULE_WITHOUT_RECIPIENTS, Collections.emptyList());
         createDashboardSchedule(SCHEDULE_WITH_INTERNAL_RECIPIENTS,
                 asList(testParams.getEditorUser(), testParams.getViewerUser()));
         createDashboardSchedule(SCHEDULE_WITH_EXTERNAL_RECIPIENTS, asList(externalUser));
         createDashboardSchedule(SCHEDULE_WITH_INVALID_RECIPIENTS, asList("invalid"),
                 "Incorrect format. Enter a list of comma-separated email addresses");
-        List<String> recipients = new ArrayList<String>();
+        List<String> recipients = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
             recipients.add("bear+" + i + "@gooddata.com");
         }
@@ -277,11 +269,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
     public void createPrivateDashboardSchedules() throws JSONException {
-        initEmailSchedulesPage();
         String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
         refreshSchedulesPage();
         assertDashboardScheduleInfo(SCHEDULE_WITHOUT_RECIPIENTS,
-                userUri, Collections.<String>emptyList());
+                userUri, Collections.emptyList());
         assertDashboardScheduleInfo(SCHEDULE_WITH_INTERNAL_RECIPIENTS,
                 userUri, asList(testParams.getEditorUser(), testParams.getViewerUser()));
         assertDashboardScheduleInfo(SCHEDULE_WITH_EXTERNAL_RECIPIENTS,
@@ -289,12 +280,11 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
-    public void checkVariousCombinationsOfFeatureFlag() throws JSONException, IOException {
+    public void checkVariousCombinationsOfFeatureFlag() throws JSONException {
         try {
             disableHideDashboardScheduleFlag();
             disableDashboardScheduleRecipientsFlag();
 
-            initEmailSchedulesPage();
             assertFalse(refreshSchedulesPage().isBccColumnPresent(), "Bcc columns were not displayed as expected!");
             assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
                     "Private Schedules Created on Dashboard table was not displayed!");
@@ -332,9 +322,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         dashboardsPage.addNewDashboard(privateDashboard);
         dashboardsPage.addSampleTextToDashboard().publishDashboard(false);
         createDefaultDashboardSchedule();
-
+        logoutAndLoginAs(true, UserRoles.EDITOR);
         try {
-            loginAs(UserRoles.EDITOR);
             assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(publicDashboard),
                     "Schedule of public dashboard " + publicDashboard + " was not present!");
             assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulePresent(privateDashboard),
@@ -342,7 +331,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
                     "Private schedule table was not present!");
         } finally {
-            loginAs(UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
@@ -355,7 +344,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String scheduleUserB = "Schedule with deleted author";
         UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
                 new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
-
         try {
             String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
             userManagementRestRequest.addUserToProject(userA, UserRoles.EDITOR);
@@ -372,28 +360,19 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             logout();
             signInAtGreyPages(userB, testParams.getPassword());
             initDashboardsPage();
-            createDashboardSchedule(scheduleUserA, Collections.<String>emptyList());
+            createDashboardSchedule(scheduleUserA, Collections.emptyList());
 
-            logout();
-            signIn(true, UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
             userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userB);
 
             assertFalse(initEmailSchedulesPage().isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
-            loginAs(UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
-        createAndAddUserToProject(UserRoles.VIEWER);
-        externalUser = createDynamicUserFrom(testParams.getUser());
-    }
-
     private void checkOnlyPublicScheduleVisible() {
-        initEmailSchedulesPage();
         assertTrue(refreshSchedulesPage().isGlobalSchedulePresent(PUBLIC_SCHEDULE), "Public schedule was displayed!");
 
         assertFalse(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
@@ -440,7 +419,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, true);
     }
 
-    private void disableHideDashboardScheduleFlag() throws JSONException, IOException {
+    private void disableHideDashboardScheduleFlag() throws JSONException {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, false);
     }
@@ -450,7 +429,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
     }
 
-    private void disableDashboardScheduleRecipientsFlag() throws JSONException, IOException {
+    private void disableDashboardScheduleRecipientsFlag() throws JSONException {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, false);
     }
@@ -472,14 +451,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     private EmailSchedulePage refreshSchedulesPage() {
         browser.navigate().refresh();
-        waitForSchedulesPageLoaded(browser);
-        return EmailSchedulePage.getInstance(browser);
-    }
-
-    // login with defined user role, fail test on error
-    private void loginAs(UserRoles userRole) throws JSONException {
-        logout();
-        signIn(true, userRole); // login with gray pages to reload application and have feature flag set
+        return initEmailSchedulesPage();
     }
 
     private void checkScheduleButtonStatusThroughTabs() {

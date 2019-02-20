@@ -45,13 +45,24 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
     }
 
     protected void deployEtlProcessFromDiscWithDefaultConfig(String processName, ProcessType processType) {
-        initDiscProjectDetailPage().deployEtlProcess(processName,
+        deployEtlProcess(processName,
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
                 defaultS3AccessKey,
                 defaultS3SecretKey,
                 DEFAULT_S3_REGION,
                 DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
+    }
+
+    protected void deployEtlProcess(String processName, ProcessType processType, String configPath, String accessKey,
+                                    String secretKey, String region, boolean encryption) {
+        initDiscProjectDetailPage().deployEtlProcess(processName,
+                processType,
+                configPath,
+                accessKey,
+                secretKey,
+                region,
+                encryption);
     }
 
     protected void createEtlProcessWithDefaultConfig(String processName, DeployProcessForm.ProcessType processType) {

@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.Process
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import org.apache.commons.lang3.tuple.Pair;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -16,6 +17,7 @@ import static com.gooddata.qa.graphene.entity.disc.Parameters.createRandomParam;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -23,44 +25,26 @@ import static org.testng.Assert.assertTrue;
  */
 public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void editCSVDownloaderProcessScheduleWithCustomName() {
-        testEditScheduleWithCustomName(ProcessType.CSV_DOWNLOADER);
+    @DataProvider(name = "processTypeProvider")
+    public Object[][] getProcessTypeProvider() {
+        return new Object[][] {
+                {ProcessType.CSV_DOWNLOADER},
+                {ProcessType.SQL_DOWNLOADER},
+                {ProcessType.GOOGLE_ANALYTICS_DOWNLOADER},
+                {ProcessType.SALESFORCE_DOWNLOADER},
+                {ProcessType.ADS_INTEGRATOR},
+                {ProcessType.SQL_EXECUTOR}
+        };
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void editSQLDownloaderProcessScheduleWithCustomName() {
-        testEditScheduleWithCustomName(ProcessType.SQL_DOWNLOADER);
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "processTypeProvider")
+    public void editEtlProcessScheduleWithCustomName(ProcessType processType) {
+        testEditScheduleWithCustomName(processType);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void editADSIntegratorProcessScheduleWithCustomName() {
-        testEditScheduleWithCustomName(ProcessType.ADS_INTEGRATOR);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void editSQLExecutorProcessScheduleWithCustomName() {
-        testEditScheduleWithCustomName(ProcessType.SQL_DOWNLOADER);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void editCSVDownloaderProcessScheduleParameters() {
-        testEditScheduleParameters(ProcessType.CSV_DOWNLOADER);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void editSQLDownloaderProcessScheduleParameters() {
-        testEditScheduleParameters(ProcessType.SQL_DOWNLOADER);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void editADSIntegratorProcessScheduleParameters() {
-        testEditScheduleParameters(ProcessType.ADS_INTEGRATOR);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void editSQLExecutorProcessScheduleParameters() {
-        testEditScheduleParameters(ProcessType.SQL_DOWNLOADER);
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "processTypeProvider")
+    public void editEtlProcessScheduleParameters(ProcessType processType) {
+        testEditScheduleParameters(processType);
     }
 
     private void testEditScheduleWithCustomName(ProcessType processType) {
@@ -68,20 +52,19 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
         createEtlProcessWithDefaultConfig(processName, processType);
         DataloadProcess process = getProcessByName(processName);
 
-        assertTrue(process != null, "Failed to deploy process");
+        assertNotNull(process);
         String scheduleName = generateScheduleName();
         etlProcessRequest.createEtlProcessSchedule(process.getId(), scheduleName,
                 ScheduleCronTime.EVERY_30_MINUTES.getExpression());
         Schedule schedule = getEtlProcessScheduleByName(process, scheduleName);
-        assertTrue(schedule != null, "Failed to create schedule");
+        assertNotNull(schedule);
         try {
             String customName = generateScheduleName();
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             scheduleDetail.editNameByClickOnTitle(customName).saveChanges();
 
             assertEquals(scheduleDetail.getName(), customName);
-            assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(customName),
-                    "Schedule is not edited");
+            assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(customName));
         } finally {
             getProcessService().removeProcess(process);
         }
@@ -92,7 +75,7 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
         createEtlProcessWithDefaultConfig(processName, processType);
         DataloadProcess process = getProcessByName(processName);
 
-        assertTrue(process != null, "Failed to deploy process");
+        assertNotNull(process);
 
         try {
             // Create schedule
@@ -114,9 +97,9 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
             Map<String, String> actualParam = scheduleDetail.getAllParametersInfo();
             Map<String, String> actualSecureParam = scheduleDetail.getAllSecureParametersInfo();
 
-            assertTrue(actualParam.size() == 2, "Failed to add schedule parameters");
+            assertEquals(actualParam.size(), 2);
             assertThat(scheduleDetail.getAllParametersInfo().entrySet(), hasItem(param));
-            assertTrue(actualSecureParam.size() == 2);
+            assertEquals(actualSecureParam.size(), 2);
             assertTrue(scheduleDetail.getAllSecureParametersInfo().keySet().contains(secureParam.getKey()));
 
             // Edit schedule parameters
@@ -132,9 +115,9 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
             actualParam = scheduleDetail.getAllParametersInfo();
             actualSecureParam = scheduleDetail.getAllSecureParametersInfo();
 
-            assertTrue(actualParam.size() == 2, "Failed to edit schedule parameters");
+            assertEquals(actualParam.size(), 2);
             assertThat(scheduleDetail.getAllParametersInfo().entrySet(), hasItem(editedParam));
-            assertTrue(actualSecureParam.size() == 2);
+            assertEquals(actualSecureParam.size(), 2);
             assertTrue(scheduleDetail.getAllSecureParametersInfo().keySet().contains(editedSecureParam.getKey()));
         } finally {
             getProcessService().removeProcess(process);

@@ -183,4 +183,13 @@ public class Reports extends CommonRestRequest{
         ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
         return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
     }
+
+    public String createActivitiesAndOppFirstSnapshotByTypeReport() {
+        return createReport(GridReportDefinitionContent.create(REPORT_ACTIVITIES_AND_OPP_FIRST_SNAPSHOT_BY_TYPE,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY_TYPE))),
+                Arrays.asList(
+                        new MetricElement(metrics.createNumberOfActivitiesMetric()),
+                        new MetricElement(metrics.createOppFirstSnapshotMetric()))));
+    }
 }

@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -19,9 +20,13 @@ import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectio
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
+
+import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
+
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.lcm.LCMServiceProject;
 import com.gooddata.qa.utils.lcm.LcmRestUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,11 +36,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -56,6 +67,9 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String CLIENT_PROJECT_TITLE = "Client project " + generateHashString();
     private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1_" + generateHashString();
     private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
+    private static final String MULTI_METRIC_APPLY_COLOR_PALETTE = "Multi_Metric_Apply_Color_Palette";
+    private static List<Pair<String, ColorPalette>> listColorPalettes = Arrays.asList(Pair.of("guid1", ColorPalette.RED),
+            Pair.of("guid2", ColorPalette.GREEN), Pair.of("guid3", ColorPalette.BLUE), Pair.of("guid4", ColorPalette.YELLOW));
 
     private String devProjectId;
     private String clientProjectId;
@@ -80,7 +94,12 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     @Override
     protected void customizeProject() throws Throwable {
         String numberKpiUri = createNumOfActivitiesKpi();
-        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(getAdminRestClient(), testParams.getProjectId());
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createOppFirstSnapshotMetric();
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        indigoRestRequest.setColor(initColorPalette(listColorPalettes));
+
         String insightUri = indigoRestRequest.createInsight(
                 new InsightMDConfiguration(FIRST_TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
@@ -166,6 +185,26 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                 .getPageHeader().hasLockedIcon());
         analysisPage.getPageHeader().setInsightTitle("new insight");
         assertEquals(analysisPage.getPageHeader().getInsightTitle(), "new insight");
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightWithColorPalette() {
+        AnalysisPage analysisPage = initAnalysePage();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .saveInsight(MULTI_METRIC_APPLY_COLOR_PALETTE);
+        analysisPage.getPageHeader()
+                .expandInsightSelection()
+                .switchFilter(FilterType.ALL)
+                .getInsightItem(MULTI_METRIC_APPLY_COLOR_PALETTE);
+        takeScreenshot(browser, "checkReportInsightApplyColorPalette", getClass());
+        ChartReport chartReport = analysisPage.openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
+                .waitForReportComputing()
+                .getChartReport();
+        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
+        assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
+        assertEquals(chartReport.getLegendColors(), asList(ColorPalette.RED.toString(), ColorPalette.GREEN.toString()));
     }
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
