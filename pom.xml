@@ -48,6 +48,7 @@
         <browserDownloadFolder>${targetFolder}${file.separator}downloads</browserDownloadFolder>
         <language>en-US</language>
         <user.domain>default</user.domain>
+        <host>defaultHost</host>
         <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
@@ -69,6 +70,8 @@
         <ignoreFailedTests>true</ignoreFailedTests>
 
         <skipTests>false</skipTests>
+
+        <skipPrepareReactProject>true</skipPrepareReactProject>
 
         <version.org.jboss.arquillian>1.1.15.Final</version.org.jboss.arquillian>
         <version.org.jboss.arquillian.drone>2.5.1</version.org.jboss.arquillian.drone>
@@ -398,6 +401,29 @@
                                     </configuration>
                                 </execution>
                             </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>exec-maven-plugin</artifactId>
+                            <version>1.6.0</version>
+                            <executions>
+                                <execution>
+                                    <id>prepare-react-project</id>
+                                    <phase>pre-integration-test</phase>
+                                    <goals>
+                                        <goal>exec</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <skip>${skipPrepareReactProject}</skip>
+                                <executable>${test.module}/src/test/resources/scripts/setup-react-project.sh
+                                </executable>
+                                <arguments>
+                                    <argument>ui-tests-gd-react-sdk</argument>
+                                    <argument>${host}</argument>
+                                </arguments>
+                            </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>

@@ -2,7 +2,7 @@
 ########################################
 # Create and setup a React application #
 ########################################
-RESOURCE_DIR=$HOME/ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources
+RESOURCE_DIR=$(dirname "$(realpath $0)")
 REACT_PROJECT_NAME=$1
 TESTING_HOST=$2
 
@@ -30,7 +30,7 @@ yarn add node-sass
 
 if [ -n "$TESTING_HOST" ]; then
     # Setup proxy to prevent cross-origin issues
-    sed s/replaceWithTestingHost/$TESTING_HOST/g $RESOURCE_DIR/scripts/setupProxy.js > ./src/setupProxy.js
+    sed s/replaceWithTestingHost/$TESTING_HOST/g $RESOURCE_DIR/setupProxy.js > ./src/setupProxy.js
 fi
 
 # Start react-sdk-app project up
