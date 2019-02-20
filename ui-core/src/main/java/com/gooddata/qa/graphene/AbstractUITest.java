@@ -24,9 +24,11 @@ import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.utils.PdfUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -78,7 +80,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     private static final String EMBEDDED_INDIGO_DASHBOARD_PAGE_URI = "dashboards/embedded/#/p/%s";
     private static final String EMBEDDED_IFRAME_WRAPPER_URL = "https://s3.amazonaws.com/gdc-testing-public/embedding-wrapper.html";
-
     /**
      * ----- UI fragmnets -----
      */
@@ -97,28 +98,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * @throws org.json.JSONException
      */
     protected void signIn(boolean greyPages, UserRoles userRole) throws JSONException {
-        String user;
-        String password;
-        switch (userRole) {
-            case ADMIN:
-                user = testParams.getUser();
-                password = testParams.getPassword();
-                break;
-            case EDITOR:
-                user = testParams.getEditorUser();
-                password = testParams.getPassword();
-                break;
-            case VIEWER:
-                user = testParams.getViewerUser();
-                password = testParams.getPassword();
-                break;
-            case DASHBOARD_ONLY:
-                user = testParams.getDashboardOnlyUser();
-                password = testParams.getPassword();
-                break;
-            default:
-                throw new IllegalArgumentException("Unknow user role " + userRole);
-        }
+        Pair<String, String> infoUser = testParams.getInfoUser(userRole);
+        String user = infoUser.getKey();
+        String password = infoUser.getValue();
         if (greyPages) {
             signInAtGreyPages(user, password);
         } else {
@@ -136,6 +118,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("Successful login with user: " + username);
     }
 
+    protected void signInFromReact(UserRoles userRole) throws JSONException {
+        Pair<String, String> infoUser = testParams.getInfoUser(userRole);
+        signInFromReact(infoUser.getKey(), infoUser.getValue());
+    }
+
+    public void signInFromReact(String username, String password) {
+        openNodeJsUrl(ACCOUNT_PAGE);
+        LoginFragment.getInstance(browser).login(username, password, true);
+        System.out.println(format("Successful login with user: %s to react project", username));
+    }
+
     public LoginFragment logout() {
         openUrl(PAGE_PROJECTS);
 
@@ -146,8 +139,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
         //see CL-11186 for more details
         waitForProjectsPageLoaded(browser);
         Graphene.waitGui()
-            .until(ExpectedConditions.elementToBeClickable(BY_LOGGED_USER_BUTTON))
-            .click();
+                .until(ExpectedConditions.elementToBeClickable(BY_LOGGED_USER_BUTTON))
+                .click();
 
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
@@ -160,7 +153,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
-            boolean openPage) {
+                                               boolean openPage) {
         // sleep to avoid RED BAR - An error occurred while performing this operation.
         sleepTightInSeconds(5);
         if (openPage) {
@@ -193,26 +186,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 log.info("Current dashboard: " + dashboardName);
                 singleDashboardWalkthrough(validation, expectedTabs, dashboardName);
             }
-        }
-    }
-
-    private void singleDashboardWalkthrough(boolean validation, String[] expectedTabs, String dashboardName) {
-        DashboardTabs tabs = dashboardsPage.getTabs();
-        int numberOfTabs = tabs.getNumberOfTabs();
-        System.out.println("Number of tabs on dashboard " + dashboardName + ": " + numberOfTabs);
-        if (validation) assertTrue(numberOfTabs == expectedTabs.length,
-                "Expected number of dashboard tabs for project is not present");
-        List<String> tabLabels = tabs.getAllTabNames();
-        System.out.println("These tabs are available for selected project: " + tabLabels.toString());
-        for (int i = 0; i < tabLabels.size(); i++) {
-            if (validation) assertEquals(tabLabels.get(i), expectedTabs[i],
-                    "Expected tab name doesn't match, index:" + i + ", " + tabLabels.get(i));
-            tabs.openTab(i);
-            System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-            waitForDashboardPageLoaded(browser);
-            takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
-            assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
-            checkRedBar(browser);
         }
     }
 
@@ -281,11 +254,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public ReportPage initReportCreation() {
         return initReportsPage()
-            .openFolder("My Reports")
-            .startCreateReport();
+                .openFolder("My Reports")
+                .startCreateReport();
     }
 
-    public void verifyDashboardExport(String dashboardName, String tabName, long minimalSize) {
+    public void verifyDashboardExport(String dashboardName, String tabName) {
         // client-demo does not support dashboard export
         if (testParams.isClientDemoEnvironment()) {
             log.info("client-demo does not support dashboard export");
@@ -294,17 +267,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
-        Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.length() > minimalSize;
+        Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.exists() && pdfExport.length() != 0;
         Graphene.waitGui()
-            .pollingEvery(5, TimeUnit.SECONDS)
-            .withTimeout(5, TimeUnit.MINUTES)
-            .until(exportCompleted);
-        long fileSize = pdfExport.length();
-        System.out.println("File size: " + fileSize);
+                .pollingEvery(5, TimeUnit.SECONDS)
+                .withTimeout(5, TimeUnit.MINUTES)
+                .until(exportCompleted);
+        System.out.println("File size: " + pdfExport.length());
 
         assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName), "Content of exported PDF is wrong");
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
-                + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
     public String getContentFrom(File pdfFile) {
@@ -319,24 +289,21 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return getContentFrom(pdfExport);
     }
 
-    public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
+    public void verifyReportExport(ExportFormat format, String reportName) {
         String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "."
                 + format.getName();
         File export = new File(fileURL);
         System.out.println("pdfExport = " + export);
 
         try {
-            Function<WebDriver, Boolean> exportCompleted = browser -> export.length() > minimalSize;
+            Function<WebDriver, Boolean> exportCompleted = browser -> export.exists() && export.length() != 0;
             Graphene.waitGui()
-                .pollingEvery(5, TimeUnit.SECONDS)
-                .withTimeout(5, TimeUnit.MINUTES)
-                .until(exportCompleted);
+                    .pollingEvery(5, TimeUnit.SECONDS)
+                    .withTimeout(5, TimeUnit.MINUTES)
+                    .until(exportCompleted);
         } catch (TimeoutException e) { // do nothing
         } finally {
-            long fileSize = export.length();
-            System.out.println("File size: " + fileSize);
-            assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "
-                    + fileSize + ", but minimum " + minimalSize + " was expected");
+            System.out.println("File size: " + export.length());
         }
 
         if (format == ExportFormat.IMAGE_PNG) {
@@ -383,20 +350,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void updateCsvDataset(String datasetName, String filePath) {
         initDataUploadPage()
-            .getMyDatasetsTable()
-            .getDataset(datasetName)
-            .clickUpdateButton()
-            .pickCsvFile(filePath)
-            .clickUploadButton();
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickUpdateButton()
+                .pickCsvFile(filePath)
+                .clickUploadButton();
         DataPreviewPage.getInstance(browser).triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
         DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar();
-    }
-
-    private DashboardsPage waitForDashboardPage() {
-        waitForDashboardPageLoaded(browser);
-        return waitForFragmentVisible(dashboardsPage);
     }
 
     public DatasetsListPage initDataUploadPage() {
@@ -550,6 +512,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return UserProfilePage.getInstance(browser);
     }
 
+    public SDKAnalysisPage initSDKAnalysisPage() {
+        openNodeJsUrl(testParams.getLocalhostSDK());
+        //Just using a default link localhost:3000 to access page
+        //so that page will not refresh.
+        browser.navigate().refresh();
+        return SDKAnalysisPage.getInstance(browser);
+    }
+
     public <T> T doActionWithImapClient(ImapClientAction<T> action) {
         return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
     }
@@ -601,6 +571,31 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
 
         waitForElementNotPresent(loadingLabel);
+    }
+
+    private void singleDashboardWalkthrough(boolean validation, String[] expectedTabs, String dashboardName) {
+        DashboardTabs tabs = dashboardsPage.getTabs();
+        int numberOfTabs = tabs.getNumberOfTabs();
+        System.out.println("Number of tabs on dashboard " + dashboardName + ": " + numberOfTabs);
+        if (validation) assertTrue(numberOfTabs == expectedTabs.length,
+                "Expected number of dashboard tabs for project is not present");
+        List<String> tabLabels = tabs.getAllTabNames();
+        System.out.println("These tabs are available for selected project: " + tabLabels.toString());
+        for (int i = 0; i < tabLabels.size(); i++) {
+            if (validation) assertEquals(tabLabels.get(i), expectedTabs[i],
+                    "Expected tab name doesn't match, index:" + i + ", " + tabLabels.get(i));
+            tabs.openTab(i);
+            System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
+            waitForDashboardPageLoaded(browser);
+            takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
+            assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
+            checkRedBar(browser);
+        }
+    }
+
+    private DashboardsPage waitForDashboardPage() {
+        waitForDashboardPageLoaded(browser);
+        return waitForFragmentVisible(dashboardsPage);
     }
 
     private void tryToInitEmbeddedIndigoDashboardPage(String params) {

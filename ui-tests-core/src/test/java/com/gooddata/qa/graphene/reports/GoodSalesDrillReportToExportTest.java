@@ -69,7 +69,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             sleepTight(4000);
-            verifyReportExport(ExportFormat.CSV, "Interest", 6000);
+            verifyReportExport(ExportFormat.CSV, "Interest");
             checkRedBar(browser);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -97,14 +97,14 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOn("Discovery", CellType.ATTRIBUTE_VALUE);
             sleepTight(6000);
-            verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery", 5510);
+            verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery");
             checkRedBar(browser);
             
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOn("Short List", CellType.ATTRIBUTE_VALUE);
             sleepTight(4000);
-            verifyReportExport(ExportFormat.CSV, "Short List", 120);
+            verifyReportExport(ExportFormat.CSV, "Short List");
             checkRedBar(browser);
             
             dashboardsPage.editDashboard();
@@ -115,7 +115,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOn("Risk Assessment", CellType.ATTRIBUTE_VALUE);
             sleepTight(4000);
-            verifyReportExport(ExportFormat.CSV, "Risk Assessment", 1295);
+            verifyReportExport(ExportFormat.CSV, "Risk Assessment");
             checkRedBar(browser);
             
             setDrillReportTargetAsPopup();

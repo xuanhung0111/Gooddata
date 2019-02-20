@@ -81,12 +81,20 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public void openUrl(String url) {
+        openUrl(getRootUrl(), url);
+    }
+
+    public void openNodeJsUrl(String url) {
+        openUrl(getNodeJsUrl(), url);
+    }
+
+    private void openUrl(String rootUrl, String url) {
         String pageURL;
 
-        if (url.contains(getRootUrl())) {
+        if (url.contains(rootUrl)) {
             pageURL = url.replaceAll("^/", "");
         } else {
-            pageURL = getRootUrl() + url.replaceAll("^/", "");
+            pageURL = rootUrl + url.replaceAll("^/", "");
         }
 
         System.out.println("Loading page ... " + pageURL);
@@ -109,6 +117,10 @@ public abstract class AbstractTest extends Arquillian {
 
     public String getRootUrl() {
         return "https://" + testParams.getHost() + "/";
+    }
+
+    public String getNodeJsUrl() {
+        return testParams.getLocalhostSDK();
     }
 
     public String generateEmail(String email) {

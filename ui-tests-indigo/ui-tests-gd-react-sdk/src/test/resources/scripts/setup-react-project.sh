@@ -34,7 +34,11 @@ if [ -n "$TESTING_HOST" ]; then
 fi
 
 # Start react-sdk-app project up
+echo "Starting react project"
+export BROWSER = 'none'
 nohup yarn start >> $REACT_PROJECT_NAME.log 2>&1 &
+echo "Done"
+
 
 ################################################################################################
 # NOTE: Stand at $REACT_PROJECT_NAME .Use command "yarn start/stop" to start/stop React project#

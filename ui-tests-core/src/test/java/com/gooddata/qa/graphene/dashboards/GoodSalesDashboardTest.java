@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -34,7 +33,6 @@ import com.gooddata.qa.utils.java.Builder;
 
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
-    private static final long expectedDashboardExportSize = 30000L;
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
     private String exportedDashboardName;
@@ -80,7 +78,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         if (testParams.isClientDemoEnvironment()) {
             throw new SkipException("There isn't exported feature in client demo enviroment");
         }
-        verifyDashboardExport(exportedDashboardName, SOURCE_TAB, expectedDashboardExportSize);
+        verifyDashboardExport(exportedDashboardName, SOURCE_TAB);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})

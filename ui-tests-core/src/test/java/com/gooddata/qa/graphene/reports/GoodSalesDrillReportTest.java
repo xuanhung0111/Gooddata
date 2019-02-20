@@ -200,7 +200,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             reportInfoPanel.downloadReportAsFormat(ExportFormat.PDF_PORTRAIT);
             sleepTight(4000);
-            verifyReportExport(ExportFormat.PDF_PORTRAIT, "2010", 30000L);
+            verifyReportExport(ExportFormat.PDF_PORTRAIT, "2010");
             checkRedBar(browser);
             drillDialog.closeDialog();
         } finally {

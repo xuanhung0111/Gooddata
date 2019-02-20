@@ -2,9 +2,11 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
+import static org.openqa.selenium.By.className;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import org.openqa.selenium.By;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -20,6 +22,11 @@ public class Headline extends AbstractFragment {
 
     @FindBy(className = "s-headline-secondary-item")
     private WebElement secondaryItem;
+
+    public static Headline getInstance(SearchContext context) {
+        return Graphene.createPageFragment(Headline.class,
+                waitForElementVisible(className("headline"), context));
+    }
 
     public String getPrimaryItem() {
         return waitForElementVisible(primaryItem).getText();
