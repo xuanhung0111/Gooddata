@@ -100,7 +100,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteScheduleEmail() throws IOException, JSONException {
         try {
             String dashboardSchedule = "dashboard";
@@ -127,7 +127,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteComment() throws IOException, JSONException {
         DashboardRestRequest dashboardRequest = new DashboardRestRequest(
                 getAdminRestClient(), testParams.getProjectId());
@@ -202,20 +202,20 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteFact() throws JSONException, IOException {
         initFactPage();
         ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(FACT_VELOCITY);
         String metricName = FactDetailPage.getInstance(browser).createSimpleMetric(SimpleMetricTypes.SUM, FACT_VELOCITY);
         String metricUri = getMetricByTitle(metricName).getUri();
-        String identifierVelocityFact = getFactByTitle(FACT_VELOCITY).getIdentifier(); 
+        String identifierVelocityFact = getFactByTitle(FACT_VELOCITY).getIdentifier();
 
         dropObject(identifierVelocityFact, DropStrategy.CASCADE);
         assertFalse(isObjectDeleted(getDatasetByTitle("stagehistory").getUri()), "stagehistory shouldn't be deleted");
         assertTrue(isObjectDeleted(metricUri), metricName + " should be deleted");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deletePrompt() throws JSONException, IOException {
         final String ReportUsingQuotaVariable = "Quote Report";
         //Create metric and report using Quote variable
@@ -244,7 +244,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteMetric() throws JSONException, IOException {
         //create report using won opp. metric
         getReportCreator().createSalesSeasonalityReport();
@@ -266,7 +266,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteReport() throws JSONException, IOException {
         String reportSchedule = null;
         try {
@@ -285,7 +285,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnMethods = {"deleteAttribute"}, groups = {"group1"})
     public void deleteDashboard() throws IOException, JSONException {
         addReportToNewDashboard(REPORT_NEW_LOST_DRILL_IN, DASHBOARD_NAME);
 

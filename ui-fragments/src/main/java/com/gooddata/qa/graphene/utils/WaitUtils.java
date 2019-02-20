@@ -244,7 +244,7 @@ public final class WaitUtils {
         Graphene.waitGui().until(missingString);
     }
 
-    public static void waitForExportReport(final File destination) {
+    public static void waitForExporting(final File destination) {
         System.out.println("waiting for export " + destination.getName());
 
         Function<WebDriver, Boolean> isExportCompleted = browser -> destination.exists() && destination.length() != 0;

@@ -221,7 +221,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                             .getGroupNames().contains("Totals"),
                     "Totals group is displayed");
 
-            TableReport tableReport = initReportsPage().openReport(REPORT_WITHOUT_METRIC)
+            TableReport tableReport = initReportsPage().openReport(REPORT_WITHOUT_METRIC).showConfiguration()
                     .getTableReport().waitForLoaded().selectContentArea(Pair.of(3,3),
                             stageNamePosition == Position.TOP ? Pair.of(3, 4) : Pair.of(4, 3));
             Screenshots.takeScreenshot(browser, format("Report has two attributes on %s and %s with feature set %s",

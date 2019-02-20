@@ -1,0 +1,44 @@
+FROM harbor.intgdc.com/staging/graphene-firefox:60.0.1-0.20.1
+
+ARG GIT_COMMIT=unspecified
+LABEL image_name="Graphene Firefox Image for UISDK"
+LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
+LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
+LABEL parent_image="harbor.intgdc.com/staging/graphene-firefox:60.0.1-0.20.1"
+LABEL git_commit=$GIT_COMMIT
+
+ARG NODEJS_VERSION=8.10.0
+ARG REACT_PRORJECT_SETUP_TOOL=~/ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources/scripts
+
+##################
+# Install NodeJs #
+##################
+RUN yum install -y npm && npm install -g n && n $NODEJS_VERSION && node -v
+
+########################
+# Install YARN via npm #
+########################
+RUN npm install yarn -g && yarn -v
+
+############################
+# Install create-react-app #
+############################
+RUN yarn global add create-react-app && yarn global add gdc-catalog-export
+
+# Workaround bug https://jira.intgdc.com/browse/ONE-3382
+COPY ./ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources/scripts/clear.js /usr/local/share/.config/yarn/global/node_modules/gdc-catalog-export/lib/utils/clear.js
+
+###################################
+# Ignore self-sign certificate #
+###################################
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+
+#########
+# Tools #
+#########
+
+# Path to react tools
+ENV PATH=$REACT_PRORJECT_SETUP_TOOL:$PATH
+
+# Install jq to manipulate with json in CLI
+RUN yum install -y jq && jq --version

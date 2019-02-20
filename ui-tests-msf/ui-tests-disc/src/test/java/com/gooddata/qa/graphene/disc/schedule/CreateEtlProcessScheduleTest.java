@@ -6,10 +6,12 @@ import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.time.DayOfWeek;
 
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -17,88 +19,25 @@ import static org.testng.Assert.assertTrue;
  */
 public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createCSVDownloaderSchedule() {
-        String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(processName, ProcessType.CSV_DOWNLOADER);
-        DataloadProcess process = getProcessByName(processName);
-
-        assertTrue(process != null, "Failed to deploy CSV Downloader process");
-
-        String scheduleName = generateScheduleName();
-        try {
-            CreateScheduleForm scheduleForm = initDiscProjectDetailPage()
-                    .openCreateScheduleForm()
-                    .selectProcess(processName)
-                    .enterScheduleName(scheduleName);
-            scheduleForm.selectRunTimeByEveryHour(1);
-            scheduleForm.schedule();
-
-            ScheduleDetail.getInstance(browser).close();
-            assertTrue(projectDetailPage.getProcess(processName).hasSchedule(scheduleName),
-                    "CSV Downloader process schedule is not created");
-        } finally {
-            getProcessService().removeProcess(process);
-        }
+    @DataProvider(name = "processTypeProvider")
+    public Object[][] getProcessTypeProvider() {
+        return new Object[][] {
+                {ProcessType.CSV_DOWNLOADER},
+                {ProcessType.SQL_DOWNLOADER},
+                {ProcessType.GOOGLE_ANALYTICS_DOWNLOADER},
+                {ProcessType.SALESFORCE_DOWNLOADER},
+                {ProcessType.ADS_INTEGRATOR},
+                {ProcessType.SQL_EXECUTOR}
+        };
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createSQLDownloaderSchedule() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "processTypeProvider")
+    public void createEtlProcessSchedule(ProcessType processType) {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(processName, ProcessType.SQL_DOWNLOADER);
+        createEtlProcessWithDefaultConfig(processName, processType);
         DataloadProcess process = getProcessByName(processName);
 
-        assertTrue(process != null, "Failed to deploy SQL Downloader process");
-
-        String scheduleName = generateScheduleName();
-        try {
-            CreateScheduleForm scheduleForm = initDiscProjectDetailPage()
-                    .openCreateScheduleForm()
-                    .selectProcess(processName)
-                    .enterScheduleName(scheduleName);
-            scheduleForm.selectRunTimeByEveryDay(1,1);
-            scheduleForm.schedule();
-
-            ScheduleDetail.getInstance(browser).close();
-            assertTrue(projectDetailPage.getProcess(processName).hasSchedule(scheduleName),
-                    "SQL Downloader process schedule is not created");
-        } finally {
-            getProcessService().removeProcess(process);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void createADSIntegratorSchedule() {
-        String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(processName, ProcessType.ADS_INTEGRATOR);
-        DataloadProcess process = getProcessByName(processName);
-
-        assertTrue(process != null, "Failed to deploy ADS Integrator process");
-
-        String scheduleName = generateScheduleName();
-        try {
-            CreateScheduleForm scheduleForm = initDiscProjectDetailPage()
-                    .openCreateScheduleForm()
-                    .selectProcess(processName)
-                    .enterScheduleName(scheduleName);
-            scheduleForm.selectRunTimeByEveryWeek(DayOfWeek.MONDAY, 1, 1);
-            scheduleForm.schedule();
-
-            ScheduleDetail.getInstance(browser).close();
-            assertTrue(projectDetailPage.getProcess(processName).hasSchedule(scheduleName),
-                    "ADS Integrator process schedule is not created");
-        } finally {
-            getProcessService().removeProcess(process);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void createSQLExecutorSchedule() {
-        String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(processName, ProcessType.SQL_DOWNLOADER);
-        DataloadProcess process = getProcessByName(processName);
-
-        assertTrue(process != null, "Failed to deploy SQL Executor process");
+        assertNotNull(process);
 
         String scheduleName = generateScheduleName();
         try {
@@ -107,13 +46,30 @@ public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
                     .selectProcess(processName)
                     .enterScheduleName(scheduleName);
             scheduleForm.selectRunTimeByCronExpression(ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            configScheduleType(scheduleForm, processType);
             scheduleForm.schedule();
 
             ScheduleDetail.getInstance(browser).close();
-            assertTrue(projectDetailPage.getProcess(processName).hasSchedule(scheduleName),
-                    "SQL Executor process schedule is not created");
+            assertTrue(projectDetailPage.getProcess(processName).hasSchedule(scheduleName));
         } finally {
             getProcessService().removeProcess(process);
+        }
+    }
+
+    /**
+     * Expected testing Etl process schedules with many schedule types
+     */
+    private void configScheduleType(CreateScheduleForm scheduleForm, ProcessType processType) {
+        if (ProcessType.CSV_DOWNLOADER.equals(processType)) {
+            scheduleForm.selectRunTimeByEveryHour(1);
+        } else if (ProcessType.SQL_DOWNLOADER.equals(processType)) {
+            scheduleForm.selectRunTimeByEveryDay(1,1);
+        } else if (ProcessType.GOOGLE_ANALYTICS_DOWNLOADER.equals(processType)) {
+            scheduleForm.selectRunTimeByEveryWeek(DayOfWeek.MONDAY, 1, 1);
+        } else if (ProcessType.SALESFORCE_DOWNLOADER.equals(processType)) {
+            scheduleForm.selectRunTimeByCronExpression(ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+        } else {
+            scheduleForm.selectRunTime(ScheduleCronTime.EVERY_15_MINUTES);
         }
     }
 }

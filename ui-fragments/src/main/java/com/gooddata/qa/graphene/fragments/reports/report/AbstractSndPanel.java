@@ -92,7 +92,7 @@ public abstract class AbstractSndPanel extends AbstractFragment {
         WebElement groupElement = getViewGroupsContainerRoot()
                 .findElement(By.className("s-grid-" + simplifyText(group)));
 
-        groupElement.click();
+        waitForElementVisible(groupElement).click();
         waitForElementAttributeContainValue(groupElement, "class", "highlight");
         return this;
     }

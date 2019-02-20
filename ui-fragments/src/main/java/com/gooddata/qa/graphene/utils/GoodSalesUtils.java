@@ -151,6 +151,7 @@ public final class GoodSalesUtils {
     public static final String REPORT_TOP_5_LOST_BY_CASH = "Top 5 Lost (by $)";
     public static final String REPORT_NEW_LOST_DRILL_IN = "New Lost [Drill-In]";
     public static final String REPORT_NEW_WON_DRILL_IN = "New Won [Drill-In]";
+    public static final String REPORT_ACTIVITIES_AND_OPP_FIRST_SNAPSHOT_BY_TYPE = "Activities_And_Opp_First_Snapshot_By_Type";
 
     // variables
     public static final String VARIABLE_STATUS = "Status";

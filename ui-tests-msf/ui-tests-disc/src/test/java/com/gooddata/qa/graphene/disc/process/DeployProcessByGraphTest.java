@@ -46,7 +46,7 @@ public class DeployProcessByGraphTest extends AbstractProcessTest {
                 .clickDeployButton()
                 .selectProcessType(DeployProcessForm.ProcessType.CLOUD_CONNECT);
 
-        deployForm.submit();
+        deployForm.submitClick();
         takeScreenshot(browser, "Package-input-shows-error", getClass());
         assertTrue(deployForm.isPackageInputError(), "Package input not show error");
         assertEquals(getBubbleMessage(browser), ZIP_FILE_INPUT_ERROR_MESSAGE);

@@ -5,10 +5,13 @@ import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
+import java.util.concurrent.TimeUnit;
 
 public class EmbeddedWidget extends AbstractFragment {
 
@@ -42,6 +45,22 @@ public class EmbeddedWidget extends AbstractFragment {
         } finally {
             browser.switchTo().defaultContent();
         }
+    }
+
+    public EmbeddedWidget waitForImageLoading() {
+        try {
+            browser.switchTo().frame(iframe);
+            Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(browser -> {
+                WebElement image = waitForElementVisible(browser.findElement(By.className("yui3-c-iframewidget")));
+                String lastSrc = image.getAttribute("src");
+                return !lastSrc.equals(image.getAttribute("src"));
+            });
+        } catch (TimeoutException e){
+            //Do nothing
+        } finally {
+            browser.switchTo().defaultContent();
+        }
+        return this;
     }
 
     public EmbeddedReportContainer getEmbeddedReportContainer() {

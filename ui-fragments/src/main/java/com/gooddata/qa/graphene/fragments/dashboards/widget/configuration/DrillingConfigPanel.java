@@ -18,6 +18,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class DrillingConfigPanel extends AbstractFragment {
 
@@ -160,20 +161,24 @@ public class DrillingConfigPanel extends AbstractFragment {
     }
 
     private ItemPanel getItemPanelBySelectedValues(List<String> leftValues, String rightValue) {
-        if (isNull(leftValues) && isNull(rightValue))
-            throw new IllegalArgumentException("left & right values can't be null");
+        if (isNull(leftValues))
+            throw new IllegalArgumentException("left value can't be null");
 
         return drillItemPanelList.stream()
                 .map(element -> Graphene.createPageFragment(ItemPanel.class, element))
                 .filter(panel -> {
-                    boolean result = true;
-                    if (!isNull(leftValues))
-                        result = leftValues.stream().collect(Collectors.joining(", ")).equals(panel.getLeftItemValue());
+                    Graphene.waitGui().until(browser ->
+                            isNotEmpty(panel.getLeftItemValue()) && !panel.getLeftItemValue().equals("Loading..."));
+                    boolean result = leftValues.stream().collect(Collectors.joining(", ")).equals(panel.getLeftItemValue());
+                    if (!result) {
+                        return false;
+                    }
 
-
-                    if (!isNull(rightValue) && !result)
+                    if (!isNull(rightValue)) {
+                        Graphene.waitGui().until(browser ->
+                                isNotEmpty(panel.getRightItemValue()) && !panel.getRightItemValue().equals("Loading..."));
                         result = rightValue.equals(panel.getRightItemValue());
-
+                    }
                     return result;
                 })
                 .findFirst()
