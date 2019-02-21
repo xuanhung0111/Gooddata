@@ -3,7 +3,7 @@ package com.gooddata.qa.graphene.utils;
 public class ReactSKDUtils {
 
     //Headline Insight
-    public static final String TEMPLATE_EMPTY_INSIGHT = "EmptyInsight.js";
+    public static final String TEMPLATE_NO_DATA_INSIGHT = "NoDataInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHT = "HeadlineInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHTS = "HeadlineInsights.js";
     public static final String TEMPLATE_HEADLINE_INSIGHT_URL = "HeadlineInsightUrl.js";
