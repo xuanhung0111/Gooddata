@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -64,6 +65,10 @@ public class ChartReport extends AbstractFragment {
     private static final By BY_X_AXIS_TITLE = className("highcharts-xaxis-title");
     private static final By BY_Y_AXIS_TITLE = className("highcharts-yaxis-title");
     private static final By BY_LEGEND = className("viz-static-legend-wrap");
+    private static final By BY_PRIMARY_Y_AXIS_TITLE = By.className("s-highcharts-primary-yaxis");
+    private static final By BY_SECONDARY_Y_AXIS_TITLE = By.className("s-highcharts-secondary-yaxis");
+    private static final By BY_PRIMARY_Y_AXIS = By.className("s-highcharts-primary-yaxis-labels");
+    private static final By BY_SECONDARY_Y_AXIS = By.className("s-highcharts-secondary-yaxis-labels");
 
     public static ChartReport getInstance(SearchContext context) {
         return Graphene.createPageFragment(ChartReport.class,
@@ -111,6 +116,30 @@ public class ChartReport extends AbstractFragment {
             return "";
         }
         return yAxisTitle.get(0).getText();
+    }
+
+    public String getPrimaryYaxisTitle() {
+        List<WebElement> yPrimaryAxisTitle = getRoot().findElements(BY_PRIMARY_Y_AXIS_TITLE);
+        if (yPrimaryAxisTitle.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        return yPrimaryAxisTitle.get(0).getText();
+    }
+
+    public String getSencondaryYaxisTitle() {
+        List<WebElement> ySencondaryAxisTitle = getRoot().findElements(BY_SECONDARY_Y_AXIS_TITLE);
+        if (ySencondaryAxisTitle.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        return ySencondaryAxisTitle.get(0).getText();
+    }
+
+    public Boolean isPrimaryYaxisVisible() {
+        return isElementVisible(BY_PRIMARY_Y_AXIS, getRoot());
+    }
+
+    public Boolean isSecondaryYaxisVisible() {
+        return isElementVisible(BY_SECONDARY_Y_AXIS, getRoot());
     }
 
     //Some type charts don't exist axis will return empty
@@ -249,9 +278,5 @@ public class ChartReport extends AbstractFragment {
         WebElement webElement = getTracker(xAxis, yAxis);
         String getColorColumn = webElement.getAttribute("fill");
         return getColorColumn;
-    }
-
-    public boolean hasColorLegend() {
-       return waitForCollectionIsNotEmpty(tracker).size() > 1 ;
     }
 }

@@ -1,14 +1,14 @@
 microservices:
-#  graphene-chrome:
-#    docker:
-#      dockerfile: './Dockerfile_chrome'
-#      customTags:
-#        - '67.0.3396.79-2.39'
-#        - 'latest'
-#      cacheFromTag: 'latest'
-#    buildOnChangeOf:
-#      paths:
-#      - 'Dockerfile_chrome'
+  graphene-chrome:
+    docker:
+      dockerfile: './Dockerfile_chrome'
+      customTags:
+        - '67.0.3396.79-2.39'
+        - 'latest'
+      cacheFromTag: 'latest'
+    buildOnChangeOf:
+      paths:
+      - 'Dockerfile_chrome'
   graphene-firefox:
     docker:
       dockerfile: './Dockerfile_firefox'

@@ -686,4 +686,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
         @FindBy(className = "gd-mobile-dropdown-content")
         private WebElement dropdownList;
     }
+
+    /**
+     *
+     * @param index : A color position in color palette
+     * @return : A color position in color palette is selected
+     */
+    public String getColor(int index) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
+                .findElements(By.cssSelector(".gd-base-visualization .highcharts-series rect")));
+        return list.get(index).getAttribute("fill");
+    }
 }

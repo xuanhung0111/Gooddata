@@ -48,6 +48,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-show-in-percent")
     private WebElement showInPercents;
 
+    @FindBy(className = SHOW_ON_SECONDARY_AXIS_CLASS_NAME)
+    private WebElement showOnSecondaryAxis;
+
     @FindBy(className = DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME)
     private List<WebElement> byDateAndAddAttributeFilter;
 
@@ -65,6 +68,7 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String SUB_HEADER_CLASS_NAME = "adi-bucket-item-sub-header";
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
     private static final String DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME = "button-dropdown";
+    private static final String SHOW_ON_SECONDARY_AXIS_CLASS_NAME = "s-show-on-secondary-axis";
 
     private static final String DISABLED = "is-disabled";
 
@@ -113,6 +117,28 @@ public class MetricConfiguration extends AbstractFragment {
         waitForElementVisible(showInPercents).click();
         assertTrue(showInPercents.isSelected(), "Show in percents isn't checked");
         return this;
+    }
+
+    public MetricConfiguration checkShowOnSecondaryAxis() {
+        if (!isShowOnSecondaryAxisChecked()) {
+            waitForElementVisible(showOnSecondaryAxis).click();
+        }
+        return this;
+    }
+
+    public void uncheckShowOnSecondaryAxis() {
+        if (!isShowOnSecondaryAxisChecked()) {
+            return;
+        }
+        waitForElementVisible(showOnSecondaryAxis).click();
+    }
+
+    public String getShowOnSecondaryAxis() {
+        return waitForElementVisible(waitForElementVisible(showOnSecondaryAxis).findElement(BY_PARENT)).getText();
+    }
+
+    public Boolean isShowOnSecondaryAxisPresent() {
+        return isElementPresent(By.className(SHOW_ON_SECONDARY_AXIS_CLASS_NAME), getRoot());
     }
 
     public boolean isShowPercentEnabled() {
@@ -296,6 +322,10 @@ public class MetricConfiguration extends AbstractFragment {
     private MetricFilterByDatePicker getMetricFilterByDatePicker() {
         return Graphene.createPageFragment(MetricFilterByDatePicker.class,
                 waitForElementVisible(BY_DATE_BY_FILTER_PICKER, browser));
+    }
+
+    private boolean isShowOnSecondaryAxisChecked() {
+        return waitForElementVisible(showOnSecondaryAxis).isSelected();
     }
 
     public static class AttributeFilterPicker extends AbstractPicker {

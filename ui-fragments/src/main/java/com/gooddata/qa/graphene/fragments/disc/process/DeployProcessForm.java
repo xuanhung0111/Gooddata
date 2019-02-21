@@ -256,12 +256,12 @@ public class DeployProcessForm extends AbstractFragment {
         return waitForElementVisible(s3SecretKeyInput).getAttribute("class").contains("has-error");
     }
 
-    public void submitClick() {
+    public void tryToSubmit() {
         waitForElementVisible(deployButton).click();
     }
 
     public void submit() {
-        submitClick();
+        tryToSubmit();
         waitForFragmentNotVisible(this);
     }
 

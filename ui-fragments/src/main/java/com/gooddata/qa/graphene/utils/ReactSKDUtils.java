@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.utils;
 
 public class ReactSKDUtils {
 
-    //Headline
+    //Headline Insight
     public static final String TEMPLATE_EMPTY_INSIGHT = "EmptyInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHT = "HeadlineInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHTS = "HeadlineInsights.js";
@@ -27,6 +27,16 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_HEADLINE_WITH_PERCENT_MEASURE = "HeadlineWithPercentMeasure.js";
     public static final String TEMPLATE_HEADLINE_WITH_PP_COMPARISON = "HeadlineWithPPComparison.js";
     public static final String TEMPLATE_HEADLINE_WITH_SPPY_COMPARISON = "HeadlineWithSPPYComparison.js";
+
+    //Visualization
+    public static final String TEMPLATE_EMPTY_VISIUALIZATION = "EmptyVisualization.js";
+    public static final String TEMPLATE_VISUALIZATION_BY_IDENTIFIER = "VisualizationByIdentifier.js";
+    public static final String TEMPLATE_VISUALIZATION_BY_URI = "VisualizationByUri.js";
+    public static final String TEMPLATE_VISUALIZATIONS = "Visualizations.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_ABSOLUTE_DATE_FILTER = "VisualizationWithAbsoluteDateFilter.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_FILTER = "VisualizationWithFilter.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_NEGATIVE_FILTER = "VisualizationWithNegativeFilter.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS = "VisualizationWithConfigurations.js";
 
     //Warning
     public static final String WARNING_CAN_NOT_DISPLAY = "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.";

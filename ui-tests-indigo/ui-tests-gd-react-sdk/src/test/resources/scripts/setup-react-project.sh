@@ -35,7 +35,7 @@ fi
 
 # Start react-sdk-app project up
 echo "Starting react project"
-export BROWSER = 'none'
+export BROWSER='none'
 nohup yarn start >> $REACT_PROJECT_NAME.log 2>&1 &
 echo "Done"
 

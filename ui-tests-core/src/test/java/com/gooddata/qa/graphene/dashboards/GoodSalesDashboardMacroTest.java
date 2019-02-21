@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.md.Metric;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
@@ -30,7 +31,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static java.lang.String.format;
@@ -48,12 +48,6 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
     private static final String METRIC_AVAILABLE = "Metric available";
     private static final String DIRECT_SALES = "Direct Sales";
     private static final String WEB_CONTENT = "https://urlecho.appspot.com/echo?status=200&body=%s";
-    private static final LocalDate TODAY = LocalDate.now();
-    private static final LocalDate LAST_WEEK = TODAY.minusWeeks(1);
-    private static final LocalDate MONDAY_OF_LAST_WEEK = LAST_WEEK.with(previousOrSame(MONDAY));
-    private static final LocalDate SUNDAY_OF_LAST_WEEK = LAST_WEEK.with(nextOrSame(SUNDAY));
-    private static final LocalDate MONDAY_OF_THIS_WEEK = TODAY.with(previousOrSame(MONDAY));
-    private static final LocalDate SUNDAY_OF_THIS_WEEK = TODAY.with(nextOrSame(SUNDAY));
     private String statusVariableUri;
     private DashboardRestRequest dashboardRequest;
 
@@ -180,23 +174,25 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
     @Test(dependsOnGroups = "createProject")
     public void createDateFilterMacro() throws IOException {
         String dashboardName = createDashboardHasFilter(createDateFilter(getAttributeByIdentifier("closed.euweek"), 0, 0));
+        final String MONDAY_OF_THIS_WEEK = DateRange.now().with(previousOrSame(MONDAY)).toString();
+        final String SUNDAY_OF_THIS_WEEK = DateRange.now().with(nextOrSame(SUNDAY)).toString();
         initDashboardsPage().selectDashboard(dashboardName);
         dashboardsPage.addTextToDashboard(TextObject.HEADLINE, "", "%DATE_FILTER_VALUE(closed.euweek,FROM)%");
-        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_THIS_WEEK.toString());
+        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_THIS_WEEK);
 
         dashboardsPage.addTextToDashboard(TextObject.HEADLINE, "", "%DATE_FILTER_VALUE(closed.euweek,TO)%");
-        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), SUNDAY_OF_THIS_WEEK.toString());
+        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), SUNDAY_OF_THIS_WEEK);
 
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%DATE_FILTER_VALUE(closed.euweek,FROM)%"));
         EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(embeddedWidget.getRoot());
-        assertEquals(embeddedWidget.getContentBodyAsText(), MONDAY_OF_THIS_WEEK.toString());
+        assertEquals(embeddedWidget.getContentBodyAsText(), MONDAY_OF_THIS_WEEK);
 
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%DATE_FILTER_VALUE(closed.euweek,TO)%"));
         embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget.getRoot());
         Screenshots.takeScreenshot(browser, "Create_Date_Filter_Macro", getClass());
-        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_THIS_WEEK.toString());
+        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_THIS_WEEK);
     }
 
     /**
@@ -209,25 +205,27 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
         String dashboardName = createDashboardHasFilter(createDateFilter(getAttributeByIdentifier("closed.euweek"), 0, 0));
         initDashboardsPage().selectDashboard(dashboardName).editDashboard()
             .addTimeFilterToDashboard(DATE_CREATED, TimeFilterPanel.DateGranularity.WEEK, "last");
+        final String MONDAY_OF_LAST_WEEK = DateRange.now().minusWeeks(1).with(previousOrSame(MONDAY)).toString();
+        final String SUNDAY_OF_LAST_WEEK = DateRange.now().minusWeeks(1).with(nextOrSame(SUNDAY)).toString();
         FilterWidget filterWidget= dashboardsPage.getFilterWidgetByName(DATE_CREATED);
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(filterWidget.getRoot());
         //Filter just applies after saving
         dashboardsPage.saveDashboard().addTextToDashboard(TextObject.HEADLINE, "", "%DATE_FILTER_VALUE(created.euweek,FROM)%");
-        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_LAST_WEEK.toString());
+        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_LAST_WEEK);
 
         dashboardsPage.addTextToDashboard(TextObject.HEADLINE, "", "%DATE_FILTER_VALUE(created.euweek,TO)%");
-        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), SUNDAY_OF_LAST_WEEK.toString());
+        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), SUNDAY_OF_LAST_WEEK);
 
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%DATE_FILTER_VALUE(created.euweek,FROM)%"));
         EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(embeddedWidget.getRoot());
-        assertEquals(embeddedWidget.getContentBodyAsText(), MONDAY_OF_LAST_WEEK.toString());
+        assertEquals(embeddedWidget.getContentBodyAsText(), MONDAY_OF_LAST_WEEK);
 
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%DATE_FILTER_VALUE(created.euweek,TO)%"));
         embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget.getRoot());
         Screenshots.takeScreenshot(browser, "Create_More_Date_Filter_Macro", getClass());
-        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_LAST_WEEK.toString());
+        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_LAST_WEEK);
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -236,6 +234,8 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
         final String weekTitle = getAttributeByIdentifier("closed.euweek").getTitle();
         String dashboardName =
             createDashboardHasFilter(createDateFilter(getAttributeByIdentifier("closed.euweek"), 0, 0));
+        final String MONDAY_OF_THIS_WEEK = DateRange.now().with(previousOrSame(MONDAY)).toString();
+        final String SUNDAY_OF_THIS_WEEK = DateRange.now().with(nextOrSame(SUNDAY)).toString();
 
         WidgetConfigPanel widgetConfigPanel = initDashboardsPage().selectDashboard(dashboardName).editDashboard()
             .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, weekTitle)
@@ -245,7 +245,7 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
         FilterWidget filterWidget = dashboardsPage.getFilterWidgetByName(weekTitle);
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(filterWidget.getRoot());
         dashboardsPage.saveDashboard().addTextToDashboard(TextObject.HEADLINE, "", "%DATE_FILTER_VALUE(closed.euweek,FROM)%");
-        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_THIS_WEEK.toString());
+        assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), MONDAY_OF_THIS_WEEK);
 
         dashboardsPage.addTextToDashboard(TextObject.HEADLINE, "", "%FILTER_TITLE(closed.euweek)%");
         assertEquals(dashboardsPage.getContent().getLastTextWidgetValue(), EMPTY_VALUE);
@@ -253,7 +253,7 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%DATE_FILTER_VALUE(closed.euweek,TO)%"));
         EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(embeddedWidget.getRoot());
-        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_THIS_WEEK.toString());
+        assertEquals(embeddedWidget.getContentBodyAsText(), SUNDAY_OF_THIS_WEEK);
 
         dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%FILTER_TITLE(closed.euweek)%"));
         embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
