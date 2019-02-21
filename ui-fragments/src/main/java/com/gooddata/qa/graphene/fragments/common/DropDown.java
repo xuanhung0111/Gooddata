@@ -8,10 +8,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 
 import java.util.List;
 import java.util.Objects;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -44,6 +46,12 @@ public class DropDown extends AbstractFragment {
             searchItem(name);
         }
 
+        selectItem(name);
+    }
+
+    public void scrollAndSelectItem(final String name) {
+        By selector = By.cssSelector(".s-" + simplifyText(name));
+        ElementUtils.scrollElementIntoView(By.cssSelector(getRoot().getAttribute("class")), selector, browser, 10);
         selectItem(name);
     }
 
