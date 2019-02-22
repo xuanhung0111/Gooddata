@@ -16,11 +16,14 @@ import java.util.Collection;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import static org.openqa.selenium.By.cssSelector;
 
 public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
@@ -36,6 +39,8 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         getMetricCreator().createNumberOfActivitiesMetric();
     }
 

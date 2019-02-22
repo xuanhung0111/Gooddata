@@ -73,8 +73,10 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         metrics.createAmountMetric();
         metrics.createAvgAmountMetric();
 
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

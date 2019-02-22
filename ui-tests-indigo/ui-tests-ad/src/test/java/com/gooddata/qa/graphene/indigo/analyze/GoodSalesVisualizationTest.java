@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
@@ -11,6 +12,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -65,6 +68,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createAmountMetric();
         metricCreator.createNumberOfActivitiesMetric();

@@ -21,6 +21,7 @@ import java.util.*;
 import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
@@ -28,6 +29,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
@@ -54,6 +56,8 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         createMetricIfNotExist(new RestClient(getProfile(Profile.ADMIN)), METRIC_NUMBER_OF_PERSONS,
                 format("SELECT COUNT([%s], [%s])",
                         getAttributeByTitle(ATTR_PERSON).getUri(),

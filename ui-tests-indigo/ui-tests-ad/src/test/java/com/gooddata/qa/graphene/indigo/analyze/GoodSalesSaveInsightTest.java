@@ -3,9 +3,11 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
@@ -54,6 +56,8 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createStageVelocityMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());

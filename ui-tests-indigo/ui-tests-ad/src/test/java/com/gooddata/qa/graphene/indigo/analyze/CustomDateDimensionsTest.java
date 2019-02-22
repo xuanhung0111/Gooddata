@@ -58,8 +58,11 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
                 .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
