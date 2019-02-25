@@ -333,7 +333,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * @return a list of insight names
      */
     public List<String> getAllInsightNames()
-            throws JSONException, IOException {
+            throws JSONException {
         return getMdObjectValues("visualizationobjects", jsonObj -> jsonObj.getString("title"));
     }
 

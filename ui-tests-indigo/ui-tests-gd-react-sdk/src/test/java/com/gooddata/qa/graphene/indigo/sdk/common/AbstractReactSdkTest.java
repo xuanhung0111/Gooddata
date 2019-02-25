@@ -30,9 +30,9 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
      * and it is gotten from catalog.json
      * @param variables Pair.of("visualizationName", $titleOfVisualization)
      */
-    public void createCatalogJSON(Pair<String, String>... variables) throws IOException {
+    public File createCatalogJSON(Pair<String, String>... variables) throws IOException {
         createTestingVariable(variables);
-        createCatalogExportConfig();
+        return createCatalogExportConfig();
     }
 
     public void replaceContentAppJSFrom(String fileName) throws IOException {
@@ -60,9 +60,10 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void createCatalogExportConfig() throws JSONException, IOException {
+    private File createCatalogExportConfig() throws JSONException, IOException {
         final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/catalog.json");
         Files.deleteIfExists(file.toPath());
+        Graphene.waitGui().until(browser -> !file.exists());
         List<String> commands = new LinkedList<>();
         commands.add("gdc-catalog-export");
         commands.add("--project-id");
@@ -86,6 +87,8 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
                 System.out.println(inputStream);
             }
             log.info("Created a new file: " + file.getAbsolutePath());
+            Graphene.waitGui().until(browser -> file.isFile() && file.exists() && file.length() > 0);
+            return file;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("there is an error while creating catalog.json", e);
         }
