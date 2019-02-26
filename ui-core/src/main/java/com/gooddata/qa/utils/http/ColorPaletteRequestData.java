@@ -85,12 +85,16 @@ public class ColorPaletteRequestData {
         GREEN(0, 255, 0),
         BLUE(0, 0, 255),
         YELLOW(255, 255, 0),
+        WHITE(255, 255, 255),
         CYAN(20, 178, 226),
         LIME_GREEN(0, 193, 141),
         LIGHT_RED(255, 153, 153),
         BRIGHT_RED(229, 77, 66),
         PURE_ORANGE(241, 134, 0),
-        SOFT_RED(245, 184, 179);
+        SOFT_RED(245, 184, 179),
+        LIGHT_PURPLE(196, 110, 188),
+        VIVID_ORANGE(25, 218, 166),
+        PURPLE(171, 85, 163);
 
         private int red;
         private int green;

@@ -270,13 +270,20 @@ public class ChartReport extends AbstractFragment {
     private WebElement getTracker(int groupIndex, int index) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
                 .findElements(By.cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
-                        ".highcharts-series-%s.highcharts-tracker path", groupIndex, groupIndex))));
+                        ".highcharts-series-%s.highcharts-tracker path," +
+                        ".highcharts-series-%s.highcharts-tracker circle", groupIndex, groupIndex, groupIndex))));
         return list.get(index);
     }
 
     public String checkColorColumn(int xAxis, int yAxis) {
         WebElement webElement = getTracker(xAxis, yAxis);
         String getColorColumn = webElement.getAttribute("fill");
+        return getColorColumn;
+    }
+
+    public String getColor(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        String getColorColumn = webElement.getAttribute("stroke");
         return getColorColumn;
     }
 }

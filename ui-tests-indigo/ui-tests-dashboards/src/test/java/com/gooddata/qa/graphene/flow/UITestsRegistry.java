@@ -44,6 +44,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.ApplyColorPaletteOnAnalyzePage
 import com.gooddata.qa.graphene.indigo.dashboards.KpiApplyColorPaletteTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ReportPageApplyColorPaletteTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ColorPalettePickerBasicInsightAndKPITest;
+import com.gooddata.qa.graphene.indigo.dashboards.ColorPalettePickerAdvancedInsightAndKPITest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -129,6 +130,7 @@ public class UITestsRegistry {
             ReportPageApplyColorPaletteTest.class,
             KpiApplyColorPaletteTest.class,
             ColorPalettePickerBasicInsightAndKPITest.class,
+            ColorPalettePickerAdvancedInsightAndKPITest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

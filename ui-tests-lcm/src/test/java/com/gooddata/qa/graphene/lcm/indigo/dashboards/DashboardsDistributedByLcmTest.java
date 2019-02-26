@@ -5,11 +5,14 @@ import com.gooddata.md.Dataset;
 import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -22,8 +25,10 @@ import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
+import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LCMServiceProject;
 import com.gooddata.qa.utils.lcm.LcmRestUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,8 +50,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -67,7 +72,10 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String CLIENT_PROJECT_TITLE = "Client project " + generateHashString();
     private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1_" + generateHashString();
     private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
-    private static final String MULTI_METRIC_APPLY_COLOR_PALETTE = "Multi_Metric_Apply_Color_Palette";
+    private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
+            "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
+    private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
+            "Insight Has View By And Stack By Apply Custom Color Picker" + generateHashString();
     private static List<Pair<String, ColorPalette>> listColorPalettes = Arrays.asList(Pair.of("guid1", ColorPalette.RED),
             Pair.of("guid2", ColorPalette.GREEN), Pair.of("guid3", ColorPalette.BLUE), Pair.of("guid4", ColorPalette.YELLOW));
 
@@ -98,6 +106,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         getMetricCreator().createOppFirstSnapshotMetric();
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        createInsightToTestCustomColorPicker();
         indigoRestRequest.setColor(initColorPalette(listColorPalettes));
 
         String insightUri = indigoRestRequest.createInsight(
@@ -188,23 +197,34 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
-    public void testInsightWithColorPalette() {
+    public void testInsightWithColorPaletteViaAPI() {
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .saveInsight(MULTI_METRIC_APPLY_COLOR_PALETTE);
-        analysisPage.getPageHeader()
-                .expandInsightSelection()
-                .switchFilter(FilterType.ALL)
-                .getInsightItem(MULTI_METRIC_APPLY_COLOR_PALETTE);
-        takeScreenshot(browser, "checkReportInsightApplyColorPalette", getClass());
+        takeScreenshot(browser, "testInsightWithColorPaletteViaAPI", getClass());
         ChartReport chartReport = analysisPage.openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
         assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
         assertEquals(chartReport.getLegendColors(), asList(ColorPalette.RED.toString(), ColorPalette.GREEN.toString()));
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightWithColorPickerConfiguration() {
+        try {
+            setCustomColorPickerFlag(true);
+            ChartReport chartReport = initAnalysePage().openInsight(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER)
+                    .waitForReportComputing().getChartReport();
+            takeScreenshot(browser, "testInsightWithColorPickerConfiguration", getClass());
+            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
+            assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
+            assertEquals(chartReport.getLegendColors(), asList(ColorPalette.YELLOW.toString(), ColorPalette.GREEN.toString()));
+        }finally {
+            setCustomColorPickerFlag(false);
+        }
     }
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
@@ -354,5 +374,36 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     private String getDateDatasetUri(final String dataset) {
         return getMdService().getObjUri(getProject(), Dataset.class, title(format("Date (%s)", dataset)));
+    }
+
+    private void createInsightToTestCustomColorPicker() {
+        try {
+            setCustomColorPickerFlag(true);
+            createInsightHasAttributeOnStackByAndViewBy(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER,
+                    METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+            AnalysisPage analysisPage = initAnalysePage()
+                    .openInsight(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER).waitForReportComputing();
+            analysisPage.setCustomColorPicker(ColorPalette.YELLOW.getHexColor())
+                    .applyCustomColorPicker().waitForReportComputing().saveInsight();
+        } finally {
+            setCustomColorPickerFlag(false);
+        }
+    }
+
+    private void createInsightHasAttributeOnStackByAndViewBy(String title, String metric, String attribute, String stack) {
+        new IndigoRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId()).createInsight(
+                new InsightMDConfiguration(title, ReportType.COLUMN_CHART)
+                        .setMeasureBucket(
+                                singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
+                                        CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
+                                        CategoryBucket.Type.ATTRIBUTE))));
+    }
+
+    private void setCustomColorPickerFlag(boolean status) {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CUSTOM_COLOR_PICKER, status);
     }
 }
