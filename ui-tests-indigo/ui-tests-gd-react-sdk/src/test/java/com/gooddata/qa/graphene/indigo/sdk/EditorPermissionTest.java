@@ -67,7 +67,7 @@ public class EditorPermissionTest extends AbstractReactSdkTest {
                 singletonList(ATTR_DEPARTMENT));
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        ChartReport chartReport = ChartReport.getInstance(browser);
+        ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), singletonList("rgb(20,178,226)"));
         assertEquals(chartReport.getLegends(), singletonList(DIRECT_SALES));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
