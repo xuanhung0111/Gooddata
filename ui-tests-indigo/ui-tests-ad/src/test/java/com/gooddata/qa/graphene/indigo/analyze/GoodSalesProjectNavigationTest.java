@@ -59,18 +59,18 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
     @DataProvider(name = "userRoleProvider")
     public Object[][] userRoleProvider() {
         return new Object[][] {
-            {embeddedDashboardUser, testParams.getPassword(), UserRoles.DASHBOARD_ONLY},
-            {testParams.getViewerUser(), testParams.getPassword(), UserRoles.VIEWER}
+            {embeddedDashboardUser, UserRoles.DASHBOARD_ONLY},
+            {testParams.getViewerUser(), UserRoles.VIEWER}
         };
     }
 
     @Test(dependsOnGroups = {"precondition"}, dataProvider = "userRoleProvider", groups = {"switchProject"})
-    public void switchProjectWithOtherUserRoles(String user, String password, UserRoles role)
-            throws ParseException, IOException, JSONException {
-        final RestClient restClient = new RestClient(new RestProfile(testParams.getHost(), user, password, true));
+    public void switchProjectWithOtherUserRoles(String user, UserRoles role)
+            throws ParseException, JSONException {
+        final RestClient restClient = new RestClient(new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
 
         logout();
-        signInAtGreyPages(user, password);
+        signInAtGreyPages(user, testParams.getPassword());
 
         String newProjectId = createNewEmptyProject(restClient, NEW_PROJECT_NAME);
         final ProjectRestRequest newProjectRestRequest = new ProjectRestRequest(restClient, newProjectId);
