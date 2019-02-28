@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
@@ -52,6 +53,14 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNA
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.Y_AXIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.X_AXIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.LEGEND;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.CANVAS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.COLORS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -104,6 +113,9 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         String numberKpiUri = createNumOfActivitiesKpi();
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createBestCaseMetric();
+        
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         createInsightToTestCustomColorPicker();
@@ -312,6 +324,38 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             indigoRestRequest.setLockedAttribute(FIRST_DASHBOARD, 1);
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightAnalyseWithDualAxis() {
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
+        final List<String> itemsConfigurationPanelColumnChart =
+                asList(COLORS, X_AXIS, Y_AXIS + " (Left)", Y_AXIS + " (Right)", LEGEND, CANVAS);
+        final String INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE = "Two measure and attribute";
+
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE, ReportType.COLUMN_CHART)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BEST_CASE))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.ATTRIBUTE))));
+
+        AnalysisPage analysisPage = initAnalysePage();
+        MetricsBucket metricsBucket = analysisPage.openInsight(INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE)
+                .waitForReportComputing().getMetricsBucket();
+        metricsBucket.getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().checkShowOnSecondaryAxis();
+        metricsBucket.getMetricConfiguration(METRIC_BEST_CASE).expandConfiguration().uncheckShowOnSecondaryAxis();
+        analysisPage.waitForReportComputing();
+
+        ChartReport chartReport = analysisPage.getChartReport();
+        assertEquals(chartReport.getPrimaryYaxisTitle(), METRIC_BEST_CASE);
+        assertTrue(chartReport.isPrimaryYaxisVisible(), "Rerender insight should have primary axis");
+        assertEquals(chartReport.getSecondaryYaxisTitle(), METRIC_AMOUNT);
+        assertTrue(chartReport.isSecondaryYaxisVisible(), "Rerender insight should have secondary axis");
+        assertEquals(analysisPage.getConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
     }
 
     @AfterClass(alwaysRun = true)

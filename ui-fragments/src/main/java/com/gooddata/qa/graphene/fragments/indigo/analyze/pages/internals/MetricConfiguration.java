@@ -133,6 +133,10 @@ public class MetricConfiguration extends AbstractFragment {
         waitForElementVisible(showOnSecondaryAxis).click();
     }
 
+    public boolean isShowOnSecondaryAxisChecked() {
+        return waitForElementVisible(showOnSecondaryAxis).isSelected();
+    }
+
     public String getShowOnSecondaryAxis() {
         return waitForElementVisible(waitForElementVisible(showOnSecondaryAxis).findElement(BY_PARENT)).getText();
     }
@@ -322,10 +326,6 @@ public class MetricConfiguration extends AbstractFragment {
     private MetricFilterByDatePicker getMetricFilterByDatePicker() {
         return Graphene.createPageFragment(MetricFilterByDatePicker.class,
                 waitForElementVisible(BY_DATE_BY_FILTER_PICKER, browser));
-    }
-
-    private boolean isShowOnSecondaryAxisChecked() {
-        return waitForElementVisible(showOnSecondaryAxis).isSelected();
     }
 
     public static class AttributeFilterPicker extends AbstractPicker {

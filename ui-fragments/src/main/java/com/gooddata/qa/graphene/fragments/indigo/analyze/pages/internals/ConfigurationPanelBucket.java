@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -18,6 +19,20 @@ public class ConfigurationPanelBucket extends AbstractBucket {
 
     @FindBy(className = "adi-bucket-item")
     protected List<ItemConfiguration> itemsConfiguration;
+
+    @FindBy(className = "s-properties-unsupported")
+    private WebElement propertiesUnsupported;
+
+    public ItemConfiguration getItemConfiguration(final String item) {
+        return waitForCollectionIsNotEmpty(itemsConfiguration).stream()
+                .filter(input -> item.equals(input.getHeader()))
+                .findFirst()
+                .get();
+    }
+
+    public String getPropertiesUnsupported() {
+        return waitForElementVisible(propertiesUnsupported).getText();
+    }
 
     public List<String> getItemNames() {
         return waitForCollectionIsNotEmpty(itemsConfiguration).stream()
@@ -84,6 +99,57 @@ public class ConfigurationPanelBucket extends AbstractBucket {
         @FindBy(className = "adi-bucket-item-header")
         private WebElement header;
 
-        public String getHeader() { return waitForElementVisible(header).getText(); }
+        @FindBy(className = "s-checkbox-toggle")
+        private WebElement switchToggle;
+
+        @FindBy(xpath = "//span[.='Min']/following-sibling::input")
+        private WebElement minInputField;
+
+        @FindBy(xpath = "//span[.='Max']/following-sibling::input")
+        private WebElement maxInputField;
+
+        public String getHeader() {
+            return waitForElementVisible(header).getText();
+        }
+
+        public ItemConfiguration expandConfiguration() {
+            if (isConfigurationCollapsed()) {
+                clickItemHeader();
+            }
+            return this;
+        }
+
+        public ItemConfiguration switchOff() {
+            if (isToggleTurnOn()) {
+                clickToggle();
+                waitForElementAttributeNotContainValue(switchToggle, "class", "bucket-collapsed");
+            }
+            assertFalse(isToggleTurnOn(), "Item Configuration should be expanded");
+            return this;
+        }
+
+        public ItemConfiguration setMinMaxValueOnAxis(String minValue, String maxValue) {
+            waitForElementVisible(minInputField).clear();
+            minInputField.sendKeys(minValue + Keys.ENTER);
+            waitForElementVisible(maxInputField).clear();
+            maxInputField.sendKeys(maxValue + Keys.ENTER);
+            return this;
+        }
+
+        private boolean isConfigurationCollapsed() {
+            return waitForElementVisible(header).getAttribute("class").contains("collapsed");
+        }
+
+        private void clickItemHeader() {
+            waitForElementVisible(header).click();
+        }
+
+        private boolean isToggleTurnOn() {
+            return waitForElementPresent(switchToggle).isSelected();
+        }
+
+        private void clickToggle() {
+            waitForElementPresent(switchToggle).findElement(BY_PARENT).click();
+        }
     }
 }
