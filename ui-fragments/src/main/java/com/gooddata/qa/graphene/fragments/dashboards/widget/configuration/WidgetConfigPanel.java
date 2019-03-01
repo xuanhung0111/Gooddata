@@ -80,8 +80,7 @@ public class WidgetConfigPanel extends AbstractFragment {
     }
 
     private WebElement getConfigPanel(final Tab tab) {
-        waitForCollectionIsNotEmpty(configPanels);
-        return Iterables.find(configPanels, new Predicate<WebElement>() {
+        return Iterables.find(waitForCollectionIsNotEmpty(configPanels), new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement panel) {
                 return panel.getAttribute("class").contains(tab.panelClassName);
@@ -99,7 +98,8 @@ public class WidgetConfigPanel extends AbstractFragment {
         ARRANGE("Arrange", "s-Arrange"),
         STYLE("Style", "s-Style"),
         METRIC("Metric", "s-Metric"),
-        METRIC_STYLE("Style", "s-activeConfigTab");
+        METRIC_STYLE("Style", "s-activeConfigTab"),
+        DATA("Data", "s-activeConfigTab");
 
         private final String tabName;
         private final String panelClassName;

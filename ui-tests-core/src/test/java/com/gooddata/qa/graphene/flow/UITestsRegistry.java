@@ -99,6 +99,7 @@ import com.gooddata.qa.graphene.reports.GoodSalesSaveReportTest;
 import com.gooddata.qa.graphene.reports.GoodSalesSortByTotalsTest;
 import com.gooddata.qa.graphene.reports.GoodSalesTotalsInReportTest;
 import com.gooddata.qa.graphene.reports.GoodsalesMufReportTest;
+import com.gooddata.qa.graphene.reports.HelpLinkReferenceTest;
 import com.gooddata.qa.graphene.reports.ReportWithEmptyValuesInTimeDimensionTest;
 import com.gooddata.qa.graphene.reports.SimpleCompAttributesTest;
 import com.gooddata.qa.graphene.reports.TimeFormattingTest;
@@ -191,7 +192,8 @@ public class UITestsRegistry {
             TimeFormattingTest.class,
             GoodSalesEmbeddedReportTest.class,
             LockingReportTest.class,
-            BulkPermissionReportSetting.class
+            BulkPermissionReportSetting.class,
+            HelpLinkReferenceTest.class
         });
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{

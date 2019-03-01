@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.stream.Stream;
@@ -44,6 +45,10 @@ public class FloatingRangePanel extends AbstractFragment {
                 .findFirst()
                 .get()
                 .click();
+    }
+
+    public boolean isMoreInfoPresent() {
+        return isElementPresent(By.cssSelector(".yui3-timezonehintwidget-content a"), getRoot());
     }
 
     private void selectRange(Range range, FloatingTime time) {
