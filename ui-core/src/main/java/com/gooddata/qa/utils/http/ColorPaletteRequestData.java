@@ -87,6 +87,7 @@ public class ColorPaletteRequestData {
         YELLOW(255, 255, 0),
         WHITE(255, 255, 255),
         CYAN(20, 178, 226),
+        CYAN_DEVIANT(20, 177, 225),
         LIME_GREEN(0, 193, 141),
         LIGHT_RED(255, 153, 153),
         BRIGHT_RED(229, 77, 66),
@@ -94,7 +95,10 @@ public class ColorPaletteRequestData {
         SOFT_RED(245, 184, 179),
         LIGHT_PURPLE(196, 110, 188),
         VIVID_ORANGE(25, 218, 166),
-        PURPLE(171, 85, 163);
+        PURPLE(171, 85, 163),
+        LIGHT_GRAYISH_PURPLE(221, 187, 218),
+        DARK_CYAN(0, 110, 145),
+        MODERATE_RED(181, 60, 51);
 
         private int red;
         private int green;
@@ -113,6 +117,10 @@ public class ColorPaletteRequestData {
 
         public String toReportFormatString() {
             return String.format("rgb(%d, %d, %d)", red, green, blue);
+        }
+
+        public String toCssFormatString() {
+            return String.format("%d-%d-%d", red, green, blue);
         }
 
         public int getRed() {

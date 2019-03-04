@@ -156,7 +156,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getSecondaryYaxisTitle(), METRIC_AMOUNT);
         assertTrue(chartReport.isSecondaryYaxisVisible(),
                 "The Column chart should render well with Y-axis on right of chart");
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getItemNames(), defaultItemsConfigurationPanel);
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
@@ -186,7 +186,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getSecondaryYaxisTitle(), StringUtils.EMPTY);
         assertTrue(chartReport.isSecondaryYaxisVisible(),
                 "The Column chart should render well with Y-axis on right of chart");
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getItemNames(), defaultItemsConfigurationPanel);
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
@@ -215,7 +215,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getSecondaryYaxisTitle(), StringUtils.EMPTY);
         assertFalse(chartReport.isSecondaryYaxisVisible(), "Rerender insight shouldn't have secondary axis");
 
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getItemNames(), defaultItemsConfigurationPanel);
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
@@ -253,7 +253,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getSecondaryYaxisTitle(), StringUtils.EMPTY);
         assertFalse(chartReport.isSecondaryYaxisVisible(), "Rerender insight shouldn't have secondary axis");
 
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getItemNames(), defaultItemsConfigurationPanel);
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
@@ -336,7 +336,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         metricsBucket.getMetricConfiguration(METRIC_BEST_CASE).expandConfiguration().uncheckShowOnSecondaryAxis();
         analysisPage.saveInsight().waitForReportComputing();
 
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getItemNames(), itemsConfigurationPanelColumnChart);
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
@@ -392,7 +392,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         assertFalse(metricsBucket.getMetricConfiguration("Sum of " + METRIC_AMOUNT).expandConfiguration()
                 .isShowOnSecondaryAxisPresent(), "“Show dual axes” checkbox should be hidden");
-        ConfigurationPanelBucket configurationPanelBucket = analysisPage.getConfigurationPanelBucket();
+        ConfigurationPanelBucket configurationPanelBucket = analysisPage.openConfigurationPanelBucket();
         assertEquals(configurationPanelBucket.getPropertiesUnsupported(),
                  "This visualization doesn’t support configuration");
         ChartReport chartReport = analysisPage.getChartReport();
@@ -409,7 +409,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             initAnalysePage().openInsight(INSIGHT_TEST_CONFIGURATION_HAS_TWO_MEASURE_AND_ATTRIBUTE)
                     .waitForReportComputing();
-            assertEquals(analysisPage.getConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
+            assertEquals(analysisPage.openConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
 
             analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
             ChartReport chartReport = analysisPage.getChartReport();
@@ -438,11 +438,10 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
                 .getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .checkShowOnSecondaryAxis();
         analysisPage.saveInsight().waitForReportComputing();
-        analysisPage.getConfigurationPanelBucket()
+        analysisPage.openConfigurationPanelBucket()
                 .getItemConfiguration(Y_AXIS.toString() + " (Right)").expandConfiguration().setMinMaxValueOnAxis(rightMin, rightMax);
-        analysisPage.getConfigurationPanelBucket()
+        analysisPage.openConfigurationPanelBucket()
                 .getItemConfiguration(Y_AXIS.toString() + " (Left)").expandConfiguration().setMinMaxValueOnAxis(leftMin, leftMax);
-
         rightMin = "-14.9";
         rightMax = "130";
         leftMin = "-23";

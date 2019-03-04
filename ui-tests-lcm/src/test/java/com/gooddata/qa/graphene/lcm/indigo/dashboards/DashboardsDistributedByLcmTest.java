@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ColorsPaletteDialog;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CustomColorsPaletteDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -354,7 +356,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertTrue(chartReport.isPrimaryYaxisVisible(), "Rerender insight should have primary axis");
         assertEquals(chartReport.getSecondaryYaxisTitle(), METRIC_AMOUNT);
         assertTrue(chartReport.isSecondaryYaxisVisible(), "Rerender insight should have secondary axis");
-        assertEquals(analysisPage.getConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
+        assertEquals(analysisPage.openConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
     }
 
     @AfterClass(alwaysRun = true)
@@ -426,8 +428,10 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                     METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
             AnalysisPage analysisPage = initAnalysePage()
                     .openInsight(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER).waitForReportComputing();
-            analysisPage.setCustomColorPicker(ColorPalette.YELLOW.getHexColor())
-                    .applyCustomColorPicker().waitForReportComputing().saveInsight();
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                    .openCustomColorPalette().getCustomColorsPaletteDialog().setColorCustomPicker(ColorPalette.YELLOW.getHexColor()).apply();
+            analysisPage.waitForReportComputing().saveInsight();
         } finally {
             setCustomColorPickerFlag(false);
         }
