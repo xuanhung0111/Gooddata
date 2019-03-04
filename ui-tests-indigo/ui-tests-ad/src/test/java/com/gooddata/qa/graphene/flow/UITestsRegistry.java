@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureExtendedTest;
 import com.gooddata.qa.graphene.indigo.analyze.RenamingMeasuresAndAttributesTest;
 import com.gooddata.qa.graphene.indigo.analyze.RedesigningDateFilterDialogOnFilterBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableTest;
+import com.gooddata.qa.graphene.indigo.analyze.PivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.SecondaryAxisTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
@@ -150,6 +151,7 @@ public class UITestsRegistry {
             RedesigningDateFilterDialogOnFilterBucketTest.class,
             PivotTableTest.class,
             SecondaryAxisTest.class,
+            PivotTableAdvancedTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
