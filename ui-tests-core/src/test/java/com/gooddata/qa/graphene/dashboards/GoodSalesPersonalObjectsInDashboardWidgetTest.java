@@ -60,8 +60,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
     @Test(dependsOnGroups = "createProject")
     public void testPersonalObjects() throws JSONException {
         String dashboardName = "Personal dashboard";
-        logout();
-        signIn(false, UserRoles.EDITOR);
+        logoutAndLoginAs(false, UserRoles.EDITOR);
 
         try {
             initDashboardsPage();
@@ -77,8 +76,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
         } finally {
             dashboardsPage.deleteDashboard();
 
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 

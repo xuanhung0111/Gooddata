@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar.getCurrentProjectName;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -7,17 +8,22 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 public class CreateAndDeleteProjectTest extends AbstractProjectTest {
@@ -91,6 +97,30 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
 
         } finally {
             testParams.setProjectId(secondProjectId);
+        }
+    }
+
+    @Test(dependsOnMethods = { "deleteProjectByInvitedAdminUser" })
+    public void switchToDashboardPageWithOneProject() throws IOException {
+        if (!useDynamicUser) {
+            throw new SkipException("To avoid affecting to configuration of another project, should use dynamic user");
+        }
+        RestClient restClient = new RestClient(getProfile(ADMIN));
+        UserManagementRestRequest userManagementRestRequest =
+                new UserManagementRestRequest(restClient, testParams.getProjectId());
+        int countProjects = restClient.getProjectService().getProjects().size();
+        if (countProjects > 1) {
+            throw new SkipException("Don't test for user has more than 1 project");
+        }
+        userManagementRestRequest.setFeatureFlags(ProjectFeatureFlags.IS_REDIRECTED_FOR_ONE_PROJECT, true);
+        logoutAndLoginAs(true, UserRoles.ADMIN);
+        try {
+            openUrl(PAGE_PROJECTS);
+            waitForDashboardPageLoaded(browser);
+        } catch (TimeoutException e) {
+            fail("Don't switch to dashboard page");
+        } finally {
+            userManagementRestRequest.setFeatureFlags(ProjectFeatureFlags.IS_REDIRECTED_FOR_ONE_PROJECT, false);
         }
     }
 }

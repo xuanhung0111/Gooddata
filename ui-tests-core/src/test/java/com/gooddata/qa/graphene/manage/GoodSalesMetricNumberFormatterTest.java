@@ -149,7 +149,6 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     }
 
     private void resetMetricFormat() {
-        initProjectsPage();
         assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeMetricFormat(Formatter.DEFAULT).getMetricFormat(), Formatter.DEFAULT.toString());
     }

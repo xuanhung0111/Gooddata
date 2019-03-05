@@ -38,6 +38,12 @@ public class LeaveProjectTest extends AbstractProjectTest {
         createAndAddUserToProject(UserRoles.VIEWER);
     }
 
+    @Override
+    protected void customizeProject() throws Throwable {
+        //To avoid auto switch to dashboard page if there is one project
+        createNewEmptyProject("First Project");
+    }
+
     @Test(dependsOnGroups = {"createProject"})
     public void testProjectHavingOneAdmin() {
         String blankProjectID = createNewEmptyProject("Project-Having-One-Admin");

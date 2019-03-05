@@ -267,8 +267,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             dashboardsPage.deleteDashboard();
         }
 
-        logout();
-        signIn(false, UserRoles.EDITOR);
+        logoutAndLoginAs(false, UserRoles.EDITOR);
 
         initDashboardsPage();
         dashboardsPage.addNewDashboard("view variable values");

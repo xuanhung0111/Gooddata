@@ -91,8 +91,7 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
                 .switchProject(NEW_PROJECT_NAME)
                 .getSplashScreen();
 
-        logout();
-        signIn(false, UserRoles.ADMIN);
+        logoutAndLoginAs(false, UserRoles.ADMIN);
 
         takeScreenshot(browser, "Last-visited-project-is-updated-with-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
