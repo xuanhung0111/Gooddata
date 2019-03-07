@@ -51,7 +51,7 @@ public class DropDown extends AbstractFragment {
 
     public void scrollAndSelectItem(final String name) {
         By selector = By.cssSelector(".s-" + simplifyText(name));
-        ElementUtils.scrollElementIntoView(By.cssSelector(getRoot().getAttribute("class")), selector, browser, 10);
+        ElementUtils.scrollElementIntoView(By.cssSelector(".ember-view.ember-list-view"), selector, browser, 10);
         selectItem(name);
     }
 
