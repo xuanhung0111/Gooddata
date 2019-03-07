@@ -277,8 +277,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                     .saveEditModeWithWidgets();
 
             try {
-                logout();
-                signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
+                logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
 
                 initDashboardsPage();
                 assertThat(dashboardsPage.getDashboardsNames(), not(contains(personalDashboard)));
@@ -298,8 +297,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 DashboardTabs tabs = dashboardsPage.getTabs();
                 assertEquals(tabs.getTabLabel(tabs.getSelectedTabIndex()), personalTab);
             } finally {
-                logout();
-                signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+                logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
                 indigoRestRequest.deleteDashboardsUsingCascade();
             }

@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -34,6 +36,7 @@ public final class UserManagementRestRequest extends CommonRestRequest {
 
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
+    private static final String FEATURE_FLAGS_LINK = "/gdc/internal/account/profile/featureFlags";
     private static final String DOMAIN_USER_LINK = "/gdc/account/domains/%s/users";
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
@@ -435,6 +438,13 @@ public final class UserManagementRestRequest extends CommonRestRequest {
 
         return getJsonObject(RestRequest.initPostRequest(GROUPS_URI, payload.toString()),
                 HttpStatus.CREATED).getString("uri");
+    }
+
+    public void setFeatureFlags(final ProjectFeatureFlags featureFlag, final boolean enabled) throws IOException {
+        JSONObject content = getJsonObject(FEATURE_FLAGS_LINK);
+        content.getJSONObject("featureFlags").put(featureFlag.getFlagName(), enabled);
+        executeRequest(RestRequest.initPutRequest(FEATURE_FLAGS_LINK, content.toString()),
+                HttpStatus.NO_CONTENT);
     }
 
     /**

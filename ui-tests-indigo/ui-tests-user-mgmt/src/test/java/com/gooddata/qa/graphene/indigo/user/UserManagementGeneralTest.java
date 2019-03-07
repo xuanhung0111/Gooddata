@@ -198,8 +198,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(true);
         try {
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
             initDashboardsPage();
             selectDashboard(DASHBOARD_TEST);
             checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.openPermissionsDialog());

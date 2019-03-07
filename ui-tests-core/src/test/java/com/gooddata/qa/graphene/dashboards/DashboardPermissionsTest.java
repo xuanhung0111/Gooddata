@@ -384,9 +384,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareEditorAndViewerTests"}, groups = {"viewer-tests", "sanity"})
     public void prepareViewerTests() throws JSONException {
         initDashboardsPage();
-
-        logout();
-        signIn(false, UserRoles.VIEWER);
+        logoutAndLoginAs(false, UserRoles.VIEWER);
     }
 
     /**
@@ -418,9 +416,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"viewer-tests"}, groups = {"editor-tests", "sanity"}, alwaysRun = true)
     public void prepareEditorTests() throws JSONException {
         initDashboardsPage();
-
-        logout();
-        signIn(false, UserRoles.EDITOR);
+        logoutAndLoginAs(false, UserRoles.EDITOR);
     }
 
     @Test(dependsOnMethods = {"prepareEditorTests"}, groups = {"editor-tests", "sanity"})
@@ -774,8 +770,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"shouldShowDashboardSharedWithAllUser"}, groups = {"acl-tests"})
     public void shouldEditorEditGrantees() throws JSONException {
         try {
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
 
             selectDashboard("Dashboard shared to all users and groups");
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
@@ -826,8 +821,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             assertFalse(dashboardsPage.isPrivate(), "Dashboard should be public");
             waitForElementVisible(By.cssSelector(".s-btn-ok__got_it"), browser).click();
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
             selectDashboard("Dashboard shared to all users and groups");
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
             permissionsDialog.publish(PublishType.SELECTED_USERS);
@@ -874,8 +868,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     public void prepareUsergroupTests() throws IOException, JSONException {
         initDashboardsPage();
 
-        logout();
-        signIn(false, UserRoles.ADMIN);
+        logoutAndLoginAs(false, UserRoles.ADMIN);
 
         UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
                 new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
@@ -961,8 +954,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             createTestDashboard(dashboardName);
             dashboardRequest.setPrivateDashboard(dashboardName, false);
 
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
             selectDashboard("Hide yourself test dashboard");
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
             permissionsDialog.publish(PublishType.SELECTED_USERS);
@@ -1001,8 +993,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             List<String> dashboards = dashboardsPage.getDashboardsNames();
             assertThat(dashboards, not(hasItem("Hide yourself test dashboard")));
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 
@@ -1014,16 +1005,14 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     private boolean checkDashboardVisible(String dashboardName) throws JSONException {
         try {
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
 
             initDashboardsPage();
             List<String> dashboards = dashboardsPage.getDashboardsNames();
 
             return dashboards.contains(dashboardName);
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 

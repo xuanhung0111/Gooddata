@@ -56,14 +56,12 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
         try {
             initDashboardsPage();
 
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
 
             CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search(RATIO_METRIC);
             assertFalse(cataloguePanel.getFieldNamesInViewPort().contains(RATIO_METRIC), "Private metric shouldn't display");
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 

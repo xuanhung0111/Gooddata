@@ -253,6 +253,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
+    public AnalysisPage reorderSecondaryMetric(String sourceMetric, String targetMetric) {
+        WebElement source = getMetricsBucket().get(sourceMetric);
+        WebElement target = getMetricsSecondaryBucket().get(targetMetric);
+        return drag(source, target);
+    }
+
     public AnalysisPage reorderAttribute(String sourceAttribute, String targetAttribute) {
         WebElement source = getAttributesBucket().get(sourceAttribute);
         WebElement target = getAttributesBucket().get(targetAttribute);
@@ -533,6 +539,14 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(configurationPanelBucket).expandConfigurationPanel();
     }
 
+    public MetricsBucket getMeasureConfigurationPanelBucket() {
+        return waitForFragmentVisible(metricsBucket).expandMeasureConfigurationPanel();
+    }
+
+    public StacksBucket getStackConfigurationPanelBucket() {
+        return waitForFragmentVisible(stacksBucket).expandStackConfigurationPanel();
+    }
+
     public String checkColorItems() {
         getConfigurationPanelBucket().openColorConfiguration();
         return waitForElementPresent(cssSelector(".gd-color-unsupported"), browser).getText();
@@ -551,6 +565,10 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage resetColor() {
         waitForElementPresent(cssSelector(".s-reset-colors-button.s-reset_colors"), browser).click();
         return this;
+    }
+
+    public boolean isDisableOpenAsReport() {
+        return waitForElementVisible(cssSelector(".s-open_as_report"), getRoot()).getAttribute("class").contains("disabled");
     }
 
 }

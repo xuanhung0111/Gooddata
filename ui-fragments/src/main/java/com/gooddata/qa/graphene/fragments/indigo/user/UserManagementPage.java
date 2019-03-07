@@ -10,6 +10,8 @@ import static org.openqa.selenium.By.cssSelector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import com.gooddata.qa.graphene.fragments.common.DropDown;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -21,7 +23,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.utils.CssUtils;
 
 public class UserManagementPage extends AbstractFragment {

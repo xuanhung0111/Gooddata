@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
 import static java.util.stream.Collectors.toList;
+import static org.testng.Assert.assertFalse;
 
 import java.util.List;
 
@@ -43,5 +45,18 @@ public class MetricsBucket extends AbstractBucket {
         return metrics.stream()
                 .map(MetricConfiguration::getHeaderAndSequenceNumber)
                 .collect(toList());
+    }
+
+    public MetricsBucket expandMeasureConfigurationPanel() {
+        if (isConfigurationPanelCollapsed()) {
+            getRoot().click();
+            waitForElementAttributeNotContainValue(getRoot(), "class", "bucket-collapsed");
+        }
+        assertFalse(isConfigurationPanelCollapsed(), "Measure Configuration Panel Bucket should be expanded");
+        return this;
+    }
+
+    private boolean isConfigurationPanelCollapsed() {
+        return getRoot().getAttribute("class").contains("bucket-collapsed");
     }
 }

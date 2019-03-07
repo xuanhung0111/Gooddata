@@ -265,8 +265,6 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"setupDashboardENV"})
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
-        initProjectsPage();
-
         new IndigoRestRequest(new RestClient(
                 new RestProfile(testParams.getHost(), testParams.getEditorUser(), testParams.getPassword(), true)),
                 testParams.getProjectId())
@@ -275,9 +273,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
         indigoRestRequest.createInsight(new InsightMDConfiguration(INSIGHT_CREATED_BY_MAIN_USER, ReportType.BAR_CHART));
 
         // need refresh to make sure the insights are added to working project
-        browser.navigate().refresh();
-        waitForProjectsPageLoaded(browser);
-
+        initAnalysePage();
         assertEquals(
                 indigoRestRequest.getAllInsightNames().stream()
                         .filter(INSIGHTS_FOR_FILTER_TEST::contains).count(),
