@@ -43,7 +43,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "The password must have at least 7 characters.";
 
     private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 

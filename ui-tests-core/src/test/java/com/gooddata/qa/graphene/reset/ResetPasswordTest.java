@@ -6,7 +6,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -36,15 +35,14 @@ public class ResetPasswordTest extends AbstractUITest {
 
     private static final String NEW_PASSWORD = "Gooddata12345";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "The password must have at least 7 characters.";
 
     private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
-    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "Password is exactly the same as the old one. "
-            + "Choose different one.";
+    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "The password must be different from your last 1 passwords.";
 
     private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
 
@@ -102,13 +100,20 @@ public class ResetPasswordTest extends AbstractUITest {
         LostPasswordPage resetPasswordPage = LostPasswordPage.getInstance(RESET_PASSWORD_PAGE_LOCATOR, browser);
 
         final SoftAssert softAssert = new SoftAssert();
-        softAssert.assertEquals(resetPasswordPage.getPasswordHint(), PASSWORD_HINT);
 
         resetPasswordPage.setNewPassword("aaaaa");
-        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(),
+            SHORT_PASSWORD_ERROR_MESSAGE +
+            '\n' +
+            SEQUENTIAL_PASSWORD_ERROR_MESSAGE
+        );
 
         resetPasswordPage.setNewPassword("12345678");
-        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(),
+            COMMONLY_PASSWORD_ERROR_MESSAGE+
+            '\n' +
+            SEQUENTIAL_PASSWORD_ERROR_MESSAGE
+        );
 
         resetPasswordPage.setNewPassword("aaaaaaaa");
         softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
