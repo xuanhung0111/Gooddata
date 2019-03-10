@@ -48,8 +48,14 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-show-in-percent")
     private WebElement showInPercents;
 
+    @FindBy(css = ".s-show-in-percent + span.input-label-text")
+    private WebElement showInPercentLabel;
+
     @FindBy(className = SHOW_ON_SECONDARY_AXIS_CLASS_NAME)
     private WebElement showOnSecondaryAxis;
+
+    @FindBy(css = ".s-show-on-secondary-axis + span.input-label-text")
+    private WebElement showOnSecondaryAxisLabel;
 
     @FindBy(className = DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME)
     private List<WebElement> byDateAndAddAttributeFilter;
@@ -114,14 +120,14 @@ public class MetricConfiguration extends AbstractFragment {
     }
 
     public MetricConfiguration showPercents() {
-        waitForElementVisible(showInPercents).click();
-        assertTrue(showInPercents.isSelected(), "Show in percents isn't checked");
+        waitForElementVisible(showInPercentLabel).click();
+        assertTrue(waitForElementPresent(showInPercents).isSelected(), "Show in percents isn't checked");
         return this;
     }
 
     public MetricConfiguration checkShowOnSecondaryAxis() {
         if (!isShowOnSecondaryAxisChecked()) {
-            waitForElementVisible(showOnSecondaryAxis).click();
+            waitForElementVisible(showOnSecondaryAxisLabel).click();
         }
         return this;
     }
@@ -130,15 +136,15 @@ public class MetricConfiguration extends AbstractFragment {
         if (!isShowOnSecondaryAxisChecked()) {
             return;
         }
-        waitForElementVisible(showOnSecondaryAxis).click();
+        waitForElementVisible(showOnSecondaryAxisLabel).click();
     }
 
     public boolean isShowOnSecondaryAxisChecked() {
-        return waitForElementVisible(showOnSecondaryAxis).isSelected();
+        return waitForElementPresent(showOnSecondaryAxis).isSelected();
     }
 
     public String getShowOnSecondaryAxis() {
-        return waitForElementVisible(waitForElementVisible(showOnSecondaryAxis).findElement(BY_PARENT)).getText();
+        return waitForElementVisible(waitForElementPresent(showOnSecondaryAxis).findElement(BY_PARENT)).getText();
     }
 
     public Boolean isShowOnSecondaryAxisPresent() {
