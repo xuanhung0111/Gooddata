@@ -66,9 +66,6 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
 
-    @FindBy(css = ".highcharts-series")
-    private List<WebElement> tracker;
-
     private static final By BY_X_AXIS_TITLE = className("highcharts-xaxis-title");
     private static final By BY_Y_AXIS_TITLE = className("highcharts-yaxis-title");
     private static final By BY_LEGEND = className("viz-static-legend-wrap");
