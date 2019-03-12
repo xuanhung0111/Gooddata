@@ -9,7 +9,8 @@ public final class GoodSalesUtils {
     public static final String SP_YEAR_AGO = " - SP year ago";
 
     //@TODO GOODSALES TEMPLATE, will removed when QA-6396 completes
-    public static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
+    public static final String PROJECT_TEMPLATES_GOOD_SALES_DEMO_2 = "/projectTemplates/GoodSalesDemo/2";
+    public static final String PROJECT_TEMPLATES_GOOD_SALES_DEMO_3 = "/projectTemplates/GoodSalesDemo/3";
 
     // dashboards
     public static final String DASH_PIPELINE_ANALYSIS = "Pipeline Analysis";
@@ -170,11 +171,4 @@ public final class GoodSalesUtils {
     public static final String DATE_DATASET_ACTIVITY = "Activity";
     public static final String DATE_DATASET_SNAPSHOT = "Snapshot";
     public static final String DATE_DATASET_TIMELINE = "Timeline";
-
-    // items configuration panel
-    public static final String Y_AXIS = "Y-Axis";
-    public static final String COLORS = "Colors";
-    public static final String X_AXIS = "X-Axis";
-    public static final String LEGEND = "Legend";
-    public static final String CANVAS = "Canvas";
 }

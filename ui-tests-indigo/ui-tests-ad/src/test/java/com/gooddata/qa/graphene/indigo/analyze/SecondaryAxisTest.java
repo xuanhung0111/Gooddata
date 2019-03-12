@@ -41,11 +41,11 @@ import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.COLORS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.X_AXIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.Y_AXIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.LEGEND;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.CANVAS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.COLORS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.LEGEND;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.X_AXIS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -58,13 +58,16 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES = "A metric and attributes";
     private IndigoRestRequest indigoRestRequest;
     private ProjectRestRequest projectRestRequest;
-    private final List<String> defaultItemsConfigurationPanel = asList(COLORS, X_AXIS, Y_AXIS, LEGEND, CANVAS);
+    private final List<String> defaultItemsConfigurationPanel =
+            asList(COLORS.toString(), X_AXIS.toString(), Y_AXIS.toString(), LEGEND.toString(), CANVAS.toString());
     private static final String INSIGHT_TEST_CONFIGURATION_HAS_TWO_MEASURE_AND_ATTRIBUTE =
             "Configuration two measure and attribute";
     private final List<String> itemsConfigurationPanelColumnChart =
-            asList(COLORS, X_AXIS, Y_AXIS + " (Left)", Y_AXIS + " (Right)", LEGEND, CANVAS);
+            asList(COLORS.toString(), X_AXIS.toString(), Y_AXIS.toString() + " (Left)", Y_AXIS.toString() + " (Right)",
+                    LEGEND.toString(), CANVAS.toString());
     private final List<String> itemsConfigurationPanelBarChart =
-            asList(COLORS, X_AXIS + " (Top)", X_AXIS + " (Bottom)", Y_AXIS, LEGEND, CANVAS);
+            asList(COLORS.toString(), X_AXIS.toString() + " (Top)", X_AXIS.toString() + " (Bottom)",
+                    Y_AXIS.toString(), LEGEND.toString(), CANVAS.toString());
     private String sourceProjectId;
     private String targetProjectId;
     private String insight;
@@ -340,14 +343,14 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(configurationPanelBucket.getItemNames(), itemsConfigurationPanelBarChart);
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
-        configurationPanelBucket.getItemConfiguration(Y_AXIS + " (Left)").switchOff();
+        configurationPanelBucket.getItemConfiguration(Y_AXIS.toString() + " (Left)").switchOff();
 
         analysisPage.waitForReportComputing();
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getPrimaryYaxisTitle(), StringUtils.EMPTY);
         assertFalse(chartReport.isPrimaryYaxisVisible(), "Rerender insight shouldn't have primary axis");
 
-        configurationPanelBucket.getItemConfiguration(Y_AXIS + " (Right)").switchOff();
+        configurationPanelBucket.getItemConfiguration(Y_AXIS.toString() + " (Right)").switchOff();
         analysisPage.waitForReportComputing();
         assertEquals(chartReport.getSecondaryYaxisTitle(), StringUtils.EMPTY);
         assertFalse(chartReport.isSecondaryYaxisVisible(), "Rerender insight shouldn't have secondary axis");
@@ -436,9 +439,9 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
                 .checkShowOnSecondaryAxis();
         analysisPage.saveInsight().waitForReportComputing();
         analysisPage.getConfigurationPanelBucket()
-                .getItemConfiguration(Y_AXIS + " (Right)").expandConfiguration().setMinMaxValueOnAxis(rightMin, rightMax);
+                .getItemConfiguration(Y_AXIS.toString() + " (Right)").expandConfiguration().setMinMaxValueOnAxis(rightMin, rightMax);
         analysisPage.getConfigurationPanelBucket()
-                .getItemConfiguration(Y_AXIS + " (Left)").expandConfiguration().setMinMaxValueOnAxis(leftMin, leftMax);
+                .getItemConfiguration(Y_AXIS.toString() + " (Left)").expandConfiguration().setMinMaxValueOnAxis(leftMin, leftMax);
 
         rightMin = "-14.9";
         rightMax = "130";
