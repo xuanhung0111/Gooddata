@@ -36,7 +36,7 @@ public class MetricsBucket extends AbstractBucket {
     }
 
     public List<String> getItemNames() {
-        return waitForCollectionIsNotEmpty(metrics).stream()
+        return metrics.stream()
             .map(MetricConfiguration::getHeader)
             .collect(toList());
     }

@@ -104,7 +104,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testTheApplyOnDropdownlistIsNotEnabled() {
+    public void testTheApplyOnDropDownListIsNotEnabled() {
         initAnalysePage().addMetric(METRIC_AVG_AMOUNT).addMetric(METRIC_AMOUNT).addDateFilter();
         ElementUtils.makeSureNoPopupVisible();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -183,7 +183,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void disableApplyButtonWithoutChoosedMeasure() throws NoSuchFieldException {
+    public void disableApplyButtonWithoutChoosingMeasure() throws NoSuchFieldException {
         initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
@@ -470,8 +470,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_ALL_MODE);
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME));
-        assertThat(analysisPage.getMetricsBucket().getItemNames(),
-                not(hasItems(DERIVED_METRIC_AMOUNT, DERIVED_METRIC_WON, DERIVED_METRIC_AVG_AMOUNT)));
+        assertTrue(analysisPage.getMetricsBucket().isEmpty(), "Metrics bucket should be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"})
