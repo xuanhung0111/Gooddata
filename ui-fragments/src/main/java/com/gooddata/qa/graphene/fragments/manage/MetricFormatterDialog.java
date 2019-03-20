@@ -93,7 +93,12 @@ public class MetricFormatterDialog extends AbstractFragment {
             .append("[<1000][blue]$#,#.##;")
             .append("[>=1000][green]$#,#.##")
             .toString()),
-        UTF_8("新年快樂");
+        UTF_8("新年快樂"),
+        COLORS_FORMAT("[RED]#,##0.00"),
+        BACKGROUND_COLOR_FORMAT("[RED][backgroundColor=aff8ef]#,##0.00"),
+        XSS("<button>#,##0.00</button>"),
+        NULL_VALUE("#'##0,00 formatted; [=null] null value!"),
+        LONG("$#,##0,00 long format long format long format long format long format long format long format");
 
         private String text;
 
