@@ -94,6 +94,25 @@ public class ConfigurationPanelBucket extends AbstractBucket {
         return getRoot().getAttribute("class").contains("bucket-collapsed");
     }
 
+    public enum Items {
+        Y_AXIS("Y-Axis"),
+        COLORS("Colors"),
+        X_AXIS("X-Axis"),
+        LEGEND("Legend"),
+        CANVAS("Canvas");
+
+        private String item;
+
+        Items(String item) {
+            this.item = item;
+        }
+
+        @Override
+        public String toString() {
+            return item;
+        }
+    }
+
     public class ItemConfiguration extends AbstractFragment {
 
         @FindBy(className = "adi-bucket-item-header")

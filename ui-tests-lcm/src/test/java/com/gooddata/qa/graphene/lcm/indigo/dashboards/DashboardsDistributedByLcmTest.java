@@ -24,10 +24,6 @@ import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectio
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
-
-import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
-import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
-
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LCMServiceProject;
@@ -54,12 +50,14 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.Y_AXIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.X_AXIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.LEGEND;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.CANVAS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.COLORS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.COLORS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.LEGEND;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.X_AXIS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
+import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
+import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -331,7 +329,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
         final List<String> itemsConfigurationPanelColumnChart =
-                asList(COLORS, X_AXIS, Y_AXIS + " (Left)", Y_AXIS + " (Right)", LEGEND, CANVAS);
+                asList(COLORS.toString(), X_AXIS.toString(), Y_AXIS.toString() + " (Left)",
+                        Y_AXIS.toString() + " (Right)", LEGEND.toString(), CANVAS.toString());
         final String INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE = "Two measure and attribute";
 
         indigoRestRequest.createInsight(

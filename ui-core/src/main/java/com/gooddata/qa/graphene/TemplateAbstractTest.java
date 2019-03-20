@@ -21,7 +21,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_SALES_VELOC
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_SEASONALITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WATERFALL_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.PROJECT_TEMPLATES_GOOD_SALES_DEMO_3;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 @Deprecated
@@ -38,7 +38,7 @@ public class TemplateAbstractTest extends AbstractProjectTest{
     protected void initProperties() {
         // GS template is used by default
         projectTitle = "GoodSales-test";
-        projectTemplate = GOODSALES_TEMPLATE;
+        projectTemplate = PROJECT_TEMPLATES_GOOD_SALES_DEMO_3;
 
         expectedGoodSalesDashboardsAndTabs = new HashMap<>();
         expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[]{
