@@ -483,7 +483,8 @@ public class TableReport extends AbstractFragment {
         }
 
         public void selectPivotItem(AggregationItem item) {
-            waitForElementVisible(className(format("s-menu-aggregation-%s", item.metadataName)), getRoot()).click();
+            waitForElementVisible(cssSelector(
+                    format(".s-menu-aggregation-%s .s-menu-aggregation-inner", item.metadataName)), getRoot()).click();
         }
 
         public Boolean isItemChecked(AggregationItem type) {
