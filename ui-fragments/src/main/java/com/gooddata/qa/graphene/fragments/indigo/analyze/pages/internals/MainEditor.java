@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -54,8 +55,8 @@ public class MainEditor extends AbstractFragment {
                 waitForElementVisible(BY_TABLE_REPORT, browser));
     }
 
-    public TableReport getPivotTableReport() {
-        return Graphene.createPageFragment(TableReport.class,
+    public PivotTableReport getPivotTableReport() {
+        return Graphene.createPageFragment(PivotTableReport.class,
                 waitForElementVisible(BY_PIVOT_TABLE_REPORT, browser));
     }
 

@@ -514,7 +514,7 @@ public class EventingBasicTest extends AbstractEventingTest {
             embeddedAnalysisPage.waitForReportComputing();
 
             cleanUpLogger();
-            embeddedAnalysisPage.getPivotTableReport().getPivotCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
             JSONObject content = getLatestPostMessageObj();
             verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
         } finally {
@@ -537,7 +537,7 @@ public class EventingBasicTest extends AbstractEventingTest {
             embeddedAnalysisPage.waitForReportComputing();
 
             cleanUpLogger();
-            embeddedAnalysisPage.getPivotTableReport().getPivotCellElement(ATTR_STAGE_NAME, 0).click();
+            embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
             JSONObject content = getLatestPostMessageObj();
             verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
         } finally {
