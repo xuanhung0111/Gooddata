@@ -15,7 +15,8 @@ public enum DashboardWidgetDirection {
     RIGHT("(left): (\\d+)px", 630),
     UP("(top): (\\d+)px", 0),
     MIDDLE("(top): (\\d+)px", 60),
-    DOWN("(top): (\\d+)px", 120);
+    DOWN("(top): (\\d+)px", 120),
+    NEXT_PAGE("(top): (\\d+)px", 1250);
 
     private String pattern;
     private int expectedCoordinates;
