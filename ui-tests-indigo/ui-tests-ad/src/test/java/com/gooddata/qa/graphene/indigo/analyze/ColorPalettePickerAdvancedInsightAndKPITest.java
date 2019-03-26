@@ -1,15 +1,14 @@
-package com.gooddata.qa.graphene.indigo.dashboards;
+package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
 import com.gooddata.qa.utils.http.ColorPaletteRequestData;
@@ -35,7 +34,7 @@ import java.util.List;
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 import static java.util.Collections.singletonList;
 
-public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstractTest {
+public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyseTest {
 
     private ProjectRestRequest projectRestRequest;
     private IndigoRestRequest indigoRestRequest;
@@ -46,16 +45,12 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
     private final String DEFAULT_INSIGHT = "Default Insight" + generateHashString();
     private final String NEW_INSIGHT = "New Insight" + generateHashString();
     private final String INSIGHT_APPLY_CUSTOM_COLOR_PICKER = "Insight Apply Custom Color Picker" + generateHashString();
-    private final String INSIGHT_APPLY_COLOR_PICKER_MAPPING =
-            "Insight Apply Color Picker Mapping" + generateHashString();
+    private final String INSIGHT_APPLY_COLOR_PICKER_MAPPING = "Insight Apply Color Picker Mapping" + generateHashString();
     private final String INSIGHT_TEST = "Insight Test" + generateHashString();
     private final String INSIGHT_TEST_SAVE_AS = "Insight Test Save As" + generateHashString();
-    private final String IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT =
-            "Import Export Partial Project With Insight" + generateHashString();
-    private final String IMPORT_EXPORT_PROJECT_WITH_INSIGHT =
-            "Import Export Project With Insight" + generateHashString();
-    private final String INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES =
-            "Insight Switch between insight types" + generateHashString();
+    private final String IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT = "Import Export Partial Project With Insight" + generateHashString();
+    private final String IMPORT_EXPORT_PROJECT_WITH_INSIGHT = "Import Export Project With Insight" + generateHashString();
+    private final String INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES = "Insight Switch between insight types" + generateHashString();
     private static List<Pair<String, ColorPaletteRequestData.ColorPalette>> listColorPalettes = asList(
             Pair.of("guid1", ColorPaletteRequestData.ColorPalette.RED),
             Pair.of("guid2", ColorPaletteRequestData.ColorPalette.GREEN),
@@ -70,11 +65,13 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Override
     protected void customizeProject() throws Throwable {
-        getMetricCreator().createNumberOfActivitiesMetric();
-        getMetricCreator().createOppFirstSnapshotMetric();
-        getMetricCreator().createSnapshotBOPMetric();
+        Metrics metrics = getMetricCreator();
+        metrics.createNumberOfActivitiesMetric();
+        metrics.createOppFirstSnapshotMetric();
+        metrics.createSnapshotBOPMetric();
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         setCustomColorPickerFlag(false);
     }
 
@@ -86,24 +83,25 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchBetweenColumnChartAndPieChartOnInsight() {
+        setCustomColorPickerFlag(true);
         try {
-            setCustomColorPickerFlag(true);
             createInsightHasAttributeOnViewBy(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES,
                     METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ReportType.COLUMN_CHART);
-            AnalysisPage analysisPage = initAnalysePage()
-                    .openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing();
-            ChartReport chartReport = analysisPage.setCustomColorPicker(ColorPalette.YELLOW.getHexColor())
-                    .applyCustomColorPicker().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
+            initAnalysePage().openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing()
+                    .openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
+                    .getColorsPaletteDialog().openCustomColorPalette()
+                    .getCustomColorsPaletteDialog().setColorCustomPicker(ColorPalette.YELLOW.getHexColor()).apply();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
             analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing();
-            setColorPickerMapping(analysisPage, 5);
-            chartReport = analysisPage.getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 2), ColorPalette.PURPLE.toString());
-            chartReport = analysisPage.changeReportType(ReportType.COLUMN_CHART)
-                    .waitForReportComputing().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
-            chartReport = analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 2), ColorPalette.PURPLE.toString());
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                    .selectColor(ColorPalette.PURPLE.toReportFormatString());
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURPLE.toString());
+            analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
+            analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURPLE.toString());
         } finally {
             setCustomColorPickerFlag(false);
         }
@@ -111,28 +109,30 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnMethods = {"testSwitchBetweenColumnChartAndPieChartOnInsight"})
     public void testSwitchBetweenTreeMapChartAndHeadMapChartOnInsight() {
+        setCustomColorPickerFlag(true);
         try {
-            setCustomColorPickerFlag(true);
-            AnalysisPage analysisPage = initAnalysePage()
-                    .openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing()
+            initAnalysePage().openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing()
                     .changeReportType(ReportType.TREE_MAP).waitForReportComputing();
-            ChartReport chartReport = analysisPage.setCustomColorPicker(ColorPalette.YELLOW.getHexColor())
-                    .applyCustomColorPicker().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
-            assertEquals(chartReport.getLegendColors(), asList(
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
+                    .getColorsPaletteDialog().openCustomColorPalette()
+                    .getCustomColorsPaletteDialog().setColorCustomPicker(ColorPalette.YELLOW.getHexColor()).apply();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
+            assertEquals(analysisPage.getChartReport().getLegendColors(), asList(
                     ColorPalette.YELLOW.toString(), ColorPalette.LIME_GREEN.toString(),
                     ColorPalette.BRIGHT_RED.toString(), ColorPalette.PURE_ORANGE.toString()));
             analysisPage.changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
-            setColorPickerMapping(analysisPage, 4);
-            chartReport = analysisPage.getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
-            chartReport = analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
-            assertEquals(chartReport.getLegendColors(), asList(
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.DARK_CYAN.toCssFormatString()).getColorsPaletteDialog()
+                    .selectColor(ColorPalette.PURE_ORANGE.toReportFormatString());
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
+            analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
+            assertEquals(analysisPage.getChartReport().getLegendColors(), asList(
                     ColorPalette.YELLOW.toString(), ColorPalette.LIME_GREEN.toString(),
                     ColorPalette.BRIGHT_RED.toString(), ColorPalette.PURE_ORANGE.toString()));
-            chartReport = analysisPage.changeReportType(ReportType.HEAT_MAP).waitForReportComputing().getChartReport();
-            assertEquals(chartReport.checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
+            analysisPage.changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
         } finally {
             setCustomColorPickerFlag(false);
         }
@@ -140,49 +140,53 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnAttribute() {
-        AnalysisPage analysisPage = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 4);
-        ChartReport chartReport = analysisPage.getChartReport();
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURE_ORANGE.toString());
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURE_ORANGE.toReportFormatString());
+        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.PURE_ORANGE.toString());
         analysisPage.getStackConfigurationPanelBucket();
-        analysisPage.addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        chartReport = analysisPage.removeStack().waitForReportComputing().getChartReport();
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURE_ORANGE.toString());
+        analysisPage.addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing().removeStack().waitForReportComputing();
+        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.PURE_ORANGE.toString());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnMeasure() {
-        AnalysisPage analysisPage = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
-        ChartReport chartReport = analysisPage.getChartReport();
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
+        analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
+        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
         analysisPage.getStackConfigurationPanelBucket();
         analysisPage.removeStack().waitForReportComputing();
         analysisPage.addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
+        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchBetweenXAxisMetricAndYAxisMetricOnInsight() {
+        setCustomColorPickerFlag(true);
         try {
-            setCustomColorPickerFlag(true);
-            AnalysisPage analysisPage = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addMetric(METRIC_OPP_FIRST_SNAPSHOT).waitForReportComputing();
             analysisPage.changeReportType(ReportType.BUBBLE_CHART).waitForReportComputing();
-            ChartReport chartReport = analysisPage.setCustomColorPicker(ColorPalette.YELLOW.getHexColor())
-                    .applyCustomColorPicker().getChartReport();
-            assertEquals(chartReport.getColor(0, 0), ColorPalette.YELLOW.toString());
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
+                    .getColorsPaletteDialog().openCustomColorPalette()
+                    .getCustomColorsPaletteDialog().setColorCustomPicker(ColorPalette.YELLOW.getHexColor()).apply();
+            assertEquals(analysisPage.getChartReport().getColor(0, 0), ColorPalette.YELLOW.toString());
             analysisPage.getMeasureConfigurationPanelBucket();
-            analysisPage.reorderSecondaryMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT).waitForReportComputing();
-            setColorPickerMapping(analysisPage, 4);
-            chartReport = analysisPage.getChartReport();
-            assertEquals(chartReport.getColor(0, 0), ColorPalette.PURE_ORANGE.toString());
+            analysisPage.reorderSecondaryMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT)
+                    .waitForReportComputing().openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                    .selectColor(ColorPalette.PURE_ORANGE.toReportFormatString());
+            assertEquals(analysisPage.getChartReport().getColor(0, 0), ColorPalette.PURE_ORANGE.toString());
             analysisPage.getMeasureConfigurationPanelBucket();
             analysisPage.reorderSecondaryMetric(METRIC_OPP_FIRST_SNAPSHOT, METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
-            assertEquals(chartReport.getColor(0, 0), ColorPalette.YELLOW.toString());
+            assertEquals(analysisPage.getChartReport().getColor(0, 0), ColorPalette.YELLOW.toString());
             analysisPage.reorderSecondaryMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT).waitForReportComputing();
-            assertEquals(chartReport.getColor(0, 0), ColorPalette.PURE_ORANGE.toString());
+            assertEquals(analysisPage.getChartReport().getColor(0, 0), ColorPalette.PURE_ORANGE.toString());
         } finally {
             setCustomColorPickerFlag(false);
         }
@@ -190,8 +194,8 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDisableCustomColorPickerFlagWithPaletteColorOnGreyPageTurnOff() {
+        setCustomColorPickerFlag(false);
         try {
-            setCustomColorPickerFlag(false);
             createInsightHasAttributeOnStackByAndViewBy(DEFAULT_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
             ChartReport chartReport = initAnalysePage().openInsight(DEFAULT_INSIGHT)
@@ -200,11 +204,11 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
             createInsightHasAttributeOnStackByAndViewBy(INSIGHT_APPLY_COLOR_PICKER_MAPPING, METRIC_NUMBER_OF_ACTIVITIES,
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-            AnalysisPage analysisPage = initAnalysePage()
-                    .openInsight(INSIGHT_APPLY_COLOR_PICKER_MAPPING).waitForReportComputing();
-            setColorPickerMapping(analysisPage, 5);
+            initAnalysePage().openInsight(INSIGHT_APPLY_COLOR_PICKER_MAPPING).waitForReportComputing();
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                    .selectColor(ColorPalette.PURPLE.toReportFormatString());
             analysisPage.saveInsight();
-            chartReport = analysisPage.getChartReport();
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
             assertEquals(chartReport.getLegendColors(), asList(
@@ -212,8 +216,11 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
             setCustomColorPickerFlag(true);
             createInsightHasAttributeOnStackByAndViewBy(INSIGHT_APPLY_CUSTOM_COLOR_PICKER, METRIC_NUMBER_OF_ACTIVITIES,
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-            chartReport = initAnalysePage().openInsight(INSIGHT_APPLY_CUSTOM_COLOR_PICKER).waitForReportComputing()
-                    .setCustomColorPicker(ColorPalette.YELLOW.getHexColor()).applyCustomColorPicker().getChartReport();
+            initAnalysePage().openInsight(INSIGHT_APPLY_CUSTOM_COLOR_PICKER).waitForReportComputing();
+            analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
+                    .getColorsPaletteDialog().openCustomColorPalette()
+                    .getCustomColorsPaletteDialog().setColorCustomPicker(ColorPalette.YELLOW.getHexColor()).apply();
             analysisPage.saveInsight();
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
@@ -231,20 +238,18 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
             applyColorPaletteOnGrayPage();
             browser.navigate().refresh();
-            AnalysisPage analysisPage = initAnalysePage().openInsight(NEW_INSIGHT).waitForReportComputing();
+            initAnalysePage().openInsight(NEW_INSIGHT).waitForReportComputing();
             ChartReport chartReport = analysisPage.getChartReport();
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
             assertEquals(chartReport.getLegendColors(), asList(
                     ColorPalette.RED.toString(), ColorPalette.GREEN.toString()));
-            chartReport = initAnalysePage().openInsight(INSIGHT_APPLY_COLOR_PICKER_MAPPING)
-                    .waitForReportComputing().getChartReport();
+            initAnalysePage().openInsight(INSIGHT_APPLY_COLOR_PICKER_MAPPING).waitForReportComputing();
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
             assertEquals(chartReport.getLegendColors(), asList(
                     ColorPalette.RED.toString(), ColorPalette.GREEN.toString()));
-            chartReport = initAnalysePage().openInsight(INSIGHT_APPLY_CUSTOM_COLOR_PICKER)
-                    .waitForReportComputing().getChartReport();
+            initAnalysePage().openInsight(INSIGHT_APPLY_CUSTOM_COLOR_PICKER).waitForReportComputing();
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
             assertEquals(chartReport.getLegendColors(), asList(
@@ -258,25 +263,30 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
     public void testOpenAsReportButtonDisabledWhenAppliedPaletteColorOnInsight() {
         createInsightHasAttributeOnViewBy(INSIGHT_TEST, METRIC_NUMBER_OF_ACTIVITIES,
                 ATTR_ACTIVITY_TYPE, ReportType.COLUMN_CHART);
-        AnalysisPage analysisPage = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         assertTrue(analysisPage.isDisableOpenAsReport(), "The insight is not compatible with custom colors");
     }
 
     @Test(dependsOnMethods = {"testOpenAsReportButtonDisabledWhenAppliedPaletteColorOnInsight"})
     public void testSaveAsInsightWhenAppliedPaletteColorOnInsight() {
-        AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         analysisPage.saveInsightAs(INSIGHT_TEST_SAVE_AS);
-        ChartReport chartReport = analysisPage.getChartReport();
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
+        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
     }
 
     @Test(dependsOnMethods = {"testSaveAsInsightWhenAppliedPaletteColorOnInsight"})
     public void testActionsUndoAndRedoWhenAppliedPaletteColorOnInsight() {
-        AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
+        analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
         analysisPage.undo();
@@ -287,17 +297,20 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnMethods = {"testSaveAsInsightWhenAppliedPaletteColorOnInsight"})
     public void testActionReorderingWhenAppliedPaletteColorOnInsight() {
-        AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
+        initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
         analysisPage.addMetric(METRIC_OPP_FIRST_SNAPSHOT).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        analysisPage.openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         analysisPage.getMeasureConfigurationPanelBucket();
-        ChartReport chartReport = analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT).getChartReport();
+        ChartReport chartReport = analysisPage
+                .reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT).getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.CYAN.toString());
         assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.PURPLE.toString());
         assertEquals(chartReport.getLegendColors(), asList(
                 ColorPalette.CYAN.toString(), ColorPalette.PURPLE.toString()));
         analysisPage.getMeasureConfigurationPanelBucket();
-        chartReport = analysisPage.reorderMetric(METRIC_OPP_FIRST_SNAPSHOT, METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        analysisPage.reorderMetric(METRIC_OPP_FIRST_SNAPSHOT, METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
         assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
         assertEquals(chartReport.getLegendColors(), asList(
@@ -306,19 +319,23 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
 
     @Test(dependsOnMethods = {"testActionReorderingWhenAppliedPaletteColorOnInsight"})
     public void testActionClearWhenAppliedPaletteColorOnInsight() {
-        AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        initAnalysePage().openInsight(INSIGHT_TEST).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         analysisPage.getPageHeader().getResetButton();
         assertTrue(analysisPage.getPageHeader().isResetButtonEnabled(),
-                "Insight has been cleared ,So can not apply Color Palette");
+            "Insight has been cleared ,So can not apply Color Palette");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testApplyColorPalettePickerOnKpi() {
         createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PROJECT_WITH_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
                 ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-        AnalysisPage analysisPage = initAnalysePage().openInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        initAnalysePage().openInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         analysisPage.saveInsight();
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForWidgetsLoading()
@@ -335,7 +352,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
     public void testExportAndImportProjectWithInsight() {
         final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-                true, true, true, statusPollingCheckIterations);
+            true, true, true, statusPollingCheckIterations);
         testParams.setProjectId(targetProjectId);
         try {
             importProject(exportToken, statusPollingCheckIterations);
@@ -356,9 +373,10 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
     public void testPartialExportAndImportWithInsight() {
         String insight = createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT,
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-        AnalysisPage analysisPage = initAnalysePage()
-                .openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT).waitForReportComputing();
-        setColorPickerMapping(analysisPage, 5);
+        initAnalysePage().openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
         assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
@@ -369,12 +387,12 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
         try {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             chartReport = initAnalysePage().openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT)
-                    .waitForReportComputing().getChartReport();
+                .waitForReportComputing().getChartReport();
             takeScreenshot(browser, "testPartialExportAndImportWithInsight", getClass());
             assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.CYAN.toString());
             assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
             assertEquals(chartReport.getLegendColors(), asList(
-                    ColorPalette.CYAN.toString(), ColorPalette.LIME_GREEN.toString()));
+                ColorPalette.CYAN.toString(), ColorPalette.LIME_GREEN.toString()));
         } finally {
             testParams.setProjectId(sourceProjectId);
             if (nonNull(targetProjectId)) {
@@ -383,28 +401,27 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
         }
     }
 
-    private void createInsightHasAttributeOnViewBy(String title, String metric,
-                                                   String attribute, ReportType reportType) {
-        indigoRestRequest.createInsight(
-                new InsightMDConfiguration(title, reportType)
-                        .setMeasureBucket(
-                                singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
-                        .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+    private void createInsightHasAttributeOnViewBy(String title, String metric, String attribute, ReportType reportType) {
+            indigoRestRequest.createInsight(
+                    new InsightMDConfiguration(title, reportType)
+                            .setMeasureBucket(
+                                    singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
+                            .setCategoryBucket(asList(
+                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
+                                            CategoryBucket.Type.ATTRIBUTE))));
     }
 
     private String createInsightHasAttributeOnStackByAndViewBy(String title, String metric,
                                                                String attribute, String stack) {
-        return indigoRestRequest.createInsight(
-                new InsightMDConfiguration(title, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(
-                                singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
-                        .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
-                                        CategoryBucket.Type.ATTRIBUTE),
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+            return indigoRestRequest.createInsight(
+                    new InsightMDConfiguration(title, ReportType.COLUMN_CHART)
+                            .setMeasureBucket(
+                                    singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
+                            .setCategoryBucket(asList(
+                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
+                                            CategoryBucket.Type.ATTRIBUTE),
+                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
+                                            CategoryBucket.Type.ATTRIBUTE))));
     }
 
     private void setCustomColorPickerFlag(boolean status) {
@@ -415,21 +432,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends GoodSalesAbstra
         indigoRestRequest.setColor(initColorPalette(listColorPalettes));
     }
 
-    public void deleteColorPaletteOnGrayPage() {
+    private void deleteColorPaletteOnGrayPage() {
         indigoRestRequest.deleteColorsPalette();
-    }
-
-    /**
-     * Opening the color configuration bucket, list color items measure are showed .
-     * Select the first color at position (0) in list color items to match color column of chart
-     * and then select the palette in position (indexColor)
-     *
-     * @param analysisPage the page apply color palette
-     * @param indexColor   the palette in position (indexColor)
-     * @return ConfigurationPanelBucket after applied color to a column of chart
-     */
-    private ConfigurationPanelBucket setColorPickerMapping(AnalysisPage analysisPage, Integer indexColor) {
-        return analysisPage.getConfigurationPanelBucket().openColorConfiguration()
-                .openColorPicker(0).getItemColorPicker(indexColor);
     }
 }

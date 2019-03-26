@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -547,24 +548,16 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, typeAttribute);
     }
 
-    /**
-     *
-     * @param hexColor : Input hex color in custom color palette
-     * @return AnalysisPage after input hex color
-     */
-
-    public AnalysisPage setCustomColorPicker(String hexColor) {
-        getConfigurationPanelBucket().openColorConfiguration().openColorPicker(0)
-                .openColorCustomPicker().setColorCustomPicker(hexColor);
-        return this;
-    }
-
     public AnalysisPage resetColorPicker() {
-        getConfigurationPanelBucket().openColorConfiguration().resetColor();
+        openConfigurationPanelBucket().openColorConfiguration().resetColor();
         return this;
     }
 
-    public ConfigurationPanelBucket getConfigurationPanelBucket() {
+    public boolean isDialogDropdownBoxVisible() {
+        return isElementVisible(className("gd-color-drop-down"), browser);
+    }
+
+    public ConfigurationPanelBucket openConfigurationPanelBucket() {
         return waitForFragmentVisible(configurationPanelBucket).expandConfigurationPanel();
     }
 
@@ -572,28 +565,17 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket).expandMeasureConfigurationPanel();
     }
 
+    public boolean isCustomColorPaletteDialogVisible() {
+        return isElementVisible(By.className("color-picker-container"), browser);
+    }
+
     public StacksBucket getStackConfigurationPanelBucket() {
         return waitForFragmentVisible(stacksBucket).expandStackConfigurationPanel();
     }
 
     public String checkColorItems() {
-        getConfigurationPanelBucket().openColorConfiguration();
+        openConfigurationPanelBucket().openColorConfiguration();
         return waitForElementPresent(cssSelector(".gd-color-unsupported"), browser).getText();
-    }
-
-    public AnalysisPage applyCustomColorPicker() {
-        waitForElementPresent(cssSelector(".color-picker-ok-button.s-ok"), browser).click();
-        return this;
-    }
-
-    public AnalysisPage clickCancelButtonInColorCustomPicker() {
-        waitForElementPresent(cssSelector(".color-picker-button.s-cancel"), browser).click();
-        return this;
-    }
-
-    public AnalysisPage resetColor() {
-        waitForElementPresent(cssSelector(".s-reset-colors-button.s-reset_colors"), browser).click();
-        return this;
     }
 
     public boolean isDisableOpenAsReport() {

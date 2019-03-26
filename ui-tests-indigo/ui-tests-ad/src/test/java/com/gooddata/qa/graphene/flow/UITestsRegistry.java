@@ -51,6 +51,11 @@ import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
 import com.gooddata.qa.graphene.indigo.analyze.TotalsResultWithInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.WalkmeOnEmbeddedAdTest;
+import com.gooddata.qa.graphene.indigo.analyze.ApplyColorPaletteOnAnalyzePageTest;
+import com.gooddata.qa.graphene.indigo.analyze.ColorPalettePickerBasicInsightAndKPITest;
+import com.gooddata.qa.graphene.indigo.analyze.ColorPalettePickerAdvancedInsightAndKPITest;
+import com.gooddata.qa.graphene.indigo.analyze.ColorPalettePickerUILayoutInsightAndKPITest;
+import com.gooddata.qa.graphene.indigo.analyze.CustomColorPaletteUILayoutInsightAndKPITest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
@@ -98,6 +103,8 @@ public class UITestsRegistry {
             EventingBasicTest.class,
             BackwardCompatibilityTest.class,
             DateFilterADMeasureTest.class,
+            ApplyColorPaletteOnAnalyzePageTest.class,
+            ColorPalettePickerBasicInsightAndKPITest.class,
         });
 
         suites.put("all", new Object[] {
@@ -154,6 +161,11 @@ public class UITestsRegistry {
             SecondaryAxisTest.class,
             PivotTableAdvancedTest.class,
             ReferencePointAndVisSwitchingTest.class,
+            ApplyColorPaletteOnAnalyzePageTest.class,
+            ColorPalettePickerBasicInsightAndKPITest.class,
+            ColorPalettePickerAdvancedInsightAndKPITest.class,
+            ColorPalettePickerUILayoutInsightAndKPITest.class,
+            CustomColorPaletteUILayoutInsightAndKPITest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
