@@ -15,7 +15,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
@@ -229,8 +229,8 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                         CategoryBucket.Type.COLUMNS))));
         initAnalysePage().openInsight(INSIGHT_HAS_A_COLUMN_ATTRIBUTE).waitForReportComputing();
 
-        TableReport tableReport = analysisPage.getPivotTableReport();
-        assertThat(tableReport.getPivotHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+        PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
+        assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
 
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_A_ATTRIBUTE, ReportType.TABLE)
@@ -238,7 +238,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.ATTRIBUTE))));
         initAnalysePage().openInsight(INSIGHT_HAS_A_ATTRIBUTE).waitForReportComputing();
-        assertThat(tableReport.getPivotHeadersRow(), hasItem(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersRow(), hasItem(ATTR_DEPARTMENT));
 
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES, ReportType.TABLE)
@@ -249,16 +249,16 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                         CategoryBucket.Type.COLUMNS))));
 
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();;
-        assertThat(tableReport.getPivotHeadersRow(), hasItem(ATTR_FORECAST_CATEGORY));
-        assertThat(analysisPage.getPivotTableReport().getPivotHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersRow(), hasItem(ATTR_FORECAST_CATEGORY));
+        assertThat(analysisPage.getPivotTableReport().getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSomeCommonPivotTablesHaveOnlyMeasures() {
         createSimpleInsight(INSIGHT_HAS_A_METRIC, METRIC_AMOUNT);
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC)
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.getHeadersMeasure(), asList(METRIC_AMOUNT));
+        assertEquals(pivotTableReport.getHeadersMeasure(), asList(METRIC_AMOUNT));
 
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_METRICS, ReportType.TABLE)
@@ -266,8 +266,8 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
                                 MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_WON)),
                                 MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_TIMELINE_BOP)))));
-        tableReport = initAnalysePage().openInsight(INSIGHT_HAS_METRICS).waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.getHeadersMeasure(), asList(METRIC_AMOUNT, METRIC_WON, METRIC_TIMELINE_BOP));
+        pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_METRICS).waitForReportComputing().getPivotTableReport();
+        assertEquals(pivotTableReport.getHeadersMeasure(), asList(METRIC_AMOUNT, METRIC_WON, METRIC_TIMELINE_BOP));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -280,9 +280,9 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.COLUMNS))));
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        TableReport tableReport = analysisPage.getPivotTableReport();
-        assertThat(tableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
-        assertThat(tableReport.getPivotHeadersColumn(), hasItems(ATTR_DEPARTMENT));
+        PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
+        assertThat(pivotTableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
+        assertThat(pivotTableReport.getHeadersColumn(), hasItems(ATTR_DEPARTMENT));
 
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, ReportType.TABLE)
@@ -292,25 +292,25 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.ATTRIBUTE))));
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        assertThat(tableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
-        assertEquals(tableReport.getPivotHeadersRow(), asList(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
+        assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_DEPARTMENT));
 
         createInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, METRIC_AMOUNT, ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT);
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        assertThat(tableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
-        assertEquals(tableReport.getPivotHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
-        assertThat(tableReport.getPivotHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersMeasure(), hasItem(METRIC_AMOUNT));
+        assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
+        assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSpecialPivotTablesHaveSameObjects() {
         createInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, METRIC_WON, ATTR_DEPARTMENT, ATTR_DEPARTMENT);
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).addMetric(METRIC_WON).waitForReportComputing();
-        TableReport tableReport = analysisPage.getPivotTableReport();
+        PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
 
-        assertThat(tableReport.getHeadersMeasure(), hasItems(METRIC_WON));
-        assertEquals(tableReport.getPivotHeadersRow(), asList(ATTR_DEPARTMENT));
-        assertThat(tableReport.getPivotHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersMeasure(), hasItems(METRIC_WON));
+        assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_DEPARTMENT));
+        assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -406,7 +406,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
             changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOODDATA_CREATED_FILTER_XSSNAME);
             initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).addColumnsAttribute(ATTR_FORECAST_CATEGORY)
                     .waitForReportComputing();
-            TableReport tableReport = analysisPage.getPivotTableReport();
+            PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
             AttributesBucket attributesColumnsBucket = analysisPage.getAttributesColumnsBucket();
             AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
             MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -419,17 +419,17 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
             //metric name
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getHeadersMeasure(), hasItem(xssFormatMetricName));
+            assertThat(pivotTableReport.getHeadersMeasure(), hasItem(xssFormatMetricName));
 
             //attribute name/value
             attributesColumnsBucket.setTitleItemBucket(ATTR_FORECAST_CATEGORY, xssHeader);
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getPivotHeadersColumn(), hasItem(xssHeader));
+            assertThat(pivotTableReport.getHeadersColumn(), hasItem(xssHeader));
 
             //header
             attributesBucket.setTitleItemBucket(ATTR_DEPARTMENT, xssHeader);
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getPivotHeadersRow(), hasItem(xssHeader));
+            assertThat(pivotTableReport.getHeadersRow(), hasItem(xssHeader));
         } finally {
             changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, ATTR_DATE_CREATED);
         }
@@ -455,7 +455,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
             changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOODDATA_FISCAL_CREATED_FILTER_LONG_NAME);
             initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).addColumnsAttribute(ATTR_FORECAST_CATEGORY)
                     .waitForReportComputing();
-            TableReport tableReport = analysisPage.getPivotTableReport();
+            PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
             AttributesBucket attributesColumnsBucket = analysisPage.getAttributesColumnsBucket();
             AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
             MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -469,17 +469,17 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
             //metric name
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getHeadersMeasure(), hasItem(longNameMetric));
+            assertThat(pivotTableReport.getHeadersMeasure(), hasItem(longNameMetric));
 
             //attribute name/value
             attributesColumnsBucket.setTitleItemBucket(ATTR_FORECAST_CATEGORY, longNameMetric);
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getPivotHeadersColumn(), hasItem(longNameMetric));
+            assertThat(pivotTableReport.getHeadersColumn(), hasItem(longNameMetric));
 
             //header
             attributesBucket.setTitleItemBucket(ATTR_DEPARTMENT, longNameMetric);
             analysisPage.waitForReportComputing();
-            assertThat(tableReport.getPivotHeadersRow(), hasItem(longNameMetric));
+            assertThat(pivotTableReport.getHeadersRow(), hasItem(longNameMetric));
         } finally {
             changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, ATTR_DATE_CREATED);
         }
@@ -544,11 +544,11 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST_DASHBOARD).selectDateFilterByName("All time");
-        TableReport tableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getTableReport();
-        assertEquals(tableReport.getPivotContent(), expectedValues);
-        assertThat(tableReport.getHeadersMeasure(), hasItems(METRIC_AMOUNT));
-        assertEquals(tableReport.getPivotHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
-        assertThat(tableReport.getPivotHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+        PivotTableReport pivotTableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport();
+        assertEquals(pivotTableReport.getContent(), expectedValues);
+        assertThat(pivotTableReport.getHeadersMeasure(), hasItems(METRIC_AMOUNT));
+        assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
+        assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
     }
 
     private List<String> getTitlesAttributeFromInsightMetadata(String insight, String localIdentifierOfBucket)

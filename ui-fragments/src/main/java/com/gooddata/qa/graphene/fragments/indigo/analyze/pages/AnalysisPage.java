@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksB
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -383,7 +384,7 @@ public class AnalysisPage extends AbstractFragment {
         return getMainEditor().getTableReport();
     }
 
-    public TableReport getPivotTableReport() {
+    public PivotTableReport getPivotTableReport() {
         return getMainEditor().getPivotTableReport();
     }
 

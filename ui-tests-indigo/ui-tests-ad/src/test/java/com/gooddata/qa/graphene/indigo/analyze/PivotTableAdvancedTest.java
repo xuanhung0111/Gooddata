@@ -7,10 +7,12 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.PivotAggregationPopup;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -33,8 +35,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
-
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
 
 public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
@@ -119,9 +119,9 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_PERCENT)),
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BARS)),
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_TRUNCATE_NUMBER)))));
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.getPivotContent(), expectedValues);
+        assertEquals(pivotTableReport.getContent(), expectedValues);
 
         expectedValues = singletonList(asList("$5,617,913,708.72", "5,617,913,708.72", "5,617,913,708.72",
                 "<button>5,617,913,708.72</button>"));
@@ -133,9 +133,9 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BACKGROUND_FORMAT)),
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_XSS_FORMAT)))));
 
-        tableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
+        pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.getPivotContent(), expectedValues);
+        assertEquals(pivotTableReport.getContent(), expectedValues);
 
         expectedValues = singletonList(
                 asList("新年快樂", "null value!", "$5,617,913,709 " +
@@ -147,9 +147,9 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NULL_VALUE)),
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_LONG)))));
 
-        tableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
+        pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.getPivotContent(), expectedValues);
+        assertEquals(pivotTableReport.getContent(), expectedValues);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -415,16 +415,16 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         CategoryBucket.Type.ATTRIBUTE))));
 
         initAnalysePage().openInsight(INSIGHT_TREE_MAP).waitForReportComputing();
-        assertTrue(analysisPage.getPivotTableReport().isPivotRowHeaderSortedUp(ATTR_PRODUCT),
+        assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_PRODUCT),
                 "Default sorting should be with ASC");
 
         analysisPage.addAttribute(ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPage.getPivotTableReport().isPivotRowHeaderSortedUp(ATTR_PRODUCT),
+        assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_PRODUCT),
                 "Default sorting should be kept with ASC");
 
         analysisPage.addAttributeTopRowsBucket(ATTR_PRODUCT, ATTR_IS_CLOSED);
         takeScreenshot(browser, "Validate-GoodSales-project", getClass());
-        assertTrue(analysisPage.getPivotTableReport().isPivotRowHeaderSortedUp(ATTR_IS_CLOSED),
+        assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_IS_CLOSED),
                 "Default sorting should be kept with ASC");
     }
 
@@ -437,7 +437,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT)))));
 
         initAnalysePage().openInsight(INSIGHT_HAS_METRICS).waitForReportComputing();
-        assertFalse(analysisPage.getPivotTableReport().isPivotTableSortArrowPresent(),
+        assertFalse(analysisPage.getPivotTableReport().isTableSortArrowPresent(),
                 "Should be not sort on table");
 
         indigoRestRequest.createInsight(
@@ -448,7 +448,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_PRODUCT),
                                         CategoryBucket.Type.COLUMNS))));
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
-        assertFalse(analysisPage.getPivotTableReport().isPivotTableSortArrowPresent(),
+        assertFalse(analysisPage.getPivotTableReport().isTableSortArrowPresent(),
                 "Should be not sort on table");
 
         indigoRestRequest.createInsight(
@@ -462,7 +462,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_PRODUCT),
                                         CategoryBucket.Type.COLUMNS))));
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        assertFalse(analysisPage.getPivotTableReport().isPivotTableSortArrowPresent(),
+        assertFalse(analysisPage.getPivotTableReport().isTableSortArrowPresent(),
                 "Should be not sort on table");
     }
 
@@ -479,14 +479,14 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         CategoryBucket.Type.ATTRIBUTE))));
 
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        TableReport tableReport = analysisPage.getPivotTableReport();
-        tableReport.sortBaseOnPivotHeader(ATTR_PRODUCT);
+        PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
+        pivotTableReport.sortBaseOnHeader(ATTR_PRODUCT);
         analysisPage.waitForReportComputing();
-        assertTrue(tableReport.isPivotRowHeaderSortedUp(ATTR_PRODUCT),
+        assertTrue(pivotTableReport.isRowHeaderSortedUp(ATTR_PRODUCT),
                 "Product Attribute should be sorted with ASC");
 
         analysisPage.addAttribute(ATTR_IS_CLOSED).waitForReportComputing();
-        assertTrue(tableReport.isPivotRowHeaderSortedUp(ATTR_PRODUCT),
+        assertTrue(pivotTableReport.isRowHeaderSortedUp(ATTR_PRODUCT),
                 "Product Attribute should be still sorted with ASC");
     }
 
@@ -503,29 +503,29 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         CategoryBucket.Type.COLUMNS))));
 
         initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
-        TableReport tableReport = analysisPage.getPivotTableReport();
-        tableReport.sortBaseOnPivotHeader(METRIC_AMOUNT);
+        PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
+        pivotTableReport.sortBaseOnHeader(METRIC_AMOUNT);
 
         analysisPage.addMetric(METRIC_AVG_AMOUNT).waitForReportComputing();
-        assertFalse(tableReport.isPivotRowHeaderSortedUp(METRIC_AMOUNT),
+        assertFalse(pivotTableReport.isRowHeaderSortedUp(METRIC_AMOUNT),
                 "Custom sort on M1 should be still kept");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkCustomSortingOnFilterBar() {
-        TableReport tableReport = initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
+        PivotTableReport pivotTableReport = initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_DEPARTMENT).addColumnsAttribute(ATTR_PRODUCT).waitForReportComputing()
                 .getPivotTableReport();
-        tableReport.sortBaseOnPivotHeader(METRIC_AMOUNT);
+        pivotTableReport.sortBaseOnHeader(METRIC_AMOUNT);
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_PRODUCT,
                 "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid");
         analysisPage.waitForReportComputing();
-        assertTrue(tableReport.isPivotRowHeaderSortedUp(ATTR_DEPARTMENT),
+        assertTrue(pivotTableReport.isRowHeaderSortedUp(ATTR_DEPARTMENT),
                 "Sorting should be changed to " + ATTR_DEPARTMENT + " attribute A1 with ASC");
 
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_PRODUCT, "All");
         analysisPage.waitForReportComputing();
-        assertTrue(tableReport.isPivotRowHeaderSortedUp(ATTR_DEPARTMENT),
+        assertTrue(pivotTableReport.isRowHeaderSortedUp(ATTR_DEPARTMENT),
                 "Sorting should be still kept on " + ATTR_DEPARTMENT + " attribute A1 with ASC");
 
     }
@@ -542,13 +542,13 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.COLUMNS))));
 
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
                 .waitForReportComputing().getPivotTableReport();
-        tableReport.hoverOnBurgerMenuPivotColumn(METRIC_AMOUNT, 0);
-        assertTrue(tableReport.isBurgerMenuVisible(),
+        pivotTableReport.hoverOnBurgerMenuColumn(METRIC_AMOUNT, 0);
+        assertTrue(pivotTableReport.isBurgerMenuVisible(),
                 "Burger menu should be appeared when I hover into header column");
-        ElementUtils.moveToElementActions(tableReport.getRoot(), 1, 1).perform();
-        assertFalse(tableReport.isBurgerMenuVisible(),
+        ElementUtils.moveToElementActions(pivotTableReport.getRoot(), 1, 1).perform();
+        assertFalse(pivotTableReport.isBurgerMenuVisible(),
                 "Burger menu should be disappeared when I hover out header column");
     }
 
@@ -564,10 +564,10 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.COLUMNS))));
 
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(tableReport.openAggregationPopupPivot(METRIC_AMOUNT, 0).getItemsPivotList(),
-                TableReport.AggregationItem.getAllFullNames(),
+        assertEquals(pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0).getItemsList(),
+                AggregationItem.getAllFullNames(),
                 "Aggregation items should include 6 functions in order is sum, max, min, avg, median, rollup (total)");
     }
 
@@ -584,29 +584,29 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.COLUMNS))));
 
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
                 .waitForReportComputing().getPivotTableReport();
-        tableReport.addNewTotalsPivot(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        pivotTableReport.addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
         analysisPage.waitForReportComputing();
-        assertEquals(tableReport.getPivotCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
-        assertEquals(tableReport.getPivotCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
-        assertEquals(tableReport.getPivotCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
-        assertEquals(tableReport.getPivotCellElementText(METRIC_AVG_AMOUNT, 1, 2), "–");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "–");
 
-        TableReport.AggregationPopup aggregationPopup = tableReport.openAggregationPopupPivot(METRIC_AMOUNT, 0);
+        PivotAggregationPopup aggregationPopup = pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0);
         assertTrue(aggregationPopup.isItemChecked(AggregationItem.SUM),
-                "The SUM item shoud be checked");
-        tableReport.collapseBurgerMenuPivotColumn(METRIC_AMOUNT);
-        assertFalse(tableReport.openAggregationPopupPivot(METRIC_AVG_AMOUNT, 0).isItemChecked(AggregationItem.SUM),
-                "The SUM item shoud be not checked");
-        tableReport.collapseBurgerMenuPivotColumn(METRIC_AVG_AMOUNT);
-        assertFalse(tableReport.openAggregationPopupPivot("Direct Sales", 0)
-                .isItemChecked(AggregationItem.SUM), "The SUM item shoud be not checked");
+                "The SUM item should be checked");
+        pivotTableReport.collapseBurgerMenuColumn(METRIC_AMOUNT);
+        assertFalse(pivotTableReport.openAggregationPopup(METRIC_AVG_AMOUNT, 0).isItemChecked(AggregationItem.SUM),
+                "The SUM item should be not checked");
+        pivotTableReport.collapseBurgerMenuColumn(METRIC_AVG_AMOUNT);
+        assertFalse(pivotTableReport.openAggregationPopup("Direct Sales", 0)
+                .isItemChecked(AggregationItem.SUM), "The SUM item it should be not checked");
 
-        aggregationPopup.selectPivotItem(AggregationItem.SUM);
+        aggregationPopup.selectItem(AggregationItem.SUM);
         analysisPage.waitForReportComputing();
-        assertTrue(tableReport.openAggregationPopupPivot("Direct Sales", 0)
-                .isItemChecked(AggregationItem.SUM), "The SUM item shoud be checked");
+        assertTrue(pivotTableReport.openAggregationPopup("Direct Sales", 0)
+                .isItemChecked(AggregationItem.SUM), "The SUM item should be checked");
     }
 
     private void createSimpleInsight(String title, String metric, ReportType reportType) {

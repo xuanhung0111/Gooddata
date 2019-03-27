@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -15,6 +16,7 @@ public class Insight extends Widget {
 
     private static final By BY_CHART_REPORT = By.className("highcharts-container");
     private static final By BY_TABLE_REPORT = By.className("gd-base-visualization");
+    private static final By BY_PIVOT_TABLE_REPORT = By.className("s-pivot-table");
 
     public static Insight getInstance(final WebElement root) {
         return Graphene.createPageFragment(Insight.class, waitForElementVisible(root));
@@ -28,6 +30,11 @@ public class Insight extends Widget {
     public TableReport getTableReport() {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(BY_TABLE_REPORT, getRoot()));
+    }
+
+    public PivotTableReport getPivotTableReport() {
+        return Graphene.createPageFragment(PivotTableReport.class,
+            waitForElementVisible(BY_PIVOT_TABLE_REPORT, getRoot()));
     }
 
     public static boolean isInsight(final Widget widget) {
