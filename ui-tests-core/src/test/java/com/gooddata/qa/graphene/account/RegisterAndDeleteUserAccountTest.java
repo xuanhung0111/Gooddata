@@ -45,7 +45,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "The password must have at least 7 characters.";
 
     private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
