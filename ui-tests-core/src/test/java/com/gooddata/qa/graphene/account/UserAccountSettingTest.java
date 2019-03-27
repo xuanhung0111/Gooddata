@@ -44,7 +44,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String NUMBER_FORMAT_SUCCESS_MESSAGE = "Your regional number formatting "
             + "settings were saved successfully.";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "The password must have at least 7 characters.";
 
     private static final String FIELD_REQUIRED_ERROR_MESSAGE = "Field is required.";
 
@@ -53,8 +53,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
-    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "Password is exactly the same as the old one. "
-            + "Choose different one.";
+    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "The password must be different from your last 1 passwords.";
 
     private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
 
