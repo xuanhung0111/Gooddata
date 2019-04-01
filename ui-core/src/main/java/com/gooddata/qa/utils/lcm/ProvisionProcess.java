@@ -15,7 +15,7 @@ public final class ProvisionProcess extends RubyProcess {
     ProvisionProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
         super(new RestClient(
                 new RestProfile(testParameters.getHost(), testParameters.getDomainUser(), testParameters.getPassword(),
-                        true)), projectId, Brick.ofProvisionBrick());
+                        true)), projectId, Brick.ofProvisionBrick(testParameters.getBrickAppstore()));
         this.testParameters = testParameters;
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
