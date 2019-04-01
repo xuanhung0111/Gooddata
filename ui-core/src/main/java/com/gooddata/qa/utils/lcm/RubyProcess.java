@@ -96,16 +96,19 @@ public abstract class RubyProcess {
             this.path = path;
         }
 
-        public static Brick ofReleaseBrick() {
-            return new Brick("release", "${PRODUCTION_APPSTORE}:branch/lcm2:/apps/release_brick");
+        public static Brick ofReleaseBrick(final String appstore) {
+            final String releaseStore = String.format("${%s}:branch/lcm2:/apps/release_brick", appstore);
+            return new Brick("release", releaseStore);
         }
 
-        public static Brick ofRolloutBrick() {
-            return new Brick("rollout", "${PRODUCTION_APPSTORE}:branch/lcm2:/apps/rollout_brick");
+        public static Brick ofRolloutBrick(final String appstore) {
+            final String rolloutStore = String.format("${%s}:branch/lcm2:/apps/rollout_brick", appstore);
+            return new Brick("rollout", rolloutStore);
         }
 
-        public static Brick ofProvisionBrick() {
-            return new Brick("provision", "${PRODUCTION_APPSTORE}:branch/lcm2:/apps/provisioning_brick");
+        public static Brick ofProvisionBrick(final String appstore) {
+            final String provisionStore = String.format("${%s}:branch/lcm2:/apps/provisioning_brick", appstore);
+            return new Brick("provision", provisionStore);
         }
     }
 

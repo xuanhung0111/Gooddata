@@ -44,6 +44,7 @@ public class TestParameters {
     private String reactFolder;
     private String reactProjectTitle;
     private String localhostSDK;
+    private String brickAppstore;
 
 
     public TestParameters(Properties testVariables) {
@@ -69,6 +70,12 @@ public class TestParameters {
         hostProxy = loadProperty("hostProxy");
         languageCode = loadProperty("language");
         userDomain = loadProperty("user.domain");
+        brickAppstore = loadProperty("brickAppstore");
+        // For staging env, brickAppstore is PRODUCTION_APPSTORE
+        // TODO: remove this workaround once testing on NA3 completed, this param should be manipulated at ci-infra
+        if ("gdctest-na3".equals(userDomain)) {
+            brickAppstore = "PUBLIC_APPSTORE";
+        }
         reactFolder = loadProperty("reactFolder");
         reactProjectTitle = loadProperty("reactProjectTitle");
         localhostSDK = loadProperty("localhostSDK");
@@ -263,6 +270,10 @@ public class TestParameters {
 
     public String getLocalhostSDK() {
         return localhostSDK;
+    }
+
+    public String getBrickAppstore() {
+        return brickAppstore;
     }
 
     public Pair<String, String> getInfoUser(UserRoles userRole) {

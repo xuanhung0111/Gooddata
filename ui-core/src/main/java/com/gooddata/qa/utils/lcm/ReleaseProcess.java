@@ -15,7 +15,7 @@ public final class ReleaseProcess extends RubyProcess {
     ReleaseProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
         super(new RestClient(
                 new RestProfile(testParameters.getHost(), testParameters.getDomainUser(), testParameters.getPassword(),
-                        true)), projectId, Brick.ofReleaseBrick());
+                        true)), projectId, Brick.ofReleaseBrick(testParameters.getBrickAppstore()));
         this.testParameters = testParameters;
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
