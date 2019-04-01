@@ -76,7 +76,9 @@ public abstract class TabItem implements MdObject {
         LEFT(0, 150),
         RIGHT(750, 151),
         MIDDLE(370, 151),
-        NEXT_PAGE(370, 1250);
+        NEXT_PAGE(370, 1250),
+        LEFT_OF_NEXT_PAGE(0, 1250),
+        RIGHT_OF_NEXT_PAGE(750, 1250);
 
         private int posX;
         private int posY;

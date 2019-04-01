@@ -4,7 +4,9 @@ import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
+import com.gooddata.qa.fixture.utils.GoodSales.Reports;
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -24,6 +26,7 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
+import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
@@ -59,6 +62,8 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
     private static final String RISK_ASSESSMENT = "Risk Assessment";
     private static final String CONVICTION = "Conviction";
     private static final String F_STAGE_NAME = "FStage Name";
+    private static final String ICON_EMBEDED_URL = "https://s3.amazonaws.com/gd-images.gooddata.com/customtext/" +
+            "magic.html?text=MY%20ICON&size=20&color=1C1CFF&background=FFE6B3&url=https%3A%2F%2Fwww.google.com%2Fmaps%2F";
 
     private static final int currentYear = DateRange.now().getYear();
     private String today;
@@ -82,8 +87,9 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        getReportCreator().createAmountByProductReport();
-        getReportCreator().createAmountByStageNameReport();
+        Reports reports = getReportCreator();
+        reports.createAmountByProductReport();
+        reports.createAmountByStageNameReport();
         promptUri = getVariableCreator().createFilterVariable(F_STAGE_NAME, getAttributeByTitle(ATTR_STAGE_NAME).getUri(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT, CONVICTION));
         createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_F_STAGE_NAME,
@@ -264,6 +270,48 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
                 REPORT_AMOUNT_BY_F_STAGE_NAME, "Stage Name Amount", "Interest", "Discovery", "Short List",
                 "Risk Assessment", "Conviction", "$18,447,266.14", "$4,249,027.88", "$5,612,062.60", "$2,606,293.46",
                 "$3,067,466.12", "Page 2/2"));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void printDashboardWithWebContentsNearPageBreakMarkerToPdf() throws IOException {
+        dashboardTitle = generateDashboardName();
+        openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT));
+        WebElement embeddedWidget = dashboardsPage.addWebContentToDashboard(ICON_EMBEDED_URL).getLastEmbeddedWidget().getRoot();
+        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlace(embeddedWidget);
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(embeddedWidget);
+        embeddedWidget = dashboardsPage.addWebContentToDashboard(ICON_EMBEDED_URL).getLastEmbeddedWidget().getRoot();
+        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlace(embeddedWidget);
+        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget);
+        Screenshots.takeScreenshot(browser, "Dashboard_With_Web_Contents_Near_Page_Break_Maker", getClass());
+        dashboardsPage.saveDashboard();
+        
+        initDashboardsPage().printDashboardTab(); //Have to initialize Page to rollback top of site
+        today = DateRange.getCurrentDate();
+        List<String> contents = asList(getContentFrom(firstTab).split("\n"));
+        assertEquals(contents, asList(REPORT_AMOUNT_BY_PRODUCT, "Product Amount", "CompuSci", "Educationly", "Explorer",
+                "Grammar Plus", "PhoenixSoft", "WonderKid", "$27,222,899.64", "$22,946,895.47", "$38,596,194.86",
+                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", firstTab + " " + today, "Page 1/2",
+                "MY ICON MY ICON", "Page 2/2"));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void printDashboardWithReportsNearPageBreakMarkerToPdf() throws IOException {
+        dashboardTitle = generateDashboardName();
+        openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT),
+                Pair.of(REPORT_AMOUNT_BY_F_STAGE_NAME, ItemPosition.NEXT_PAGE),
+                Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT_OF_NEXT_PAGE));
+        dashboardsPage.printDashboardTab();
+        today = DateRange.getCurrentDate();
+        List<String> contents = asList(getContentFrom(firstTab).split("\n"));
+        Screenshots.takeScreenshot(browser, "Dashboard_With_Reports_Near_Page_Break_Maker", getClass());
+        assertEquals(contents, asList(REPORT_AMOUNT_BY_PRODUCT, "Product Amount", "CompuSci", "Educationly", "Explorer",
+                "Grammar Plus", "PhoenixSoft", "WonderKid", "$27,222,899.64", "$22,946,895.47", "$38,596,194.86",
+                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", firstTab + " " + today, "Page 1/2",
+                REPORT_AMOUNT_BY_F_STAGE_NAME, "Stage Name Amount", "Interest", "Discovery", "Short List",
+                "Risk Assessment", "Conviction", "$18,447,266.14", "$4,249,027.88", "$5,612,062.60", "$2,606,293.46",
+                "$3,067,466.12", REPORT_AMOUNT_BY_PRODUCT, "Product Amount", "CompuSci", "Educationly", "Explorer",
+                "Grammar Plus", "PhoenixSoft", "WonderKid", "$27,222,899.64", "$22,946,895.47", "$38,596,194.86",
+                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", "Page 2/2"));
     }
 
     @Test(dependsOnGroups = "createProject")
