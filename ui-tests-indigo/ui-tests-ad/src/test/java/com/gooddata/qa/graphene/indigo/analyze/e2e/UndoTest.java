@@ -25,6 +25,8 @@ import com.gooddata.qa.utils.http.RestClient;
 
 public class UndoTest extends AbstractAdE2ETest {
 
+    private ProjectRestRequest projectRestRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -33,29 +35,35 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_one_version_per_user_action() {
-        // 1st version
-        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .getMetricsBucket()
-            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-            .expandConfiguration();
+        try {
+            setExtendedStackingFlag(false);
+            // 1st version
+            MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .getMetricsBucket()
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
 
-        // 2nd version
-        analysisPage.addDate();
+            // 2nd version
+            analysisPage.addDate();
 
-        // 3rd version
-        configuration.showPercents();
+            // 3rd version
+            configuration.showPercents();
 
-        // 4th version -- switch category and turn off pop
-        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+            // 4th version -- switch category and turn off pop
+            analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
 
-        IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
+            IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -116,5 +124,9 @@ public class UndoTest extends AbstractAdE2ETest {
             .removeAttribute(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isFilterVisible(ATTR_ACTIVITY_TYPE));
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
