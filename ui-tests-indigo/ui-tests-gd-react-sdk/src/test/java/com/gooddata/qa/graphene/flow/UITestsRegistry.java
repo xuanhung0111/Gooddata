@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.indigo.sdk.EditorPermissionTest;
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedHeadlineTest;
 import com.gooddata.qa.graphene.indigo.sdk.HeadlineByBucketComponentTest;
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedTreemapTest;
+import com.gooddata.qa.graphene.indigo.sdk.VisualizationTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -18,7 +19,8 @@ public class UITestsRegistry {
                 EmbeddedHeadlineTest.class,
                 HeadlineByBucketComponentTest.class,
                 EmbeddedTreemapTest.class,
-                EditorPermissionTest.class
+                EditorPermissionTest.class,
+                VisualizationTest.class
         });
 
         TestsRegistry.getInstance()

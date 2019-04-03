@@ -32,7 +32,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
      */
     public File createCatalogJSON(Pair<String, String>... variables) throws IOException {
         createTestingVariable(variables);
-        return createCatalogExportConfig();
+        return createCatalogExportConfig(testParams.getProjectId(), "catalog.json");
     }
 
     public void replaceContentAppJSFrom(String fileName) throws IOException {
@@ -60,14 +60,14 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         }
     }
 
-    private File createCatalogExportConfig() throws JSONException, IOException {
-        final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/catalog.json");
+    public File createCatalogExportConfig(String projectID, String fileName) throws JSONException, IOException {
+        final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/" + fileName);
         Files.deleteIfExists(file.toPath());
         Graphene.waitGui().until(browser -> !file.exists());
         List<String> commands = new LinkedList<>();
         commands.add("gdc-catalog-export");
         commands.add("--project-id");
-        commands.add(testParams.getProjectId());
+        commands.add(projectID);
         commands.add("--username");
         commands.add(testParams.getUser());
         commands.add("--password");
@@ -75,7 +75,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         commands.add("--hostname");
         commands.add(testParams.getHost());
         commands.add("--output");
-        commands.add("src/catalog.json");
+        commands.add("src/" + fileName);
         try{
             ProcessBuilder processBuilder = new ProcessBuilder(commands);
             processBuilder.directory(new File(testParams.getReactFolder() + testParams.getReactProjectTitle()));

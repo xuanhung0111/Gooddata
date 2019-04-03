@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHT;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHTS;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHT_URL;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHT_URI;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER_INSIGHT;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_FILTER_INSIGHT;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT;
@@ -53,12 +53,12 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
     @Test(dependsOnMethods = "login", groups = "hasData")
     public void embedHeadlineInsight() throws IOException {
         String headline = "Headline " + generateHashString();
-        String insightUrl = createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
-        createCatalogJSON(Pair.of("visualizationName", headline), Pair.of("visualizationUrl", insightUrl));
+        String insightUri = createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
+        createCatalogJSON(Pair.of("visualizationName", headline), Pair.of("visualizationUri", insightUri));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
 
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT_URL);
+        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT_URI);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
     }
 
