@@ -30,6 +30,7 @@ public class ReferencePointAndVisSwitchingTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES = "Some measures, attributes";
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -43,8 +44,9 @@ public class ReferencePointAndVisSwitchingTest extends AbstractAnalyseTest {
         metrics.createAmountMetric();
         metrics.createAvgAmountMetric();
         metrics.createWonMetric();
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
+        projectRestRequest= new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
     }

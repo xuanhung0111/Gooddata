@@ -438,7 +438,7 @@ public class RenamingMeasuresAndAttributesTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                         CategoryBucket.Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                                        CategoryBucket.Type.STACK))));
     }
 
     private void createInsightHaveSameAttributes(String title, String metric, String attribute, String stack) {
@@ -451,6 +451,6 @@ public class RenamingMeasuresAndAttributesTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                         CategoryBucket.Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                                        CategoryBucket.Type.STACK))));
     }
 }
