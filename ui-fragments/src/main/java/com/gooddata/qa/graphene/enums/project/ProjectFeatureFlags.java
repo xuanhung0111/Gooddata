@@ -26,7 +26,8 @@ public enum ProjectFeatureFlags {
     ENABLE_PIVOT_TABLE("enablePivot"),
     ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker"),
     IS_REDIRECTED_FOR_ONE_PROJECT("isRedirectedForOneProject"),
-    ENABLE_DUAL_AXIS("enableDualAxes");
+    ENABLE_DUAL_AXIS("enableDualAxes"),
+    ENABLE_EXTENDED_STACKING("enableExtendedStacking");
 
     private final String featureFlag;
 

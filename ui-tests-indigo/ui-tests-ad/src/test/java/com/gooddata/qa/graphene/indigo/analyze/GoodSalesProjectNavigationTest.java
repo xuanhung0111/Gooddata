@@ -111,8 +111,8 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void switchProjectWithFeatureFlagDisabled() {
-         new ProjectRestRequest(new RestClient(getProfile(ADMIN)), newProjectId).setFeatureFlagInProject(
-                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), newProjectId).setFeatureFlagInProject(
+                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
 
         initAnalysePage();
 

@@ -305,13 +305,11 @@ public class ChartReport extends AbstractFragment {
 
     public String checkColorColumn(int xAxis, int yAxis) {
         WebElement webElement = getTracker(xAxis, yAxis);
-        String getColorColumn = webElement.getAttribute("fill");
-        return getColorColumn;
+        return webElement.getAttribute("fill");
     }
 
     public String getColor(int xAxis, int yAxis) {
         WebElement webElement = getTracker(xAxis, yAxis);
-        String getColorColumn = webElement.getAttribute("stroke");
-        return getColorColumn;
+        return webElement.getAttribute("stroke");
     }
 }
