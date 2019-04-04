@@ -19,6 +19,8 @@ import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 
 public class SubFilterContainer extends AbstractFragment {
 
+    public static final By LOCATOR = By.className("yui3-c-subfilters");
+
     private static final String ATTRIBUTE_VALUES_SUB_FILTER = "Attribute Values";
     private static final String DATE_RANGE_SUB_FILTER = "Date Range";
     private static final String VARIABLE_SUB_FILTER = "Variable";
@@ -56,6 +58,14 @@ public class SubFilterContainer extends AbstractFragment {
     public void addSubFilterByVariable(String variableName) {
         selectType(VARIABLE_SUB_FILTER);
         searchAndSelectItem(variableName);
+    }
+
+    public FloatingRangePanel openFloatingRangePanel(String attrDate) {
+        selectType(DATE_RANGE_SUB_FILTER);
+        searchAndSelectItem(attrDate);
+
+        return Graphene.createPageFragment(FloatingRangePanel.class,
+                waitForElementVisible(By.className("t-floatingPanel"), browser));
     }
 
     public SubFilter getLatestSubFilter() {

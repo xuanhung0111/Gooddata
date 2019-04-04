@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.tagName;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -277,6 +279,10 @@ public class SavedViewWidget extends AbstractFragment{
 
         public WebElement getSavedCurrentViewButton() {
             return waitForElementVisible(savedCurrentViewButton);
+        }
+
+        public boolean isLearnMorePresent() {
+            return isElementPresent(tagName("a"), this.getRoot());
         }
 
         public boolean isNoSavedViewPresent() {

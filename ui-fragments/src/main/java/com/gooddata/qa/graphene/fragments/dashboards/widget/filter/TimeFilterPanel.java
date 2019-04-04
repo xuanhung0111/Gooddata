@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.tagName;
 
 import com.gooddata.qa.graphene.entity.filter.TimeRange;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -213,6 +214,10 @@ public class TimeFilterPanel extends AbstractFragment {
 
         return ElementUtils.isElementVisible(filterTimeFromInput)
                 && ElementUtils.isElementVisible(filterTimeToInput);
+    }
+
+    public boolean isMoreInfoPresent() {
+        return isElementPresent(tagName("a"), this.getRoot());
     }
 
     public boolean canMoveLeftOnTimeline() {

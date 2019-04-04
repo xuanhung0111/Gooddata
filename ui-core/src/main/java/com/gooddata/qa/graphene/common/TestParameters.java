@@ -238,6 +238,11 @@ public class TestParameters {
                 .anyMatch(this.host::matches);
     }
 
+    public boolean isWhitelabeledEnvironment() {
+        return Stream.of("whitelabeled\\.intgdc\\.com")
+                .anyMatch(this.host::matches);
+    }
+
     public boolean isPerformanceEnvironment() {
         return Stream.of("perf\\.getgooddata\\.com")
                 .anyMatch(this.host::matches);
