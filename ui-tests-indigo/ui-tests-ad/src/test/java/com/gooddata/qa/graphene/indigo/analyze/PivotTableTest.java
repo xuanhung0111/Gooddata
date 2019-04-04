@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -51,6 +52,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 import static com.gooddata.md.Restriction.identifier;
@@ -62,12 +64,15 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 public class PivotTableTest extends AbstractAnalyseTest {
 
+    private static final String INSIGHT_HAS_A_ROW_ATTRIBUTE_AND_SOME_MEASURES = "A row attribute and some measures";
+    private static final String INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES = "Some attributes and some measures";
     private static final String INSIGHT_HAS_ATTRIBUTE_AND_MEASURE = "Attribute and measure";
     private static final String INSIGHT_HAS_METRICS = "Metrics";
     private static final String INSIGHT_HAS_ATTRIBUTES = "Attributes";
@@ -94,6 +99,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         Metrics metrics = getMetricCreator();
         metrics.createAmountMetric();
+        metrics.createAvgAmountMetric();
         metrics.createWonMetric();
         metrics.createWinRateMetric();
         metrics.createTimelineBOPMetric();
@@ -248,7 +254,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.COLUMNS))));
 
-        initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();;
+        initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
         assertThat(pivotTableReport.getHeadersRow(), hasItem(ATTR_FORECAST_CATEGORY));
         assertThat(analysisPage.getPivotTableReport().getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
     }
@@ -388,11 +394,11 @@ public class PivotTableTest extends AbstractAnalyseTest {
     public void createSpecialXSSPivotTables() throws IOException {
         final String xssHeader = "<script>alert('testing')</script>";
         final String xssFormatMetricName = "<button>" + METRIC_PERCENT_OF_GOAL + "</button>";
-        final String xssFormatMetricMaql = "SELECT 1";
-        final String GOODDATA_CREATED_FILTER_XSSNAME = "<script>alert(\"testing\")</script>";
+        final String xssFormatMetricMaQL = "SELECT 1";
+        final String GOOD_DATA_CREATED_FILTER_XSS_NAME = "<script>alert(\"testing\")</script>";
 
         final Metric xssFormatMetric = getMdService().createObj(getProject(),
-                new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
+                new Metric(xssFormatMetricName, xssFormatMetricMaQL, "<button>#,##0.00</button>"));
 
         createInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, xssFormatMetricName, ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY);
         indigoRestRequest.createInsight(
@@ -403,7 +409,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.ATTRIBUTE))));
         try {
-            changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOODDATA_CREATED_FILTER_XSSNAME);
+            changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOOD_DATA_CREATED_FILTER_XSS_NAME);
             initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).addColumnsAttribute(ATTR_FORECAST_CATEGORY)
                     .waitForReportComputing();
             PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
@@ -438,10 +444,10 @@ public class PivotTableTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void createPivotTablesHaveLongNames() throws IOException {
         final String longNameMetric = "Having-Long-Name" + UUID.randomUUID().toString().substring(0, 10);
-        final String fomatMetricMaql = "SELECT 1";
+        final String formatMetricMaQL = "SELECT 1";
         final Metric formatMetric = getMdService().createObj(getProject(),
-                new Metric(longNameMetric, fomatMetricMaql, DEFAULT_METRIC_NUMBER_FORMAT));
-        final String GOODDATA_FISCAL_CREATED_FILTER_LONG_NAME = "Date-Dimension-Having-Long-Name" +
+                new Metric(longNameMetric, formatMetricMaQL, DEFAULT_METRIC_NUMBER_FORMAT));
+        final String GOOD_DATA_FISCAL_CREATED_FILTER_LONG_NAME = "Date-Dimension-Having-Long-Name" +
                 UUID.randomUUID().toString().substring(0, 10);
 
         indigoRestRequest.createInsight(
@@ -452,7 +458,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.ATTRIBUTE))));
         try {
-            changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOODDATA_FISCAL_CREATED_FILTER_LONG_NAME);
+            changeDatasetTitleByRest(GOODDATA_DATE_CREATED_DATASET_ID, GOOD_DATA_FISCAL_CREATED_FILTER_LONG_NAME);
             initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).addColumnsAttribute(ATTR_FORECAST_CATEGORY)
                     .waitForReportComputing();
             PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
@@ -462,7 +468,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
             //date dimension
             assertEquals(metricsBucket.getLastMetricConfiguration().expandConfiguration()
-                    .addFilterByDate(GOODDATA_FISCAL_CREATED_FILTER_LONG_NAME.toLowerCase(),
+                    .addFilterByDate(GOOD_DATA_FISCAL_CREATED_FILTER_LONG_NAME.toLowerCase(),
                             DateRange.THIS_YEAR.toString())
                     .getFilterByDate(), "Date-Dime…This year");
             metricsBucket.getLastMetricConfiguration().removeFilterByDate();
@@ -537,7 +543,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void placePivotTableOnDashboard() throws IOException {
+    public void placePivotTableOnDashboard() {
         List<List<String>> expectedValues = asList(asList("Exclude", "$33,562,482.51", "$15,370,157.08"),
                                                    asList("Include", "$46,843,842.45", "$20,848,974.50"));
         createInsight(INSIGHT_TEST_DASHBOARD, METRIC_AMOUNT, ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT);
@@ -545,10 +551,135 @@ public class PivotTableTest extends AbstractAnalyseTest {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST_DASHBOARD).selectDateFilterByName("All time");
         PivotTableReport pivotTableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport();
-        assertEquals(pivotTableReport.getContent(), expectedValues);
+
+        List<List<String>> contentsTable = pivotTableReport.getContent();
+        for(int i = 0; i < contentsTable.size(); i++) {
+            arrayContainingInAnyOrder(contentsTable.get(i), expectedValues.get(i));
+        }
         assertThat(pivotTableReport.getHeadersMeasure(), hasItems(METRIC_AMOUNT));
         assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
         assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void addATotalIntoColumnMetricHeader_ForInsightHasARowAttribute() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_A_ROW_ATTRIBUTE_AND_SOME_MEASURES, ReportType.TABLE)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.ATTRIBUTE))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_A_ROW_ATTRIBUTE_AND_SOME_MEASURES)
+                .waitForReportComputing().getPivotTableReport()
+                .addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        analysisPage.waitForReportComputing();
+
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$116,625,456.54");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
+
+        analysisPage.addFilter(ATTR_FORECAST_CATEGORY).waitForReportComputing().getFilterBuckets()
+                .configAttributeFilter(ATTR_FORECAST_CATEGORY, "Exclude");
+        analysisPage.waitForReportComputing();
+
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 1), "$48,932,639.59");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 1), "–");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void addATotalIntoColumnMetricHeader_ForInsightHasSomeAttributes() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES, ReportType.TABLE)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.COLUMNS))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES)
+                .waitForReportComputing().getPivotTableReport()
+                .addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        analysisPage.waitForReportComputing();
+
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "–");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void addATotalIntoAttributeValueColumnHeader_ForInsightHasSomeAttributes() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES, ReportType.TABLE)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.COLUMNS))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES)
+                .waitForReportComputing().getPivotTableReport()
+                .addNewTotals(AggregationItem.SUM, "Direct Sales", 0);
+        analysisPage.waitForReportComputing();
+
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "$42,598.21");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
+        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "$36,751.70");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotAddTotalIntoPivotTable_ForInsightHasOnlyColumnsAttributes() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES, ReportType.TABLE)
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.COLUMNS),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.COLUMNS))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES)
+                .waitForReportComputing().getPivotTableReport().hoverOnBurgerMenuColumn("Direct Sales", 0);
+
+        assertFalse(pivotTableReport.isBurgerMenuPresent(), "Burger Menu shouldn't be visible");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotAddTotalIntoPivotTable_ForInsightHasAMeasureAndAnAttribute() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_A_COLUMN_ATTRIBUTE, ReportType.TABLE)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                        .setCategoryBucket(singletonList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.COLUMNS))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_A_COLUMN_ATTRIBUTE)
+                .waitForReportComputing().getPivotTableReport().hoverOnBurgerMenuColumn("Direct Sales", 0);
+
+        assertFalse(pivotTableReport.isBurgerMenuPresent(), "Burger Menu shouldn't be visible");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotAddTotalIntoPivotTable_ForInsightHasOnlyMeasures() {
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_METRICS, ReportType.TABLE)
+                        .setMeasureBucket(
+                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)))));
+
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_METRICS)
+                .waitForReportComputing().getPivotTableReport().hoverOnBurgerMenuColumn(METRIC_AMOUNT, 0);
+
+        assertFalse(pivotTableReport.isBurgerMenuPresent(), "Burger Menu shouldn't be visible");
     }
 
     private List<String> getTitlesAttributeFromInsightMetadata(String insight, String localIdentifierOfBucket)

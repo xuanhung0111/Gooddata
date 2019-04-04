@@ -165,6 +165,10 @@ public class PivotTableReport extends AbstractFragment {
             waitForElementVisible(PivotAggregationPopup.LOCATOR, browser));
     }
 
+    public boolean isBurgerMenuPresent() {
+        return isElementPresent(className(BURGER_MENU_CLASS_NAME), getRoot());
+    }
+
     private boolean isHeaderSorted(final String name, final String css, int index) {
         return waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
