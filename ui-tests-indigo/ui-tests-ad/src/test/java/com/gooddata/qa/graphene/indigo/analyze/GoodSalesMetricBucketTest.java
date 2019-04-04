@@ -32,6 +32,8 @@ import com.gooddata.qa.utils.http.RestClient;
 
 public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
+    private ProjectRestRequest projectRestRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -40,8 +42,9 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createAmountMetric();
         metricCreator.createNumberOfActivitiesMetric();
@@ -197,29 +200,38 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void compareIsStillActiveWhenReplaceAttribute() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                "Tracker should display");
+        setExtendedStackingFlag(false);
+        try {
+            initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addDate();
+            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                    "Tracker should display");
 
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
+            analysisPage.getFilterBuckets()
+                    .openDateFilterPickerPanel()
+                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
-        analysisPage.waitForReportComputing();
+            analysisPage.waitForReportComputing();
 
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+            assertEquals(analysisPage.getMetricsBucket().getItemNames(),
+                    asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                "Tracker should display");
+            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                    "Tracker should display");
 
-        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                "Tracker should display");
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-        checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
+            analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                    "Tracker should display");
+            assertEquals(analysisPage.getMetricsBucket().getItemNames(),
+                    asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+            checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

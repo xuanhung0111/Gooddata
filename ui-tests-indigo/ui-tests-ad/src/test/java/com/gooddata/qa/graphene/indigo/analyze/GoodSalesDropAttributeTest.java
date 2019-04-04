@@ -30,6 +30,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -39,8 +40,9 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         getMetricCreator().createNumberOfActivitiesMetric();
     }
 
@@ -59,16 +61,21 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dropThirdAttributeToBucket() {
-        dropAttributeToReportHaveOneMetric();
+        setExtendedStackingFlag(false);
+        try {
+            dropAttributeToReportHaveOneMetric();
 
-        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
-        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
-        assertThat(addedAttributes, hasItem(PRIORITY));
-        assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
+            analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
+            Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
+            assertThat(addedAttributes, hasItem(PRIORITY));
+            assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
 
-        analysisPage.replaceStack(REGION);
-        assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
-        checkingOpenAsReport("dropThirdAttributeToBucket");
+            analysisPage.replaceStack(REGION);
+            assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
+            checkingOpenAsReport("dropThirdAttributeToBucket");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -150,5 +157,9 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
         analysisPage.redo().redo();
         assertEquals(stacksBucket.getAttributeName(), REGION);
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
