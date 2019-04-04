@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -31,6 +34,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     private String emptyMetricUri;
     private DashboardRestRequest dashboardRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -51,6 +55,7 @@ public class TableTest extends AbstractAdE2ETest {
 
         emptyMetricUri = metric.getUri();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -217,13 +222,18 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
-                    analysisPage.getAttributesBucket().getRoot())
-            .getAttributesBucket()
-            .getItemNames()
-            .size(), 1);
+        try {
+            setExtendedStackingFlag(false);
+            assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
+                        analysisPage.getAttributesBucket().getRoot())
+                .getAttributesBucket()
+                .getItemNames()
+                .size(), 1);
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -256,5 +266,9 @@ public class TableTest extends AbstractAdE2ETest {
 
     private Integer unformatNumber(String number) {
         return new Integer(number.replace(",", ""));
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
