@@ -64,7 +64,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -141,30 +140,24 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void enabledPivot_ForAttributesBucketMappedToAttributesOnRowsBucket() {
-        try {
-            setPivotFlag(true);
-            indigoRestRequest.createInsight(
-                    new InsightMDConfiguration(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES, ReportType.TABLE)
-                            .setMeasureBucket(singletonList(MeasureBucket
-                                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
-                            .setCategoryBucket(asList(
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                            CategoryBucket.Type.ATTRIBUTE),
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
-                                            CategoryBucket.Type.ATTRIBUTE))));
-            AttributesBucket attributesBucket = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES)
-                    .waitForReportComputing().getAttributesBucket();
-            assertEquals(attributesBucket.getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
-            assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), emptyList());
-        } finally {
-            setPivotFlag(true);
-        }
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES, ReportType.TABLE)
+                        .setMeasureBucket(singletonList(MeasureBucket
+                                .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                        .setCategoryBucket(asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                                        CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.ATTRIBUTE))));
+        AttributesBucket attributesBucket = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES)
+                .waitForReportComputing().getAttributesBucket();
+        assertEquals(attributesBucket.getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
+        assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), emptyList());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void disablePivot_ForAttributesOnRowsAndColumnsMappedToAttributesBucket() {
         try {
-            setPivotFlag(true);
             indigoRestRequest.createInsight(
                     new InsightMDConfiguration(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES, ReportType.TABLE)
                             .setMeasureBucket(singletonList(MeasureBucket
@@ -551,11 +544,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST_DASHBOARD).selectDateFilterByName("All time");
         PivotTableReport pivotTableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport();
-
-        List<List<String>> contentsTable = pivotTableReport.getContent();
-        for(int i = 0; i < contentsTable.size(); i++) {
-            arrayContainingInAnyOrder(contentsTable.get(i), expectedValues.get(i));
-        }
+        assertEquals(pivotTableReport.getBodyContent(), expectedValues);
         assertThat(pivotTableReport.getHeadersMeasure(), hasItems(METRIC_AMOUNT));
         assertEquals(pivotTableReport.getHeadersRow(), asList(ATTR_FORECAST_CATEGORY));
         assertThat(pivotTableReport.getHeadersColumn(), hasItem(ATTR_DEPARTMENT));
@@ -574,18 +563,19 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_A_ROW_ATTRIBUTE_AND_SOME_MEASURES)
                 .waitForReportComputing().getPivotTableReport()
-                .addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
+                .addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
         analysisPage.waitForReportComputing();
 
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$116,625,456.54");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
+
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$116,625,456.54", "–"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
 
         analysisPage.addFilter(ATTR_FORECAST_CATEGORY).waitForReportComputing().getFilterBuckets()
                 .configAttributeFilter(ATTR_FORECAST_CATEGORY, "Exclude");
         analysisPage.waitForReportComputing();
 
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 1), "$48,932,639.59");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 1), "–");
+        expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$48,932,639.59", "–"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -603,13 +593,12 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES)
                 .waitForReportComputing().getPivotTableReport()
-                .addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
+                .addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
         analysisPage.waitForReportComputing();
 
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "–");
+        List<List<String>> expectedValues = singletonList(
+            asList(AggregationItem.SUM.getRowName(), "$80,406,324.96", "–", "$36,219,131.58", "–"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -627,13 +616,12 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_SOME_ATTRIBUTES_AND_SOME_MEASURES)
                 .waitForReportComputing().getPivotTableReport()
-                .addNewTotals(AggregationItem.SUM, "Direct Sales", 0);
+                .addTotal(AggregationItem.SUM, "Direct Sales", 0);
         analysisPage.waitForReportComputing();
 
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "$42,598.21");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "$36,751.70");
+        List<List<String>> expectedValues = singletonList(
+            asList(AggregationItem.SUM.getRowName(), "$80,406,324.96", "$42,598.21", "$36,219,131.58", "$36,751.70"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -783,6 +771,6 @@ public class PivotTableTest extends AbstractAnalyseTest {
     }
 
     private void setPivotFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
     }
 }
