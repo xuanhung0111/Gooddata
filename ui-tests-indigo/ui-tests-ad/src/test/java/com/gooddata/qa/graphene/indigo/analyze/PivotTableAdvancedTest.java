@@ -6,8 +6,8 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.PivotAggregationPopup;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -65,7 +65,6 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private IndigoRestRequest indigoRestRequest;
     private ProjectRestRequest projectRestRequest;
 
-
     @Override
     public void initProperties() {
         super.initProperties();
@@ -78,8 +77,8 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         metrics.createAmountMetric();
         metrics.createAvgAmountMetric();
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        setPivotFlag(true);
     }
 
     @DataProvider(name = "formattingProvider")
@@ -121,7 +120,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                         MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_TRUNCATE_NUMBER)))));
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(pivotTableReport.getContent(), expectedValues);
+        assertEquals(pivotTableReport.getBodyContent(), expectedValues);
 
         expectedValues = singletonList(asList("$5,617,913,708.72", "5,617,913,708.72", "5,617,913,708.72",
                 "<button>5,617,913,708.72</button>"));
@@ -135,7 +134,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
         pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(pivotTableReport.getContent(), expectedValues);
+        assertEquals(pivotTableReport.getBodyContent(), expectedValues);
 
         expectedValues = singletonList(
                 asList("新年快樂", "null value!", "$5,617,913,709 " +
@@ -149,7 +148,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
         pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
-        assertEquals(pivotTableReport.getContent(), expectedValues);
+        assertEquals(pivotTableReport.getBodyContent(), expectedValues);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -223,36 +222,42 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkReferencePointWithMeasureAndViewByAndStackBy() {
-        indigoRestRequest.createInsight(
+        try {
+            setExtendedStackingFlag(false);
+
+            indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_MEASURE_AND_ATTRIBUTE_AND_STACK, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(
-                                singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
-                        .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                        CategoryBucket.Type.ATTRIBUTE),
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                    .setMeasureBucket(
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                    .setCategoryBucket(asList(
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                            CategoryBucket.Type.ATTRIBUTE),
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE),
+                            CategoryBucket.Type.ATTRIBUTE))));
 
-        initAnalysePage().openInsight(INSIGHT_HAS_MEASURE_AND_ATTRIBUTE_AND_STACK).waitForReportComputing();
-        MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-        StacksBucket stacksBucket = analysisPage.getStacksBucket();
-        AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
-        for (ReportType reportType : REPORT_TYPES) {
-            analysisPage.changeReportType(reportType);
-            assertThat(metricsBucket.getItemNames(), hasItem(METRIC_AMOUNT));
+            initAnalysePage().openInsight(INSIGHT_HAS_MEASURE_AND_ATTRIBUTE_AND_STACK).waitForReportComputing();
+            MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+            StacksBucket stacksBucket = analysisPage.getStacksBucket();
+            AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
+            for (ReportType reportType : REPORT_TYPES) {
+                analysisPage.changeReportType(reportType);
+                assertThat(metricsBucket.getItemNames(), hasItem(METRIC_AMOUNT));
 
-            if (reportType.equals(ReportType.HEAT_MAP) || reportType.equals(ReportType.COLUMN_CHART)) {
+                if (reportType.equals(ReportType.HEAT_MAP) || reportType.equals(ReportType.COLUMN_CHART)) {
+                    assertThat(attributesBucket.getItemNames(), hasItem(ATTR_DEPARTMENT));
+                    assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
+                } else {
+                    assertThat(attributesBucket.getItemNames(), hasItem(ATTR_DEPARTMENT));
+                }
+
+                analysisPage.changeReportType(ReportType.TABLE);
+                AttributesBucket attributesColumnsBucket = analysisPage.getAttributesColumnsBucket();
+                assertThat(metricsBucket.getItemNames(), hasItem(METRIC_AMOUNT));
                 assertThat(attributesBucket.getItemNames(), hasItem(ATTR_DEPARTMENT));
-                assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-            } else {
-                assertThat(attributesBucket.getItemNames(), hasItem(ATTR_DEPARTMENT));
+                assertThat(attributesColumnsBucket.getItemNames(), hasItem(ATTR_ACTIVITY_TYPE));
             }
-
-            analysisPage.changeReportType(ReportType.TABLE);
-            AttributesBucket attributesColumnsBucket = analysisPage.getAttributesColumnsBucket();
-            assertThat(metricsBucket.getItemNames(), hasItem(METRIC_AMOUNT));
-            assertThat(attributesBucket.getItemNames(), hasItem(ATTR_DEPARTMENT));
-            assertThat(attributesColumnsBucket.getItemNames(), hasItem(ATTR_ACTIVITY_TYPE));
+        } finally {
+            setExtendedStackingFlag(true);
         }
     }
 
@@ -362,45 +367,51 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkReferencePointWhenSwitchingFromInsightHasSomeAttribute() {
-        indigoRestRequest.createInsight(
+        try {
+            setExtendedStackingFlag(false);
+
+            indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES, ReportType.COLUMN_CHART)
-                        .setCategoryBucket(singletonList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                        CategoryBucket.Type.STACK))));
+                    .setCategoryBucket(singletonList(
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                            CategoryBucket.Type.STACK))));
 
-        initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
-        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+            initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
+            assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPage.changeReportType(ReportType.TABLE);
-        assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+            analysisPage.changeReportType(ReportType.TABLE);
+            assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
 
-        indigoRestRequest.createInsight(
+            indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES, ReportType.COLUMN_CHART)
-                        .setCategoryBucket(singletonList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                    .setCategoryBucket(singletonList(
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                            CategoryBucket.Type.ATTRIBUTE))));
 
-        initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+            initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
 
-        analysisPage.changeReportType(ReportType.TABLE);
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+            analysisPage.changeReportType(ReportType.TABLE);
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
 
-        indigoRestRequest.createInsight(
+            indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES, ReportType.COLUMN_CHART)
-                        .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE),
-                                        CategoryBucket.Type.ATTRIBUTE),
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                    .setCategoryBucket(asList(
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE),
+                            CategoryBucket.Type.ATTRIBUTE),
+                        CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                            CategoryBucket.Type.ATTRIBUTE))));
 
-        initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+            initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTES).waitForReportComputing();
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+            assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPage.changeReportType(ReportType.TABLE);
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+            analysisPage.changeReportType(ReportType.TABLE);
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+            assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -586,12 +597,10 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
                 .waitForReportComputing().getPivotTableReport();
-        pivotTableReport.addNewTotals(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        pivotTableReport.addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
         analysisPage.waitForReportComputing();
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 0, 2), "$80,406,324.96");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AMOUNT, 1, 2), "$36,219,131.58");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 0, 2), "–");
-        assertEquals(pivotTableReport.getCellElementText(METRIC_AVG_AMOUNT, 1, 2), "–");
+
+        assertEquals(pivotTableReport.getGrandTotalValues(AggregationItem.SUM), asList("$80,406,324.96", "–", "$36,219,131.58", "–"));
 
         PivotAggregationPopup aggregationPopup = pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0);
         assertTrue(aggregationPopup.isItemChecked(AggregationItem.SUM),
@@ -616,7 +625,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                                 singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))));
     }
 
-    private void setPivotFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

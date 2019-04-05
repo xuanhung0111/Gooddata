@@ -1,15 +1,16 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.PivotAggregationPopup;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
@@ -18,6 +19,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -30,11 +32,14 @@ public class PivotTableReport extends AbstractFragment {
     private static final String TABLE_HEADER_ALL_CSS
         = ".gd-column-group-header:not(.ag-header-group-cell-no-group)";
     private static final String BURGER_MENU_CLASS_NAME = "gd-pivot-table-header-menu";
+    private static final String PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX = "gd-column-index-";
+    private static final String CLASS_NAME_SEPARATOR = " ";
+    private static final String TABLE_HEADER_VALUE_SELECTOR = ".s-header-cell-label span";
 
     @FindBy(css = TABLE_HEADER_ALL_CSS)
     private List<WebElement> headers;
 
-    @FindBy(className = "gd-table-row")
+    @FindBy(css = ".ag-body .gd-table-row")
     private List<WebElement> rows;
 
     @FindBy(css = ".ag-body-container .s-value")
@@ -48,6 +53,9 @@ public class PivotTableReport extends AbstractFragment {
 
     @FindBy(css = ".gd-row-attribute-column-header.gd-column-group-header")
     private List<WebElement> headersRows;
+
+    @FindBy(css = ".ag-floating-bottom .gd-table-row")
+    private List<WebElement> grandTotalsRows;
 
     // represents the most top row header
     public List<String> getHeadersColumn() {
@@ -75,24 +83,68 @@ public class PivotTableReport extends AbstractFragment {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
     }
 
-    public List<List<String>> getContent() {
+    public boolean containsGrandTotals() {
+        return !grandTotalsRows.isEmpty();
+    }
+
+    public List<List<String>> getGrandTotalsContent() {
+        return getContent(grandTotalsRows);
+    }
+
+    public List<String> getGrandTotalValues(final AggregationItem type) {
+        return getGrandTotalsContent()
+                .stream()
+                .filter(values -> values.size() > 0 && values.get(0).equals(type.getFullName()))
+                .map(values -> values.subList(1, values.size()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<List<String>> getBodyContent() {
+        return getContent(rows);
+    }
+
+    private List<List<String>> getContent(List<WebElement> contentElements) {
         waitForElementVisible(attributeValuePresent);
 
-        return waitForCollectionIsNotEmpty(rows).stream()
-            .filter(ElementUtils::isElementVisible)
-            .map(e -> e.findElements(className("s-table-cell")))
-            .map(es -> es.stream().map(WebElement::getText).collect(toList()))
-            .collect(toList());
+        return waitForCollectionIsNotEmpty(contentElements).stream()
+                .filter(ElementUtils::isElementVisible)
+                .map(row -> row.findElements(className("s-table-cell")))
+                .map(rowCells -> rowCells
+                        .stream()
+                        // because of custom React LoadingRendered, sometimes the first pivot attribute cell is the last in the DOM
+                        // (visually it is always the first as it is absolutely positioned but wrong result is returned by this method if cells are not sorted)
+                        .sorted(Comparator.comparingInt(this::parseColumnIndex))
+                        .map(WebElement::getText)
+                        .collect(toList())
+                )
+                .collect(toList());
+    }
+
+    private int parseColumnIndex(final WebElement cell) {
+        final String classAttributeValue = cell.getAttribute("class");
+        if (classAttributeValue == null) {
+            return -1;
+        }
+        return Arrays.stream(classAttributeValue.split(CLASS_NAME_SEPARATOR))
+                .filter(className -> className.matches(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX + "\\d+"))
+                .findFirst()
+                .map(indexClassName -> Integer.parseInt(indexClassName.substring(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX.length())))
+                .orElse(-1);
     }
 
     public WebElement getCellElement(String columnTitle, int cellIndex) {
+        int columnIndex = getHeaders().indexOf(columnTitle);
+        return getCellElement(columnIndex, cellIndex);
+    }
+
+    public WebElement getCellElement(int columnIndex, int cellIndex) {
         waitForElementVisible(attributeValuePresent);
 
         List<List<WebElement>> elements = waitForCollectionIsNotEmpty(rows).stream()
             .filter(ElementUtils::isElementVisible)
             .map(tableRow -> tableRow.findElements(className("s-table-cell")))
             .collect(toList());
-        int columnIndex = getHeaders().indexOf(columnTitle);
         return elements.get(cellIndex).get(columnIndex);
     }
 
@@ -129,9 +181,19 @@ public class PivotTableReport extends AbstractFragment {
             .getAttribute("class").contains("gd-pivot-table-header-menu--show");
     }
 
-    public PivotTableReport addNewTotals(AggregationItem type, String columnTitle, int columnIndex) {
-        openAggregationPopup(columnTitle, columnIndex).selectItem(type);
-        AnalysisPage.getInstance(browser).waitForReportComputing();
+    public PivotTableReport addTotal(AggregationItem type, String columnTitle, int columnIndex) {
+        PivotAggregationPopup pivotAggregationPopup = openAggregationPopup(columnTitle, columnIndex);
+        if (!pivotAggregationPopup.isItemChecked(type)) {
+            pivotAggregationPopup.selectItem(type);
+        }
+        return this;
+    }
+
+    public PivotTableReport removeTotal(AggregationItem type, String columnTitle, int columnIndex) {
+        PivotAggregationPopup pivotAggregationPopup = openAggregationPopup(columnTitle, columnIndex);
+        if (pivotAggregationPopup.isItemChecked(type)) {
+            pivotAggregationPopup.selectItem(type);
+        }
         return this;
     }
 
@@ -209,5 +271,17 @@ public class PivotTableReport extends AbstractFragment {
             .map(e -> e.findElements(By.className(format("gd-column-measure-%s", columnIndex))))
             .collect(toList());
         return elements.get(rowIndex).get(headerIndex);
+    }
+
+    public boolean isCellUnderlined(String columnTitle, int cellIndex) {
+        WebElement cell = getCellElement(columnTitle, cellIndex);
+        hoverItem(cell);
+        return cell.getCssValue("text-decoration").contains("underline");
+    }
+
+    public boolean isShortenHeader(String headerName, int columnIndex, int width) {
+        final WebElement headerElement = getHeaderElement(headerName, columnIndex);
+        final WebElement headerValueElement = headerElement.findElement(By.cssSelector(TABLE_HEADER_VALUE_SELECTOR));
+        return isShortendTilteDesignByCss(headerValueElement, width);
     }
 }
