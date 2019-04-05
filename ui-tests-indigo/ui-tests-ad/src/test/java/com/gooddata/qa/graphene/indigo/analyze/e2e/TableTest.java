@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -56,6 +57,8 @@ public class TableTest extends AbstractAdE2ETest {
         emptyMetricUri = metric.getUri();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 TableTest should be removed as we are removing Table Visualization
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})

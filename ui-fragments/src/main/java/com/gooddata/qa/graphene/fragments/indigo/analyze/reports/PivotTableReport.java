@@ -84,6 +84,8 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     public boolean containsGrandTotals() {
+        waitForElementVisible(attributeValuePresent);
+
         return !grandTotalsRows.isEmpty();
     }
 
