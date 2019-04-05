@@ -14,7 +14,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
-import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -383,7 +382,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public boolean isShortenTitleDesignByCss(int sizeText) {
-        return isShortendTilteDesignByCss(isMobileMode() ? dashboardTitleOnMobile : dashboardTitle, sizeText);
+        return isShortenedTitleDesignByCss(isMobileMode() ? dashboardTitleOnMobile : dashboardTitle, sizeText);
     }
 
     public IndigoDashboardsPage changeDashboardTitle(String newTitle) {

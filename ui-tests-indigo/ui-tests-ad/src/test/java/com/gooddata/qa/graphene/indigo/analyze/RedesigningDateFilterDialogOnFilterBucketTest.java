@@ -1,10 +1,13 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -50,10 +53,13 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createTimelineBOPMetric();
+        // TODO: BB-1448 enablePivot FF should be removed
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void redesignTheDateFilterDialog() throws NoSuchFieldException {
+    public void redesignTheDateFilterDialog() {
         List<String> datePeriods = asList(ALL_TIME.toString(), STATIC_PERIOD.toString(), LAST_7_DAYS.toString(),
                 LAST_30_DAYS.toString(), LAST_90_DAYS.toString(), THIS_MONTH.toString(), LAST_MONTH.toString(),
                 LAST_12_MONTHS.toString(), THIS_QUARTER.toString(), LAST_QUARTER.toString(), LAST_4_QUARTERS.toString(),
@@ -75,7 +81,7 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void chooseStaticPeriodOption() throws NoSuchFieldException {
+    public void chooseStaticPeriodOption() {
         DateFilterPickerPanel dateFilterPickerPanel = initAnalysePage()
                 .addDateFilter()
                 .getFilterBuckets()
@@ -100,7 +106,7 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void applyDateFilterDialog() throws NoSuchFieldException {
+    public void applyDateFilterDialog() {
         FiltersBucket filterBucket = initAnalysePage()
                 .addMetric(METRIC_TIMELINE_BOP)
                 .addDateFilter()

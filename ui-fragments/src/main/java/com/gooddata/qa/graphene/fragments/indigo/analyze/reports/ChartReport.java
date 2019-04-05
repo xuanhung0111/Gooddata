@@ -5,9 +5,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
@@ -192,7 +191,7 @@ public class ChartReport extends AbstractFragment {
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
-        return isShortendTilteDesignByCss(waitForElementVisible(tooltip.findElement(className("title"))), width);
+        return isShortenedTitleDesignByCss(waitForElementVisible(tooltip.findElement(className("title"))), width);
     }
 
     public boolean isLegendVisible() {
@@ -209,7 +208,7 @@ public class ChartReport extends AbstractFragment {
 
     public boolean isShortenNameInLegend(String measureName, int width) {
         WebElement measure = legendNames.stream().filter(measures -> measures.getText().equals(measureName)).findFirst().get();
-        return isShortendTilteDesignByCss(measure, width);
+        return isShortenedTitleDesignByCss(measure, width);
     }
 
     public List<String> getLegends() {

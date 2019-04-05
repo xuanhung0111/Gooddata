@@ -19,7 +19,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -282,6 +282,6 @@ public class PivotTableReport extends AbstractFragment {
     public boolean isShortenHeader(String headerName, int columnIndex, int width) {
         final WebElement headerElement = getHeaderElement(headerName, columnIndex);
         final WebElement headerValueElement = headerElement.findElement(By.cssSelector(TABLE_HEADER_VALUE_SELECTOR));
-        return isShortendTilteDesignByCss(headerValueElement, width);
+        return isShortenedTitleDesignByCss(headerValueElement, width);
     }
 }
