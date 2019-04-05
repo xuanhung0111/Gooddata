@@ -108,6 +108,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
         setPivotFlag(true);
     }
 

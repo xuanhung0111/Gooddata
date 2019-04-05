@@ -10,8 +10,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationPopup;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebElement;
@@ -44,8 +44,11 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        final ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 AggregationPopupManipulationTest should be removed as we are removing Table Visualization
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+
         Metrics metrics = getMetricCreator();
         metrics.createAmountMetric();
         metrics.createNumberOfActivitiesMetric();
@@ -54,11 +57,12 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
 
     /**
      * Data provider to test hovering on metric column
+     *
      * @return 2 dimension array contains:
-     * List of measures to add to a table report
-     * List of attributes to add to a table report
-     * List of filters: attribute to be used as filter and expected filter value
-     * List of results: hovered column (attribute/measure) and its aggregation status (available or not)
+     *         List of measures to add to a table report
+     *         List of attributes to add to a table report
+     *         List of filters: attribute to be used as filter and expected filter value
+     *         List of results: hovered column (attribute/measure) and its aggregation status (available or not)
      */
     @DataProvider(name = "getHoveringTestData")
     public Object[][] getHoveringTestData() {
@@ -77,16 +81,15 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         };
     }
 
-    @Test(dataProvider = "getHoveringTestData", dependsOnGroups = "createProject")
+    @Test(dataProvider = "getHoveringTestData", dependsOnGroups = {"createProject"})
     public void testHovering(List<String> measures, List<String> attributes,
-                             List<Pair<String, List<String>>> filters, List<Pair<String, Boolean>> results)
-            throws ParseException {
+                             List<Pair<String, List<String>>> filters, List<Pair<String, Boolean>> results) {
         AnalysisPage analysisPage = initAnalysePage();
         try {
             analysisPage.changeReportType(ReportType.TABLE);
 
-            measures.forEach(measure -> analysisPage.addMetric(measure));
-            attributes.forEach(attribute -> analysisPage.addAttribute(attribute));
+            measures.forEach(analysisPage::addMetric);
+            attributes.forEach(analysisPage::addAttribute);
 
             filters.forEach(filter -> analysisPage.getFilterBuckets().configAttributeFilter(filter.getLeft(),
                     (String[]) filter.getRight().toArray()));
@@ -96,7 +99,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
             results.forEach(result -> {
                 tableReport.hoverOnColumn(result.getLeft());
                 assertEquals(tableReport.isTotalsElementShowed(result.getLeft()), result.getRight().booleanValue());
-                if(result.getRight().booleanValue()) {
+                if (result.getRight()) {
                     tableReport.openAggregationPopup(result.getLeft());
                     tableReport.closeAggregationPopup(result.getLeft());
                 }
@@ -107,8 +110,8 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
 
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void testAggregationHasNullString() throws ParseException {
+    @Test(dependsOnGroups = {"createProject"})
+    public void testAggregationHasNullString() {
         final String metricExpression = format("SELECT SUM([%s]) WHERE 1 = 0",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount")));
         createMetric("EMPTY_SHOW_NULL_STRING", metricExpression, "#'##0,00 formatted; [=null] null value!");
@@ -133,8 +136,8 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void testAggregationWithoutNullString() throws ParseException {
+    @Test(dependsOnGroups = {"createProject"})
+    public void testAggregationWithoutNullString() {
         final String metricExpression = format("SELECT SUM([%s]) WHERE 1 = 0",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount")));
         createMetric("EMPTY_NO_NULL_STRING", metricExpression, "#'##0,00");
@@ -159,7 +162,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testShowAggregationPopup() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -174,7 +177,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testMaximumAggregationFunction() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -185,9 +188,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
                     .addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
             List<String> functions = tableReport.getEnabledAggregations(METRIC_NUMBER_OF_ACTIVITIES);
             Collections.shuffle(functions);
-            functions.stream().forEach(aggFunctionText -> {
-                tableReport.addNewTotals(AggregationItem.fromString(aggFunctionText), METRIC_NUMBER_OF_ACTIVITIES);
-            });
+            functions.forEach(aggFunctionText -> tableReport.addNewTotals(AggregationItem.fromString(aggFunctionText), METRIC_NUMBER_OF_ACTIVITIES));
 
             tableReport.hoverOnColumn(METRIC_NUMBER_OF_ACTIVITIES);
             assertFalse(tableReport.isTotalsElementShowed(METRIC_NUMBER_OF_ACTIVITIES),
@@ -201,7 +202,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testHidingOpenReport() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -218,7 +219,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testAddIconOnAggregationCell() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -242,7 +243,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testCloseAggregationPopup() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -262,7 +263,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testAddTotalRowToFooter() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -284,7 +285,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testHoverReportWithDateAttribute() {
         AnalysisPage analysisPage = initAnalysePage();
         try {
@@ -306,7 +307,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void testHoverReportWithDateFilter() throws ParseException {
         AnalysisPage analysisPage = initAnalysePage();
         try {

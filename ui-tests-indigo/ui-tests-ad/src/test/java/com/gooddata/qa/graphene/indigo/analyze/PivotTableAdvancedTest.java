@@ -77,6 +77,8 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         metrics.createAmountMetric();
         metrics.createAvgAmountMetric();
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        // TODO: BB-1448 enablePivot FF should be removed
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }

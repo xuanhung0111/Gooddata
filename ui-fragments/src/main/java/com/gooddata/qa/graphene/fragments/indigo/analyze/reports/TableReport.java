@@ -20,7 +20,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
@@ -63,7 +63,7 @@ public class TableReport extends AbstractFragment {
     }
 
     public boolean isShortenHeader(String headerName, int width) {
-        return isShortendTilteDesignByCss(getHeader(headerName), width);
+        return isShortenedTitleDesignByCss(getHeader(headerName), width);
     }
 
     public String getTooltipText(String headerName) {
