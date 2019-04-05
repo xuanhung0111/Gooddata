@@ -150,8 +150,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public String checkColorColumn(int xAxis, int yAxis) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
                 .findElements(By.cssSelector(String.format(".gd-base-visualization .highcharts-series-%s rect", xAxis))));
-        String columnColor = list.get(yAxis).getAttribute("fill");
-        return columnColor;
+        return list.get(yAxis).getAttribute("fill");
     }
 
     /*Set value from "ATTRIBUTE_COLOR_REGEX" to "$1" and remove space value by replace method
