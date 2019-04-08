@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.entity.visualization;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 
 public class TotalsBucket {
 

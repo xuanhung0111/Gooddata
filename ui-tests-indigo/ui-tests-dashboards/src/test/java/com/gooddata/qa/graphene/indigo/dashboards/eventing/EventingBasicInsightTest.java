@@ -46,7 +46,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
@@ -91,12 +91,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
     }
@@ -151,7 +151,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
     }
@@ -172,12 +172,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_REGION, regionUri);
     }
@@ -202,12 +202,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_REGION, regionUri);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
@@ -229,12 +229,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_REGION, regionUri);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
@@ -349,12 +349,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        insight.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
     }

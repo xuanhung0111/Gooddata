@@ -60,7 +60,7 @@ public class EventingInEditMode extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        insight.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         String contentStr = getLoggerContent();
         assertTrue(contentStr.isEmpty(), "should no drill event triggered");
     }
