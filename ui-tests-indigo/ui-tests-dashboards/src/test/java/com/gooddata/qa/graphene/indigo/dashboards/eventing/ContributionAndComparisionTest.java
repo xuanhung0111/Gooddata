@@ -4,7 +4,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
@@ -45,7 +45,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
+        insight.getPivotTableReport().getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
 
         verifyReportHasShowPercentation(yearActivityUri);
     }
@@ -91,7 +91,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        insight.getTableReport().getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
+        insight.getPivotTableReport().getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
 
         verifyReportHasShowPercentation(activityTypeUri);
     }
@@ -141,13 +141,13 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        TableReport tableReport = insight.getTableReport();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        PivotTableReport pivotTableReport = insight.getPivotTableReport();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
 
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
         verifyReportWithPoP();
     }
 
@@ -240,16 +240,16 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        TableReport tableReport = insight.getTableReport();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        PivotTableReport pivotTableReport = insight.getPivotTableReport();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
+        pivotTableReport.getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
         verifyReportWithPoP();
     }
 
@@ -309,12 +309,12 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        TableReport tableReport = insight.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
+        PivotTableReport pivotTableReport = insight.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_IN_PERCENTATION, 1, true);
 
         cleanUpLogger();
-        tableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
+        pivotTableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 0, false);
     }
 
@@ -376,12 +376,12 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         cleanUpLogger();
-        TableReport tableReport = insight.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
+        PivotTableReport pivotTableReport = insight.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_IN_PERCENTATION, 1, true);
 
         cleanUpLogger();
-        tableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
+        pivotTableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 0, false);
     }
 
