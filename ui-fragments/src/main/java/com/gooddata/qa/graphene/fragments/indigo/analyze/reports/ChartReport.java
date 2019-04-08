@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
@@ -64,6 +65,9 @@ public class ChartReport extends AbstractFragment {
 
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
+
+    @FindBy(css = ".highcharts-stack-labels text")
+    private List<WebElement> totalsStackedColumn;
 
     private static final By BY_X_AXIS_TITLE = className("highcharts-xaxis-title");
     private static final By BY_Y_AXIS_TITLE = className("highcharts-yaxis-title");
@@ -262,6 +266,33 @@ public class ChartReport extends AbstractFragment {
                 .get();
     }
 
+    public List<String> getTotalsStackedColumn() {
+        if (totalsStackedColumn.isEmpty()) {
+            return emptyList();
+        }
+        return getElementTexts(totalsStackedColumn);
+    }
+
+    public String checkColorColumn(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        return webElement.getAttribute("fill");
+    }
+
+    public String getColor(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        return webElement.getAttribute("stroke");
+    }
+
+    public String getHeightColumn(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        return webElement.getAttribute("height");
+    }
+
+    public String getXLocationColumn(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        return webElement.getAttribute("x");
+    }
+
     private boolean isLineChart() {
         return getRoot().getAttribute("class").contains("visualization-line");
     }
@@ -300,15 +331,5 @@ public class ChartReport extends AbstractFragment {
                         ".highcharts-series-%s.highcharts-tracker path," +
                         ".highcharts-series-%s.highcharts-tracker circle", groupIndex, groupIndex, groupIndex))));
         return list.get(index);
-    }
-
-    public String checkColorColumn(int xAxis, int yAxis) {
-        WebElement webElement = getTracker(xAxis, yAxis);
-        return webElement.getAttribute("fill");
-    }
-
-    public String getColor(int xAxis, int yAxis) {
-        WebElement webElement = getTracker(xAxis, yAxis);
-        return webElement.getAttribute("stroke");
     }
 }
