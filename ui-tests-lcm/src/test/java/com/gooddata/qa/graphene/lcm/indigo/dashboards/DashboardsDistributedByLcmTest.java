@@ -15,8 +15,6 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ColorsPaletteDialog;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CustomColorsPaletteDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -226,8 +224,9 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightWithColorPickerConfiguration() {
+        setCustomColorPickerFlag(true);
+        setExtendedStackingFlag(false);
         try {
-            setCustomColorPickerFlag(true);
             ChartReport chartReport = initAnalysePage().openInsight(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER)
                     .waitForReportComputing().getChartReport();
             takeScreenshot(browser, "testInsightWithColorPickerConfiguration", getClass());
@@ -236,6 +235,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             assertEquals(chartReport.getLegendColors(), asList(ColorPalette.YELLOW.toString(), ColorPalette.GREEN.toString()));
         }finally {
             setCustomColorPickerFlag(false);
+            setExtendedStackingFlag(true);
         }
     }
 
@@ -422,8 +422,9 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     }
 
     private void createInsightToTestCustomColorPicker() {
+        setCustomColorPickerFlag(true);
+        setExtendedStackingFlag(false);
         try {
-            setCustomColorPickerFlag(true);
             createInsightHasAttributeOnStackByAndViewBy(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER,
                     METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
             AnalysisPage analysisPage = initAnalysePage()
@@ -434,6 +435,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             analysisPage.waitForReportComputing().saveInsight();
         } finally {
             setCustomColorPickerFlag(false);
+            setExtendedStackingFlag(true);
         }
     }
 
@@ -452,5 +454,10 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private void setCustomColorPickerFlag(boolean status) {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CUSTOM_COLOR_PICKER, status);
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
