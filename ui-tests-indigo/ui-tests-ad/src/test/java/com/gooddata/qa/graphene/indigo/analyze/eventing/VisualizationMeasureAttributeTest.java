@@ -1,32 +1,38 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
-
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONArray;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
-    private String insightUri;
+
+    private static final int TESTED_ROW_INDEX = 3;
+
     private String insightObjectId;
 
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
 
-        insightUri = createSimpleInsight("Simple_Drillable_Insight", ReportType.TABLE, METRIC_NUMBER_OF_ACTIVITIES,
-                ATTR_ACTIVITY_TYPE, ATTR_REGION);
+        final String insightUri = createInsight("Simple_Drillable_Insight", ReportType.TABLE, Collections.singletonList(METRIC_NUMBER_OF_ACTIVITIES),
+                Arrays.asList(ATTR_ACTIVITY_TYPE, ATTR_REGION));
         insightObjectId = getObjectIdFromUri(insightUri);
     }
 
@@ -38,21 +44,33 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testVisualizationOfDrillingUrisReports() throws IOException {
-        JSONArray uris = new JSONArray() {{
-            put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri());
-        }};
-        final String file = createTemplateHtmlFile(insightObjectId, uris.toString());
-        verifyUnderlineAndHighlight(file);
+        try {
+            setExtendedStackingFlag(false);
+
+            JSONArray uris = new JSONArray() {{
+                put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri());
+            }};
+            final String file = createTemplateHtmlFile(insightObjectId, uris.toString());
+            verifyUnderlineAndHighlight(file);
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testVisualizationOfDrillingIdentifiersReports() throws IOException {
-        JSONArray identifiers = new JSONArray() {{
-            put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getIdentifier());
-        }};
-        final String file = createTemplateHtmlFile(insightObjectId,
-                "[]", identifiers.toString());
-        verifyUnderlineAndHighlight(file);
+        try {
+            setExtendedStackingFlag(false);
+            
+            JSONArray identifiers = new JSONArray() {{
+                put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getIdentifier());
+            }};
+            final String file = createTemplateHtmlFile(insightObjectId,
+                    "[]", identifiers.toString());
+            verifyUnderlineAndHighlight(file);
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -69,12 +87,12 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
 
         EmbeddedAnalysisPage analysisPage = openEmbeddedPage(file);
         analysisPage.waitForReportComputing();
-        TableReport report = analysisPage.getTableReport();
+        PivotTableReport report = analysisPage.getPivotTableReport();
 
-        assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
+        assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, TESTED_ROW_INDEX),
                 String.format("Column %s should be underlined", ATTR_ACTIVITY_TYPE));
 
-        assertTrue(report.isCellUnderlined(ATTR_REGION, 0),
+        assertTrue(report.isCellUnderlined(ATTR_REGION, TESTED_ROW_INDEX),
                 String.format("Column %s should be underlined", ATTR_REGION));
     }
 
@@ -92,18 +110,18 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
 
         EmbeddedAnalysisPage analysisPage = openEmbeddedPage(file);
         analysisPage.waitForReportComputing();
-        TableReport report = analysisPage.getTableReport();
+        PivotTableReport report = analysisPage.getPivotTableReport();
 
-        assertTrue(report.isCellUnderlined(ATTR_REGION, 0),
+        assertTrue(report.isCellUnderlined(ATTR_REGION, TESTED_ROW_INDEX),
                 String.format("Column %s should be underlined", ATTR_REGION));
     }
 
     private void verifyNotUnderlineAndHighlight(final String htmlFile) {
         EmbeddedAnalysisPage analysisPage = openEmbeddedPage(htmlFile);
         analysisPage.waitForReportComputing();
-        TableReport report = analysisPage.getTableReport();
+        PivotTableReport report = analysisPage.getPivotTableReport();
 
-        assertFalse(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
+        assertFalse(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, TESTED_ROW_INDEX),
                 String.format("Column %s should not be underlined", ATTR_ACTIVITY_TYPE));
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
@@ -116,14 +134,19 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
     private void verifyUnderlineAndHighlight(final String htmlFile) {
         EmbeddedAnalysisPage analysisPage = openEmbeddedPage(htmlFile);
         analysisPage.waitForReportComputing();
-        TableReport report = analysisPage.getTableReport();
+        PivotTableReport report = analysisPage.getPivotTableReport();
 
-        assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
+        assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, TESTED_ROW_INDEX),
                 String.format("Column %s should be underlined", ATTR_ACTIVITY_TYPE));
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         ChartReport chartReport = analysisPage.getChartReport();
         assertTrue(chartReport
                         .isColumnHighlighted(getColumnPosition(chartReport, "East Coast", "Email")),
                 "Chart(East Coast, Email) should be highlighted");
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
