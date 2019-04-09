@@ -4,7 +4,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,8 +41,8 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
 
         verifyReportHasShowPercentation(yearActivityUri);
     }
@@ -86,8 +86,8 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 0).click();
 
         verifyReportHasShowPercentation(activityTypeUri);
     }
@@ -136,13 +136,13 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
 
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
         verifyReportWithPoP();
     }
 
@@ -232,16 +232,16 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
+        pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, 0).click();
         verifyReportWithPoP();
 
         cleanUpLogger();
-        tableReport.getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
+        pivotTableReport.getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
         verifyReportWithPoP();
     }
 
@@ -299,12 +299,12 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_IN_PERCENTATION, 1, true);
 
         cleanUpLogger();
-        tableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
+        pivotTableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 0, false);
     }
 
@@ -364,12 +364,12 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        TableReport tableReport = embeddedAnalysisPage.getTableReport();
-        tableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.getCellElement(ACTIVITIES_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_IN_PERCENTATION, 1, true);
 
         cleanUpLogger();
-        tableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
+        pivotTableReport.getCellElement(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 3).click();
         verifyReportWithCombination(ACTIVITIES_YEAR_AGO_IN_PERCENTATION, 0, false);
     }
 
