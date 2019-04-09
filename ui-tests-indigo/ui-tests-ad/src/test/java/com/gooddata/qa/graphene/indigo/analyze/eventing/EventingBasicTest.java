@@ -32,26 +32,33 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportSingleMetric() throws IOException {
-        String insightUri = createInsight("single_metric_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final JSONArray uris = new JSONArray() {{
-            put(activityUri);
-        }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+        try {
+            setPivotFlag(false);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+            String insightUri = createInsight("single_metric_table_insight", TABLE,
+                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(activityUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final JSONArray uris = new JSONArray() {{
             put(activityUri);
@@ -73,33 +80,40 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportMultipleMetrics() throws IOException {
-        String insightUri = createInsight("multiple_metrics_table_insight", TABLE,
+        try {
+            setPivotFlag(false);
+
+            String insightUri = createInsight("multiple_metrics_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-        JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(opportunityUri);
-        }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+            JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(opportunityUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
-        content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
+            content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportMultipleMetrics() throws IOException {
         String insightUri = createInsight("multiple_metrics_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
         JSONArray uris = new JSONArray() {{
@@ -133,107 +147,135 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute_table_insight", TABLE, Collections.emptyList(),
-                Arrays.asList(ATTR_STAGE_NAME));
-        final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
-        final JSONArray uris = new JSONArray() {{
-            put(stageUri);
-        }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+        try {
+            setPivotFlag(false);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+            String insightUri = createInsight("single_attribute_table_insight", TABLE, Collections.emptyList(),
+                Arrays.asList(ATTR_STAGE_NAME));
+            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(stageUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportMultipleAttributes() throws IOException {
-        String insightUri = createInsight("multiple_attributes_table_insight", TABLE, Collections.emptyList(),
+        try {
+            setPivotFlag(false);
+
+            String insightUri = createInsight("multiple_attributes_table_insight", TABLE, Collections.emptyList(),
                 Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION));
-        final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        JSONArray uris = new JSONArray() {{
-            put(stageUri);
-            put(regionUri);
-        }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            JSONArray uris = new JSONArray() {{
+                put(stageUri);
+                put(regionUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-        content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_REGION, regionUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+            content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_REGION, regionUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportMultipleMetricsSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute__multiple_metric_table_insight", TABLE,
+        try {
+            setPivotFlag(false);
+
+            String insightUri = createInsight("single_attribute__multiple_metric_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
                 Arrays.asList(ATTR_REGION));
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(opportunityUri);
-            put(regionUri);
-        }};
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(opportunityUri);
+                put(regionUri);
+            }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_REGION, regionUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_REGION, regionUri);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-        content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportSingleMetricSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute_single_metric_table_insight", TABLE,
+        try {
+            setPivotFlag(false);
+
+            String insightUri = createInsight("single_attribute_single_metric_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
                 Arrays.asList(ATTR_REGION));
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(regionUri);
-        }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(regionUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_REGION, regionUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_REGION, regionUri);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-        content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricSingleAttribute() throws IOException {
         String insightUri = createInsight("single_attribute_single_metric_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_REGION));
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_REGION));
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
         JSONArray uris = new JSONArray() {{
@@ -246,7 +288,7 @@ public class EventingBasicTest extends AbstractEventingTest {
 
         cleanUpLogger();
         Pair<Integer, Integer> position  = getColumnPosition(embeddedAnalysisPage.getChartReport(),
-                METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+            METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
         embeddedAnalysisPage.getChartReport().clickOnElement(position);
 
         JSONObject content = getLatestPostMessageObj();
@@ -261,8 +303,8 @@ public class EventingBasicTest extends AbstractEventingTest {
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportHasStackBy() throws IOException {
         String insightUri = createInsight("test_stackby_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_REGION);
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_REGION);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -293,8 +335,8 @@ public class EventingBasicTest extends AbstractEventingTest {
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportHasStackBySameAsViewBy() throws IOException {
         String insightUri = createInsight("test_same_attr_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE);
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -323,37 +365,44 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportSingleMetricViewByDate() throws IOException {
-        String insightUri = createInsight("test_view_date_table_insight", TABLE,
+        try {
+            setPivotFlag(false);
+
+            String insightUri = createInsight("test_view_date_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
                 Arrays.asList(ATTR_YEAR_ACTIVITY));
 
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
-        JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(yearActivity);
-        }};
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+            JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(yearActivity);
+            }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-        JSONObject content = getLatestPostMessageObj();
-        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
 
-        cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
-        content = getLatestPostMessageObj();
-        verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
+            cleanUpLogger();
+            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
+            content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
+        }
+        finally {
+            setPivotFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricViewByDate() throws IOException {
         String insightUri = createInsight("test_view_date_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_YEAR_ACTIVITY));
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_YEAR_ACTIVITY));
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
@@ -367,7 +416,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         Pair<Integer, Integer> position  = getColumnPosition(embeddedAnalysisPage.getChartReport(),
-                METRIC_NUMBER_OF_ACTIVITIES, "2011");
+            METRIC_NUMBER_OF_ACTIVITIES, "2011");
 
         cleanUpLogger();
         embeddedAnalysisPage.getChartReport().clickOnElement(position);
@@ -385,8 +434,8 @@ public class EventingBasicTest extends AbstractEventingTest {
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportMultipleMetricsViewByDate() throws IOException {
         String insightUri = createInsight("test_view_date_multi_metrics_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
-                Arrays.asList(ATTR_YEAR_CREATED));
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
+            Arrays.asList(ATTR_YEAR_CREATED));
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
@@ -402,7 +451,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         Pair<Integer, Integer> position  = getColumnPosition(embeddedAnalysisPage.getChartReport(),
-                METRIC_NUMBER_OF_ACTIVITIES, "2011");
+            METRIC_NUMBER_OF_ACTIVITIES, "2011");
 
         cleanUpLogger();
         embeddedAnalysisPage.getChartReport().clickOnElement(position);
@@ -417,7 +466,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(1), "2011", yearCreated);
 
         position  = getColumnPosition(embeddedAnalysisPage.getChartReport(),
-                METRIC_NUMBER_OF_OPPORTUNITIES, "2011");
+            METRIC_NUMBER_OF_OPPORTUNITIES, "2011");
         cleanUpLogger();
         embeddedAnalysisPage.getChartReport().clickOnElement(position);
 
@@ -434,8 +483,8 @@ public class EventingBasicTest extends AbstractEventingTest {
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricViewByDateHasStack() throws IOException {
         String insightUri = createInsight("test_view_date_has_stack_column_insight", COLUMN_CHART,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_YEAR_ACTIVITY), ATTR_REGION);
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_YEAR_ACTIVITY), ATTR_REGION);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
@@ -501,48 +550,171 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleMetric() throws IOException {
-        try {
-            setPivotFlag(true);
-            String insightUri = createInsight("single_metric_pivot_table_insight", TABLE,
-                    Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final JSONArray uris = new JSONArray() {{
-                put(activityUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
+        String insightUri = createInsight("single_metric_pivot_table_insight", TABLE,
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final JSONArray uris = new JSONArray() {{
+            put(activityUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
 
-            cleanUpLogger();
-            embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-        } finally {
-            setPivotFlag(false);
-        }
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleAttribute() throws IOException {
-        try {
-            setPivotFlag(true);
-            String insightUri = createInsight("single_attribute_pivot_table_insight", TABLE, Collections.emptyList(),
-                    Arrays.asList(ATTR_STAGE_NAME));
-            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
-            final JSONArray uris = new JSONArray() {{
-                put(stageUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
+        String insightUri = createInsight("single_attribute_pivot_table_insight", TABLE, Collections.emptyList(),
+            Arrays.asList(ATTR_STAGE_NAME));
+        final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
+        final JSONArray uris = new JSONArray() {{
+            put(stageUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
 
-            cleanUpLogger();
-            embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
-        } finally {
-            setPivotFlag(false);
-        }
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportSingleMetricViewByDate() throws IOException {
+        String insightUri = createInsight("test_view_date_pivot_table_insight", TABLE,
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_YEAR_ACTIVITY));
+
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(yearActivity);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportSingleMetricSingleAttribute() throws IOException {
+        String insightUri = createInsight("single_attribute_single_metric_pivot_table_insight", TABLE,
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
+            Arrays.asList(ATTR_REGION));
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(regionUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_REGION, regionUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportMultipleMetricsSingleAttribute() throws IOException {
+        String insightUri = createInsight("single_attribute__multiple_metric_pivot_table_insight", TABLE,
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
+            Arrays.asList(ATTR_REGION));
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(opportunityUri);
+            put(regionUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_REGION, regionUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportMultipleAttributes() throws IOException {
+        String insightUri = createInsight("multiple_attributes_pivot_table_insight", TABLE, Collections.emptyList(),
+            Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION));
+        final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(stageUri);
+            put(regionUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_REGION, regionUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportMultipleMetrics() throws IOException {
+        String insightUri = createInsight("multiple_metrics_pivot_table_insight", TABLE,
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(opportunityUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
     }
 
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
@@ -576,6 +748,6 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     private void setPivotFlag(boolean status) {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
     }
 }
