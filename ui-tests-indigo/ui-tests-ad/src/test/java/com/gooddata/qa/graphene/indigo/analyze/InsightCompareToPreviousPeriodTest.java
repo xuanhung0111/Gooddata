@@ -15,6 +15,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_EOP;
 import static java.util.Arrays.asList;
@@ -27,8 +28,12 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+
         Metrics metricCreator = getMetricCreator();
         metricCreator.createNumberOfActivitiesMetric();
         metricCreator.createTimelineEOPMetric();
@@ -56,7 +61,7 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
         assertEquals(dateFilterPickerPanel.getCompareApplyMeasuresText(), "All measures");
 
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.waitForReportComputing().getTableReport().getHeaders(),
+        assertEquals(analysisPage.waitForReportComputing().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES,
                         METRIC_TIMELINE_EOP + " - period ago", METRIC_TIMELINE_EOP));
         assertEquals(filtersBucket.getDateFilterText(),
@@ -67,9 +72,9 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
         assertEquals(dateFilterPickerPanel.getCompareApplyMeasuresText(), "Individual selection (1)");
 
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.waitForReportComputing().getTableReport().getHeaders(),
+        assertEquals(analysisPage.waitForReportComputing().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES, METRIC_TIMELINE_EOP));
-        assertEquals(analysisPage.waitForReportComputing().getTableReport().getContent(),
+        assertEquals(analysisPage.waitForReportComputing().getPivotTableReport().getBodyContent(),
                 singletonList(asList("18", "7", "44,195")));
         assertEquals(filtersBucket.getDateFilterText(),
                 "Activity\n:\nJan 1, 2016 - Dec 31, 2017\nCompare (1) to:\nPrevious period");
@@ -80,7 +85,7 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void canNotApplyPreviousPeriodCompareWithAllTimePeriod() throws NoSuchFieldException {
+    public void canNotApplyPreviousPeriodCompareWithAllTimePeriod() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
         FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
         filtersBucket.openDateFilterPickerPanel()
@@ -110,13 +115,13 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
         filtersBucket.openDateFilterPickerPanel().changeCompareType(CompareType.PREVIOUS_PERIOD);
         assertEquals(dateFilterPickerPanel.getCompareApplyMeasuresText(), "Individual selection (1)");
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.waitForReportComputing().getTableReport().getHeaders(),
+        assertEquals(analysisPage.waitForReportComputing().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES, METRIC_TIMELINE_EOP));
 
         filtersBucket.openDateFilterPickerPanel().changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         assertEquals(dateFilterPickerPanel.getCompareApplyMeasuresText(), "Individual selection (1)");
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.waitForReportComputing().getTableReport().getHeaders(),
+        assertEquals(analysisPage.waitForReportComputing().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - SP year ago", METRIC_NUMBER_OF_ACTIVITIES, METRIC_TIMELINE_EOP));
     }
 
@@ -136,12 +141,12 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser, "Change to nothing compare", getClass());
         filtersBucket.openDateFilterPickerPanel().changeCompareType(CompareType.NOTHING).apply();
-        assertEquals( analysisPage.waitForReportComputing().getTableReport().getHeaders(),
+        assertEquals( analysisPage.waitForReportComputing().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_TIMELINE_EOP));
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void notApplyWeekFilterWithPreviousPeriodCompare() throws NoSuchFieldException {
+    public void notApplyWeekFilterWithPreviousPeriodCompare()  {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
         FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
         filtersBucket.openDateFilterPickerPanel()

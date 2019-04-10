@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -44,8 +46,12 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        
         getMetricCreator().createNumberOfActivitiesMetric();
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_TEST);
@@ -54,7 +60,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testRenameInsight() throws JSONException, IOException {
+    public void testRenameInsight() throws JSONException {
         final String copyOfInsightTest = "Copy-Of-Insight-Test";
         final String renamedInsight = "Renamed-Insight";
         initAnalysePage().openInsight(INSIGHT_TEST)
@@ -75,7 +81,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "renameInsightDataProvider")
-    public void renameInsightUsingSpecicalName(final String name) throws JSONException, IOException {
+    public void renameInsightUsingSpecialName(final String name) throws JSONException {
         final String insight = "Renaming-Saved-Insight-Test-Using-Special-Name"
                 + UUID.randomUUID().toString().substring(0, 3);
         initAnalysePage().openInsight(INSIGHT_TEST)
@@ -102,7 +108,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void deleteUnsavedChangesInsight() throws JSONException, IOException {
+    public void deleteUnsavedChangesInsight() throws JSONException {
         final String insight = "Delete-Unsaved-Change-Insight";
         assertTrue(
                 initAnalysePage().openInsight(INSIGHT_TEST)
@@ -123,7 +129,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void deleteCurrentlyOpenedInsight() throws JSONException, IOException {
+    public void deleteCurrentlyOpenedInsight() throws JSONException {
         final String insight = "Delete-Currently-Opened-Insight";
         assertFalse(initAnalysePage().openInsight(INSIGHT_TEST).saveInsightAs(insight).isBlankState(),
                 "Workspace is cleared before deleting insight");
@@ -137,7 +143,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void deleteNotCurrentlyOpenedInsight() throws JSONException, IOException {
+    public void deleteNotCurrentlyOpenedInsight() throws JSONException {
         final String insight = "Delete-Currently-Opened-Insight";
         initAnalysePage().openInsight(INSIGHT_TEST).saveInsightAs(insight);
         assertTrue(indigoRestRequest.getAllInsightNames()
@@ -190,8 +196,8 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
-                .getTableReport()
-                .getContent();
+                .getPivotTableReport()
+                .getBodyContent();
         analysisPage.saveInsight(insight);
         takeScreenshot(browser, "Table-Chart-is-created", getClass());
 
@@ -200,10 +206,10 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         assertEquals(
                 analysisPage.openInsight(insight)
                         .waitForReportComputing()
-                        .getTableReport()
-                        .getContent(),
+                        .getPivotTableReport()
+                        .getBodyContent(),
                 expectedContent, "Table content is not correct");
-        assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ATTR_ACTIVITY_TYPE),
+        assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_ACTIVITY_TYPE),
                 ATTR_ACTIVITY_TYPE + " is not sorted up");
     }
 
@@ -229,7 +235,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testInsightListWithCreatedByMeFilter() throws JSONException, IOException {
+    public void testInsightListWithCreatedByMeFilter() throws JSONException {
         final String insight = "Insight-List-Test-With-Filter-Created-By-Me";
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertFalse(indigoRestRequest.getAllInsightNames().contains(insight),
@@ -341,7 +347,6 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void openAsReportAfterSaveInsight() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
-                .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
                 .saveInsight("Open-As-Report-After-Save-Insight");
 
@@ -349,7 +354,10 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         BrowserUtils.switchToLastTab(browser);
         try {
             waitForAnalysisPageLoaded(browser);
-            List<String> attributes = reportPage.getTableReport().getAttributeValues();
+            List<String> attributes = reportPage
+                    .selectReportVisualisation(ReportTypes.TABLE)
+                    .getTableReport()
+                    .getAttributeValues();
             takeScreenshot(browser, "openAsReportAfterSaveInsight", getClass());
             assertEquals(attributes, asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"),
                     "Report is not rendered correctly");
@@ -364,8 +372,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
 
-    private void checkRenamedInsight(final int expectedNumberOfInsights, final String oldInsight,
-                                     final String newInsight) throws JSONException, IOException {
+    private void checkRenamedInsight(final int expectedNumberOfInsights, final String oldInsight, final String newInsight) throws JSONException {
         final List<String> savedInsightNames = indigoRestRequest.getAllInsightNames();
         assertEquals(savedInsightNames.size(), expectedNumberOfInsights);
         assertEquals(savedInsightNames.stream().filter(e -> e.equals(newInsight)).count(), 1,
