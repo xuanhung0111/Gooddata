@@ -6,12 +6,15 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
@@ -21,7 +24,7 @@ import org.testng.annotations.Test;
 
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -59,6 +62,8 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createSnapshotBOPMetric();
     }
@@ -74,12 +79,12 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
-        TableReport report = analysisPage
+        PivotTableReport report = analysisPage
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
-                .getTableReport();
+                .getPivotTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
-                equalTo(asList(ATTR_ACTIVITY_TYPE.toLowerCase())));
+                equalTo(Collections.singletonList(ATTR_ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
     }
 
@@ -148,6 +153,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
             setExtendedStackingFlag(true);
         }
     }
+
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
         setExtendedStackingFlag(false);
@@ -209,34 +215,44 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void exportCustomDiscovery() {
-        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        final AnalysisPage analysisPage = initAnalysePage();
+
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
+                .waitForReportComputing();
+
+        PivotTableReport analysisReport = this.analysisPage.getPivotTableReport();
+        List<List<String>> analysisContent = analysisReport.getBodyContent();
+        List<String> analysisHeaders = analysisReport.getHeaders();
+
+        assertTrue(analysisPage
+                .changeReportType(ReportType.COLUMN_CHART)
                 .waitForReportComputing()
                 .getPageHeader()
                 .isExportButtonEnabled(), "Export button should be enabled");
-        TableReport analysisReport = analysisPage.getTableReport();
-        List<List<String>> analysisContent = analysisReport.getContent();
-        Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
-        analysisPage.exportReport();
+        this.analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
 
         try {
             waitForAnalysisPageLoaded(browser);
 
-            com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
-                    reportPage.getTableReport();
+            final ReportPage reportPage = this.reportPage
+                    .selectReportVisualisation(ReportTypes.TABLE)
+                    .waitForReportExecutionProgress()
+                    .exchangeColAndRowHeaders();
+
+            com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport = reportPage
+                    .getTableReport();
 
             assertThat(tableReport.getDataContent(), equalTo(analysisContent));
 
-            List<String> headers = tableReport.getAttributeHeaders();
-            headers.addAll(tableReport.getMetricHeaders());
-            Iterator<String> reportHeaders = headers.iterator();
+            List<String> reportHeaders = tableReport.getAttributeHeaders();
+            reportHeaders.addAll(tableReport.getMetricHeaders());
 
-            while (analysisHeaders.hasNext() && reportHeaders.hasNext()) {
-                assertThat(reportHeaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
-            }
+            assertThat(analysisHeaders, equalTo(reportHeaders));
+
             checkRedBar(browser);
         } finally {
             browser.close();
