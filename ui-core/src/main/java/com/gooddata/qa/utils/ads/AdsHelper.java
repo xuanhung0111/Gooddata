@@ -6,12 +6,17 @@ import static java.lang.String.format;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.gooddata.FutureResult;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.warehouse.WarehouseUser;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +34,7 @@ public final class AdsHelper extends CommonRestRequest {
     public static final String OUTPUT_STAGE_METADATA_URI = OUTPUT_STAGE_URI + "metadata";
     public static final String ADS_INSTANCES_USERS_URI = ADS_INSTANCES_URI + "%s/users";
 
+    private static final Logger log = Logger.getLogger(AdsHelper.class.getName());
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
     private static final String ADD_USER_CONTENT_BODY;
 
@@ -57,6 +63,25 @@ public final class AdsHelper extends CommonRestRequest {
         final Warehouse adsInstance = new Warehouse(adsName, adsToken);
         adsInstance.setEnvironment(env);
         return restClient.getWarehouseService().createWarehouse(adsInstance).get();
+    }
+
+    /**
+     * Add user login to an ads instance
+     */
+    public void addUserToWarehouse(final Warehouse warehouse, final String login) {
+        try {
+            FutureResult<WarehouseUser> result = restClient.getWarehouseService()
+                    .addUserToWarehouse(warehouse, new WarehouseUser("admin", null, login));
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(input -> result.isDone());
+            log.info(String.format("Added user '%s' to instance '%s", login, warehouse.getUri()));
+        } catch (GoodDataException e) {
+            if (e.getCause() != null && e.getCause().getMessage()
+                    .contains(String.format("User '%s' has already been added to Data Warehouse instance", login))) {
+                log.info(e.getCause().getMessage());
+                return;
+            }
+            throw e;
+        }
     }
 
     public void removeAds(Warehouse adsInstance) throws ParseException, JSONException, IOException {
@@ -111,6 +136,7 @@ public final class AdsHelper extends CommonRestRequest {
 
     private void removeReferencedProjects(List<String> pids) throws ParseException, JSONException, IOException {
         for (String pid : pids) {
+            log.info(String.format("Removing ads instance reference from '%s'", pid));
             resetOutputStageOfProject(pid);
         }
     }

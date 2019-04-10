@@ -20,7 +20,7 @@ import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
