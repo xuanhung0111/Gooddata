@@ -167,10 +167,10 @@ public class BucketsTest extends AbstractAdE2ETest {
             assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
 
             // Drag stacking attribute to x-axis category
-            analysisPage.tryToDrag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
+            analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
 
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE));
-            assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
+            assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
         } finally {
             setExtendedStackingFlag(true);
         }
