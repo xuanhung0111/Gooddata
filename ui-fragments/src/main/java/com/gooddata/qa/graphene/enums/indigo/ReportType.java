@@ -49,6 +49,10 @@ public enum ReportType {
         return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
     }
 
+    public String getExtendedStackByMessage() {
+        return "TO STACK BY AN ATTRIBUTE, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
+    }
+
     public String getLabel() {
         return label;
     }
