@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -19,6 +20,10 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.text.ParseException;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -34,7 +39,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
@@ -52,6 +56,11 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createSnapshotBOPMetric();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = { "createProject" })
@@ -129,8 +138,8 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
                 .waitForReportComputing();
 
         takeScreenshot(browser, "Test-Table-Report-Render-On-Embedded-Ad", getClass());
-        final TableReport table = getEmbeddedAnalysisPage().getTableReport();
-        assertTrue(table.getContent().size() >= 1 && CollectionUtils.isEqualCollection(table.getHeaders(),
+        final PivotTableReport table = getEmbeddedAnalysisPage().getPivotTableReport();
+        assertTrue(table.getBodyContent().size() >= 1 && CollectionUtils.isEqualCollection(table.getHeaders(),
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES)), "Table is not rendered");
     }
 

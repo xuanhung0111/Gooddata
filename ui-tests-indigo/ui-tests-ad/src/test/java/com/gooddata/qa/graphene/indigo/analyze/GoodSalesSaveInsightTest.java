@@ -7,9 +7,9 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
@@ -56,8 +57,12 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createStageVelocityMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -291,8 +296,10 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void saveInsightAfterOpenAsReport() {
         String insight = "Save-Insight-After-Open-As-Report";
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
+        initAnalysePage()
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing();
 
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
@@ -303,11 +310,22 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
             BrowserUtils.switchToFirstTab(browser);
         }
 
-        analysisPage.saveInsight(insight).resetToBlankState().openInsight(insight).waitForReportComputing();
+        analysisPage
+                .saveInsight(insight)
+                .resetToBlankState()
+                .openInsight(insight)
+                .changeReportType(ReportType.TABLE)
+                .waitForReportComputing();
 
         takeScreenshot(browser, "saveInsightAfterOpenAsReport", getClass());
-        assertEquals(analysisPage.getTableReport().getContent(),
-                asList(asList("Email", "33,920"), asList("In Person Meeting", "35,975"),
-                        asList("Phone Call", "50,780"), asList("Web Meeting", "33,596")));
+
+        assertEquals(analysisPage.getPivotTableReport().getBodyContent(),
+                asList(
+                        asList("Email", "33,920"),
+                        asList("In Person Meeting", "35,975"),
+                        asList("Phone Call", "50,780"),
+                        asList("Web Meeting", "33,596")
+                )
+        );
     }
 }

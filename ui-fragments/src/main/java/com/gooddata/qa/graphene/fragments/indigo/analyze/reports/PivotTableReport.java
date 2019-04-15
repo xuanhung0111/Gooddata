@@ -184,6 +184,8 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     public PivotTableReport addTotal(AggregationItem type, String columnTitle, int columnIndex) {
+        waitForElementVisible(attributeValuePresent);
+
         PivotAggregationPopup pivotAggregationPopup = openAggregationPopup(columnTitle, columnIndex);
         if (!pivotAggregationPopup.isItemChecked(type)) {
             pivotAggregationPopup.selectItem(type);
@@ -192,6 +194,8 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     public PivotTableReport removeTotal(AggregationItem type, String columnTitle, int columnIndex) {
+        waitForElementVisible(attributeValuePresent);
+
         PivotAggregationPopup pivotAggregationPopup = openAggregationPopup(columnTitle, columnIndex);
         if (pivotAggregationPopup.isItemChecked(type)) {
             pivotAggregationPopup.selectItem(type);

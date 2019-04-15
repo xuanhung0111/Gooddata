@@ -63,6 +63,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
                 new RestClient(getProfile(ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -126,7 +127,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
-                .getTableReport()
+                .getPivotTableReport()
                 .getHeaders()
                 .stream()
                 .map(String::toLowerCase)

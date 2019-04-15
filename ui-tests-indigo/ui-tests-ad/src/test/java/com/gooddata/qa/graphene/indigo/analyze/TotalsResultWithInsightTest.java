@@ -7,20 +7,22 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,8 +30,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
@@ -72,6 +76,11 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         metrics.createAmountMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -104,7 +113,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
-        
+
         analysisPage.waitForReportComputing();
 
         analysisPage.saveInsight();
@@ -113,15 +122,15 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     @DataProvider
     public Object[][] getSavedInsight() {
         return new Object[][] {
-                {INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, "101,054"},
-                {INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE, "73,073"},
-                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON, "73,073"},
-                {INSIGHT_SHOW_PERCENT, "47.37%"}
+                {INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, singletonList("101,054")},
+                {INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE, singletonList("73,073")},
+                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON, asList("–", "73,073")},
+                {INSIGHT_SHOW_PERCENT, singletonList("47.37%")}
         };
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getSavedInsight")
-    public void saveInsightHasTotalsResult(String insight, String totalsValue) throws JSONException, IOException {
+    public void saveInsightHasTotalsResult(String insight, List<String> totalsValues) throws JSONException {
         String metric = METRIC_NUMBER_OF_ACTIVITIES;
         if (insight.equals(INSIGHT_SHOW_PERCENT))
             metric = "% " + METRIC_NUMBER_OF_ACTIVITIES;
@@ -129,20 +138,21 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
         //open exist insight
         analysisPage.openInsight(insight).waitForReportComputing();
-        TableReport tableReport = analysisPage.getTableReport();
-        tableReport.addNewTotals(AggregationItem.MAX, metric);
+        PivotTableReport tableReport = analysisPage.getPivotTableReport();
+        tableReport.addTotal(AggregationItem.MAX, metric, 0);
         Screenshots.takeScreenshot(browser, "Save " + insight + " has totals result", getClass());
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, metric), totalsValue);
+        assertEquals(tableReport.getGrandTotalValues(AggregationItem.MAX), totalsValues);
 
         //save insight as
         analysisPage.saveInsightAs(insight + generateHashString());
         checkRedBar(browser);
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, metric), totalsValue);
+        assertEquals(tableReport.getGrandTotalValues(AggregationItem.MAX), totalsValues);
 
         //modify and save
         analysisPage.addAttribute(ATTR_IS_CLOSED).saveInsightAs(insight + generateHashString());
         checkRedBar(browser);
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, metric), totalsValue);
+        final List<String> grandTotals = tableReport.getGrandTotalValues(AggregationItem.MAX);
+        assertEquals(grandTotals.subList(1, grandTotals.size()), totalsValues);
     }
 
     @DataProvider
@@ -155,27 +165,27 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getRemovedInsight")
-    public void removedInsightHasTotalsResult(String insight) throws JSONException, IOException {
+    public void removedInsightHasTotalsResult(String insight) throws JSONException {
         String metric = METRIC_NUMBER_OF_ACTIVITIES;
         if (insight.equals(INSIGHT_SHOW_PERCENT))
             metric = "% " + METRIC_NUMBER_OF_ACTIVITIES;
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.openInsight(insight).waitForReportComputing();
         //remove one of totals results
-        TableReport tableReport = analysisPage.getTableReport()
-            .addNewTotals(AggregationItem.MAX, metric)
-            .addNewTotals(AggregationItem.SUM, metric)
-            .deleteTotalsResultCell(AggregationItem.MAX, metric);
+        PivotTableReport tableReport = analysisPage.getPivotTableReport()
+            .addTotal(AggregationItem.MAX, metric, 0)
+            .addTotal(AggregationItem.SUM, metric, 0)
+            .removeTotal(AggregationItem.MAX, metric, 0);
         Screenshots.takeScreenshot(browser, "Remove " + insight + " has totals result", getClass());
-        assertTrue(tableReport.hasTotalsResult(), "The rest row should be kept as before");
+        assertTrue(tableReport.containsGrandTotals(), "The rest row should be kept as before");
 
         //remove all totals results
-        tableReport.deleteTotalsResultCell(AggregationItem.SUM, metric);
-        assertFalse(tableReport.hasTotalsResult(), "The empty total row should be disappeared");
+        tableReport.removeTotal(AggregationItem.SUM, metric, 0);
+        assertFalse(tableReport.containsGrandTotals(), "The empty total row should be disappeared");
 
         //save empty totals result
         analysisPage.saveInsightAs(insight + generateHashString());
-        assertFalse(tableReport.hasTotalsResult(), "The empty total row cannot be saved");
+        assertFalse(tableReport.containsGrandTotals(), "The empty total row cannot be saved");
     }
 
     @Test(dependsOnMethods = "prepareInsights")
@@ -183,27 +193,29 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
             .waitForReportComputing()
-            .getTableReport()
-            .addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES)
-            .deleteTotalsResultRow(AggregationItem.MAX);
+            .getPivotTableReport()
+            .addTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0)
+            .removeTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0);
         analysisPage.saveInsightAs("empty totals result");
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage() ;
         indigoDashboardsPage.addDashboard().addInsight("empty totals result").getConfigurationPanel().disableDateFilter();
-        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getLastWidget(Insight.class).getTableReport().hasTotalsResult(),
+        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getLastWidget(Insight.class).getPivotTableReport().containsGrandTotals(),
             "The empty total row cannot show at KD");
     }
 
     @Test(dependsOnMethods = "prepareInsights")
     public void checkMetadataTotalsResult() throws JSONException, IOException {
         AnalysisPage analysisPage = initAnalysePage();
-        analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).getTableReport()
-            .addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPage
+                .openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
+                .getPivotTableReport()
+                .addTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0);
         analysisPage.saveInsightAs("Add totals result");
         Screenshots.takeScreenshot(browser, "Check metadata totals result", getClass());
         assertEquals(countTotalsDefinitions("Add totals result"), 1);
 
-        analysisPage.getTableReport().deleteTotalsResultRow(AggregationItem.MAX);
+        analysisPage.getPivotTableReport().removeTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0);
         analysisPage.saveInsightAs("Delete totals result");
         assertEquals(countTotalsDefinitions("Delete totals result"), 0);
     }
@@ -213,17 +225,19 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE);
 
-        TableReport tableReport = analysisPage.getTableReport();
-        tableReport.addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES).deleteTotalsResultRow(AggregationItem.MAX);
+        PivotTableReport tableReport = analysisPage.getPivotTableReport();
+        tableReport
+                .addTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0)
+                .removeTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0);
 
-        //Undo
+        // Undo
         analysisPage.undo().waitForReportComputing();
-        assertTrue(tableReport.hasTotalsResult(), "Totals Result should be reverted");
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
+        assertTrue(tableReport.containsGrandTotals(), "Totals Result should be reverted");
+        assertEquals(tableReport.getGrandTotalValues(AggregationItem.MAX), singletonList("101,054"));
 
-        //Redo
+        // Redo
         analysisPage.redo().waitForReportComputing();
-        assertFalse(tableReport.hasTotalsResult(), "Totals Result should be removed");
+        assertFalse(tableReport.containsGrandTotals(), "Totals Result should be removed");
     }
 
     @Test(dependsOnMethods = "prepareInsights")
@@ -243,16 +257,16 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         dashboardRestRequest.addMufToUser(assignedMufUserId, mufUri);
 
         AnalysisPage analysisPage = initAnalysePage();
-        TableReport tableReport = analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).getTableReport();
-        tableReport.addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
+        PivotTableReport tableReport = analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).getPivotTableReport();
+        tableReport.addTotal(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES, 0);
         analysisPage.saveInsightAs(newInsight);
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
+        assertEquals(tableReport.getGrandTotalValues(AggregationItem.MAX), singletonList("101,054"));
 
         logoutAndLoginAs(true, UserRoles.EDITOR);
         try {
-            tableReport = initAnalysePage().openInsight(newInsight).getTableReport();
+            tableReport = initAnalysePage().openInsight(newInsight).getPivotTableReport();
             Screenshots.takeScreenshot(browser, "Check totals results with MUF", getClass());
-            assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "53,217");
+            assertEquals(tableReport.getGrandTotalValues(AggregationItem.MAX), singletonList("53,217"));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }

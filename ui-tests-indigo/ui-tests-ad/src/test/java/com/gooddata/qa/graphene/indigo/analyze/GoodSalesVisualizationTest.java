@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Attribu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -22,8 +22,6 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -73,6 +71,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createAmountMetric();
         metricCreator.createNumberOfActivitiesMetric();
@@ -83,7 +83,6 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         metricCreator.createPercentOfGoalMetric();
         metricCreator.createQuotaMetric();
         metricCreator.createBestCaseMetric();
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -97,8 +96,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
-        TableReport report = analysisPage.changeReportType(ReportType.TABLE)
-                .waitForReportComputing().getTableReport();
+        PivotTableReport report = analysisPage.changeReportType(ReportType.TABLE)
+                .waitForReportComputing().getPivotTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(singletonList(ATTR_ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
@@ -205,53 +204,6 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         } finally {
             dashboardRequest.changeMetricFormat(uri, oldFormat);
         }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void exportCustomDiscovery() {
-        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .changeReportType(ReportType.TABLE)
-                .waitForReportComputing()
-                .getPageHeader()
-                .isExportButtonEnabled(), "Trackers should display");
-        TableReport analysisReport = analysisPage.waitForReportComputing().getTableReport();
-        List<List<String>> analysisContent = analysisReport.getContent();
-        Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
-
-        analysisPage.exportReport();
-        String currentWindowHandle = browser.getWindowHandle();
-        for (String handle : browser.getWindowHandles()) {
-            if (!handle.equals(currentWindowHandle))
-                browser.switchTo().window(handle);
-        }
-
-        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
-                Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
-                        waitForElementVisible(By.id("gridContainerTab"), browser));
-
-        Iterator<String> attributes = tableReport.waitForLoaded().getAttributeValues().iterator();
-        Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
-
-        List<List<String>> content = new ArrayList<>();
-        while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(asList(attributes.next(), metrics.next()));
-        }
-
-        assertThat(content, equalTo(analysisContent));
-
-        List<String> headers = tableReport.getAttributeHeaders();
-        headers.addAll(tableReport.getMetricHeaders());
-        Iterator<String> reportheaders = headers.iterator();
-
-        while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
-            assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
-        }
-        checkRedBar(browser);
-
-        browser.close();
-        browser.switchTo().window(currentWindowHandle);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -415,7 +367,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing()
-            .getTableReport()
+            .getPivotTableReport()
             .getHeaders()
             .stream()
             .map(String::toLowerCase)
