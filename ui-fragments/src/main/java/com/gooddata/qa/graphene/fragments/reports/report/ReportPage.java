@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -13,6 +14,7 @@ import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter
 import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -22,6 +24,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Collection;
@@ -30,6 +33,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
@@ -94,6 +98,12 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(css = ".yui3-widget-content-expanded g path[fill-opacity=\"1\"]")
     private List<WebElement> reportLegendIcons;
+
+    @FindBy(css = ".yui3-dd-draggable.metric")
+    private List<WebElement> metrics;
+
+    @FindBy(css = ".yui3-dd-draggable.attribute")
+    private List<WebElement> attributes;
 
     public static final By LOCATOR = By.id("p-analysisPage");
 
@@ -758,10 +768,120 @@ public class ReportPage extends AbstractFragment {
                 .findElements(By.className("customMetricFormatItem"));
     }
 
-    public String checkColorColumn(Integer position ) {
+    public String checkColorColumn(Integer position) {
         List<WebElement> list = getRoot()
                 .findElements(By.cssSelector(".yui3-widget-content-expanded g rect[fill-opacity=\"1\"]"));
         String elementColor = list.get(position).getAttribute("fill");
         return elementColor;
+    }
+
+    public ReportPage reorderMetric(String sourceMetric, String targetMetric) {
+        WebElement source = getMetric(sourceMetric);
+        WebElement drop = waitForElementVisible(By.className("s-grid-opportunity"), getRoot());
+        WebElement target = getMetric(targetMetric);
+        drag(source, drop, target, DataType.METRIC);
+        waitForElementVisible(className("s-grid-" + simplifyText(sourceMetric)), getRoot());
+        return this;
+    }
+
+    public ReportPage removeMetric(String sourceMetric) {
+        WebElement source = getMetric(sourceMetric);
+        WebElement target = waitForElementPresent(className("reportEditorHeader"), getRoot());
+        dragAndDropWithCustomBackend(browser, source, target);
+        return this;
+    }
+
+    public ReportPage reorderAttribute(String sourceAttribute, String targetAttribute) {
+        WebElement source = getAttribute(sourceAttribute);
+        WebElement target = getAttribute(targetAttribute);
+        WebElement drop = waitForElementVisible(By.className("s-btn-filter"), getRoot());
+        drag(source, drop, target, DataType.ATTRIBUTE);
+        waitForElementVisible(className("s-grid-" + simplifyText(sourceAttribute)), getRoot());
+        return this;
+    }
+
+    public ReportPage removeAttribute(String sourceAttribute) {
+        WebElement source = getAttribute(sourceAttribute);
+        WebElement target = waitForElementPresent(className("reportEditorHeader"), getRoot());
+        dragAndDropWithCustomBackend(browser, source, target);
+        return this;
+    }
+
+    public WebElement getAttribute(String name) {
+        return waitForCollectionIsNotEmpty(attributes).stream()
+                .filter(item -> name.equals(item.getAttribute("title")))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + name));
+    }
+
+    public WebElement getMetric(String name) {
+        return waitForCollectionIsNotEmpty(metrics).stream()
+                .filter(item -> name.equals(item.getAttribute("title")))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + name));
+    }
+
+    // This method get Attribute title at position index
+    public String getAttributeTitle(int index) {
+        List<String> list = waitForCollectionIsNotEmpty(attributes).stream()
+                .map(item -> item.getAttribute("title")).collect(Collectors.toList());
+        return list.get(index);
+    }
+
+    // This method get Metric title at position index
+    public String getMetricTitle(int index) {
+        List<String> list = waitForCollectionIsNotEmpty(metrics).stream()
+                .map(item -> item.getAttribute("title")).collect(Collectors.toList());
+        return list.get(index);
+    }
+
+    public ReportPage drag(WebElement source, WebElement drop, WebElement target, DataType dataType) {
+        getActions().clickAndHold(source).perform();
+        try {
+            getActions().moveToElement(drop).perform();
+            Sleeper.sleepTightInSeconds(1);
+            // If target is not visible, the drop line of target will highlight. the pointer dragged to target
+            if (!waitForElementVisible(target).getAttribute("class").contains("active")) {
+                moveToElement(target, dataType);
+                return this;
+            }
+            // In some specific cases, the target to be dropped is not in viewport,
+            // so the selenium script when dragging and dropping element to
+            // the target will have a risk that it cannot drop to the right position of target element
+            // and element will not be droppable.
+            // The solution is move element continuously until the target element is in viewport and droppable.
+            Function<WebDriver, Boolean> droppable = browser -> {
+                getActions().moveToElement(target).perform();
+                return waitForElementVisible(target).getAttribute("class").contains("hover");
+            };
+            Graphene.waitGui().until(droppable);
+        } finally {
+            getActions().release().perform();
+        }
+        return this;
+    }
+
+    private void moveToElement(WebElement target, DataType dataType) {
+        Function<WebDriver, Boolean> droppable = browser -> {
+            String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
+                    .getBrowserName().toLowerCase();
+            if ("chrome".equals(browserName)) {
+                getActions().moveToElement(target).perform();
+            } else {
+                if (dataType == DataType.ATTRIBUTE) {
+                    getActions().moveToElement(target, -target.getSize().width / 3,
+                            (target.getSize().height * 3) / 4).perform();
+                } else {
+                    getActions().moveToElement(target, 1, (target.getSize().width * 2) / 3).perform();
+                }
+            }
+            return isElementPresent(By.className("targetPointer"), getRoot());
+        };
+        Graphene.waitGui().until(droppable);
+    }
+
+    public enum DataType {
+        METRIC,
+        ATTRIBUTE;
     }
 }

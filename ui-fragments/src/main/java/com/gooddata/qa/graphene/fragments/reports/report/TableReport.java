@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -26,9 +27,13 @@ import java.util.stream.Stream;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.google.common.collect.Iterables.getLast;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 
 /**
  * Fragment represents table report in
@@ -304,6 +309,56 @@ public class TableReport extends AbstractDashboardReport {
         }
         ElementUtils.moveToElementActions(element.findElement(By.tagName("span")), 5, 5).click().perform();
         return this;
+    }
+
+    /**
+     * this method use scroll into viewport (scroll horizontal or scroll vertical)
+     *
+     * @param value the value is found after scrolled
+     * @param scrolltype scroll horizontal or scroll vertical
+     * @return true if found and false if did not find
+     */
+    public boolean scrollIntoViewAndCheckValue(String value, ScrollType scrolltype) {
+        long startTime = System.currentTimeMillis();
+        int scroll = 0;
+        String cssSelector = "s-grid-" + simplifyText((value.replace(">", "_")));
+        while ((System.currentTimeMillis() - startTime) < 60000) {
+            sleepTight(500);
+            if (isElementVisible(className(cssSelector), getRoot())) {
+                return true;
+            }
+            scroll += 50;
+            if (scrolltype.getLocator().equals("horizScrollbar")) {
+                WebElement editor = waitForElementVisible(By.className("horizScrollbar"), getRoot());
+                getActions().clickAndHold(editor).moveByOffset(scroll, 0).release().perform();
+            } else if (scrolltype.getLocator().equals("vertScrollbar")) {
+                WebElement editor = waitForElementVisible(By.className("vertScrollbar"), getRoot());
+                getActions().clickAndHold(editor).moveByOffset(0, scroll).release().perform();
+            }
+        }
+        throw new TimeoutException("Tried for 60 second(s), element doesn't find by selector " + cssSelector);
+    }
+
+    // Check Metric or Attribute Header
+    public boolean checkValue(String name) {
+        Sleeper.sleepTightInSeconds(3);
+        String cssSelector = "s-grid-" + simplifyText(name);
+        return isElementVisible(className(cssSelector), getRoot());
+    }
+
+    public enum ScrollType {
+        HORI("horizScrollbar"),
+        VERT("vertScrollbar");
+
+        private String locator;
+
+        ScrollType(String locator) {
+            this.locator = locator;
+        }
+
+        public String getLocator() {
+            return locator;
+        }
     }
 
     private boolean isImageDisplayed(WebElement image) {
