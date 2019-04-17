@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
@@ -356,6 +357,15 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage exportReport() {
         getPageHeader().exportReport();
         return this;
+    }
+
+    public AnalysisPage exportReportToXLSX() {
+        getPageHeader().exportToXLSX();
+        return this;
+    }
+
+    public ExportXLSXDialog getExportXLSXDialog() {
+        return ExportXLSXDialog.getInstance(browser);
     }
 
     public String getExplorerMessage() {

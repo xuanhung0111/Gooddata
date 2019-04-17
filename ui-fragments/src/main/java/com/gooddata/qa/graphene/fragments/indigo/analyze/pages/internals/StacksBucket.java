@@ -44,7 +44,7 @@ public class StacksBucket extends AbstractBucket {
     }
 
     public Boolean isOptionCheckPresent(OptionalStacking optional) {
-        return isElementPresent(By.cssSelector(optional.toString()), getRoot());
+        return isElementPresent(By.cssSelector(optional.toString()), browser);
     }
 
     public StacksBucket checkOption(OptionalStacking optional) {
@@ -82,7 +82,7 @@ public class StacksBucket extends AbstractBucket {
         public String getOptionLabel() { return optionLabel; }
     }
 
-    private Boolean isOptionCheck(OptionalStacking optional) {
+    public Boolean isOptionCheck(OptionalStacking optional) {
         return waitForElementPresent(By.cssSelector(optional.toString()), getRoot()).isSelected();
     }
 

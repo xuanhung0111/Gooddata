@@ -30,6 +30,9 @@ public class AnalysisPageHeader extends AbstractFragment {
     @FindBy(className = EXPORT_BUTTON_CLASS)
     private WebElement exportToReportButton;
 
+    @FindBy(className = OPTIONS_BUTTON_CLASS)
+    private WebElement optionsButton;
+
     @FindBy(className = "s-undo")
     private WebElement undoButton;
 
@@ -53,6 +56,7 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     private static final String SAVE_AS_CLASS= "s-save_as_new";
     private static final String EXPORT_BUTTON_CLASS= "s-export-to-report";
+    private static final String OPTIONS_BUTTON_CLASS= "s-options-button";
 
     public void resetToBlankState() {
         waitForElementVisible(resetButton).click();
@@ -65,6 +69,11 @@ public class AnalysisPageHeader extends AbstractFragment {
         //make sure the new window is displayed to prevent unexpected errors
         Function<WebDriver, Boolean> hasNewWindow = browser -> browser.getWindowHandles().size() == numberOfWindows + 1;
         Graphene.waitGui().until(hasNewWindow);
+    }
+
+    public void exportToXLSX() {
+        waitForElementVisible(optionsButton).click();
+        waitForElementVisible(className("s-gd-export-menu-export-xlsx"), browser).click();
     }
 
     public boolean isExportButtonEnabled() {
@@ -185,7 +194,7 @@ public class AnalysisPageHeader extends AbstractFragment {
                 && !isSaveAsPresent()
 //                && !isResetButtonEnabled() TODO: CL-9830 Clear button is not reset after clear saved insight
                 && !isSaveButtonEnabled()
-                && !isExportButtonEnabled()
+//                && !isExportButtonEnabled() TODO: SD-183: Export in Analytical Designer (AD)
                 && getInsightTitle().equals("Untitled insight");
     }
 
