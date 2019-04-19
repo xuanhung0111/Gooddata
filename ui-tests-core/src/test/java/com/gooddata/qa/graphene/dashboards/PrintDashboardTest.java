@@ -277,11 +277,11 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
         dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT));
         WebElement embeddedWidget = dashboardsPage.addWebContentToDashboard(ICON_EMBEDED_URL).getLastEmbeddedWidget().getRoot();
-        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlace(embeddedWidget);
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(embeddedWidget);
+        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlaceOutViewPort(embeddedWidget);
         embeddedWidget = dashboardsPage.addWebContentToDashboard(ICON_EMBEDED_URL).getLastEmbeddedWidget().getRoot();
-        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlace(embeddedWidget);
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget);
+        DashboardWidgetDirection.NEXT_PAGE.moveElementToRightPlaceOutViewPort(embeddedWidget);
         Screenshots.takeScreenshot(browser, "Dashboard_With_Web_Contents_Near_Page_Break_Maker", getClass());
         dashboardsPage.saveDashboard();
         
@@ -290,7 +290,7 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         assertEquals(contents, asList(REPORT_AMOUNT_BY_PRODUCT, "Product Amount", "CompuSci", "Educationly", "Explorer",
                 "Grammar Plus", "PhoenixSoft", "WonderKid", "$27,222,899.64", "$22,946,895.47", "$38,596,194.86",
-                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", firstTab + " " + today, "Page 1/2",
+                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", "MY ICON MY ICON", firstTab + " " + today, "Page 1/2",
                 "MY ICON MY ICON", "Page 2/2"));
     }
 
