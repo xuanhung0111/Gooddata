@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -104,35 +105,6 @@ public class PivotTableReport extends AbstractFragment {
 
     public List<List<String>> getBodyContent() {
         return getContent(rows);
-    }
-
-    private List<List<String>> getContent(List<WebElement> contentElements) {
-        waitForElementVisible(attributeValuePresent);
-
-        return waitForCollectionIsNotEmpty(contentElements).stream()
-                .filter(ElementUtils::isElementVisible)
-                .map(row -> row.findElements(className("s-table-cell")))
-                .map(rowCells -> rowCells
-                        .stream()
-                        // because of custom React LoadingRendered, sometimes the first pivot attribute cell is the last in the DOM
-                        // (visually it is always the first as it is absolutely positioned but wrong result is returned by this method if cells are not sorted)
-                        .sorted(Comparator.comparingInt(this::parseColumnIndex))
-                        .map(WebElement::getText)
-                        .collect(toList())
-                )
-                .collect(toList());
-    }
-
-    private int parseColumnIndex(final WebElement cell) {
-        final String classAttributeValue = cell.getAttribute("class");
-        if (classAttributeValue == null) {
-            return -1;
-        }
-        return Arrays.stream(classAttributeValue.split(CLASS_NAME_SEPARATOR))
-                .filter(className -> className.matches(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX + "\\d+"))
-                .findFirst()
-                .map(indexClassName -> Integer.parseInt(indexClassName.substring(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX.length())))
-                .orElse(-1);
     }
 
     public WebElement getCellElement(String columnTitle, int cellIndex) {
@@ -235,6 +207,39 @@ public class PivotTableReport extends AbstractFragment {
 
     public boolean isBurgerMenuPresent() {
         return isElementPresent(className(BURGER_MENU_CLASS_NAME), getRoot());
+    }
+
+    public boolean isButtonFormat(int columnIndex, int cellIndex) {
+        return isElementVisible(tagName("button"), getCellElement(columnIndex, cellIndex));
+    }
+
+    private List<List<String>> getContent(List<WebElement> contentElements) {
+        waitForElementVisible(attributeValuePresent);
+
+        return waitForCollectionIsNotEmpty(contentElements).stream()
+                .filter(ElementUtils::isElementVisible)
+                .map(row -> row.findElements(className("s-table-cell")))
+                .map(rowCells -> rowCells
+                        .stream()
+                        // because of custom React LoadingRendered, sometimes the first pivot attribute cell is the last in the DOM
+                        // (visually it is always the first as it is absolutely positioned but wrong result is returned by this method if cells are not sorted)
+                        .sorted(Comparator.comparingInt(this::parseColumnIndex))
+                        .map(WebElement::getText)
+                        .collect(toList())
+                )
+                .collect(toList());
+    }
+
+    private int parseColumnIndex(final WebElement cell) {
+        final String classAttributeValue = cell.getAttribute("class");
+        if (classAttributeValue == null) {
+            return -1;
+        }
+        return Arrays.stream(classAttributeValue.split(CLASS_NAME_SEPARATOR))
+                .filter(className -> className.matches(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX + "\\d+"))
+                .findFirst()
+                .map(indexClassName -> Integer.parseInt(indexClassName.substring(PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX.length())))
+                .orElse(-1);
     }
 
     private boolean isHeaderSorted(final String name, final String css, int index) {
