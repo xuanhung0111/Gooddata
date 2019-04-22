@@ -125,7 +125,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         assertEquals(pivotTableReport.getBodyContent(), expectedValues);
 
         expectedValues = singletonList(asList("$5,617,913,708.72", "5,617,913,708.72", "5,617,913,708.72",
-                "5,617,913,708.72"));
+                "<button>5,617,913,708.72</button>"));
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_APPLY_NUMBER_FORMAT, ReportType.TABLE)
                         .setMeasureBucket(
@@ -137,7 +137,6 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         pivotTableReport = initAnalysePage().openInsight(INSIGHT_APPLY_NUMBER_FORMAT)
                 .waitForReportComputing().getPivotTableReport();
         assertEquals(pivotTableReport.getBodyContent(), expectedValues);
-        assertTrue(pivotTableReport.isButtonFormat(3, 0), "To be wrong format");
 
         expectedValues = singletonList(
                 asList("新年快樂", "null value!", "$5,617,913,709 " +
