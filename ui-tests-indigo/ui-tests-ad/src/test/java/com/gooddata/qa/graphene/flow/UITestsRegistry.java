@@ -75,6 +75,7 @@ import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingBasicTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingFiltersUnderMetric;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingSpecialCaseTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.VisualizationMeasureAttributeTest;
+import com.gooddata.qa.graphene.indigo.analyze.OptionalStackingTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -172,6 +173,7 @@ public class UITestsRegistry {
             ColorPalettePickerAdvancedInsightAndKPITest.class,
             ColorPalettePickerUILayoutInsightAndKPITest.class,
             CustomColorPaletteUILayoutInsightAndKPITest.class,
+            OptionalStackingTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CanvasSelect;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
@@ -86,6 +87,8 @@ public class ConfigurationPanelBucket extends AbstractBucket {
 
     public class ItemConfiguration extends AbstractFragment {
 
+        private final By BY_CANVAS_SELECT = By.className("adi-bucket-dropdown");
+
         @FindBy(className = "adi-bucket-item-header")
         private WebElement header;
 
@@ -103,6 +106,9 @@ public class ConfigurationPanelBucket extends AbstractBucket {
 
         @FindBy(xpath = "//span[.='Max']/following-sibling::input")
         private WebElement maxInputField;
+
+        @FindBy(className = "icon-navigatedown")
+        private WebElement navigateDownIcon;
 
         public boolean isResetButtonVisibled() {
             return isElementVisible(getRoot().findElement(className("s-reset_colors")));
@@ -189,6 +195,12 @@ public class ConfigurationPanelBucket extends AbstractBucket {
 
         public ColorSnippet openColorsPaletteDialog(String colorCss) {
             return waitForFragmentVisible(listColorSnippet).expandColorPaletteDialog(colorCss);
+        }
+
+        public CanvasSelect getCanvasSelect() {
+            waitForElementVisible(className("icon-navigatedown"), getRoot()).click();
+            return Graphene.createPageFragment(CanvasSelect.class,
+                waitForElementVisible(BY_CANVAS_SELECT, browser));
         }
 
         private void clickItemHeader() {
