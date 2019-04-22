@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcmTest;
+import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -12,7 +13,8 @@ public class UITestsRegistry {
         Map<String, Object> suites = new HashMap<>();
 
         suites.put("all", new Object[] {
-            DashboardsDistributedByLcmTest.class
+            DashboardsDistributedByLcmTest.class,
+            MsfProcessTest.class
         });
 
         TestsRegistry.getInstance()

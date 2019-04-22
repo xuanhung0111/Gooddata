@@ -13,7 +13,7 @@ import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.disc.Parameters;

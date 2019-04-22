@@ -22,16 +22,14 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
+import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
-import com.gooddata.qa.utils.lcm.LCMServiceProject;
 import com.gooddata.qa.utils.lcm.LcmRestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
@@ -88,10 +86,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     private String devProjectId;
     private String clientProjectId;
-    private LCMServiceProject lcmServiceProject;
-    private JSONArray releaseSegments;
-    private JSONObject datasource;
-    private JSONArray segmentFilters;
+
+    private LcmBrickFlowBuilder lcmBrickFlowBuilder;
 
     @Override
     protected void initProperties() {
@@ -132,26 +128,15 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                 asList(numberKpiUri, indigoRestRequest.createVisualizationWidget(
                         insightUri, FIRST_TEST_INSIGHT)), SECOND_DASHBOARD);
 
-        lcmServiceProject = LCMServiceProject.newWorkFlow(testParams);
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
                 testParams.getDomainUser());
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams);
+        lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)
+                .setDevelopProject(devProjectId).setClientProjects(clientProjectId).buildLcmProjectParameters();
 
         log.info("------dev project id:" + devProjectId);
         log.info("------client project id:" + clientProjectId);
-
-        releaseSegments = new JSONArray() {{
-            put(new JSONObject() {{
-                put("segment_id", SEGMENT_ID);
-                put("development_pid", devProjectId);
-                put("driver", testParams.getProjectDriver().getValue());
-                put("master_name", "Master of " + SEGMENT_ID);
-            }});
-        }};
-        datasource = lcmServiceProject.createProvisionDatasource(SEGMENT_ID, CLIENT_ID, clientProjectId);
-        segmentFilters = new JSONArray() {{
-            put(SEGMENT_ID);
-        }};
 
         testParams.setProjectId(clientProjectId);
         addUsersToClientProject();
@@ -170,7 +155,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         lockedValue = indigoRestRequest.getLockedAttribute(SECOND_DASHBOARD);
         assertEquals(lockedValue, 0, SECOND_DASHBOARD + " should not be locked");
 
-        runLcmFlow();
+        lcmBrickFlowBuilder.runLcmFlow();
 
         indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
@@ -365,19 +350,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        log.info("--------------start cleanup lcm service");
-        lcmServiceProject.cleanUp(testParams.getUserDomain());
-    }
-
-    private void runLcmFlow() {
-        lcmServiceProject.release(releaseSegments);
-        log.info("----finished releasing--------------");
-
-        lcmServiceProject.provision(segmentFilters, datasource);
-        log.info("----finished provisioning--------------");
-
-        lcmServiceProject.rollout(segmentFilters);
-        log.info("----finished rolling--------------");
+        lcmBrickFlowBuilder.destroy();
     }
 
     private void addUsersToClientProject() throws JSONException, IOException {
