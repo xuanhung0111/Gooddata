@@ -52,7 +52,7 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
         AnalysisPage analysisPage = AnalysisPage.getInstance(browser);
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(avgAmountAgo, avgAmount));
         analysisPage.waitForReportComputing();
-        assertThat(analysisPage.getTableReport().getHeaders(), hasItems(avgAmountAgo, avgAmount));
+        assertThat(analysisPage.getPivotTableReport().getHeaders(), hasItems(avgAmountAgo, avgAmount));
     }
 
     @Test(dependsOnGroups = "createProject")
