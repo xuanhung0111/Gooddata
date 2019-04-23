@@ -5,7 +5,7 @@ import { Visualization } from '@gooddata/react-components';
 import '@gooddata/react-components/styles/css/main.css';
 
 var variables = require('./testing-variable.json');
-const visualizationUrl = variables.visualizationUrl;
+const visualizationUri = variables.visualizationUri;
 const testingProjectId = catalogJson.projectId;
 
 class App extends Component {
@@ -14,7 +14,7 @@ class App extends Component {
             <div style={{ height: 400, width: 600 }}>
                 <Visualization
                     projectId = {testingProjectId}
-                    uri = {visualizationUrl}
+                    uri = {visualizationUri}
                 />
             </div>
         );

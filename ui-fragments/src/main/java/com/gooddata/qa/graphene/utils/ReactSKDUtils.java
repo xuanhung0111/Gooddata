@@ -6,7 +6,7 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_NO_DATA_INSIGHT = "NoDataInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHT = "HeadlineInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHTS = "HeadlineInsights.js";
-    public static final String TEMPLATE_HEADLINE_INSIGHT_URL = "HeadlineInsightUrl.js";
+    public static final String TEMPLATE_HEADLINE_INSIGHT_URI = "HeadlineInsightUri.js";
     public static final String TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER_INSIGHT =
             "HeadlineWithAbsoluteDateFilterInsight.js";
     public static final String TEMPLATE_HEADLINE_WITH_FILTER_INSIGHT = "HeadlineWithFilterInsight.js";
@@ -37,6 +37,8 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_VISUALIZATION_WITH_FILTER = "VisualizationWithFilter.js";
     public static final String TEMPLATE_VISUALIZATION_WITH_NEGATIVE_FILTER = "VisualizationWithNegativeFilter.js";
     public static final String TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS = "VisualizationWithConfigurations.js";
+    public static final String TEMPLATE_VISUALIZATIONS_OF_PROJECTS_BY_IDENTIFIER = "VisualizationsOfProjectsByIdentifier.js";
+    public static final String TEMPLATE_VISUALIZATIONS_OF_PROJECTS_BY_URI = "VisualizationsOfProjectsByUri.js";
 
     //Warning
     public static final String WARNING_CAN_NOT_DISPLAY = "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.";
