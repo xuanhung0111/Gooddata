@@ -27,7 +27,7 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.sdk.common.AbstractReactSdkTest;
@@ -108,9 +108,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
-        TableReport sdkTableReport = sdkAnalysisPage.getTableReport();
+        PivotTableReport sdkTableReport = sdkAnalysisPage.getPivotTableReport();
         assertEquals(sdkTableReport.getHeaders(), singletonList(METRIC_AMOUNT));
-        assertEquals(sdkTableReport.getContent(), singletonList(singletonList("$116,625,456.54")));
+        assertEquals(sdkTableReport.getBodyContent(), singletonList(singletonList("$116,625,456.54")));
     }
 
     @Test(dependsOnMethods = "login")
@@ -120,10 +120,10 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         initAnalysePage().openInsight(treemap).addStack(ATTR_IS_CLOSED).changeReportType(ReportType.TABLE).saveInsight();
-        assertEquals(initSDKAnalysisPage().getTableReport().getHeaders(),
-                asList(ATTR_DEPARTMENT, ATTR_IS_CLOSED, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
+                asList(ATTR_IS_CLOSED, "TRUE", ATTR_DEPARTMENT, METRIC_NUMBER_OF_ACTIVITIES));
 
-        initAnalysePage().openInsight(treemap).removeAttribute(ATTR_IS_CLOSED).changeReportType(ReportType.TREE_MAP).saveInsight();
+        initAnalysePage().openInsight(treemap).removeColumn(ATTR_IS_CLOSED).changeReportType(ReportType.TREE_MAP).saveInsight();
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
