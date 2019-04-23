@@ -75,7 +75,7 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHTS);
         SDKAnalysisPage sdkAnalysisPage = initSDKAnalysisPage();
         assertEquals(sdkAnalysisPage.getHeadline().getPrimaryItem(), "154,271");
-        assertEquals(sdkAnalysisPage.getTableReport().getHeaders(), singletonList(METRIC_AMOUNT));
+        assertEquals(sdkAnalysisPage.getPivotTableReport().getHeaders(), singletonList(METRIC_AMOUNT));
     }
 
     @Test(dependsOnMethods = "login", groups = "hasData")
@@ -86,7 +86,7 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
         initAnalysePage().openInsight(headline).addMetricToSecondaryBucket(METRIC_AMOUNT)
                 .changeReportType(ReportType.TABLE).saveInsight();
-        assertEquals(initSDKAnalysisPage().getTableReport().getHeaders(),
+        assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT));
 
         initAnalysePage().openInsight(headline).removeMetric(METRIC_AMOUNT).changeReportType(ReportType.HEADLINE).saveInsight();

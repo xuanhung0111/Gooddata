@@ -8,6 +8,7 @@ import static org.openqa.selenium.By.id;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.Headline;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.SearchContext;
@@ -26,6 +27,11 @@ public class SDKAnalysisPage extends AnalysisPage {
     public TableReport getTableReport() {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(className("indigo-table-component"), getRoot()));
+    }
+
+    public PivotTableReport getPivotTableReport() {
+        return Graphene.createPageFragment(PivotTableReport.class,
+                waitForElementVisible(className("s-pivot-table"), getRoot()));
     }
 
     public ChartReport getChartReport() {

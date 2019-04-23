@@ -324,6 +324,11 @@ public class AnalysisPage extends AbstractFragment {
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
+    public AnalysisPage removeColumn(String attr) {
+        return drag(getAttributesColumnsBucket().get(attr).findElement(By.className("adi-bucket-item-header")),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
     public AnalysisPage changeReportType(ReportType type) {
         waitForFragmentVisible(reportTypePicker).setReportType(type);
         return this;
