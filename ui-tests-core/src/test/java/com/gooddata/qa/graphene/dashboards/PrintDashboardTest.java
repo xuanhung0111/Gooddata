@@ -290,7 +290,7 @@ public class PrintDashboardTest extends AbstractEmbeddedModeTest {
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         assertEquals(contents, asList(REPORT_AMOUNT_BY_PRODUCT, "Product Amount", "CompuSci", "Educationly", "Explorer",
                 "Grammar Plus", "PhoenixSoft", "WonderKid", "$27,222,899.64", "$22,946,895.47", "$38,596,194.86",
-                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", "MY ICON MY ICON", firstTab + " " + today, "Page 1/2",
+                "$8,042,031.92", "$9,525,857.91", "$10,291,576.74", firstTab + " " + today, "Page 1/2",
                 "MY ICON MY ICON", "Page 2/2"));
     }
 
