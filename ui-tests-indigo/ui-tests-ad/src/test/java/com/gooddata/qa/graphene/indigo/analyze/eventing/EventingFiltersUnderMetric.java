@@ -46,7 +46,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(String.format("%s (Region: East Coast)",
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(String.format("%s (Region: East Coast)",
                 METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -117,7 +117,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(String.format("%s (Region: East Coast)",
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(String.format("%s (Region: East Coast)",
                 METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -192,7 +192,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport()
+        embeddedAnalysisPage.getPivotTableReport()
                 .getCellElement(String.format("%s (Region: East Coast)", METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -267,7 +267,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport()
+        embeddedAnalysisPage.getPivotTableReport()
                 .getCellElement(String.format("%s (Region: East Coast)", METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -390,7 +390,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport()
+        embeddedAnalysisPage.getPivotTableReport()
                 .getCellElement(String.format("%s (Department: Direct Sales)", METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -473,7 +473,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport()
+        embeddedAnalysisPage.getPivotTableReport()
                 .getCellElement(String.format("%s (Priority: HIGH)", METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 
@@ -550,7 +550,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport()
+        embeddedAnalysisPage.getPivotTableReport()
                 .getCellElement(String.format("%s (Priority: HIGH)", METRIC_NUMBER_OF_ACTIVITIES), 0).click();
         JSONObject content = getLatestPostMessageObj();
 

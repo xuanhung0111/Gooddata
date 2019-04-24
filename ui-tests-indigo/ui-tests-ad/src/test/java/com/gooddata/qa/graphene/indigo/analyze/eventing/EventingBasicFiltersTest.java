@@ -44,7 +44,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -109,7 +109,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -120,7 +120,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 getDatasetByIdentifier("created.dataset.dt").getUri());
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_YEAR_CREATED, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_YEAR_CREATED, 0).click();
         content = getLatestPostMessageObj();
 
         executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -188,7 +188,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -200,7 +200,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .getJSONObject("dataSet").getString("uri"), getDatasetByIdentifier("created.dataset.dt").getUri());
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_ACTIVITY_TYPE, 0).click();
         content = getLatestPostMessageObj();
 
         executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -252,7 +252,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testEventingTableReportHasMultipleMetricsSingleAttribute() throws IOException, ParseException {
+    public void testEventingTableReportHasMultipleMetricsSingleAttribute() throws IOException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
@@ -275,7 +275,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -285,7 +285,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .getJSONObject("displayForm").getString("uri"), regionUri);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         content = getLatestPostMessageObj();
 
         executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -296,7 +296,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testEventingColumnReportHasMultipleMetricsSingleAttribute() throws IOException, ParseException {
+    public void testEventingColumnReportHasMultipleMetricsSingleAttribute() throws IOException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
@@ -334,7 +334,9 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingTableReportHasMultipleMetricsDateAttribute() throws IOException, ParseException {
         initAnalysePage();
-        analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage
+                .changeReportType(ReportType.TABLE)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addDate();
         analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
@@ -355,7 +357,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -402,7 +404,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testEventingTableReportHasMultipleMetricsOneAttributeDateOnFilter() throws IOException, ParseException {
+    public void testEventingTableReportHasMultipleMetricsOneAttributeDateOnFilter() throws IOException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES).addAttribute(ATTR_REGION);
@@ -425,7 +427,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -435,7 +437,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .getJSONObject("displayForm").getString("uri"), regionUri);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         content = getLatestPostMessageObj();
 
         executionContext = content.getJSONObject("data").getJSONObject("executionContext");
@@ -446,7 +448,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testEventingColumnReportHasMultipleMetricsOneAttributeDateOnFilter() throws IOException, ParseException {
+    public void testEventingColumnReportHasMultipleMetricsOneAttributeDateOnFilter() throws IOException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES).addAttribute(ATTR_REGION);

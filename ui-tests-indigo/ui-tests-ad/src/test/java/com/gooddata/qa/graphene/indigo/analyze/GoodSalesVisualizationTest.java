@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Attribu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -22,8 +22,6 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -59,6 +57,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     private static final String EXPORT_ERROR_MESSAGE = "The insight is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to open as a report.";
+    private ProjectRestRequest projectRestRequest;
+
 
     @Override
     public void initProperties() {
@@ -68,8 +68,11 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createAmountMetric();
         metricCreator.createNumberOfActivitiesMetric();
@@ -93,8 +96,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
-        TableReport report = analysisPage.changeReportType(ReportType.TABLE)
-                .waitForReportComputing().getTableReport();
+        PivotTableReport report = analysisPage.changeReportType(ReportType.TABLE)
+                .waitForReportComputing().getPivotTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(singletonList(ATTR_ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
@@ -204,53 +207,6 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void exportCustomDiscovery() {
-        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .changeReportType(ReportType.TABLE)
-                .waitForReportComputing()
-                .getPageHeader()
-                .isExportButtonEnabled(), "Trackers should display");
-        TableReport analysisReport = analysisPage.waitForReportComputing().getTableReport();
-        List<List<String>> analysisContent = analysisReport.getContent();
-        Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
-
-        analysisPage.exportReport();
-        String currentWindowHandle = browser.getWindowHandle();
-        for (String handle : browser.getWindowHandles()) {
-            if (!handle.equals(currentWindowHandle))
-                browser.switchTo().window(handle);
-        }
-
-        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
-                Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
-                        waitForElementVisible(By.id("gridContainerTab"), browser));
-
-        Iterator<String> attributes = tableReport.waitForLoaded().getAttributeValues().iterator();
-        Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
-
-        List<List<String>> content = new ArrayList<>();
-        while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(asList(attributes.next(), metrics.next()));
-        }
-
-        assertThat(content, equalTo(analysisContent));
-
-        List<String> headers = tableReport.getAttributeHeaders();
-        headers.addAll(tableReport.getMetricHeaders());
-        Iterator<String> reportheaders = headers.iterator();
-
-        while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
-            assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
-        }
-        checkRedBar(browser);
-
-        browser.close();
-        browser.switchTo().window(currentWindowHandle);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
     public void exportVisualizationWithOneAttributeInChart() {
         assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "NO MEASURE IN YOUR INSIGHT");
@@ -259,112 +215,126 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasOneMetricManyAttributes() {
-        initAnalysePage().changeReportType(ReportType.TABLE)
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .addAttribute(ATTR_DEPARTMENT)
-            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .waitForReportComputing();
+        setExtendedStackingFlag(false);
+        try {
+            initAnalysePage().changeReportType(ReportType.TABLE)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing();
 
-        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-            .forEach(type -> {
-                analysisPage.changeReportType(type);
-                takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
-                assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
-                analysisPage.undo();
-        });
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
+                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+                    assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
+                    analysisPage.undo();
+            });
 
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
-            .changeReportType(ReportType.TABLE);
-        takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+            analysisPage.changeReportType(ReportType.COLUMN_CHART)
+                .changeReportType(ReportType.TABLE);
+            takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasManyMetricsManyAttributes() {
-        initAnalysePage().changeReportType(ReportType.TABLE)
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .addAttribute(ATTR_DEPARTMENT)
-            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addMetric(METRIC_QUOTA)
-            .waitForReportComputing();
+        setExtendedStackingFlag(false);
+        try {
+            initAnalysePage().changeReportType(ReportType.TABLE)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addMetric(METRIC_QUOTA)
+                .waitForReportComputing();
 
-        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-            .forEach(type -> {
-                analysisPage.changeReportType(type);
-                takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
-                analysisPage.undo();
-        });
-
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
-            .changeReportType(ReportType.TABLE);
-        takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
+                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+                    assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
+                    analysisPage.undo();
+            });
+            analysisPage.changeReportType(ReportType.COLUMN_CHART)
+                .changeReportType(ReportType.TABLE);
+            takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributes() {
-        final StacksBucket stacksBucket = initAnalysePage().getStacksBucket();
-        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
+        setExtendedStackingFlag(false);
+        try {
+            final StacksBucket stacksBucket = initAnalysePage().getStacksBucket();
+            final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
-        analysisPage.changeReportType(ReportType.TABLE)
-            .addDate()
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .addAttribute(ATTR_DEPARTMENT);
+            analysisPage.changeReportType(ReportType.TABLE)
+                .addDate()
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT);
 
-        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-            .forEach(type -> {
-                analysisPage.changeReportType(type);
-                takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-                assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
-                analysisPage.undo();
-        });
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
+                    assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
+                    assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
+                    analysisPage.undo();
+            });
 
-        analysisPage.resetToBlankState()
-            .changeReportType(ReportType.TABLE)
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .addDate()
-            .addAttribute(ATTR_DEPARTMENT);
+            analysisPage.resetToBlankState()
+                .changeReportType(ReportType.TABLE)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addDate()
+                .addAttribute(ATTR_DEPARTMENT);
 
-        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
-            .forEach(type -> {
-                analysisPage.changeReportType(type);
-                takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-                assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                analysisPage.undo();
-        });
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
+                    assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
+                    assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+                    analysisPage.undo();
+            });
 
-        analysisPage.changeReportType(ReportType.LINE_CHART);
-        takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
-                getClass());
-        assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-        assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
+            analysisPage.changeReportType(ReportType.LINE_CHART);
+            takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
+                    getClass());
+            assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
+            assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
 
-        analysisPage.resetToBlankState()
-            .changeReportType(ReportType.TABLE)
-            .addAttribute(ATTR_ACTIVITY_TYPE)
-            .addAttribute(ATTR_DEPARTMENT)
-            .addDate();
+            analysisPage.resetToBlankState()
+                .changeReportType(ReportType.TABLE)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT)
+                .addDate();
 
-        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
-            .forEach(type -> {
-                analysisPage.changeReportType(type);
-                takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-                assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                analysisPage.undo();
-        });
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
+                    assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
+                    assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
+                    analysisPage.undo();
+            });
 
-        analysisPage.changeReportType(ReportType.LINE_CHART);
-        takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
-                getClass());
-        assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-        assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
+            analysisPage.changeReportType(ReportType.LINE_CHART);
+            takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
+                    getClass());
+            assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
+            assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -373,7 +343,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         assertTrue(stacksBucket.isDisabled(), "Stacks bucket should display");
-        assertEquals(stacksBucket.getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
+        assertEquals(stacksBucket.getWarningMessage(), ReportType.COLUMN_CHART.getExtendedStackByMessage());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -397,12 +367,16 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing()
-            .getTableReport()
+            .getPivotTableReport()
             .getHeaders()
             .stream()
             .map(String::toLowerCase)
             .collect(toList());
         assertEquals(headers, Stream.of(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS,
                 METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_WON_OPPS).map(String::toLowerCase).collect(toList()));
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

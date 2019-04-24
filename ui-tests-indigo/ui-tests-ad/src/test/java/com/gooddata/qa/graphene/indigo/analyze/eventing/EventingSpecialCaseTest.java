@@ -2,9 +2,12 @@ package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
 import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +19,7 @@ import java.util.Arrays;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static org.testng.Assert.assertEquals;
@@ -23,11 +27,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class EventingSpecialCaseTest extends AbstractEventingTest {
-
-    @Override
-    protected void customizeProject() throws Throwable {
-        super.customizeProject();
-    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingTableReportChangeExistedMetric() throws IOException {
@@ -50,12 +49,12 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         setDrillableItems(regionUri, opportunityUri);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         String contentStr = getLoggerContent();
         assertTrue(contentStr.trim().isEmpty(), String.format("%s should not drillable", METRIC_NUMBER_OF_ACTIVITIES));
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -73,48 +72,54 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingColumnReportChangeExistedMetric() throws IOException {
-        final String insightUri = createInsight("special_test_insight_16_2_" + generateHashString(), ReportType.TABLE,
+        try {
+            setExtendedStackingFlag(false);
+
+            final String insightUri = createInsight("special_test_insight_16_2_" + generateHashString(), ReportType.TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
                 Arrays.asList(ATTR_REGION, ATTR_DEPARTMENT));
 
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        final JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(regionUri);
-        }};
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(regionUri);
+            }};
 
-        String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
-        embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+            String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+            embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
-        setDrillableItems(regionUri, opportunityUri);
+            setDrillableItems(regionUri, opportunityUri);
 
-        cleanUpLogger();
-        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_OPPORTUNITIES, "East Coast");
-        chartReport.clickOnElement(position);
+            cleanUpLogger();
+            ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+            Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_OPPORTUNITIES, "East Coast");
+            chartReport.clickOnElement(position);
 
-        JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
-        assertEquals(drillContext.getString("type"), "column");
-        assertEquals(drillContext.getString("element"), "bar");
-        assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
-        assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
+            JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
+            assertEquals(drillContext.getString("type"), "column");
+            assertEquals(drillContext.getString("element"), "bar");
+            assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
+            assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
 
-        JSONArray intersection = drillContext.getJSONArray("intersection");
-        assertEquals(intersection.length(), 2);
+            JSONArray intersection = drillContext.getJSONArray("intersection");
+            assertEquals(intersection.length(), 2);
 
-        String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
-        String title = intersection.getJSONObject(0).getString("title");
-        assertEquals(uri, opportunityUri);
-        assertEquals(title, METRIC_NUMBER_OF_OPPORTUNITIES);
+            String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
+            String title = intersection.getJSONObject(0).getString("title");
+            assertEquals(uri, opportunityUri);
+            assertEquals(title, METRIC_NUMBER_OF_OPPORTUNITIES);
 
-        uri = intersection.getJSONObject(1).getJSONObject("header").getString("uri");
-        title = intersection.getJSONObject(1).getString("title");
-        assertEquals(uri, regionUri);
-        assertEquals(title, "East Coast");
+            uri = intersection.getJSONObject(1).getJSONObject("header").getString("uri");
+            title = intersection.getJSONObject(1).getString("title");
+            assertEquals(uri, regionUri);
+            assertEquals(title, "East Coast");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -140,10 +145,10 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         setDrillableItems(activityUri, departmentUri);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         String contentStr = getLoggerContent();
         assertTrue(contentStr.trim().isEmpty(), String.format("%s should not drillable", ATTR_REGION));
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_DEPARTMENT, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_DEPARTMENT, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -161,93 +166,105 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingColumnReportChangeExistedAttribute() throws IOException {
-        final String insightUri = createInsight("special_test_insight_16_4_" + generateHashString(), ReportType.TABLE,
+        try {
+            setExtendedStackingFlag(false);
+
+            final String insightUri = createInsight("special_test_insight_16_4_" + generateHashString(), ReportType.TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
                 Arrays.asList(ATTR_REGION, ATTR_DEPARTMENT));
 
-        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        final String departmentUri = getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri();
-        final JSONArray uris = new JSONArray() {{
-            put(activityUri);
-            put(opportunityUri);
-            put(regionUri);
-        }};
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            final String departmentUri = getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(activityUri);
+                put(opportunityUri);
+                put(regionUri);
+            }};
 
-        String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.waitForReportComputing();
-        embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+            String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+            embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
-        setDrillableItems(activityUri, departmentUri);
+            setDrillableItems(activityUri, departmentUri);
 
-        cleanUpLogger();
+            cleanUpLogger();
 
-        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
-        chartReport.clickOnElement(position);
+            ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+            Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+            chartReport.clickOnElement(position);
 
-        JSONObject content = getLatestPostMessageObj();
+            JSONObject content = getLatestPostMessageObj();
 
-        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
-        assertEquals(drillContext.getString("type"), "column");
-        assertEquals(drillContext.getString("element"), "bar");
-        assertTrue(drillContext.has("x"), "drill event of column chart should show X");
-        assertTrue(drillContext.has("y"), "drill event of column chart should show Y");
+            JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+            assertEquals(drillContext.getString("type"), "column");
+            assertEquals(drillContext.getString("element"), "bar");
+            assertTrue(drillContext.has("x"), "drill event of column chart should show X");
+            assertTrue(drillContext.has("y"), "drill event of column chart should show Y");
 
-        JSONArray intersection = drillContext.getJSONArray("intersection");
-        assertEquals(intersection.length(), 2);
+            JSONArray intersection = drillContext.getJSONArray("intersection");
+            assertEquals(intersection.length(), 2);
 
-        String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
-        String title = intersection.getJSONObject(0).getString("title");
-        assertEquals(uri, activityUri);
-        assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
+            String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
+            String title = intersection.getJSONObject(0).getString("title");
+            assertEquals(uri, activityUri);
+            assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
 
-        uri = intersection.getJSONObject(1).getJSONObject("header").getString("uri");
-        title = intersection.getJSONObject(1).getString("title");
-        assertEquals(uri, regionUri);
-        assertEquals(title, "East Coast");
+            uri = intersection.getJSONObject(1).getJSONObject("header").getString("uri");
+            title = intersection.getJSONObject(1).getString("title");
+            assertEquals(uri, regionUri);
+            assertEquals(title, "East Coast");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingColumnReportRearrangeMetric() throws IOException {
-        final String insightUri = createInsight("special_test_insight_16_5_" + generateHashString(), ReportType.TABLE,
+        try {
+            setExtendedStackingFlag(false);
+
+            final String insightUri = createInsight("special_test_insight_16_5_" + generateHashString(), ReportType.TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
                 Arrays.asList(ATTR_REGION, ATTR_DEPARTMENT));
 
-        final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-        final JSONArray uris = new JSONArray() {{
-            put(opportunityUri);
-            put(regionUri);
-        }};
+            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
+            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(opportunityUri);
+                put(regionUri);
+            }};
 
-        String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-        embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART);
-        embeddedAnalysisPage.waitForReportComputing();
+            String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART);
+            embeddedAnalysisPage.waitForReportComputing();
 
-        analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES).waitForReportComputing();
+            analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES).waitForReportComputing();
 
-        cleanUpLogger();
-        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
-        chartReport.clickOnElement(position);
-        JSONObject content = getLatestPostMessageObj();
+            cleanUpLogger();
+            ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+            Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+            chartReport.clickOnElement(position);
+            JSONObject content = getLatestPostMessageObj();
 
-        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
-        assertTrue(drillContext.has("x"), "drill event of column chart should show X");
-        assertTrue(drillContext.has("y"), "drill event of column chart should show Y");
-        assertEquals(drillContext.getString("type"), "column");
-        assertEquals(drillContext.getString("element"), "bar");
+            JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+            assertTrue(drillContext.has("x"), "drill event of column chart should show X");
+            assertTrue(drillContext.has("y"), "drill event of column chart should show Y");
+            assertEquals(drillContext.getString("type"), "column");
+            assertEquals(drillContext.getString("element"), "bar");
 
-        JSONArray intersection = drillContext.getJSONArray("intersection");
-        String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
-        String title = intersection.getJSONObject(0).getString("title");
-        assertEquals(intersection.length(), 2);
-        assertEquals(uri, getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri());
-        assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
+            JSONArray intersection = drillContext.getJSONArray("intersection");
+            String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
+            String title = intersection.getJSONObject(0).getString("title");
+            assertEquals(intersection.length(), 2);
+            assertEquals(uri, getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri());
+            assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -270,7 +287,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES).waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 2);
@@ -306,7 +323,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.addAttribute(ATTR_REGION);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 1);
@@ -343,7 +360,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.undo();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -366,7 +383,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         content = getLatestPostMessageObj();
 
         drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -399,9 +416,9 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
         embeddedAnalysisPage.waitForReportComputing();
 
-        embeddedAnalysisPage.getTableReport().sortBaseOnHeader(ATTR_REGION);
+        embeddedAnalysisPage.getPivotTableReport().sortBaseOnHeader(ATTR_REGION);
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_REGION, 0).click();
         JSONObject content = getLatestPostMessageObj();
 
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -435,7 +452,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 1);
@@ -468,7 +485,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 1);
@@ -501,7 +518,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(1, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(1, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 1);
@@ -516,7 +533,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(2, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(2, 0).click();
 
         drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 2);
@@ -549,7 +566,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getInt("columnIndex"), 1);
@@ -571,6 +588,9 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration().showPercents();
+        analysisPage.getAttributesBucket().changeDateDimension(DATE_DATASET_ACTIVITY);
+        analysisPage.waitForReportComputing();
+
         analysisPage.saveInsight("special_test_insight_21_" + generateHashString());
 
         String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
@@ -584,7 +604,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
 
         cleanUpLogger();
-        embeddedAnalysisPage.getTableReport().getCellElement("% " + METRIC_NUMBER_OF_ACTIVITIES, 7).click();
+        embeddedAnalysisPage.getPivotTableReport().getCellElement("% " + METRIC_NUMBER_OF_ACTIVITIES, 7).click();
 
         JSONObject content = getLatestPostMessageObj();
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
@@ -623,5 +643,10 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         title = intersection.getJSONObject(1).getString("title");
         assertEquals(uri, yearActivityUri);
         assertEquals(title, "2015");
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

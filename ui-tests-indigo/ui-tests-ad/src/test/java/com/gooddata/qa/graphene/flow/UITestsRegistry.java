@@ -9,6 +9,8 @@ import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.BackwardCompatibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureExtendedTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesPivotTableReportTest;
+import com.gooddata.qa.graphene.indigo.analyze.PivotTableAggregationTest;
 import com.gooddata.qa.graphene.indigo.analyze.RenamingMeasuresAndAttributesTest;
 import com.gooddata.qa.graphene.indigo.analyze.RedesigningDateFilterDialogOnFilterBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableTest;
@@ -59,6 +61,7 @@ import com.gooddata.qa.graphene.indigo.analyze.CustomColorPaletteUILayoutInsight
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.E2ePivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.EmptyCatalogueTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.FactBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.RecommendationsWithoutDateDimensionTest;
@@ -85,6 +88,7 @@ public class UITestsRegistry {
             AttributeFiltersTest.class,
             BucketsTest.class,
             TableTest.class,
+            E2ePivotTableTest.class,
             UndoTest.class,
             AttributeBasedMetricsTest.class,
             FactBasedMetricsTest.class,
@@ -128,6 +132,7 @@ public class UITestsRegistry {
             GoodSalesShortcutRecommendationTest.class,
             SpecialCasesTest.class,
             GoodSalesTableReportTest.class,
+            GoodSalesPivotTableReportTest.class,
             GoodSalesTrendingRecommendationTest.class,
             GoodSalesUndoTest.class,
             GoodSalesUndoRedoSavedInsightTest.class,
@@ -158,6 +163,7 @@ public class UITestsRegistry {
             InsightCompareToSamePreviousPeriodYearTest.class,
             RedesigningDateFilterDialogOnFilterBucketTest.class,
             PivotTableTest.class,
+            PivotTableAggregationTest.class,
             SecondaryAxisTest.class,
             PivotTableAdvancedTest.class,
             ReferencePointAndVisSwitchingTest.class,

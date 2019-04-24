@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards.eventing;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
@@ -70,7 +70,7 @@ public class VisualizationMeasureAttributeTest extends AbstractDashboardEventing
 
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
-        TableReport report = insight.getTableReport();
+        PivotTableReport report = insight.getPivotTableReport();
 
         assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
                 String.format("Column %s should be underlined", ATTR_ACTIVITY_TYPE));
@@ -93,7 +93,7 @@ public class VisualizationMeasureAttributeTest extends AbstractDashboardEventing
 
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
-        TableReport report = insight.getTableReport();
+        PivotTableReport report = insight.getPivotTableReport();
 
         assertTrue(report.isCellUnderlined(ATTR_REGION, 0),
                 String.format("Column %s should be underlined", ATTR_REGION));
@@ -102,7 +102,7 @@ public class VisualizationMeasureAttributeTest extends AbstractDashboardEventing
     private void verifyNotUnderlineAndHighlight(final String htmlFile) {
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(htmlFile).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
-        TableReport report = insight.getTableReport();
+        PivotTableReport report = insight.getPivotTableReport();
 
         assertFalse(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
                 String.format("Column %s should not be underlined", ATTR_ACTIVITY_TYPE));
@@ -111,7 +111,7 @@ public class VisualizationMeasureAttributeTest extends AbstractDashboardEventing
     private void verifyUnderlineAndHighlight(final String htmlFile) {
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(htmlFile).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
-        TableReport report = insight.getTableReport();
+        PivotTableReport report = insight.getPivotTableReport();
 
         assertTrue(report.isCellUnderlined(ATTR_ACTIVITY_TYPE, 0),
                 String.format("Column %s should be underlined", ATTR_ACTIVITY_TYPE));

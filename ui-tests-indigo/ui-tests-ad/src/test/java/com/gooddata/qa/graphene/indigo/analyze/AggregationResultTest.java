@@ -1,17 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
 import java.text.ParseException;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
@@ -33,6 +38,11 @@ public class AggregationResultTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createCloseEOPMetric();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 AggregationResultTest should be removed as we are removing Table Visualization
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, false);
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -77,8 +87,9 @@ public class AggregationResultTest extends AbstractAnalyseTest {
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE)
                 .addDate()
-                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .waitForReportComputing();
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPage.getAttributesBucket().changeDateDimension(DATE_DATASET_ACTIVITY);
+        analysisPage.waitForReportComputing();
         checkTableTotalWithSamePeriodComparison("73,073");
     }
 

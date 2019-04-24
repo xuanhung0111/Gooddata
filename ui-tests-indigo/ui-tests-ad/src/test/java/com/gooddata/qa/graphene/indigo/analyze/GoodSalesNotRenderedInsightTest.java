@@ -1,21 +1,21 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import org.json.JSONException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
 
@@ -27,14 +27,22 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
 
     @DataProvider(name = "chartTypeDataProvider")
     public Object[][] chartTypeDataProvider() {
-        return new Object[][] {
-                { ReportType.COLUMN_CHART },
-                { ReportType.BAR_CHART },
-                { ReportType.LINE_CHART }
+        return new Object[][]{
+                {ReportType.COLUMN_CHART},
+                {ReportType.BAR_CHART},
+                {ReportType.LINE_CHART}
         };
     }
 
-    @Test(dependsOnGroups = { "createProject" }, dataProvider = "chartTypeDataProvider")
+    @Override
+    protected void customizeProject() throws Throwable {
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        // TODO: BB-1448 enablePivot FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")
     public void testNotSavableMissingMetricInsight(ReportType type) {
         initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(type);
         //checking empty Measures bucket is not a good way to verify insight containing no metric
@@ -44,12 +52,12 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
         assertFalse(analysisPage.isSaveInsightEnabled(), "The save button is enabled");
     }
 
-    @Test(dependsOnGroups = { "createProject" })
-    public void saveMissingMetricTableInsight() throws JSONException, IOException {
+    @Test(dependsOnGroups = {"createProject"})
+    public void saveMissingMetricTableInsight() throws JSONException {
         final String insight = "Test-Save-Table-Insight-Missing-Metric";
         initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
-        assertEquals(analysisPage.getTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE),
-                "Table was not displayed sucessfully");
+        assertEquals(analysisPage.getPivotTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE),
+                "Table was not displayed successfully");
         analysisPage.saveInsight(insight);
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());

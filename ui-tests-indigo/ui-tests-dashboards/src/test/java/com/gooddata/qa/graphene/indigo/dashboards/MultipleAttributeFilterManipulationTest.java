@@ -224,9 +224,8 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         takeScreenshot(browser, "check-shorten-measure-name-in-table-column-header", getClass());
-        assertTrue(analysisPage.getTableReport().isShortenHeader(HEADER_NAME, 579),
+        assertTrue(analysisPage.getPivotTableReport().isShortenHeader(HEADER_NAME, 0, 180),
                 "Measure Name should be shorten by too long");
-        assertEquals(analysisPage.getTableReport().getTooltipText(HEADER_NAME), HEADER_NAME);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -246,7 +245,7 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
         indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
         indigoDashboardsPage.waitForWidgetsLoading();
         takeScreenshot(browser, "check-shorten-measure-name-on-KPI-dashboard", getClass());
-        assertTrue(indigoDashboardsPage.getFirstWidget(Insight.class).getTableReport().isShortenHeader(HEADER_NAME, 573),
+        assertTrue(indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport().isShortenHeader(HEADER_NAME, 0,180),
                 "Measure Name should be shorten by too long");
     }
 
@@ -260,13 +259,12 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
 
     private void addMetricWithAttributeFilters(String metric, List<Pair<String, String>> attributes) {
         addMetric(metric);
-        attributes.stream()
-                .forEach(attribute -> metricConfiguration.addFilterBySelectOnly(attribute.getLeft(), attribute.getRight()));
+        attributes.forEach(attribute -> metricConfiguration.addFilterBySelectOnly(attribute.getLeft(), attribute.getRight()));
     }
 
     private void addMetricWithAllValueAttributeFilters(String metric, List<String> attributes) {
         addMetric(metric);
-        attributes.stream().forEach(attribute -> metricConfiguration.addFilterWithAllValue(attribute));
+        attributes.forEach(attribute -> metricConfiguration.addFilterWithAllValue(attribute));
     }
 
     private void addMetric(String metric) {

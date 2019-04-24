@@ -35,6 +35,8 @@ import java.util.Arrays;
 
 public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
+    private ProjectRestRequest projectRestRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -43,8 +45,9 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
     }
@@ -135,33 +138,45 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAttributeReplaceDate() {
-        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
+        setExtendedStackingFlag(false);
+        try {
+            final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                "Number of Trackers should be greater or equal 1");
-        assertTrue(filtersBucketReact.isDateFilterVisible(), "Date filter should display");
+            analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                    "Number of Trackers should be greater or equal 1");
+            assertTrue(filtersBucketReact.isDateFilterVisible(), "Date filter should display");
 
-        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-        assertFalse(filtersBucketReact.isDateFilterVisible(), "Date filter shouldn't display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + " filter should display");
+            analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+            assertFalse(filtersBucketReact.isDateFilterVisible(), "Date filter shouldn't display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE),
+                    ATTR_ACTIVITY_TYPE + " filter should display");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testReplaceAttribute() {
-        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
+        setExtendedStackingFlag(false);
+        try {
+            final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + " filter should display");
+            analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE),
+                    ATTR_ACTIVITY_TYPE + " filter should display");
 
-        analysisPage.addStack(ATTR_DEPARTMENT);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
+            analysisPage.addStack(ATTR_DEPARTMENT);
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
 
-        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE),
-                ATTR_ACTIVITY_TYPE + " filter shouldn't display");
-        assertTrue(filtersBucketReact.isFilterVisible("Region"), "Region filter should display");
-        checkingOpenAsReport("testReplaceAttribute");
+            analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
+            assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE),
+                    ATTR_ACTIVITY_TYPE + " filter shouldn't display");
+            assertTrue(filtersBucketReact.isFilterVisible("Region"), "Region filter should display");
+            checkingOpenAsReport("testReplaceAttribute");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -200,5 +215,9 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
                 .scrollElementIntoView("Email with 1 Source Consulting on Feb-03-10")
                 .checkAllCheckbox();
         assertFalse(attributeFilterPickerPanel.isUncheckAll(), "Should check All");
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
