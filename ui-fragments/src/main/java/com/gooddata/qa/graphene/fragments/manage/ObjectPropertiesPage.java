@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
@@ -64,14 +63,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         }
 
         IpeEditor.getInstance(browser).setText(name);
-        By busyMask = By.className("gdc-busy-mask-visible");
-        try {
-            waitForElementPresent(busyMask, getRoot());
-            waitForElementNotPresent(busyMask);
-        } catch (TimeoutException e) {
-            // Variable detail already loaded so WebDriver unable to catch the loading indicator
-        }
-        return this;
+        return waitForLoaded();
     }
 
     public String getName() {
@@ -89,8 +81,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
     public ObjectPropertiesPage changeDescription(String description) {
         waitForElementVisible(descriptionField).click();
         IpeEditor.getInstance(browser).setText(description);
-
-        return this;
+        return waitForLoaded();
     }
 
     public String getDescription() {
@@ -181,5 +172,16 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementNotVisible(BY_CONFIRM_DELETE_BUTTON);
 
         return deleteButton.getAttribute("class").contains("disabled");
+    }
+
+    private ObjectPropertiesPage waitForLoaded() {
+        By busyMask = By.className("gdc-busy-mask-visible");
+        try {
+            waitForElementVisible(busyMask, browser, 3);
+            waitForElementNotPresent(busyMask);
+        } catch (TimeoutException e) {
+            // Variable detail already loaded so WebDriver unable to catch the loading indicator
+        }
+        return this;
     }
 }
