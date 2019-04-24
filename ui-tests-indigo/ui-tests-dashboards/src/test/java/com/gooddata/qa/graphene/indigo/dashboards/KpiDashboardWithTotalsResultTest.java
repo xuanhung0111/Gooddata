@@ -11,12 +11,13 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
@@ -24,11 +25,14 @@ import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
@@ -37,6 +41,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -98,15 +103,17 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
 
         CheckUtils.checkRedBar(browser);
 
-        TableReport tableReport = indigoDashboardsPage.waitForWidgetsLoading().getFirstWidget(Insight.class).getTableReport();
+        PivotTableReport pivotTableReport = indigoDashboardsPage.waitForWidgetsLoading().getFirstWidget(Insight.class).getPivotTableReport();
         Screenshots.takeScreenshot(browser, "place tables have totals on KD", getClass());
 
-        assertTrue(tableReport.hasTotalsResult(), "Totals result should be rendered as well");
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
+        assertTrue(pivotTableReport.containsGrandTotals(), "Grand Totals should be rendered as well");
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
 
-        tableReport = indigoDashboardsPage.getLastWidget(Insight.class).getTableReport();
-        assertTrue(tableReport.hasTotalsResult(), "Totals result should be rendered as well");
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "47,459");
+        pivotTableReport = indigoDashboardsPage.getLastWidget(Insight.class).getPivotTableReport();
+        assertTrue(pivotTableReport.containsGrandTotals(), "Grand Totals should be rendered as well");
+        expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "47,459"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
         indigoDashboardsPage.saveEditModeWithWidgets();
     }
 
@@ -123,10 +130,13 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
             IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets()
                 .selectKpiDashboard(KPI_DASHBOARD).waitForWidgetsLoading();
             Screenshots.takeScreenshot(browser, "export import project has totals result in " + KPI_DASHBOARD, getClass());
-            assertEquals(indigoDashboardsPage.getFirstWidget(Insight.class).getTableReport()
-                .getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
-            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getTableReport()
-                .getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "47,459");
+
+            List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054"));
+            assertEquals(indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport()
+                .getGrandTotalsContent(), expectedValues);
+            expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "47,459"));
+            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getPivotTableReport()
+                .getGrandTotalsContent(), expectedValues);
         } finally {
             testParams.setProjectId(workingProjectId);
         }
@@ -140,11 +150,16 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
 
         testParams.setProjectId(targetProjectId);
         try {
+            ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
+
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();
             Screenshots.takeScreenshot(browser, "partial export import project has totals result in " +
                 INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, getClass());
-            assertEquals(analysisPage.getTableReport().getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
+            List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054"));
+            assertEquals(analysisPage.getPivotTableReport().getGrandTotalsContent(), expectedValues);
         } finally {
             testParams.setProjectId(workingProjectId);
         }
@@ -176,19 +191,22 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
         Dataset.waitForDatasetLoaded(browser);
 
         //Check updated
-        TableReport tableReport = initAnalysePage().openInsight(INSIGHT_IS_UPLOADED_DATA).getTableReport();
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_IS_UPLOADED_DATA).getPivotTableReport();
         takeScreenshot(browser, "uploaded payroll dataset", getClass());
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MIN, METRIC_AMOUNT), "$10,000.00");
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MIN.getRowName(), "$10,000.00"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
     @Test(dependsOnMethods = "prepareInsights", groups = "mobile")
     public void checkKpiDashboardHasTotalsResultOnMobile() {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().selectKpiDashboard("KPI Dashboard Mobile");
 
-        TableReport tableReport = indigoDashboardsPage.waitForAlertsLoaded().getLastWidget(Insight.class).getTableReport();
+        PivotTableReport pivotTableReport = indigoDashboardsPage.waitForAlertsLoaded().getLastWidget(Insight.class).getPivotTableReport();
         Screenshots.takeScreenshot(browser, "check Kpi dashboard has totals results on mobile", getClass());
-        assertTrue(tableReport.hasTotalsResult(), "Totals Result should be displayed");
-        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");
+        assertTrue(pivotTableReport.containsGrandTotals(), "Grand Totals should be displayed");
+
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
     private String createSimpleInsight(String title, String metric, String attribute, AggregationItem type) throws IOException {

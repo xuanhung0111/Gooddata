@@ -21,6 +21,8 @@ import com.gooddata.qa.utils.http.RestClient;
 
 public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
 
+    private ProjectRestRequest projectRestRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -29,49 +31,59 @@ public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeByNewOne() {
-        final AttributesBucket categoriesBucket = initAnalysePage().getAttributesBucket();
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
-        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        setExtendedStackingFlag(false);
+        try {
+            final AttributesBucket categoriesBucket = initAnalysePage().getAttributesBucket();
+            final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+            final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPage.addAttribute(ATTR_STAGE_NAME);
-        assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_STAGE_NAME));
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
+            analysisPage.addAttribute(ATTR_STAGE_NAME);
+            assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_STAGE_NAME));
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
 
-        analysisPage.replaceAttribute(ATTR_STAGE_NAME, ATTR_PRODUCT);
-        assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_PRODUCT));
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter shouldn't display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
+            analysisPage.replaceAttribute(ATTR_STAGE_NAME, ATTR_PRODUCT);
+            assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_PRODUCT));
+            assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME),
+                    ATTR_STAGE_NAME + " filter shouldn't display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
 
-        analysisPage.changeReportType(ReportType.LINE_CHART);
-        analysisPage.addStack(ATTR_STAGE_NAME);
-        assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
+            analysisPage.changeReportType(ReportType.LINE_CHART);
+            analysisPage.addStack(ATTR_STAGE_NAME);
+            assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
 
-        analysisPage.replaceStack(ATTR_DEPARTMENT);
-        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter shouldn't display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
+            analysisPage.replaceStack(ATTR_DEPARTMENT);
+            assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
+            assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME),
+                    ATTR_STAGE_NAME + " filter shouldn't display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
 
-        analysisPage.undo();
-        assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter shouldn't display");
+            analysisPage.undo();
+            assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter should display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
+            assertFalse(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT),
+                    ATTR_DEPARTMENT + " filter shouldn't display");
 
-        analysisPage.redo();
-        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME), ATTR_STAGE_NAME + " filter shouldn't display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
-        checkingOpenAsReport("replaceAttributeByNewOne");
+            analysisPage.redo();
+            assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
+            assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME),
+                    ATTR_STAGE_NAME + " filter shouldn't display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT), ATTR_PRODUCT + " filter should display");
+            assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
+            checkingOpenAsReport("replaceAttributeByNewOne");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -87,5 +99,9 @@ public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
         assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_DEPARTMENT));
         assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
         checkingOpenAsReport("switchAttributesBetweenAxisAndStackBy");
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

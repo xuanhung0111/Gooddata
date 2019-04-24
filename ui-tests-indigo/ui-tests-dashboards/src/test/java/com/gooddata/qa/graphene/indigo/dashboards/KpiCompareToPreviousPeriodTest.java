@@ -6,7 +6,7 @@ import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import org.testng.annotations.Test;
@@ -49,8 +49,8 @@ public class KpiCompareToPreviousPeriodTest extends AbstractDashboardTest {
                 .addInsight(INSIGHT_ACTIVITIES).waitForWidgetsLoading();
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getFirstWidget(Insight.class);
-        TableReport tableReport = insight.getTableReport();
-        assertEquals(tableReport.getContent(), singletonList(asList("154,271", "154,271")));
+        PivotTableReport tableReport = insight.getPivotTableReport();
+        assertEquals(tableReport.getBodyContent(), singletonList(asList("154,271", "154,271")));
         assertEquals(tableReport.getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES));
 
@@ -77,8 +77,8 @@ public class KpiCompareToPreviousPeriodTest extends AbstractDashboardTest {
                 .addInsight("Insight Test").waitForWidgetsLoading();
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getFirstWidget(Insight.class);
-        TableReport tableReport = insight.getTableReport();
-        assertEquals(tableReport.getContent(), singletonList(asList("154,271", "154,271")));
+        PivotTableReport tableReport = insight.getPivotTableReport();
+        assertEquals(tableReport.getBodyContent(), singletonList(asList("154,271", "154,271")));
         assertEquals(tableReport.getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES));
 
@@ -96,8 +96,8 @@ public class KpiCompareToPreviousPeriodTest extends AbstractDashboardTest {
                 .disableDateFilter();
         indigoDashboardsPage.waitForWidgetsLoading();
 
-        TableReport tableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getTableReport();
-        assertEquals(tableReport.getContent(), singletonList(asList("8,329", "145,942")));
+        PivotTableReport tableReport = indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport();
+        assertEquals(tableReport.getBodyContent(), singletonList(asList("8,329", "145,942")));
         assertEquals(tableReport.getHeaders(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - period ago", METRIC_NUMBER_OF_ACTIVITIES));
     }

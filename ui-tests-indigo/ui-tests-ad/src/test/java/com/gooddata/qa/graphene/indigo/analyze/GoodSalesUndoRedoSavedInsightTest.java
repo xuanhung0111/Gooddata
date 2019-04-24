@@ -13,8 +13,10 @@ import static java.util.Arrays.asList;
 import java.io.IOException;
 import java.text.ParseException;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -26,6 +28,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
     private static final String INSIGHT_TEST_WITH_METRIC_ONLY = "Insight-With-Metric-Only";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -35,6 +38,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createSnapshotBOPMetric();
     }
@@ -109,15 +113,20 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void replaceAttribute() throws JSONException, IOException {
-        final String insightName = "Test-Saved-Insight-After-Replacing-Attribute";
-        initAnalysePage().openInsight(INSIGHT_TEST)
-                .saveInsightAs(insightName)
-                .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_REGION)
-                .waitForReportComputing()
-                .saveInsight();
-        checkUndoRedoAfterSaveInsight();
-        assertEquals(analysisPage.openInsight(insightName)
-                .waitForReportComputing().getChartReport().getTrackersCount(), 2, "Chart content is not as expected");
+        setExtendedStackingFlag(false);
+        try {
+            final String insightName = "Test-Saved-Insight-After-Replacing-Attribute";
+            initAnalysePage().openInsight(INSIGHT_TEST)
+                    .saveInsightAs(insightName)
+                    .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_REGION)
+                    .waitForReportComputing()
+                    .saveInsight();
+            checkUndoRedoAfterSaveInsight();
+            assertEquals(analysisPage.openInsight(insightName)
+                    .waitForReportComputing().getChartReport().getTrackersCount(), 2, "Chart content is not as expected");
+        } finally {
+            setExtendedStackingFlag(true);
+        }
     }
 
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
@@ -187,5 +196,9 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
                 "The expected title is NOT displayed after redo");
         assertFalse(header.isUnsavedMessagePresent(), "Unsave notification is displayed after redo");
         assertFalse(header.isSaveButtonEnabled(), "Save button is enabled after undo");
+    }
+
+    private void setExtendedStackingFlag(boolean status) {
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
