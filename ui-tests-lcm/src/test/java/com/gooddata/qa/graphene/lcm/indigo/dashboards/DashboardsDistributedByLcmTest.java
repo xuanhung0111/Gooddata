@@ -56,7 +56,6 @@ import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
-
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -69,6 +68,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     @FindBy(id = IndigoDashboardsPage.MAIN_ID)
     protected IndigoDashboardsPage indigoDashboardsPage;
+    protected boolean useK8sExecutor = false;
 
     private final String FIRST_DASHBOARD = "dashboard_1_" + generateHashString();
     private final String SECOND_DASHBOARD = "dashboard_2_" + generateHashString();
@@ -131,7 +131,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
                 testParams.getDomainUser());
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)
                 .setDevelopProject(devProjectId).setClientProjects(clientProjectId).buildLcmProjectParameters();
 

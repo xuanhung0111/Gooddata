@@ -41,6 +41,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 
 public class MsfProcessTest extends AbstractDataloadProcessTest {
 
+    protected boolean useK8sExecutor;
     private final String SEGMENT_ID = "att_segment_" + generateHashString();
     private final String CLIENT_ID = "att_client_" + generateHashString();
     private final String CLIENT_PROJECT_TITLE = "ATT_LCM Client project " + generateHashString();
@@ -101,7 +102,7 @@ public class MsfProcessTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnMethods = {"prepareAdsData"}, groups = {"precondition"})
     public void deployLcmFlow() throws ParseException, JSONException, IOException {
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         devProjectId = testParams.getProjectId();
         clientProjectId = createNewEmptyProject(domainRestClient, CLIENT_PROJECT_TITLE);
         lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)

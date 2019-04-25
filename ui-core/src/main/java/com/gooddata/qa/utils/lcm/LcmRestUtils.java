@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import static java.util.Objects.isNull;
 
 public class LcmRestUtils {
+
     public static final String ATT_LCM_DATA_PRODUCT = "att_lcm_default_data_product";
 
     public static void deleteClient(final RestClient restClient, final String domain, final String clientId) {

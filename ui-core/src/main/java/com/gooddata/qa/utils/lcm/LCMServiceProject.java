@@ -13,11 +13,13 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile.Column;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.utils.ads.AdsHelper;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.warehouse.Warehouse;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,6 +40,7 @@ import static java.util.stream.Collectors.joining;
  * 3 process for running release brick, provision brick and rollout brick
  */
 public final class LCMServiceProject {
+
     private static final Logger log = Logger.getLogger(LCMServiceProject.class.getName());
     private static final String UPDATE_ADS_TABLE_EXECUTABLE = "DLUI/graph/CreateAndCopyDataToADS.grf";
     //List of segments which used to be released by this service project, this intend for cleanup
@@ -45,9 +48,9 @@ public final class LCMServiceProject {
     //id of this service project which contains 4 dataload process
     private String projectId;
     //this lcm project contains 3 ruby process which execute brick to release, provision and rollout
-    private RubyProcess releaseProcess;
-    private RubyProcess provisionProcess;
-    private RubyProcess rolloutProcess;
+    private LcmProcess releaseProcess;
+    private LcmProcess provisionProcess;
+    private LcmProcess rolloutProcess;
     //ads associated to this project, used as lcm repository
     private Warehouse ads;
     //process to load data to associated ads
@@ -56,29 +59,34 @@ public final class LCMServiceProject {
     private Supplier<Parameters> defaultAdsParameters;
 
     private RestClient restClient;
+    private boolean useK8sExecutor;
 
     /**
      * Create a service project that contains 3 ruby-run process: release, provision, rollout and one ads dataload process
      *
+     * @param testParameters
+     * @param useK8sExecutor create built-in LCM dataload processess if true otherwise create generic RUBY brick processess
      * @return LCMServiceProject
      */
-    public static LCMServiceProject newWorkFlow(final TestParameters testParameters) {
-        return new LCMServiceProject(testParameters);
+    public static LCMServiceProject newWorkFlow(final TestParameters testParameters, boolean useK8sExecutor) {
+        return new LCMServiceProject(testParameters, useK8sExecutor);
     }
 
     private LCMServiceProject() {
         //prevent default constructor
     }
 
-    private LCMServiceProject(final TestParameters testParameters) {
+    private LCMServiceProject(final TestParameters testParameters, boolean useK8sExecutor) {
         try {
+            this.useK8sExecutor = useK8sExecutor;
             this.restClient = createDomainRestClient(testParameters);
             this.projectId = createNewEmptyProject(testParameters, "ATT Service Project");
             log.info("--->Created service project:" + this.projectId);
+            log.info("--->useK8SExecutor:" + useK8sExecutor);
 
             initAdsInstance(testParameters);
             log.info("--->Created ads instance has uri:" + ads.getUri());
-            createRubyProcesses(testParameters);
+            createLCMProcesses(testParameters);
         } catch (Exception e) {
             throw new RuntimeException("Cannot init lcm project", e);
         }
@@ -105,12 +113,21 @@ public final class LCMServiceProject {
         return projectId;
     }
 
+    public String getExecutionLog(final String logUri) {
+        try {
+            return new CommonRestRequest(restClient, projectId)
+                    .getResource(logUri, HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
     /**
      * Run release process
      *
      * @param segments
      */
-    public void release(final JSONArray segments) {
+    public ProcessExecutionDetail release(final JSONArray segments) {
         addReleasedSegmentsToAssociatedList(segments);
         Parameters releaseTemplate = getReleaseParamsTemplate();
         JSONObject encodedParamObj = new JSONObject(releaseTemplate.getParameters().get("gd_encoded_params"));
@@ -118,7 +135,7 @@ public final class LCMServiceProject {
         String encodesString = encodedParamObj.toString();
         log.info(encodesString);
         releaseTemplate.getParameters().put("gd_encoded_params", encodesString);
-        releaseProcess.execute(releaseTemplate);
+        return releaseProcess.execute(releaseTemplate);
     }
 
     /**
@@ -126,7 +143,7 @@ public final class LCMServiceProject {
      * @param segments segments filter
      * @param inputSource
      */
-    public void provision(final JSONArray segments, final JSONObject inputSource) {
+    public ProcessExecutionDetail provision(final JSONArray segments, final JSONObject inputSource) {
         Parameters provisionTemplate = getProvisionParamsTemplate();
         JSONObject encodedParamObj = new JSONObject(provisionTemplate.getParameters().get("gd_encoded_params"));
         encodedParamObj.put("SEGMENTS_FILTER", segments);
@@ -135,7 +152,7 @@ public final class LCMServiceProject {
         log.info(encodesString);
         provisionTemplate.getParameters().put("gd_encoded_params", encodesString);
 
-        provisionProcess.execute(provisionTemplate);
+        return provisionProcess.execute(provisionTemplate);
     }
 
     /**
@@ -143,7 +160,7 @@ public final class LCMServiceProject {
      *
      * @param segments
      */
-    public void rollout(final JSONArray segments) {
+    public ProcessExecutionDetail rollout(final JSONArray segments) {
         Parameters rolloutTemplate = getRolloutParamsTemplate();
         JSONObject encodedParamObj = new JSONObject(rolloutTemplate.getParameters().get("gd_encoded_params"));
         encodedParamObj.put("SEGMENTS_FILTER", segments);
@@ -151,7 +168,7 @@ public final class LCMServiceProject {
         log.info(encodesString);
         rolloutTemplate.getParameters().put("gd_encoded_params", encodesString);
 
-        rolloutProcess.execute(rolloutTemplate);
+        return rolloutProcess.execute(rolloutTemplate);
     }
 
     /**
@@ -227,10 +244,10 @@ public final class LCMServiceProject {
         return this;
     }
 
-    private LCMServiceProject createRubyProcesses(final TestParameters testParameters) {
-        this.releaseProcess = RubyProcess.ofRelease(testParameters, ads.getConnectionUrl(), this.projectId);
-        this.provisionProcess = RubyProcess.ofProvision(testParameters, ads.getConnectionUrl(), this.projectId);
-        this.rolloutProcess = RubyProcess.ofRollout(testParameters, ads.getConnectionUrl(), this.projectId);
+    private LCMServiceProject createLCMProcesses(final TestParameters testParameters) {
+        this.releaseProcess = LcmProcess.ofRelease(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
+        this.provisionProcess = LcmProcess.ofProvision(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
+        this.rolloutProcess = LcmProcess.ofRollout(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
         return this;
     }
 

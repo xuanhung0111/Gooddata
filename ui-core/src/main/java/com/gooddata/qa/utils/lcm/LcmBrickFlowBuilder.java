@@ -1,8 +1,10 @@
 package com.gooddata.qa.utils.lcm;
 
+import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.graphene.common.TestParameters;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import static org.testng.Assert.assertTrue;
 
 import java.util.logging.Logger;
 
@@ -23,10 +25,10 @@ final public class LcmBrickFlowBuilder {
     private String segmentId;
     private String clientId;
 
-    public LcmBrickFlowBuilder(final TestParameters testParameters) {
+    public LcmBrickFlowBuilder(final TestParameters testParameters, boolean useK8sExecutor) {
         this.testParams = testParameters;
         this.devProjectId = testParams.getProjectId();
-        this.lcmServiceProject = LCMServiceProject.newWorkFlow(testParams);
+        this.lcmServiceProject = LCMServiceProject.newWorkFlow(testParams, useK8sExecutor);
     }
 
     public LcmBrickFlowBuilder setDevelopProject(final String developProject) {
@@ -67,21 +69,24 @@ final public class LcmBrickFlowBuilder {
 
     public LcmBrickFlowBuilder release() {
         log.info("----Start releasing--------------");
-        lcmServiceProject.release(releaseSegments);
+        ProcessExecutionDetail detail = lcmServiceProject.release(releaseSegments);
+        verifyExecutionLog(detail);
         log.info("----Finished releasing--------------");
         return this;
     }
 
     public LcmBrickFlowBuilder provision() {
         log.info("----Start provisioning--------------");
-        lcmServiceProject.provision(segmentFilters, datasource);
+        ProcessExecutionDetail detail = lcmServiceProject.provision(segmentFilters, datasource);
+        verifyExecutionLog(detail);
         log.info("----Finished provisioning--------------");
         return this;
     }
 
     public LcmBrickFlowBuilder rollout() {
         log.info("----Start rolling--------------");
-        lcmServiceProject.rollout(segmentFilters);
+        ProcessExecutionDetail detail = lcmServiceProject.rollout(segmentFilters);
+        verifyExecutionLog(detail);
         log.info("----Finished rolling--------------");
         return this;
     }
@@ -96,5 +101,12 @@ final public class LcmBrickFlowBuilder {
         log.info("--------------Start cleanup lcm service stuff");
         lcmServiceProject.cleanUp(testParams.getUserDomain());
         log.info("--------------Finished cleanup lcm service stuff");
+    }
+
+    private void verifyExecutionLog(final ProcessExecutionDetail detail) {
+        final String executionLog = lcmServiceProject.getExecutionLog(detail.getLogUri());
+        assertTrue(executionLog.contains("INFO -- : Pipeline ending"), "execution log does not contain valid ending message");
+        assertTrue(executionLog.contains("GoodData::LCM2"), "execution log does not contain LCM2");
+        assertTrue(executionLog.contains(LcmRestUtils.ATT_LCM_DATA_PRODUCT), "execution log does not contain a expected data product");
     }
 }
