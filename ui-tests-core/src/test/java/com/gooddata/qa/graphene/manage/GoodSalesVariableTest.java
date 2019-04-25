@@ -213,7 +213,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void deleteVariable() throws JSONException, IOException {
+    public void deleteVariable() throws JSONException {
         final String variable = generateVariableName();
 
         initVariablePage().createVariable(new AttributeVariable(variable)
