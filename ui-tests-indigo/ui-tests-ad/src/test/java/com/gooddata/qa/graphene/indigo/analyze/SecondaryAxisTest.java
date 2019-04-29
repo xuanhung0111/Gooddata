@@ -57,7 +57,6 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_A_METRIC = "A metric";
     private static final String INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES = "A metric and attributes";
     private IndigoRestRequest indigoRestRequest;
-    private ProjectRestRequest projectRestRequest;
     private final List<String> defaultItemsConfigurationPanel =
             asList(COLORS.toString(), X_AXIS.toString(), Y_AXIS.toString(), LEGEND.toString(), CANVAS.toString());
     private static final String INSIGHT_TEST_CONFIGURATION_HAS_TWO_MEASURE_AND_ATTRIBUTE =
@@ -93,9 +92,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         metrics.createCloseEOPMetric();
         metrics.createNumberOfActivitiesMetric();
 
-        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        setDualAxesFlag(true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -115,33 +112,6 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         metricConfiguration = analysisPage.addMetric(ATTR_DEPARTMENT, FieldType.ATTRIBUTE).waitForReportComputing()
                 .getMetricsBucket().getMetricConfiguration("Count of " + ATTR_DEPARTMENT).expandConfiguration();
         assertEquals(metricConfiguration.getShowOnSecondaryAxis(), "show on top axis");
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableDualAxes_ForTheDualAxesCheckboxIsNotShowed() {
-        try {
-            setDualAxesFlag(false);
-            createSimpleInsight(INSIGHT_HAS_A_METRIC, METRIC_AMOUNT, ReportType.COLUMN_CHART);
-            MetricConfiguration metricConfiguration = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC)
-                    .waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                    .expandConfiguration();
-            assertFalse(metricConfiguration.isShowOnSecondaryAxisPresent(),
-                     "“Show dual axes” checkbox should be not showed");
-
-            analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
-            metricConfiguration = analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT).waitForReportComputing()
-                    .getMetricsBucket().getMetricConfiguration("Sum of " + METRIC_AMOUNT).expandConfiguration();
-            assertFalse(metricConfiguration.isShowOnSecondaryAxisPresent(),
-                    "“Show dual axes” checkbox should be not showed");
-
-            analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
-            metricConfiguration = analysisPage.addMetric(ATTR_DEPARTMENT, FieldType.ATTRIBUTE).waitForReportComputing()
-                    .getMetricsBucket().getMetricConfiguration("Count of " + ATTR_DEPARTMENT).expandConfiguration();
-            assertFalse(metricConfiguration.isShowOnSecondaryAxisPresent(),
-                     "“Show dual axes” checkbox should be not showed");
-        } finally {
-            setDualAxesFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -491,9 +461,5 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
                         .setCategoryBucket(asList(
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                         CategoryBucket.Type.ATTRIBUTE))));
-    }
-
-    private void setDualAxesFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_DUAL_AXIS, status);
     }
 }
