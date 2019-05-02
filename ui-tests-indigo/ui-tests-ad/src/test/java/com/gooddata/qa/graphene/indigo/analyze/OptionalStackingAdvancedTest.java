@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.ExportDataType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
@@ -243,7 +243,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
                     CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
                         CategoryBucket.Type.ATTRIBUTE))));
 
-        initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(ExportDataType.XLSX)
+        initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(DataType.XLSX)
             .getExportXLSXDialog().confirmExport();
 
         final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()

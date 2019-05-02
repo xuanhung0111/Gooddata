@@ -62,7 +62,7 @@ public class FiltersBucket extends AbstractBucket {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public FiltersBucket configDateFilter(String from, String to) throws ParseException {
+    public FiltersBucket configDateFilter(String from, String to) {
         WebElement filter = getDateFilter();
         openDatePanelOfFilter(filter).configTimeFilter(from, to);
         return this;

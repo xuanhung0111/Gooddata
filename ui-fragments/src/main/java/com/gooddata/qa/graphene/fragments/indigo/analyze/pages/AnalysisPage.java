@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.ExportDataType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
@@ -361,7 +361,7 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage exportTo(ExportDataType type) {
+    public AnalysisPage exportTo(DataType type) {
         clickOptionsButton().exportTo(type);
         return this;
     }
