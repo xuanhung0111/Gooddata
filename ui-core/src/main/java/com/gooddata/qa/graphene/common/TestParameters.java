@@ -45,6 +45,7 @@ public class TestParameters {
     private String reactProjectTitle;
     private String localhostSDK;
     private String brickAppstore;
+    private String lcmDataloadProcessComponentVersion;
 
 
     public TestParameters(Properties testVariables) {
@@ -76,6 +77,7 @@ public class TestParameters {
         if ("gdctest-na3".equals(userDomain)) {
             brickAppstore = "PUBLIC_APPSTORE";
         }
+        lcmDataloadProcessComponentVersion = loadProperty("lcmDataloadProcessComponentVersion");
         reactFolder = loadProperty("reactFolder");
         reactProjectTitle = loadProperty("reactProjectTitle");
         localhostSDK = loadProperty("localhostSDK");
@@ -279,6 +281,10 @@ public class TestParameters {
 
     public String getBrickAppstore() {
         return brickAppstore;
+    }
+
+    public String getLcmDataloadProcessComponentVersion() {
+        return lcmDataloadProcessComponentVersion;
     }
 
     public Pair<String, String> getInfoUser(UserRoles userRole) {

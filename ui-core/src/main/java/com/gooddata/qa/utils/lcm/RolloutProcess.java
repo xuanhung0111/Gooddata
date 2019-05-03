@@ -2,23 +2,36 @@ package com.gooddata.qa.utils.lcm;
 
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import org.json.JSONObject;
 
 import java.util.function.Supplier;
 
-public final class RolloutProcess extends RubyProcess {
-    private TestParameters testParameters;
+public final class RolloutProcess extends LcmProcess {
+
     private String adsUri;
 
+    /**
+     * Init a relase process which expected to run on old executor
+     */
     RolloutProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
-        super(new RestClient(
-                new RestProfile(testParameters.getHost(), testParameters.getDomainUser(), testParameters.getPassword(),
-                        true)), projectId, Brick.ofRolloutBrick(testParameters.getBrickAppstore()));
-        this.testParameters = testParameters;
+        super(testParameters, projectId, Brick.ofRolloutBrick(testParameters.getBrickAppstore()));
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
+    }
+
+    /**
+     * Init a relase process which expected to run on k8s executor
+     */
+    RolloutProcess(final TestParameters testParameters, final String adsUri, final String projectId, final String lcmProcessName) {
+        super(testParameters, projectId, lcmProcessName);
+        this.adsUri = adsUri;
+        this.defaultParameters = buildDefaultParams();
+    }
+
+    @Override
+    protected void createLcmProcess() {
+        dataloadProcess = restClient.getProcessService().createProcess(getProject(),
+                LcmDataloadProcess.createRolloutProcess(this.name, testParameters.getLcmDataloadProcessComponentVersion()));
     }
 
     private Supplier<Parameters> buildDefaultParams() {
