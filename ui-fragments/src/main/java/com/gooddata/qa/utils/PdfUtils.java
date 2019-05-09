@@ -47,4 +47,22 @@ public final class PdfUtils {
         pdfUtil.setImageDestinationPath(path);
         return pdfUtil.compare(exportPath, templatePath);
     }
+
+    /**
+     * @param exportPath   A path of file is exported from Dashboard.
+     * @param templatePath A path of file is stored in template folder.
+     * @param pageFrom      page from
+     * @param pageTo      page to
+     * @return true if compare pdf didn't change. Otherwise, return false.
+     * @throws IOException
+     */
+
+    public static boolean comparePDFFromPageToPage(String exportPath, String templatePath, int pageFrom, int pageTo) throws IOException {
+        String path = createFolderSavePDFDifference();
+        PDFUtil pdfUtil = new PDFUtil();
+        pdfUtil.setCompareMode(CompareMode.VISUAL_MODE);
+        pdfUtil.highlightPdfDifference(true);
+        pdfUtil.setImageDestinationPath(path);
+        return pdfUtil.compare(exportPath, templatePath, pageFrom, pageTo);
+    }
 }

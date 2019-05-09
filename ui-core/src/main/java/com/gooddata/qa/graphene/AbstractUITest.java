@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.utils.PdfUtils;
-import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -626,6 +625,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public boolean comparePDF(String exportedDashboardName) throws IOException {
+        // Exported pdf file name contain generic hashcode , So need to remove hashcode .
+        // For Example : Table_a12df.pdf (Exported in Download folder) -> Table.pdf (PDFTemplate folder)
         String PDFTemplateName = exportedDashboardName.replaceAll("_[a-z0-9]{5}", "");
         File PDFExport = new File(testParams.getExportFilePath(exportedDashboardName));
         if (!PDFExport.exists()) {
@@ -636,5 +637,20 @@ public class AbstractUITest extends AbstractGreyPageTest {
             throw new RuntimeException("Template PDF File " + PDFTemplateName + " not found ");
         }
         return PdfUtils.comparePDF(PDFExport.getPath(), PDFTemplate.getPath());
+    }
+
+    public boolean comparePDF(String exportedDashboardName, int pageFrom, int pageTo) throws IOException {
+        // Exported pdf file name contain generic hashcode , So need to remove hashcode .
+        // For Example : Table_a12df.pdf (Exported in Download folder) -> Table.pdf (PDFTemplate folder)
+        String PDFTemplateName = exportedDashboardName.replaceAll("_[a-z0-9]{5}", "");
+        File PDFExport = new File(testParams.getExportFilePath(exportedDashboardName));
+        if (!PDFExport.exists()) {
+            throw new RuntimeException("Exported PDF File " + exportedDashboardName + " not found ");
+        }
+        File PDFTemplate = new File("src/test/resources/pdfTemplate/" + PDFTemplateName);
+        if (!PDFTemplate.exists()) {
+            throw new RuntimeException("Template PDF File " + PDFTemplateName + " not found ");
+        }
+        return PdfUtils.comparePDFFromPageToPage(PDFExport.getPath(), PDFTemplate.getPath(), pageFrom, pageTo);
     }
 }
