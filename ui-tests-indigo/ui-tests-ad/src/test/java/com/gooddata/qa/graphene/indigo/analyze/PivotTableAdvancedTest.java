@@ -35,6 +35,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 
 public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
@@ -590,7 +591,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         pivotTableReport.addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
         analysisPage.waitForReportComputing();
 
-        assertEquals(pivotTableReport.getGrandTotalValues(AggregationItem.SUM), asList("$80,406,324.96", "–", "$36,219,131.58", "–"));
+        assertEquals(pivotTableReport.getGrandTotalValues(AggregationItem.SUM), asList("$80,406,324.96", EMPTY, "$36,219,131.58", EMPTY));
 
         PivotAggregationPopup aggregationPopup = pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0);
         assertTrue(aggregationPopup.isItemChecked(AggregationItem.SUM),
