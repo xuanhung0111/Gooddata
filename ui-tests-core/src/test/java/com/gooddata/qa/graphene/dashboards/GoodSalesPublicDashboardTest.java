@@ -145,13 +145,13 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
             verifyDashboardExport(exportedDashboardName, selectedTab);
             checkRedBar(browser);
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName, ExportFormat.PDF)));
+            deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName)));
             signIn(true, UserRoles.ADMIN);
         }
     }
 
-    private String getExportFilePath(String name, ExportFormat format) {
-        return testParams.getDownloadFolder() + testParams.getFolderSeparator() + name + "." + format.getName();
+    private String getExportFilePath(String name) {
+        return testParams.getDownloadFolder() + testParams.getFolderSeparator() + name;
     }
 
     private void openLink(String uri) {

@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http.dashboards;
 
+import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -28,6 +29,7 @@ public class DashboardRestRequest extends CommonRestRequest {
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String TARGET_POPUP = "pop-up";
     private static final String TARGET_EXPORT = "export";
+    private static final String DASHBOARD_EXPORT_SETTING_LINK = "/gdc/app/projects/%s/export/pdfSettings";
 
     private static final Logger log = Logger.getLogger(DashboardRestRequest.class.getName());
 
@@ -420,6 +422,12 @@ public class DashboardRestRequest extends CommonRestRequest {
         reportItem.put("sizeY", reportItem.getInt("sizeY") + height);
 
         executeRequest(initPostRequest(dashboardEditModeURI, json.toString()), HttpStatus.OK);
+    }
+
+    public void exportDashboardSetting(ExportDashboardDefinition dashboardDefinition){
+        final String dashboardSettingModeURI = format(DASHBOARD_EXPORT_SETTING_LINK, projectId);
+        executeRequest(initPutRequest(dashboardSettingModeURI,
+                dashboardDefinition.getJsonConfigurationDashboardToExportPDF().toString()));
     }
 
     private void setDefault(String uri, int requestedFormat) throws IOException {

@@ -245,8 +245,8 @@ public class DashboardsPage extends AbstractFragment {
         sleepTightInSeconds(3);
         waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
         sleepTightInSeconds(3);
-
-        return tabs.getTabLabel(tabs.getSelectedTabIndex());
+        String tabName = tabs.getTabLabel(tabs.getSelectedTabIndex());
+        return tabName + ".pdf";
     }
 
     public String printDashboardTab() {
@@ -255,8 +255,8 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementVisible(BY_PRINT_PDF_BUTTON, getRoot()).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
         waitForElementNotPresent(BY_PRINTING_PANEL);
-
-        return tabs.getTabLabel(tabs.getSelectedTabIndex());
+        String tabName = tabs.getTabLabel(tabs.getSelectedTabIndex());
+        return tabName + ".pdf";
     }
 
     public String exportDashboardToXLSX() {

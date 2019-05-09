@@ -228,7 +228,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             verifyDashboardExport(exportedDashboardName, "other_widgets");
 
         } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(exportedDashboardName + ".pdf")));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(exportedDashboardName)));
         }
 
         checkRedBar(browser);
