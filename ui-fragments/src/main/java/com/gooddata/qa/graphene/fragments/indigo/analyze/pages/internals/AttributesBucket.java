@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +22,7 @@ public class AttributesBucket extends AbstractBucket {
 
     private static final By BY_DATE_DATASET_SELECT = By.className("adi-date-dataset-switch");
     private static final By BY_DATE_GRANULARITY_SELECT = By.className("adi-date-granularity-switch");
+    private static final By BY_VIEW_BY_WARNING = className("adi-stack-warn");
 
     public List<String> getItemNames() {
         return getElementTexts(items, e -> e.findElement(BY_HEADER));
@@ -59,7 +61,7 @@ public class AttributesBucket extends AbstractBucket {
 
     @Override
     public String getWarningMessage() {
-        throw new UnsupportedOperationException();
+        return waitForElementVisible(BY_VIEW_BY_WARNING, getRoot()).getText().trim();
     }
 
     public DateDimensionSelect getDateDatasetSelect() {

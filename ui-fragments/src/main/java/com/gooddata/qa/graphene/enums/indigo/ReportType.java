@@ -29,11 +29,16 @@ public enum ReportType {
 
     HEAD_LINE("headline"),
     BAR_CHART("bar"),
-    STACKED_AREA_CHART("area");
+    STACKED_AREA_CHART("area") {
+        @Override
+        public String getStackByMessage() {
+            return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE ATTRIBUTE IN VIEW BY";
+        }
+    };
 
     private String label;
 
-    private ReportType(String label) {
+    ReportType(String label) {
         this.label = label;
     }
 
@@ -47,6 +52,10 @@ public enum ReportType {
 
     public String getStackByMessage() {
         return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
+    }
+
+    public String getViewbyByMessage() {
+        return "TO VIEW BY ANOTHER ATTRIBUTE, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
     }
 
     public String getExtendedStackByMessage() {
