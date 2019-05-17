@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -10,6 +11,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -177,7 +179,8 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
     private ObjectPropertiesPage waitForLoaded() {
         By busyMask = By.className("gdc-busy-mask-visible");
         try {
-            waitForElementVisible(busyMask, browser, 3);
+            Function<WebDriver, Boolean> isBusyMaskPresent = browser -> isElementPresent(busyMask, browser);
+            Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isBusyMaskPresent);
             waitForElementNotPresent(busyMask);
         } catch (TimeoutException e) {
             // Variable detail already loaded so WebDriver unable to catch the loading indicator
