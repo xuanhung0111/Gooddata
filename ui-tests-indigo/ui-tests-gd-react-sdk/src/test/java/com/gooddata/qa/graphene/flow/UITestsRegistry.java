@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.sdk.EditorPermissionTest;
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedHeadlineTest;
+import com.gooddata.qa.graphene.indigo.sdk.FilterTest;
 import com.gooddata.qa.graphene.indigo.sdk.HeadlineByBucketComponentTest;
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedTreemapTest;
 import com.gooddata.qa.graphene.indigo.sdk.VisualizationTest;
@@ -20,7 +21,17 @@ public class UITestsRegistry {
                 HeadlineByBucketComponentTest.class,
                 EmbeddedTreemapTest.class,
                 EditorPermissionTest.class,
-                VisualizationTest.class
+                VisualizationTest.class,
+                FilterTest.class
+        });
+
+        suites.put("all", new Object[] {
+                EmbeddedHeadlineTest.class,
+                HeadlineByBucketComponentTest.class,
+                EmbeddedTreemapTest.class,
+                EditorPermissionTest.class,
+                VisualizationTest.class,
+                FilterTest.class
         });
 
         TestsRegistry.getInstance()
