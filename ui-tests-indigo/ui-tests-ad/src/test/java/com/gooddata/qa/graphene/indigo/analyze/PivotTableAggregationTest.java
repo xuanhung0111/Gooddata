@@ -26,6 +26,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 
 public class PivotTableAggregationTest extends AbstractAnalyseTest {
 
@@ -142,7 +143,7 @@ public class PivotTableAggregationTest extends AbstractAnalyseTest {
         analysisPage.addMetric(METRIC_CLOSE_EOP)
             .waitForReportComputing();
 
-        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", "–"));
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", EMPTY));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
 
         analysisPage.removeMetric(METRIC_CLOSE_EOP)
@@ -186,7 +187,7 @@ public class PivotTableAggregationTest extends AbstractAnalyseTest {
         pivotTableReport.sortBaseOnHeader(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
 
-        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", "–"));
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", EMPTY));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
