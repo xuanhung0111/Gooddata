@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.utils;
 
 public class ReactSKDUtils {
 
-    //Headline Insight
+    //Visualization - Headline
     public static final String TEMPLATE_NO_DATA_INSIGHT = "NoDataInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHT = "HeadlineInsight.js";
     public static final String TEMPLATE_HEADLINE_INSIGHTS = "HeadlineInsights.js";
@@ -13,7 +13,7 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT =
             "HeadlineWithNegativeFilterInsight.js";
 
-    //Headline
+    //Component - Headline
     public static final String TEMPLATE_HEADLINE_WITH_ATTRIBUTE = "HeadlineWithAttribute.js";
     public static final String TEMPLATE_HEADLINE_WITH_MEASURE = "HeadlineWithMeasure.js";
     public static final String TEMPLATE_HEADLINE_WITH_MEASURES = "HeadlineWithMeasures.js";
@@ -39,6 +39,20 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS = "VisualizationWithConfigurations.js";
     public static final String TEMPLATE_VISUALIZATIONS_OF_PROJECTS_BY_IDENTIFIER = "VisualizationsOfProjectsByIdentifier.js";
     public static final String TEMPLATE_VISUALIZATIONS_OF_PROJECTS_BY_URI = "VisualizationsOfProjectsByUri.js";
+
+    //Component - Filter
+    public static final String TEMPLATE_INSIGHT_HAS_MEASURE_FILTER_ATTRIBUTE = "InsightHasMeasureFilterAttribute.js";
+    public static final String TEMPLATE_INSIGHT_HAS_MEASURE_FILTER_DATE = "InsightHasMeasureFilterDate.js";
+    public static final String TEMPLATE_ATTR_FILTER_INSIGHT_HAS_MEASURE_FILTER_ATTR = "AttributeFilterInsightHasMeasureFilterAttribute.js";
+    public static final String TEMPLATE_ATTR_FILTER_INSIGHT_HAS_MEASURE_FILTER_DATE = "AttributeFilterInsightHasMeasureFilterDate.js";
+    public static final String TEMPLATE_DATE_FILTER_INSIGHT_HAS_MEASURE_FILTER_DATE = "DateFilterInsightHasMeasureFilterDate.js";
+    public static final String TEMPLATE_DATE_FILTER_INSIGHT_HAS_MEASURE_FILTER_ATTR = "DateFilterInsightHasMeasureFilterAttribute.js";
+    public static final String TEMPLATE_COMBINE_MANY_TYPE_FILTER_INSIGHT_HAS_MEASURE_FILTER_MANY_TYPE =
+            "CombineManyTypeFiltersInsightHasMeasureFilterManyType.js";
+
+    //AFM
+
+    //KPI
 
     //Warning
     public static final String WARNING_CAN_NOT_DISPLAY = "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.";
