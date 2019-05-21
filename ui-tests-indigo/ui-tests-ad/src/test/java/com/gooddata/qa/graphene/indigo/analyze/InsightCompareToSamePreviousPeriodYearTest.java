@@ -107,7 +107,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
     @Test(dependsOnGroups = {"createProject"})
     public void testTheApplyOnDropDownListIsNotEnabled() {
         initAnalysePage().addMetric(METRIC_AVG_AMOUNT).addMetric(METRIC_AMOUNT).addDateFilter();
-        ElementUtils.makeSureNoPopupVisible();
+
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         metricsBucket.getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
@@ -199,7 +199,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
-        ChartReport chartReport = analysisPage.getChartReport();
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
                 asList("% " + DERIVED_METRIC_AMOUNT, "41.96%")));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
@@ -233,11 +233,12 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
+        MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measures and attributes are hidden");
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
+        assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         //switch the chart insight to check reference point
         assertThat(analysisPage.changeReportType(ReportType.TABLE).getMetricsBucket()
                 .getItemNames(), hasItem(METRIC_WON));
@@ -252,11 +253,11 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
+        assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measures and attributes are hidden");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(analysisPage.getMetricsBucket().getRoot(), 1, 1).perform();
         //switch the chart insight to check reference point
         assertThat(analysisPage.changeReportType(ReportType.TABLE).getMetricsBucket().getItemNames(),
                 hasItems(DERIVED_METRIC_WON, METRIC_WON));
@@ -271,11 +272,11 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
+        assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measures and attributes are hidden");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(analysisPage.getMetricsBucket().getRoot(), 1, 1).perform();
         //switch the chart insight to check reference point
         assertThat(analysisPage.changeReportType(ReportType.TABLE).getMetricsBucket().getItemNames(),
                 hasItem(DERIVED_METRIC_WON));
@@ -302,12 +303,12 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
+        assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measures and attributes are hidden");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
                         SAME_PERIOD_PREVIOUS_YEAR));
-        ElementUtils.makeSureNoPopupVisible();
+
         //switch the chart insight to check reference point
         assertThat(analysisPage.changeReportType(ReportType.TABLE).getMetricsBucket().getItemNames(),
                 hasItem(DERIVED_METRIC_AMOUNT));
@@ -322,7 +323,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
-        analysisPage.addMetric(METRIC_AVG_AMOUNT);
+        analysisPage.waitForReportComputing().addMetric(METRIC_AVG_AMOUNT);
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
                 .isItemSelected(METRIC_AVG_AMOUNT + "M4"), "Checkbox of newly ones should be unchecked");
     }
@@ -361,7 +362,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         compareApplyMeasure.selectAllValues().apply();
         dateFilterPickerPanel.apply();
 
-        analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).removeFilterByDate();
+        analysisPage.waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).removeFilterByDate();
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
                 .isItemSelected(METRIC_AMOUNT + "M3"), "Checkbox of newly ones should be unchecked");
     }
@@ -401,7 +402,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
 
-        analysisPage.removeMetric(METRIC_AMOUNT);
+        analysisPage.waitForReportComputing().removeMetric(METRIC_AMOUNT);
         assertThat(getTitles(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_INDIVIDUAL_MODE + " (1)");
@@ -422,7 +423,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
 
-        analysisPage.removeMetric(METRIC_AMOUNT);
+        analysisPage.waitForReportComputing().removeMetric(METRIC_AMOUNT);
         assertThat(getTitles(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_INDIVIDUAL_MODE + " (1)");
@@ -443,7 +444,6 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();
 
-        ElementUtils.makeSureNoPopupVisible();
         analysisPage.removeMetric(METRIC_AMOUNT);
         assertThat(getTitles(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
@@ -464,7 +464,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
 
-        analysisPage.removeMetric(METRIC_AMOUNT).removeMetric(METRIC_WON).removeMetric(METRIC_AVG_AMOUNT);//
+        analysisPage.waitForReportComputing().removeMetric(METRIC_AMOUNT).removeMetric(METRIC_WON)
+                .removeMetric(METRIC_AVG_AMOUNT);//
         assertEquals(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .getCompareTypeDropdownButtonText(), "Nothing");
         assertFalse(dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
@@ -483,7 +484,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON).apply();
         dateFilterPickerPanel.apply();
-        analysisPage.removeMetric(DERIVED_METRIC_AMOUNT).waitForReportComputing();
+        analysisPage.waitForReportComputing().removeMetric(DERIVED_METRIC_AMOUNT).waitForReportComputing();
 
         assertThat(analysisPage.getMetricsBucket().getItemNames(), not(hasItem(DERIVED_METRIC_AMOUNT)));
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
@@ -504,8 +505,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectByNames(METRIC_AMOUNT, METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
-        analysisPage.removeMetric(DERIVED_METRIC_AMOUNT).removeMetric(DERIVED_METRIC_WON).waitForReportComputing();
+        analysisPage.waitForReportComputing().removeMetric(DERIVED_METRIC_AMOUNT).removeMetric(DERIVED_METRIC_WON)
+                .waitForReportComputing();
 
         assertEquals(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .getCompareTypeDropdownButtonText(), "Nothing");
@@ -539,7 +540,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
-        analysisPage.removeDateFilter();
+        analysisPage.waitForReportComputing().removeDateFilter();
         assertFalse(analysisPage.getFilterBuckets().isFilterVisible(DATE_DATASET_CLOSED + ":\n" + DATE_FILTER_ALL_TIME),
                 "Filter should be not displayed");
 
@@ -556,8 +557,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
-        analysisPage.changeReportType(ReportType.STACKED_AREA_CHART);
+        analysisPage.waitForReportComputing().changeReportType(ReportType.STACKED_AREA_CHART);
         assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measures and attributes are hidden");
 
@@ -566,75 +566,90 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 "The warning unsupported message should be hidden");
         assertEquals(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).getWarningUnsupportedMessage(),
                 "Current visualization type doesn't support comparing. To compare, switch to another insight.");
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchFromTableInsightToColumnAndHeadlineInsightWithAMeasure() throws NoSuchFieldException {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
-                    .addAttribute(ATTR_FORECAST_CATEGORY).addAttribute(ATTR_DEPARTMENT).addDateFilter();
-            FiltersBucket filterBucket = analysisPage.getFilterBuckets();
-            DateFilterPickerPanel dateFilterPickerPanel =
-                    filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-            dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
-                    .selectAllValues().apply();
-            dateFilterPickerPanel.apply();
-            ElementUtils.makeSureNoPopupVisible();
-            //reorder metrics to follow by requirement of test case
-            analysisPage.reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT).changeReportType(ReportType.COLUMN_CHART)
-                    .waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
+                .addAttribute(ATTR_FORECAST_CATEGORY).addAttribute(ATTR_DEPARTMENT).addDateFilter();
+        FiltersBucket filterBucket = analysisPage.getFilterBuckets();
+        DateFilterPickerPanel dateFilterPickerPanel =
+                filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
+        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+                .selectAllValues().apply();
+        dateFilterPickerPanel.apply();
 
-            MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-            AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
-            StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        //reorder metrics to follow by requirement of test case
+        analysisPage.waitForReportComputing().reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT)
+                .changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
-            assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
-            assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
-            assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-            assertEquals(metricsBucket.getWarningMessage(), ReportType.COLUMN_CHART.getMetricMessage());
+        MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
+        StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-            ElementUtils.makeSureNoPopupVisible();
-            analysisPage.changeReportType(ReportType.HEAD_LINE).waitForReportComputing();
-            MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
-            assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
-            assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_AMOUNT));
+        assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT));
+        assertEquals(stacksBucket.getWarningMessage(), ReportType.COLUMN_CHART.getExtendedStackByMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
+        assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
+        assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
+        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
+        assertEquals(metricsBucket.getWarningMessage(), ReportType.LINE_CHART.getMetricMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.STACKED_AREA_CHART).waitForReportComputing();
+        assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
+        assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT));
+        assertEquals(stacksBucket.getWarningMessage(), ReportType.STACKED_AREA_CHART.getStackByMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.HEAD_LINE).waitForReportComputing();
+        MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
+        assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
+        assertEquals(metricsSecondaryBucket.getItemNames(), asList(DERIVED_METRIC_AMOUNT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchFromTableInsightToColumnAndHeadlineInsightWithTwoMeasures() throws NoSuchFieldException {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_WON)
-                    .addAttribute(ATTR_FORECAST_CATEGORY).addAttribute(ATTR_DEPARTMENT).addDateFilter();
-            FiltersBucket filterBucket = analysisPage.getFilterBuckets();
-            DateFilterPickerPanel dateFilterPickerPanel =
-                    filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-            dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
-                    .selectByNames(METRIC_AMOUNT).apply();
-            dateFilterPickerPanel.apply();
-            ElementUtils.makeSureNoPopupVisible();
-            analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_WON)
+                .addAttribute(ATTR_FORECAST_CATEGORY).addAttribute(ATTR_DEPARTMENT).addDateFilter();
+        FiltersBucket filterBucket = analysisPage.getFilterBuckets();
+        DateFilterPickerPanel dateFilterPickerPanel =
+                filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
+        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+                .selectByNames(METRIC_AMOUNT).apply();
+        dateFilterPickerPanel.apply();
 
-            MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-            AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
+        analysisPage.waitForReportComputing().changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
-            assertEquals(metricsBucket.getItemNames(), asList(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT, METRIC_WON));
-            assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
-            assertEquals(analysisPage.getStacksBucket().getWarningMessage(), ReportType.COLUMN_CHART.getStackByMessage());
+        MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
 
-            analysisPage.changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.HEAD_LINE)
-                    .waitForReportComputing();
-            MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
-            assertEquals(metricsBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
-            assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(METRIC_AMOUNT));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertEquals(metricsBucket.getItemNames(), asList(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT, METRIC_WON));
+        assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getStacksBucket().getWarningMessage(), ReportType.COLUMN_CHART.getExtendedStackByMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
+        StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        assertEquals(metricsBucket.getItemNames(), asList(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT, METRIC_WON));
+        assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
+        assertEquals(stacksBucket.getWarningMessage(), ReportType.LINE_CHART.getStackByMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.STACKED_AREA_CHART).waitForReportComputing();
+        assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, METRIC_WON));
+        assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY));
+        assertEquals(attributesBucket.getWarningMessage(), ReportType.STACKED_AREA_CHART.getViewbyByMessage());
+        assertEquals(stacksBucket.getWarningMessage(), ReportType.STACKED_AREA_CHART.getExtendedStackByMessage());
+
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
+        analysisPage.changeReportType(ReportType.HEAD_LINE).waitForReportComputing();
+        MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
+        assertEquals(metricsBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
+        assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(METRIC_AMOUNT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -646,15 +661,18 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
-        analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
+
+        analysisPage.waitForReportComputing().changeReportType(ReportType.TABLE).waitForReportComputing();
 
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
+        AttributesBucket attributeColumnBucket = analysisPage.getAttributesColumnsBucket();
 
         assertEquals(metricsBucket.getItemNames(), asList(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT));
-        assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT));
+        assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
+        assertEquals(attributeColumnBucket.getItemNames(), singletonList(ATTR_DEPARTMENT));
 
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.HEAD_LINE).waitForReportComputing();
         MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
         assertEquals(metricsBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
@@ -670,9 +688,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON).apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
-        analysisPage.reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT).reorderMetric(DERIVED_METRIC_WON, METRIC_WON)
-                .changeReportType(ReportType.TABLE).waitForReportComputing();
+
+        analysisPage.waitForReportComputing().reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT)
+                .reorderMetric(DERIVED_METRIC_WON, METRIC_WON).changeReportType(ReportType.TABLE).waitForReportComputing();
 
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
@@ -680,7 +698,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 DERIVED_METRIC_WON, METRIC_AVG_AMOUNT));
         assertEquals(attributesBucket.getItemNames(), singletonList(ATTR_FORECAST_CATEGORY));
 
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.HEAD_LINE).waitForReportComputing();
         MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
         assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
@@ -696,9 +714,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
+
         //reorder metrics to comply requirement of test case
-        analysisPage.reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT).changeReportType(ReportType.HEAD_LINE)
+        analysisPage.waitForReportComputing().reorderMetric(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT).changeReportType(ReportType.HEAD_LINE)
                 .waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
@@ -721,9 +739,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .selectByNames(METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
+
         //reorder metrics to comply requirement of test case
-        analysisPage.reorderMetric(DERIVED_METRIC_WON, METRIC_WON).changeReportType(ReportType.HEAD_LINE)
+        analysisPage.waitForReportComputing().reorderMetric(DERIVED_METRIC_WON, METRIC_WON).changeReportType(ReportType.HEAD_LINE)
                 .waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(METRIC_WON));
@@ -743,9 +761,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AVG_AMOUNT).apply();
         dateFilterPickerPanel.apply();
-        ElementUtils.makeSureNoPopupVisible();
+
         //reorder metrics to comply requirement of test case
-        analysisPage.reorderMetric(DERIVED_METRIC_AVG_AMOUNT, METRIC_AVG_AMOUNT).changeReportType(ReportType.HEAD_LINE)
+        analysisPage.waitForReportComputing().reorderMetric(DERIVED_METRIC_AVG_AMOUNT, METRIC_AVG_AMOUNT).changeReportType(ReportType.HEAD_LINE)
                 .waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(METRIC_WON));
@@ -768,12 +786,13 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
 
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_AMOUNT, METRIC_WON));
         assertEquals(attributesBucket.getItemNames(), emptyList());
 
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_AMOUNT, METRIC_WON));
         assertEquals(attributesBucket.getItemNames(), emptyList());
@@ -792,13 +811,12 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();
 
-        ElementUtils.makeSureNoPopupVisible();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
         assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(METRIC_WON));
 
-        ElementUtils.makeSureNoPopupVisible();
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_WON, METRIC_WON));
@@ -825,13 +843,13 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(metricsSecondaryBucket.getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
 
-        ElementUtils.makeSureNoPopupVisible();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_AMOUNT, DERIVED_METRIC_WON,
                 METRIC_WON));
         assertEquals(attributesBucket.getItemNames(), emptyList());
 
+        ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, DERIVED_METRIC_AMOUNT, DERIVED_METRIC_WON,
                 METRIC_WON));
@@ -866,9 +884,5 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         return listItems.stream()
                 .map(item -> item.substring(0, item.lastIndexOf("M")))
                 .collect(toList());
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

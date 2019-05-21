@@ -14,11 +14,11 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
@@ -46,14 +46,19 @@ public class ReferencePointAndVisSwitchingTest extends AbstractAnalyseTest {
         metrics.createWonMetric();
         projectRestRequest= new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
-        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = "createProject")
+    public void prepareInsights() {
+        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
+    }
+
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void switchToChartDoesNotAllowCombination() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_DEPARTMENT)
+        initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
+                .addFilter(ATTR_DEPARTMENT).addFilter(ATTR_FORECAST_CATEGORY).addFilter(ATTR_REGION)
                 .changeReportType(ReportType.PIE_CHART).waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
@@ -62,102 +67,104 @@ public class ReferencePointAndVisSwitchingTest extends AbstractAnalyseTest {
                 .getFilterText(ATTR_DEPARTMENT)), asList(ATTR_DEPARTMENT, "All"));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void switchToChartAllowCombination() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_DEPARTMENT)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART)
-                .waitForReportComputing();
+        initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
+            .addFilter(ATTR_DEPARTMENT).addFilter(ATTR_FORECAST_CATEGORY).addFilter(ATTR_REGION)
+            .changeReportType(ReportType.PIE_CHART)
+            .changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets()
                 .getFilterText(ATTR_DEPARTMENT)), asList(ATTR_DEPARTMENT, "All"));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+                .getFilterText(ATTR_FORECAST_CATEGORY)), asList(ATTR_FORECAST_CATEGORY, "All"));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void replaceAttributeToCreateANewReferencePoint() {
-        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
         initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART)
-                .replaceAttribute(ATTR_DEPARTMENT, ATTR_IS_CLOSED).changeReportType(ReportType.TABLE)
+                .changeReportType(ReportType.COLUMN_CHART)
+                .replaceAttribute(ATTR_DEPARTMENT, ATTR_STAGE_NAME).changeReportType(ReportType.TABLE)
                 .waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_IS_CLOSED));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_STAGE_NAME, ATTR_FORECAST_CATEGORY));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void addNewMetricToCreateANewReferencePoint() {
-        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
         initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART)
+                .changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_WON).changeReportType(ReportType.TABLE)
                 .waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_WON));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void removeSecondaryMetricToCreateANewReferencePoint() {
-        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
         initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART)
+                .changeReportType(ReportType.COLUMN_CHART)
                 .removeMetric(METRIC_AVG_AMOUNT).changeReportType(ReportType.TABLE)
                 .waitForReportComputing();
 
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void changeValuesOnFiltersToCreateANewReferencePoint() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_DEPARTMENT)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART)
+        initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
+                .addFilter(ATTR_DEPARTMENT).addFilter(ATTR_FORECAST_CATEGORY).addFilter(ATTR_REGION)
+                .changeReportType(ReportType.COLUMN_CHART)
                 .getFilterBuckets().configAttributeFilter(ATTR_DEPARTMENT, "Inside Sales");
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets()
                 .getFilterText(ATTR_DEPARTMENT)), asList(ATTR_DEPARTMENT, "Inside Sales"));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+            .getFilterText(ATTR_FORECAST_CATEGORY)), asList(ATTR_FORECAST_CATEGORY, "All"));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void addFilterOnMeasureToCreateANewReferencePoint() {
-        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
         initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART);
+                .changeReportType(ReportType.COLUMN_CHART);
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         metricsBucket.getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterWithAllValue(ATTR_STAGE_NAME);
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
 
         assertEquals(metricsBucket.getMetricConfiguration(METRIC_AMOUNT).getSubHeader(), "Stage Name: All");
         assertEquals(metricsBucket.getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void changeDateDimensionToCreateANewReferencePoint() {
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addDate()
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART);
+                .changeReportType(ReportType.COLUMN_CHART);
         analysisPage.getAttributesBucket().changeDateDimension(DATE_DATASET_CREATED);
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
 
         assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), DATE_DATASET_CREATED);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnMethods = {"prepareInsights"})
     public void keepOldReferencePointWhenSwitchToOtherReport() {
-        createTableInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES);
-        initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES).addDateFilter()
-                .changeReportType(ReportType.PIE_CHART).changeReportType(ReportType.COLUMN_CHART);
+        initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
+                .addDateFilter().changeReportType(ReportType.COLUMN_CHART);
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(),
+                asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY, ATTR_REGION));
     }
 
     private void createTableInsight(String title) {
@@ -170,6 +177,8 @@ public class ReferencePointAndVisSwitchingTest extends AbstractAnalyseTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
                                         CategoryBucket.Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                                        CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_REGION),
                                         CategoryBucket.Type.ATTRIBUTE))));
     }
 }
