@@ -11,6 +11,7 @@ import com.gooddata.qa.utils.http.RestRequest;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
 import com.jayway.awaitility.pollinterval.IterativePollInterval;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -114,5 +115,25 @@ public final class ProjectRestRequest extends CommonRestRequest {
         JSONObject settingItem = getJsonObject(url);
         settingItem.getJSONObject("settingItem").put("value", value);
         executeRequest(initPutRequest(url, settingItem.toString()), HttpStatus.NO_CONTENT);
+    }
+
+    public int setXaeVersionProject(int xaeVersion) throws IOException {
+        updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
+        return xaeVersion;
+    }
+
+    public int getXaeVersionProject() throws IOException {
+        int xaeVersionProject = 3;
+        JSONArray items = this.getJsonObject(format(PROJECT_CONFIGURATION_LINK, projectId))
+                .getJSONObject("settings").getJSONArray("items");
+
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
+            if ("xae_version".equals(jsonObject.getString("key"))) {
+                xaeVersionProject = Integer.valueOf(jsonObject.getString("value"));
+            }
+        }
+        log.info("Current XAE version of Project is: " + xaeVersionProject);
+        return xaeVersionProject;
     }
 }

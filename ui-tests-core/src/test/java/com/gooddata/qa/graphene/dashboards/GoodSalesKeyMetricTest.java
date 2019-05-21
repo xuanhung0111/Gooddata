@@ -12,13 +12,16 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
@@ -48,6 +51,12 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     private static final int YEAR_OF_DATA = 2011;
 
     private static final By HEADLINE_WIDGET_LOCATOR = className("yui3-c-headlinedashboardwidget");
+    private static final int XAE_VERSION_1 = 1;
+    private static final int XAE_VERSION_3 = 3;
+    private int DEFAULT_XAE_VERSION;
+    private int XAE_VERSION;
+
+    ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -65,85 +74,108 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         createMetric(COUNT_OF_PRODUCT, format("SELECT COUNT([%s])", productUri), "#,##0");
         createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]",
                 getMetricCreator().createAmountMetric().getUri(), variableUri), "#,##0");
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void editHeadlineWidget() {
-        initDashboardsPage()
-            .addNewDashboard(DASHBOARD_NAME)
-            .selectDashboard(DASHBOARD_NAME);
+    @DataProvider(name = "getXaeVersions")
+    public Object[][] getXaeVersions() {
+        return new Object[][]{
+            {XAE_VERSION_1},
+            {XAE_VERSION_3},
+        };
+    }
 
-        dashboardsPage.editDashboard()
-            .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR,
-                    format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_OF_DATA));
-        DashboardWidgetDirection.UP.moveElementToRightPlace(
-                dashboardsPage.getContent().getFilterWidget("filter-time").getRoot());
+    @Test(dependsOnGroups = "createProject", dataProvider = "getXaeVersions")
+    public void editHeadlineWidget(int xaeVersion) throws IOException {
+        try {
+            XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+            initDashboardsPage()
+                    .addNewDashboard(DASHBOARD_NAME)
+                    .selectDashboard(DASHBOARD_NAME);
 
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
-        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(
-                dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT)).getRoot());
+            dashboardsPage.editDashboard()
+                    .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR,
+                            format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_OF_DATA));
+            DashboardWidgetDirection.UP.moveElementToRightPlace(
+                    dashboardsPage.getContent().getFilterWidget("filter-time").getRoot());
 
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, VARIABLE_NAME);
-        DashboardWidgetDirection.LEFT.moveElementToRightPlace(
-                dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME)).getRoot());
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+            DashboardWidgetDirection.RIGHT.moveElementToRightPlace(
+                    dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT)).getRoot());
 
-        waitForElementVisible(className("s-btn-widget"), browser).click();
-        Graphene.createPageFragment(DashboardAddWidgetPanel.class,
-                waitForElementVisible(DashboardAddWidgetPanel.LOCATOR, browser))
-                .initWidget(WidgetTypes.KEY_METRIC_WITH_TREND);
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, VARIABLE_NAME);
+            DashboardWidgetDirection.LEFT.moveElementToRightPlace(
+                    dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME)).getRoot());
 
-        WidgetConfigPanel widgetConfigPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
-                waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
-        MetricConfigPanel metricConfigPanel = widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class);
-        metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
+            waitForElementVisible(className("s-btn-widget"), browser).click();
+            Graphene.createPageFragment(DashboardAddWidgetPanel.class,
+                    waitForElementVisible(DashboardAddWidgetPanel.LOCATOR, browser))
+                    .initWidget(WidgetTypes.KEY_METRIC_WITH_TREND);
 
-        waitForKeyMetricUpdateValue();
-        assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled(),
-                "When dropdown should be disabled");
-        assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterSelected(),
-                "Link external filter should be selected");
-        widgetConfigPanel.getTab(Tab.METRIC_STYLE, MetricStyleConfigPanel.class)
-            .editMetricFormat("#,##0.00USD");
-        FiltersConfigPanel filtersConfigPanel = widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class);
-        assertEquals(filtersConfigPanel.getAllFilters(), asList(DATE_DIMENSION_CREATED, ATTR_PRODUCT, VARIABLE_NAME));
-        filtersConfigPanel.removeFiltersFromSelectedList(ATTR_PRODUCT);
-        widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
-            .selectMetric(METRIC_VARIABLE, "Created");
-        widgetConfigPanel.saveConfiguration();
-        dashboardsPage.getDashboardEditBar().saveDashboard();
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "60,270,072.20USD");
+            WidgetConfigPanel widgetConfigPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
+                    waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
+            MetricConfigPanel metricConfigPanel = widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class);
+            metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
 
-        dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
-            .changeAttributeFilterValues("TouchAll");
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "60,270,072.20USD");
+            waitForKeyMetricUpdateValue();
+            assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled(),
+                    "When dropdown should be disabled");
+            assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterSelected(),
+                    "Link external filter should be selected");
+            widgetConfigPanel.getTab(Tab.METRIC_STYLE, MetricStyleConfigPanel.class)
+                    .editMetricFormat("#,##0.00USD");
+            FiltersConfigPanel filtersConfigPanel = widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class);
+            assertEquals(filtersConfigPanel.getAllFilters(), asList(DATE_DIMENSION_CREATED, ATTR_PRODUCT, VARIABLE_NAME));
+            filtersConfigPanel.removeFiltersFromSelectedList(ATTR_PRODUCT);
+            widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
+                    .selectMetric(METRIC_VARIABLE, "Created");
+            widgetConfigPanel.saveConfiguration();
+            dashboardsPage.getDashboardEditBar().saveDashboard();
+            waitForKeyMetricUpdateValue();
+            assertEquals(getKeyMetricValue(), "60,270,072.20USD");
 
-        dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME))
-            .changeAttributeFilterValues("Explorer");
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "24,922,645.37USD");
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
+                    .changeAttributeFilterValues("TouchAll");
+            waitForKeyMetricUpdateValue();
+            assertEquals(getKeyMetricValue(), "60,270,072.20USD");
 
-        dashboardsPage.getContent().getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2013");
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "No data");
+            dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME))
+                    .changeAttributeFilterValues("Explorer");
+            waitForKeyMetricUpdateValue();
+            assertEquals(getKeyMetricValue(), "24,922,645.37USD");
 
-        dashboardsPage.editDashboard();
-        widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(
-                Iterables.getLast(browser.findElements(HEADLINE_WIDGET_LOCATOR)), browser);
-        widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
-            .selectMetric(COUNT_OF_PRODUCT);
-        widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class)
-            .addFiltersToAffectedList(ATTR_PRODUCT);
-        widgetConfigPanel.saveConfiguration();
-        dashboardsPage.getDashboardEditBar().saveDashboard();
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "7.00USD");
+            dashboardsPage.getContent().getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2013");
+            waitForKeyMetricUpdateValue();
+            assertEquals(getKeyMetricValue(), "No data");
 
-        dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
-            .changeAttributeFilterValues("TouchAll");
-        waitForKeyMetricUpdateValue();
-        assertEquals(getKeyMetricValue(), "1.00USD");
+            dashboardsPage.editDashboard();
+            widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(
+                    Iterables.getLast(browser.findElements(HEADLINE_WIDGET_LOCATOR)), browser);
+            widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
+                    .selectMetric(COUNT_OF_PRODUCT);
+            widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class)
+                    .addFiltersToAffectedList(ATTR_PRODUCT);
+            widgetConfigPanel.saveConfiguration();
+            dashboardsPage.getDashboardEditBar().saveDashboard();
+            waitForKeyMetricUpdateValue();
+            if (XAE_VERSION == 1) {
+                assertEquals(getKeyMetricValue(), "7.00USD");
+            } else if (XAE_VERSION == 3){
+                assertEquals(getKeyMetricValue(), "No data");
+            }
+
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
+                    .changeAttributeFilterValues("TouchAll");
+            waitForKeyMetricUpdateValue();
+            if (XAE_VERSION == 1) {
+                assertEquals(getKeyMetricValue(), "1.00USD");
+            } else if (XAE_VERSION == 3){
+                assertEquals(getKeyMetricValue(), "No data");
+            }
+        } finally {
+            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+        }
     }
 
     private String getKeyMetricValue() {

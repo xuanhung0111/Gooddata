@@ -10,8 +10,13 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -32,47 +37,72 @@ public class DynamicImageTest extends AbstractProjectTest {
             "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage2.png";
     private final static String IMAGE_SOURCE_3 =
             "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage3.png";
+    private static final int XAE_VERSION_1 = 1;
+    private static final int XAE_VERSION_3 = 3;
+    private int DEFAULT_XAE_VERSION;
+    private int XAE_VERSION;
+
+    ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.DYNAMIC_IMAGES + "/image_url.csv"));
         takeScreenshot(browser, "uploaded-image-file", getClass());
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void testImageFromPubliclyAccessibleImages() {
-        initAttributePage().initAttribute(IMAGE)
-                .setDrillToAttribute(NAME)
-                .selectLabelType(IMAGE);
+    @DataProvider(name = "getXaeVersions")
+    public Object[][] getXaeVersions() {
+        return new Object[][]{
+                {XAE_VERSION_1},
+                {XAE_VERSION_3},
+        };
+    }
 
-        final HowItem howItem = new HowItem(IMAGE, Position.LEFT);
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
+    public void testImageFromPubliclyAccessibleImages(int xaeVersion) throws IOException {
+        try {
+            XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+            initAttributePage().initAttribute(IMAGE)
+                    .setDrillToAttribute(NAME)
+                    .selectLabelType(IMAGE);
 
-        initReportCreation().createReport(new UiReportDefinition()
-                .withName("Report-Containing-Images")
-                .withHows(howItem));
+            final HowItem howItem = new HowItem(IMAGE, Position.LEFT);
 
-        takeScreenshot(browser, "report-containing-images", getClass());
-        checkAllImagesInReport();
+            initReportCreation().createReport(new UiReportDefinition()
+                    .withName("Report-Containing-Images")
+                    .withHows(howItem));
 
-        //image's height is much smaller than cell's, so graphene probably missclick.
-        //click on img element to drill instead
-        reportPage.getTableReport().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-        reportPage.waitForReportExecutionProgress();
-        takeScreenshot(browser, "drill-on-an-image", getClass());
+            takeScreenshot(browser, "report-containing-images", getClass());
+            checkAllImagesInReport();
 
-        assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 1", "Image 2", "Image 3"));
+            //image's height is much smaller than cell's, so graphene probably missclick.
+            //click on img element to drill instead
+            reportPage.getTableReport().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            reportPage.waitForReportExecutionProgress();
+            takeScreenshot(browser, "drill-on-an-image", getClass());
 
-        howItem.setPosition(Position.TOP);
+            if (XAE_VERSION == 1) {
+                assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 1", "Image 2", "Image 3"));
+            } else if (XAE_VERSION == 3) {
+                assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 2"));
+            }
 
-        browser.navigate().back();
-        reportPage.waitForReportExecutionProgress()
-                .openHowPanel()
-                .selectAttributePosition(howItem.getAttribute().getName(), howItem.getPosition())
-                .done();
-        reportPage.waitForReportExecutionProgress();
+            howItem.setPosition(Position.TOP);
 
-        takeScreenshot(browser, "images-having-top-position", getClass());
-        checkAllImagesInReport();
+            browser.navigate().back();
+            reportPage.waitForReportExecutionProgress()
+                    .openHowPanel()
+                    .selectAttributePosition(howItem.getAttribute().getName(), howItem.getPosition())
+                    .done();
+            reportPage.waitForReportExecutionProgress();
+
+            takeScreenshot(browser, "images-having-top-position", getClass());
+            checkAllImagesInReport();
+        } finally {
+            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+        }
     }
 
     @Test(dependsOnMethods = {"testImageFromPubliclyAccessibleImages"})
