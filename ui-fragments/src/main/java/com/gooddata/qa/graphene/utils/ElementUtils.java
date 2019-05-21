@@ -167,4 +167,8 @@ public final class ElementUtils {
                 .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .perform();
     }
+
+    public static String getErrorMessage(SearchContext context){
+        return waitForElementVisible(By.cssSelector(".gd-message.error"), context).getText();
+    }
 }

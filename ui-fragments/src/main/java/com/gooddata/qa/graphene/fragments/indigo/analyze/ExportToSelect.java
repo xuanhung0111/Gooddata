@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ExportToSelect extends AbstractReactDropDown {
@@ -17,17 +19,21 @@ public class ExportToSelect extends AbstractReactDropDown {
         return ".gd-list-item:not([class*='item-header'])";
     }
 
-    public void exportTo(ExportDataType type) {
+    public void exportTo(DataType type) {
         waitForElementVisible(By.className(type.toString()), getRoot()).click();
     }
 
-    public enum ExportDataType {
+    public boolean isExportToButtonEnabled(DataType type) {
+        return !isElementDisabled(waitForElementVisible(By.className(type.toString()), getRoot()));
+    }
+
+    public enum DataType {
         CSV("gd-export-menu-export-csv"),
         XLSX("gd-export-menu-export-xlsx");
 
         private String type;
 
-        ExportDataType(String type) {
+        DataType(String type) {
             this.type = type;
         }
 

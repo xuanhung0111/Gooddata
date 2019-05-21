@@ -13,7 +13,10 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -22,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
+import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
@@ -35,20 +39,24 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.COLORS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.LEGEND;
@@ -57,6 +65,7 @@ import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.initColorPalette;
 import static java.lang.String.format;
+import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,6 +86,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String CLIENT_PROJECT_TITLE = "Client project " + generateHashString();
     private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1_" + generateHashString();
     private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
+    private final String EXPORT_VISUALIZED_DATA_INSIGHT = "Export visualized insight" + generateHashString();
     private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
     private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
@@ -127,6 +137,16 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         indigoRestRequest.createAnalyticalDashboard(
                 asList(numberKpiUri, indigoRestRequest.createVisualizationWidget(
                         insightUri, FIRST_TEST_INSIGHT)), SECOND_DASHBOARD);
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(EXPORT_VISUALIZED_DATA_INSIGHT, ReportType.TABLE)
+                .setMeasureBucket(singletonList(MeasureBucket
+                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.COLUMNS))));
 
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
@@ -342,6 +362,31 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertEquals(chartReport.getSecondaryYaxisTitle(), METRIC_AMOUNT);
         assertTrue(chartReport.isSecondaryYaxisVisible(), "Rerender insight should have secondary axis");
         assertEquals(analysisPage.openConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
+    }
+
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void exportNewInsightAnalyseToXLSX() throws IOException {
+        try {
+            AnalysisPage analysisPage = initAnalysePage();
+            analysisPage.openInsight(EXPORT_VISUALIZED_DATA_INSIGHT).waitForReportComputing().exportTo(DataType.XLSX)
+                .getExportXLSXDialog().uncheckOption(ExportXLSXDialog.OptionalExport.CELL_MERGED).confirmExport();
+
+            final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+                + EXPORT_VISUALIZED_DATA_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName());
+
+            waitForExporting(exportFile);
+            log.info(EXPORT_VISUALIZED_DATA_INSIGHT + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
+                asList(asList(ATTR_FORECAST_CATEGORY, "Exclude", "Include"),
+                    asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
+                    asList("Direct Sales", "3.356248251E7", "4.684384245E7"),
+                    asList("Inside Sales", "1.537015708E7", "2.08489745E7")));
+            assertEquals(exportFile.getName(), EXPORT_VISUALIZED_DATA_INSIGHT + ".xlsx");
+        } finally {
+            deleteIfExists(Paths.get(testParams.getExportFilePath(
+                EXPORT_VISUALIZED_DATA_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName())));
+        }
     }
 
     @AfterClass(alwaysRun = true)
