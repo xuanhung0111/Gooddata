@@ -47,6 +47,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 
 public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
@@ -124,7 +125,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         return new Object[][] {
                 {INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, singletonList("101,054")},
                 {INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE, singletonList("73,073")},
-                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON, asList("–", "73,073")},
+                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON, asList(EMPTY, "73,073")},
                 {INSIGHT_SHOW_PERCENT, singletonList("47.37%")}
         };
     }

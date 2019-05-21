@@ -67,6 +67,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 
 public class PivotTableTest extends AbstractAnalyseTest {
 
@@ -568,14 +569,14 @@ public class PivotTableTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
 
-        List<List<String>> expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$116,625,456.54", "–"));
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$116,625,456.54", EMPTY));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
 
         analysisPage.addFilter(ATTR_FORECAST_CATEGORY).waitForReportComputing().getFilterBuckets()
                 .configAttributeFilter(ATTR_FORECAST_CATEGORY, "Exclude");
         analysisPage.waitForReportComputing();
 
-        expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$48,932,639.59", "–"));
+        expectedValues = singletonList(asList(AggregationItem.SUM.getRowName(), "$48,932,639.59", EMPTY));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
@@ -598,7 +599,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         List<List<String>> expectedValues = singletonList(
-            asList(AggregationItem.SUM.getRowName(), "$80,406,324.96", "–", "$36,219,131.58", "–"));
+            asList(AggregationItem.SUM.getRowName(), "$80,406,324.96", EMPTY, "$36,219,131.58", EMPTY));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 
