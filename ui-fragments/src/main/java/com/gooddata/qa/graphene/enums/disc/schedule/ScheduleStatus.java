@@ -9,7 +9,8 @@ public enum ScheduleStatus {
     SCHEDULED(".status-icon-scheduled.icon-sync"),
     DISABLED(".status-icon-disabled.icon-pause"),
     UNSCHEDULED(".ico-unscheduled"),
-    RUNNING(".status-icon-running.icon-sync");
+    RUNNING(".status-icon-running.icon-sync"),
+    WARNING(".status-icon-warning.icon-check");
 
     private String iconCss;
 

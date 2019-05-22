@@ -18,6 +18,5 @@ public class DatabaseColumn {
     @Override
     public String toString() {
         return this.title + " " + dataType + extraParams;
-
     }
 }
