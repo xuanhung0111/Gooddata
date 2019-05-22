@@ -80,6 +80,15 @@ public class ProjectDetailPage extends AbstractFragment {
                 .map(p -> Graphene.createPageFragment(ProcessDetail.class, p)).get();
     }
 
+    public DataloadProcessDetail getDataDistributonProcess(String processName) {
+        if (processName.equals(DATALOAD_PROCESS_NAME)) {
+            throw new RuntimeException("The type of DATALOAD process should be called in getDataloadProcess method");
+        }
+
+        return findProcess(Restriction.NAME, processName)
+                .map(p -> Graphene.createPageFragment(DataloadProcessDetail.class, p)).get();
+    }
+
     public DataloadProcessDetail getDataloadProcess() {
         return findProcess(Restriction.NAME, DATALOAD_PROCESS_NAME)
                 .map(p -> Graphene.createPageFragment(DataloadProcessDetail.class, p)).get();

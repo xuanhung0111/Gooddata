@@ -21,6 +21,9 @@ public class TestParameters {
     private String domainUser = null;
     private String user;
     private String password;
+    private String snowflakePassword;
+    private String snowflakeUserName;
+    private String snowflakeJdbcUrl;
     private String editorUser;
     private String viewerUser;
     private String dashboardOnlyUser;
@@ -53,6 +56,9 @@ public class TestParameters {
         host = loadProperty("host");
         user = loadProperty("user");
         password = loadProperty("password");
+        snowflakePassword = loadProperty("snowflakePassword");
+        snowflakeUserName = loadProperty("snowflakeUserName");
+        snowflakeJdbcUrl = loadProperty("snowflakeJdbcUrl");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
@@ -125,6 +131,22 @@ public class TestParameters {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getSnowflakePassword() {
+        return snowflakePassword;
+    }
+
+    public String getSnowflakeUserName() {
+        return snowflakeUserName;
+    }
+
+    public String getSnowflakeJdbcUrl() {
+        return snowflakeJdbcUrl;
+    }
+
+    public void setSnowflakePassword(String snowflakePassword) {
+        this.snowflakePassword = snowflakePassword;
     }
 
     public String getPassword() {
