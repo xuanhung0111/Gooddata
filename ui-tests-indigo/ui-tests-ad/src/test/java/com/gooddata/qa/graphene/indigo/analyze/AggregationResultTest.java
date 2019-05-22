@@ -114,8 +114,7 @@ public class AggregationResultTest extends AbstractAnalyseTest {
         TableReport tableReport = analysisPage.getTableReport();
         tableReport.addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
         analysisPage.addMetric(METRIC_CLOSE_EOP).waitForReportComputing();
-        assertTrue(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_CLOSE_EOP).isEmpty(),
-                format("Total cell of %s should be empty", METRIC_CLOSE_EOP));
+        assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_CLOSE_EOP), "42,794.00");
 
         analysisPage.removeMetric(METRIC_CLOSE_EOP).waitForReportComputing();
         assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), "101,054");

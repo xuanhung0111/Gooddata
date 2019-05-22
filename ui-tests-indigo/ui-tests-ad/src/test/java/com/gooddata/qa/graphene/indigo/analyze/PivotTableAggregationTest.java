@@ -143,7 +143,7 @@ public class PivotTableAggregationTest extends AbstractAnalyseTest {
         analysisPage.addMetric(METRIC_CLOSE_EOP)
             .waitForReportComputing();
 
-        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", EMPTY));
+        List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054", "42,794.00"));
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
 
         analysisPage.removeMetric(METRIC_CLOSE_EOP)
