@@ -175,6 +175,14 @@ public class ReportPage extends AbstractFragment {
         return getPanel(AttributeSndPanel.class);
     }
 
+    public String getHowButton() {
+        return waitForElementVisible(howButton).getText();
+    }
+
+    public String getWhatButton() {
+        return waitForElementVisible(whatButton).getText();
+    }
+
     public <T extends AbstractSndPanel> T getPanel(Class<T> clazz) {
         WebElement panelRoot = waitForElementVisible(AbstractSndPanel.LOCATOR, getRoot());
         panelRoot.findElements(By.className("sndWheel")).forEach(WaitUtils::waitForElementNotVisible);
@@ -259,6 +267,11 @@ public class ReportPage extends AbstractFragment {
     public TableReport getTableReport() {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(id("gridContainerTab"), browser));
+    }
+
+    public ChartReport getChartReport() {
+        return Graphene.createPageFragment(ChartReport.class,
+                waitForElementVisible(id("chartContainerTab"), browser));
     }
 
     public OneNumberReport getHeadlineReport() {

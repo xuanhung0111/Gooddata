@@ -7,7 +7,13 @@ public enum ReportType {
 
     TABLE("table"),
     COLUMN_CHART("column"),
-    PIE_CHART("pie"),
+    PIE_CHART("pie"){
+        @Override
+        public String getViewbyByMessage() {
+            return "TO VIEW BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
+        }
+    },
+
     TREE_MAP("treemap"),
     STACKS_AREA_CHART("area"),
     HEADLINE("headline"),

@@ -46,6 +46,10 @@ public class MainEditor extends AbstractFragment {
         return isElementPresent(cssSelector(CSS_REPORT_EMPTY), browser);
     }
 
+    public String getReportEmpty() {
+        return waitForElementVisible(cssSelector(CSS_REPORT_EMPTY), getRoot()).getText();
+    }
+
     public boolean isNoData() {
         return isElementPresent(BY_REPORT_NO_DATA, browser);
     }
