@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcm
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessOnK8sTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.RenderingInsightUsingClientIdTest;
+import com.gooddata.qa.graphene.lcm.indigo.dashboards.RenderingAnalyticalDashboardUsingClientIdTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -19,8 +20,9 @@ public class UITestsRegistry {
                 DashboardsDistributedByLcmTest.class,
                 DashboardsDistributedByLcmOnK8sTest.class,
                 MsfProcessTest.class,
-                RenderingInsightUsingClientIdTest.class,
                 MsfProcessOnK8sTest.class,
+                RenderingInsightUsingClientIdTest.class,
+                RenderingAnalyticalDashboardUsingClientIdTest.class
         });
 
         TestsRegistry.getInstance()
