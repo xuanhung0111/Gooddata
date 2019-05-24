@@ -119,7 +119,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_DEPARTMENT)
-                .setFilterIsntValues(ATTR_DEPARTMENT, "Direct Sales")
+                .setFilterIsNotValues(ATTR_DEPARTMENT, "Direct Sales")
                 .addStack(ATTR_STATUS)
                 .setFilterIsValues(ATTR_STATUS, "Completed", "Deferred")
                 .waitForReportComputing().exportReport();

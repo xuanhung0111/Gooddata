@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
@@ -24,4 +25,15 @@ public class AnalysisInsightSelectionPanel extends AbstractInsightSelectionPanel
         getInsightItem(insight).open();
     }
 
+    public void deleteInsight(final String insight) {
+        if (!getRoot().isDisplayed())
+            throw new RuntimeException("The insight selection panel is collapsed");
+        getInsightItem(insight).delete();
+    }
+
+    public boolean isExist(final String insight) {
+        if (!getRoot().isDisplayed())
+            throw new RuntimeException("The insight selection panel is collapsed");
+        return searchInsight(insight);
+    }
 }
