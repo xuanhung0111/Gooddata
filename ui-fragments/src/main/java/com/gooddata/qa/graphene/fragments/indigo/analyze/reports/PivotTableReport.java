@@ -39,10 +39,10 @@ public class PivotTableReport extends AbstractFragment {
     @FindBy(css = TABLE_HEADER_ALL_CSS)
     private List<WebElement> headers;
 
-    @FindBy(css = ".ag-body .gd-table-row")
+    @FindBy(css = ".ag-body-viewport .gd-table-row")
     private List<WebElement> rows;
 
-    @FindBy(css = ".ag-body-container .s-value")
+    @FindBy(css = ".ag-body-viewport .s-value")
     private WebElement attributeValuePresent;
 
     @FindBy(css = ".ag-numeric-header .gd-pivot-table-header-label")
