@@ -503,7 +503,7 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage setFilterIsntValues(String filter, String... values) {
+    public AnalysisPage setFilterIsNotValues(String filter, String... values) {
         AttributeFilterPickerPanel panel = openFilterPanel(filter);
         panel.checkAllCheckbox();
         Arrays.stream(values).forEach(panel::selectItem);  //To uncheck element

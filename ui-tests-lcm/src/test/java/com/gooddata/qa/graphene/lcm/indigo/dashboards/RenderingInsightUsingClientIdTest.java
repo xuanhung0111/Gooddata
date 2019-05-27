@@ -2,13 +2,19 @@ package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_TASK;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.lcm.LcmRestUtils.ATT_LCM_DATA_PRODUCT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
@@ -19,7 +25,10 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -168,6 +177,112 @@ public class RenderingInsightUsingClientIdTest extends AbstractProjectTest {
         assertEquals(chartReport.getAxisLabels(), asList(EMAIL, IN_PERSON_MEETING, PHONE_CALL, WEB_MEETING));
         assertEquals(chartReport.getXaxisTitle(), ATTR_ACTIVITY_TYPE);
         assertEquals(chartReport.getYaxisTitle(), METRIC_NUMBER_OF_ACTIVITIES);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void openOtherInsightOnEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        final String otherInsight = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        createInsightHasAttributeOnStackByAndViewBy(
+                otherInsight, METRIC_AMOUNT, ATTR_DEPARTMENT, ATTR_IS_ACTIVE);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage analysisPage = AnalysisPage.getInstance(browser).saveInsight().openInsight(otherInsight);
+        assertEquals(analysisPage.getPageHeader().getInsightTitle(), otherInsight);
+        ChartReport chartReport = AnalysisPage.getInstance(browser).waitForReportComputing().getChartReport();
+        assertEquals(chartReport.getTrackersCount(), 2);
+        assertEquals(chartReport.getXaxisTitle(), ATTR_DEPARTMENT);
+        assertEquals(chartReport.getYaxisTitle(), METRIC_AMOUNT);
+        assertEquals(chartReport.getChartType(), ReportType.COLUMN_CHART.getLabel());
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void createAndDeleteInsightOnEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage analysisPage = AnalysisPage.getInstance(browser);
+        AnalysisPageHeader analysisPageHeader = analysisPage.getPageHeader();
+        analysisPageHeader.resetToBlankState();
+        assertEquals(analysisPageHeader.getInsightTitle(), "Untitled insight");
+
+        openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisInsightSelectionPanel analysisInsightSelectionPanel = AnalysisPage.getInstance(browser)
+                .getPageHeader().expandInsightSelection();
+        analysisInsightSelectionPanel.deleteInsight(insightTitle);
+        assertFalse(analysisPageHeader.expandInsightSelection().isExist(insightTitle), "Insight should be removed");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void editInsightOnEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        final String otherInsight = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage analysisPage = AnalysisPage.getInstance(browser);
+        AnalysisPageHeader analysisPageHeader = analysisPage.getPageHeader().setInsightTitle(otherInsight);
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing().replaceStack(ATTR_IS_CLOSED).saveInsight();
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
+        assertEquals(analysisPageHeader.getInsightTitle(), otherInsight);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void filterInsightOnEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage analysisPage = AnalysisPage.getInstance(browser).waitForReportComputing();
+        analysisPage.addFilter(ATTR_ACTIVITY_TYPE).setFilterIsValues(ATTR_ACTIVITY_TYPE, EMAIL, PHONE_CALL);
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
+        assertEquals(chartReport.getAxisLabels(), asList(EMAIL, PHONE_CALL));
+
+        analysisPage.addDateFilter().getFilterBuckets().configDateFilter("01/01/2015", "01/01/2017");
+        analysisPage.waitForReportComputing();
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList("TRUE", "6")));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void switchPageOnNonEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage.getInstance(browser).waitForReportComputing();
+        DashboardsPage dashboardsPage = initDashboardsPage();
+        assertTrue(dashboardsPage.isEmptyDashboard(), "Should move to empty dashboard");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void switchProjectOnNonEmbeddedADUrlUsingClientIdAndIdentifier() throws IOException {
+        final String insightTitle = "Insight" + generateHashString();
+        createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
+
+        openUrl(format("/analyze/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        AnalysisPage.getInstance(browser).waitForReportComputing();
+        testParams.setProjectId(devProjectId);
+        try {
+            initDashboardsPage();
+            assertTrue(browser.getCurrentUrl().contains(devProjectId), "Should switch to project " + devProjectId);
+        } finally {
+            testParams.setProjectId(clientProjectId);
+        }
     }
 
     @AfterClass(alwaysRun = true)

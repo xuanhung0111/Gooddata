@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
+import static com.gooddata.qa.graphene.enums.DateRange.THIS_YEAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_TASK;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -8,7 +9,11 @@ import static com.gooddata.qa.utils.lcm.LcmRestUtils.ATT_LCM_DATA_PRODUCT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
@@ -19,6 +24,7 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
@@ -204,6 +210,138 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
         assertEquals(chartReport.getAxisLabels(), asList(EMAIL, IN_PERSON_MEETING, PHONE_CALL, WEB_MEETING));
         assertEquals(chartReport.getXaxisTitle(), ATTR_ACTIVITY_TYPE);
         assertEquals(chartReport.getYaxisTitle(), METRIC_NUMBER_OF_ACTIVITIES);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void openOtherDashboardOnEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String otherAnalyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        createAnalyticalDashboard(otherAnalyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/embedded/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.selectKpiDashboard(otherAnalyzeDashboardTitle).waitForWidgetsLoading()
+                .getDashboardTitle(), otherAnalyzeDashboardTitle);
+        assertEquals(indigoDashboardsPage.getInsightTitles(), singletonList(widgetTitle));
+
+        ChartReport chartReport = indigoDashboardsPage.getFirstWidget(Insight.class).getChartReport();
+        assertEquals(chartReport.getTrackersCount(), 4);
+        assertEquals(chartReport.getAxisLabels(), asList(EMAIL, IN_PERSON_MEETING, PHONE_CALL, WEB_MEETING));
+        assertEquals(chartReport.getXaxisTitle(), ATTR_ACTIVITY_TYPE);
+        assertEquals(chartReport.getYaxisTitle(), METRIC_NUMBER_OF_ACTIVITIES);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void filterAnalyticalDashboardOnEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/embedded/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
+        indigoDashboardsPage.switchToEditMode().selectLastWidget(Insight.class);
+        indigoDashboardsPage.getConfigurationPanel().enableDateFilter();
+        indigoDashboardsPage.waitForDashboardLoad()
+                .saveEditModeWithWidgets()
+                .selectDateFilterByName(THIS_YEAR.toString());
+        assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getFirstWidget(Insight.class).isEmptyValue(),
+                "Should be no data for filter selection");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void addAndDeleteAnalyticalDashboardOnEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/embedded/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
+        indigoDashboardsPage.addDashboard();
+        assertEquals(indigoDashboardsPage.getDashboardTitle(), "Untitled");
+        indigoDashboardsPage.cancelEditModeWithoutChange();
+        indigoDashboardsPage.selectKpiDashboard(analyzeDashboardTitle);
+        indigoDashboardsPage.switchToEditMode().deleteDashboard(true);
+        assertThat(indigoDashboardsPage.getDashboardTitles(), not(hasItem(analyzeDashboardTitle)));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void editAnalyticalDashboardOnEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String otherAnalyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/embedded/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
+        indigoDashboardsPage.switchToEditMode()
+                .changeDashboardTitle(otherAnalyzeDashboardTitle)
+                .addAttributeFilter(ATTR_ACTIVITY_TYPE, EMAIL);
+        assertEquals(indigoDashboardsPage.getDashboardTitle(), otherAnalyzeDashboardTitle);
+        ChartReport chartReport = indigoDashboardsPage.waitForWidgetsLoading().getFirstWidget(Insight.class).getChartReport();
+        assertEquals(chartReport.getAxisLabels(), singletonList(EMAIL));
+        assertEquals(chartReport.getXaxisTitle(), ATTR_ACTIVITY_TYPE);
+        assertEquals(chartReport.getYaxisTitle(), METRIC_NUMBER_OF_ACTIVITIES);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void switchPageOnNonEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage.getInstance(browser).waitForDashboardLoad();
+        DashboardsPage dashboardsPage = initDashboardsPage();
+        assertTrue(dashboardsPage.isEmptyDashboard(), "Should move to empty dashboard");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void switchProjectOnNonEmbeddedKDUrlUsingClientIdAndIdentifier() throws IOException {
+        final String widgetTitle = "Widget-" + generateHashString();
+        final String insightTitle = "Insight-" + generateHashString();
+        final String analyzeDashboardTitle = "KD-" + generateHashString();
+        final String insightUri = createInsightHasAttributeOnStackByAndViewBy(
+                insightTitle, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_IS_TASK);
+        final String dashboardUri = createAnalyticalDashboard(analyzeDashboardTitle, insightUri, widgetTitle);
+        final String identifier = getObjIdentifiers(singletonList(dashboardUri)).get(0);
+
+        openUrl(format("/dashboards/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
+                ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
+        IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
+        testParams.setProjectId(devProjectId);
+        try {
+            initDashboardsPage();
+            assertTrue(browser.getCurrentUrl().contains(devProjectId), "Should switch to project " + devProjectId);
+        } finally {
+            testParams.setProjectId(clientProjectId);
+        }
     }
 
     @AfterClass(alwaysRun = true)
