@@ -126,7 +126,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(chartReport.getValueSecondaryYaxis().stream()
             .flatMap(List::stream)
-            .collect(Collectors.toList()), hasItems("0M", "70.7M"));
+            .collect(Collectors.toList()), hasItems("0", "70.7M"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -155,7 +155,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(analysisPage.getChartReport().getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("0M", "70.7M"));
+                .collect(Collectors.toList()), hasItems("0", "70.7M"));
     }
 
     @Test(dependsOnGroups = {"createProject"})

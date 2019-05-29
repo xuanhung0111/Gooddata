@@ -341,7 +341,7 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getPrimaryYaxisTitle(), metricNegativeValue);
         assertThat(chartReport.getValuePrimaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItem("0k"));
+                .collect(Collectors.toList()), hasItem("0"));
     }
 
     @Test(dependsOnGroups = {"createProject"})

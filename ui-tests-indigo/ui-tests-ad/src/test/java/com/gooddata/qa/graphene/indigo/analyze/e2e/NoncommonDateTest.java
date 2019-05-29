@@ -38,13 +38,13 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .changeDateDimension("Created");
 
         analysisPage.waitForReportComputing();
-        assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis-title tspan"), browser).getText(),
+        assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis .highcharts-axis-title tspan"), browser).getText(),
                 containsString("Created"));
 
         analysisPage.getAttributesBucket()
             .changeDateDimension("Activity");
         analysisPage.waitForReportComputing();
-        assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis-title tspan"), browser).getText(),
+        assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis .highcharts-axis-title tspan"), browser).getText(),
                 containsString("Activity"));
     }
 

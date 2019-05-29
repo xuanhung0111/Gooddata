@@ -629,7 +629,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
 
         assertThat(chartReport.getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("70.7M", "0M"));
+                .collect(Collectors.toList()), hasItems("70.7M", "0"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, dependsOnMethods = "checkDualAxisChartWithSomeMeasures")
