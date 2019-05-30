@@ -48,6 +48,7 @@ import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.model.ModelRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -99,6 +100,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     private static final String VARIABLE_NAME = "F Stage Name";
     private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete "
             + "its data set. Go to its Data Set administration page and click Delete.";
+    private static final int XAE_VERSION_1 = 1;
+    private static final int XAE_VERSION_3 = 3;
 
     private static final ComputedAttributeDefinition DEFINITION = new ComputedAttributeDefinition()
             .withName(COMPUTED_ATTRIBUTE_NAME)
@@ -110,6 +113,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .withBucket(new AttributeBucket(3, "Best"));
 
     private DashboardRestRequest dashboardRequest;
+    private int DEFAULT_XAE_VERSION;
+    private int XAE_VERSION;
+
+    ProjectRestRequest projectRestRequest;
 
     @Override
     protected void initProperties() {
@@ -127,6 +134,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         getMetricCreator().createExpectedPercentOfGoalMetric();
         getMetricCreator().createNumberOfWonOppsMetric();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,
@@ -279,8 +288,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createReport(new UiReportDefinition().withName(CHANGEMAQL_REPORT_NAME_2).withWhats(SUM_OF_AMOUNT)
              .withHows(ATTR_SALES_REP, COMPUTED_ANOTHER_ATTRIBUTE_4), "SaleRepReport2");
 
-         String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
-                 amountFactUri, saleRepAttributeUri, saleRepValueUri);
+        String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                amountFactUri, saleRepAttributeUri, saleRepValueUri);
         dashboardRequest.changeMetricExpression(sumOfAmountMetricUri, newMaqlExpression);
 
         initReportsPage().openReport(CHANGEMAQL_REPORT_NAME).initPage();
@@ -330,7 +339,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"checkDrillOnComputedAttribute"}, priority = 5, dataProvider = "drillComputedAttributeTest")
-    public void createReportWithDrillComputedAttribute(String name, String attribute, String value, String target){
+    public void createReportWithDrillComputedAttribute(String name, String attribute, String value, String target) {
         UiReportDefinition rd = new UiReportDefinition().withName(name)
                   .withWhats("Amount").withHows(attribute);
         createReport(rd, rd.getName());
@@ -340,7 +349,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(report.getAttributeHeaders(), asList(attribute));
         assertTrue(reportPage.getFilters().isEmpty(), "Shouldn't have filter");
 
-        report = drillOnAttributeFromReport(report,value);
+        report = drillOnAttributeFromReport(report, value);
         assertEquals(report.getAttributeHeaders(), asList(target));
         assertEquals(reportPage.getFilters(), asList(attribute + " is " + value));
 
@@ -446,9 +455,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void applyMufFiltersOnReportWithComputedAttribute() throws IOException, JSONException {
         try {
             initReportsPage()
-                .openReport(REPORT_NAME)
-                .initPage()
-                .setReportVisible();
+                    .openReport(REPORT_NAME)
+                    .initPage()
+                    .setReportVisible();
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
             initReportsPage().openReport(REPORT_NAME);
@@ -531,10 +540,19 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 "Metric values are incorrrect");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void renderReportContainComputedAttributeWithoutMetric() {
-        String factAmountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
-        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
+    @DataProvider(name = "getXaeVersions")
+    public Object[][] getXaeVersions() {
+        return new Object[][]{
+                {XAE_VERSION_1},
+                {XAE_VERSION_3},
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
+    public void renderReportContainComputedAttributeWithoutMetric(int xaeVersion) throws IOException {
+        XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+        String factAmountUri = getFactByTitle(FACT_AMOUNT).getUri();
+        Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
         String stageNameValues = getMdService()
                 .getAttributeElements(stageNameAttribute)
                 .subList(0, 2)
@@ -561,11 +579,17 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     .withName("Simple-report")
                     .withHows(computedAttribute, ATTR_DEPARTMENT),
                     "Report-renders-well-with-computed-attribute-without-metric");
-            assertEquals(reportPage.getTableReport().getAttributeValues(),
-                    asList("Large", "Direct Sales", "Inside Sales"));
 
+            if (XAE_VERSION == 1) {
+                assertEquals(reportPage.getTableReport().getAttributeValues(),
+                        asList("Large", "Direct Sales", "Inside Sales"));
+            } else if (XAE_VERSION == 3) {
+                assertEquals(reportPage.getTableReport().getAttributeValues(),
+                        asList("(empty value)", "Direct Sales", "Inside Sales", "Large", "Direct Sales", "Inside Sales"));
+            }
         } finally {
             getMdService().removeObjByUri(attributeUri);
+            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
         }
     }
 
@@ -580,7 +604,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
     }
 
-    private void createAndOpenComputedAttribute(String attribute, String metric, String name){
+    private void createAndOpenComputedAttribute(String attribute, String metric, String name) {
         initAttributePage().moveToCreateAttributePage().createComputedAttribute(
                 new ComputedAttributeDefinition()
                 .withAttribute(attribute)
@@ -617,7 +641,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     private String createStageMuf(final List<String> expectedStageElements, final String mufTitle)
-                    throws ParseException, JSONException, IOException {
+            throws ParseException, JSONException, IOException {
         final Attribute stage = getMdService().getObj(getProject(), Attribute.class, Restriction.identifier("attr.stage.status"));
         final List<AttributeElement> filteredElements = getMdService().getAttributeElements(stage).stream()
                 .filter(e -> expectedStageElements.contains(e.getTitle())).collect(Collectors.toList());
