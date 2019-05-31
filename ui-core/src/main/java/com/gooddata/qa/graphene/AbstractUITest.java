@@ -69,8 +69,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     protected static final String PAGE_LOST_PASSWORD = "account.html#/lostPassword";
-    protected static final String PAGE_REGISTRATION =
-            "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingProductTour";
+    protected static final String PAGE_REGISTRATION = "account.html#/registration";
 
     protected static final String CSV_UPLOADER_PROJECT_ROOT_TEMPLATE = "data/#/projects/%s";
     protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/datasets";

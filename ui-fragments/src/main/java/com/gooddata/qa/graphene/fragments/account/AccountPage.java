@@ -77,9 +77,10 @@ public class AccountPage extends AbstractFragment {
         waitForElementVisible(CONFIRM_DELETE_ACCOUNT_BUTTON_LOCATOR, browser).click();
     }
 
-    public void tryDeleteAccountButDiscard() {
+    public AccountPage tryDeleteAccountButDiscard() {
         waitForElementVisible(deleteYourAccountLink).click();
         waitForElementVisible(CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR, browser).click();
+        return this;
     }
 
     public void changeLanguage(String lang) {
