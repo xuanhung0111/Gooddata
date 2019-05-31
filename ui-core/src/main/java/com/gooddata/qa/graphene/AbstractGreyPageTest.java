@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -38,7 +39,9 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Objects.isNull;
 import static org.testng.Assert.assertTrue;
 
@@ -113,6 +116,25 @@ public abstract class AbstractGreyPageTest extends AbstractTest {
         waitForElementPresent(gpLoginFragment.getRoot());
         gpLoginFragment.login(username, password);
         Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
+    }
+
+    /**
+     * This is temporarily used to handle some special cases which require design changes.
+     * TITLE PROJECT WILL BE ADDED GENERATE ID
+     * DO NOT USING FOR NEW TEST, MUST BE HANDLE TO DELETE PROJECT AFTER FINISHING TEST
+     */
+    @Deprecated
+    public String createProjectByGreyPage(String projectTitle, String projectTemplate) {
+        int projectCreateCheckIterations = 60; // 5 minutes
+        openUrl(PAGE_GDC_PROJECTS);
+        waitForElementVisible(gpProject.getRoot());
+
+        projectTitle += "-" + generateHashString();
+
+        testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                testParams.getProjectEnvironment(), projectCreateCheckIterations));
+        return projectTitle;
     }
 
     public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException {

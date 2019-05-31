@@ -144,7 +144,7 @@ public class UITestsRegistry {
             AnalyticalDesignerSanityTest.class,
             NonProductionDatasetInsightTest.class,
             GoodSalesNotRenderedInsightTest.class,
-            WalkmeOnEmbeddedAdTest.class,
+//          WalkmeOnEmbeddedAdTest.class, Will be unblocked by ticket QA-9656
             GoodSalesRelatedAndUnrelatedDateDimensionsTest.class,
             EmbeddedAdTest.class,
             GoodSalesInsightTest.class,

@@ -48,7 +48,7 @@ public class TemplateAbstractTest extends AbstractProjectTest{
     }
 
     @Override
-    protected void createNewProject() throws Throwable {
+    protected void createNewProject() {
         if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
             testParams.setProjectId(createProject(new RestClient(getProfile(Profile.ADMIN)), projectTitle, projectTemplate,
