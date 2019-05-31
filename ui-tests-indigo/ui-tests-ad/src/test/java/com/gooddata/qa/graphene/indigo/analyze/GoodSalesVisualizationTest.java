@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -271,67 +270,63 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void switchReportWithDateAttributes() {
+    public void switchReportWithDateAttributesAtFirstPosition() {
         setExtendedStackingFlag(false);
         try {
-            final StacksBucket stacksBucket = initAnalysePage().getStacksBucket();
-            final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
-
-            analysisPage.changeReportType(ReportType.TABLE)
-                .addDate()
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addAttribute(ATTR_DEPARTMENT);
+            initAnalysePage().changeReportType(ReportType.TABLE)
+                    .addDate()
+                    .addAttribute(ATTR_ACTIVITY_TYPE)
+                    .addAttribute(ATTR_DEPARTMENT);
 
             Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                .forEach(type -> {
-                    analysisPage.changeReportType(type);
-                    takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
-                    assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-                    assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
-                    analysisPage.undo();
-            });
+                    .forEach(type -> {
+                        analysisPage.changeReportType(type);
+                        takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
+                        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
+                        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
+                    });
+        } finally {
+            setExtendedStackingFlag(true);
+        }
+    }
 
-            analysisPage.resetToBlankState()
-                .changeReportType(ReportType.TABLE)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addDate()
-                .addAttribute(ATTR_DEPARTMENT);
+    @Test(dependsOnGroups = {"createProject"})
+    public void switchReportWithDateAttributesAtSecondPosition() {
+        setExtendedStackingFlag(false);
+        try {
+            initAnalysePage().changeReportType(ReportType.TABLE)
+                    .addAttribute(ATTR_ACTIVITY_TYPE)
+                    .addDate()
+                    .addAttribute(ATTR_DEPARTMENT);
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
-                .forEach(type -> {
-                    analysisPage.changeReportType(type);
-                    takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
-                    assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-                    assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                    analysisPage.undo();
-            });
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+                    .forEach(type -> {
+                        analysisPage.changeReportType(type);
+                        takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
+                        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
+                        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
+                    });
+        } finally {
+            setExtendedStackingFlag(true);
+        }
+    }
 
-            analysisPage.changeReportType(ReportType.LINE_CHART);
-            takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
-                    getClass());
-            assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-            assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
-
-            analysisPage.resetToBlankState()
-                .changeReportType(ReportType.TABLE)
+    @Test(dependsOnGroups = {"createProject"})
+    public void switchReportWithDateAttributesAtThirdPosition() {
+        setExtendedStackingFlag(false);
+        try {
+            initAnalysePage().changeReportType(ReportType.TABLE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addAttribute(ATTR_DEPARTMENT)
                 .addDate();
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
                 .forEach(type -> {
                     analysisPage.changeReportType(type);
                     takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
-                    assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
-                    assertEquals(categoriesBucket.getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                    analysisPage.undo();
+                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
+                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
             });
-
-            analysisPage.changeReportType(ReportType.LINE_CHART);
-            takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
-                    getClass());
-            assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
-            assertEquals(categoriesBucket.getItemNames(), singletonList(DATE));
         } finally {
             setExtendedStackingFlag(true);
         }
