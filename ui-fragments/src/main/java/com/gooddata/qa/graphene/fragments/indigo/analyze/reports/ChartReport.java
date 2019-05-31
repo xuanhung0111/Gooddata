@@ -177,6 +177,12 @@ public class ChartReport extends AbstractFragment {
             return waitForCollectionIsNotEmpty(trackers).size();
         }
 
+        if (isPieChart()) {
+            return (int) waitForCollectionIsNotEmpty(trackers).stream()
+                    .filter(e -> isElementVisible(e))
+                    .count();
+        }
+
         return (int) waitForCollectionIsNotEmpty(trackers).stream()
             .map(e -> e.getAttribute("height"))
             .map(Integer::parseInt)
@@ -219,6 +225,19 @@ public class ChartReport extends AbstractFragment {
         return waitForCollectionIsNotEmpty(legendNames).stream()
             .map(e -> e.getText())
             .collect(toList());
+    }
+
+    public void clickLegend(String nameLegend) {
+        clickLegend(nameLegend, 0);
+    }
+
+    //using index to specific Legend which has the same name
+    public void clickLegend(String nameLegend, int index) {
+        waitForCollectionIsNotEmpty(legendNames)
+            .stream()
+            .filter(e -> nameLegend.equals(e.getText()))
+            .collect(toList())
+            .get(index).click();
     }
 
     public List<String> getLegendIndicators() {
@@ -295,6 +314,10 @@ public class ChartReport extends AbstractFragment {
 
     private boolean isLineChart() {
         return getRoot().getAttribute("class").contains("visualization-line");
+    }
+
+    private boolean isPieChart() {
+        return getRoot().getAttribute("class").contains("visualization-pie");
     }
 
     private List<String> getLabels(Collection<WebElement> labels) {
