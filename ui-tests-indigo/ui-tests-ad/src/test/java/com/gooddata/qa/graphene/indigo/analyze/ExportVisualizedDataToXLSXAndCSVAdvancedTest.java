@@ -77,6 +77,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
         metrics.createAvgAmountMetric();
         metrics.createAmountBOPMetric();
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ACTIVE_FILTER_CONTEXT, false);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
         factRestRequest = new FactRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -319,7 +320,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT, FieldType.FACT)
                 .waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
 
-            assertEquals(ElementUtils.getErrorMessage(browser), "Failed to export the data. Try again later.");
+            assertEquals(ElementUtils.getErrorMessage(browser), "You cannot export this insight because it contains restricted data.");
         } finally {
             factRestRequest.unsetFactRestricted(factUri);
         }
