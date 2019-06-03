@@ -86,7 +86,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
                 .withIndustry("Government");
     }
 
-    @Test
+    @Test(groups = {"sanity"})
     public void verifyEnvironment() {
         if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) {
@@ -101,7 +101,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             .registerNewAccount();
     }
 
-    @Test
+    @Test(dependsOnMethods = "verifyEnvironment")
     public void registerUserWithInvalidPasswordValidation() throws ParseException, JSONException {
         final SoftAssert softAssert = new SoftAssert();
 
@@ -149,7 +149,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         softAssert.assertAll();
     }
 
-    @Test
+    @Test(dependsOnMethods = "verifyEnvironment")
     public void registerUserWithInvalidValue() throws ParseException, JSONException {
         initRegistrationPage()
             .fillInRegistrationForm(new RegistrationForm())
