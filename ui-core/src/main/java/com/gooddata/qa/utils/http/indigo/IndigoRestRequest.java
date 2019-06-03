@@ -504,14 +504,18 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets)
             throws JSONException {
-        final LinkedHashMap<Type, List<CategoryBucket>> categoryBucketGroup = categoryBuckets.stream()
+        final LinkedHashMap<CategoryBucket.Type, List<CategoryBucket>> categoryBucketGroup = categoryBuckets.stream()
                 .collect(Collectors.groupingBy(CategoryBucket::getType, LinkedHashMap::new, Collectors.toList()));
+        final LinkedHashMap<MeasureBucket.Type, List<MeasureBucket>> measureBucketGroup = measureBuckets.stream()
+                .collect(Collectors.groupingBy(MeasureBucket::getType, LinkedHashMap::new, Collectors.toList()));
 
         return new JSONArray() {{
-            put(new JSONObject() {{
-                put("localIdentifier", "measures");
-                put("items", initMeasureObjects(measureBuckets));
-            }});
+            measureBucketGroup.forEach((type, measureBuckets) -> {
+                put(new JSONObject() {{
+                    put("localIdentifier", type.toString().toLowerCase());
+                    put("items", initMeasureObjects(measureBuckets));
+                }});
+            });
             categoryBucketGroup.forEach((type, categoryBuckets) -> {
                 put(new JSONObject() {{
                     put("localIdentifier", type.toString().toLowerCase());

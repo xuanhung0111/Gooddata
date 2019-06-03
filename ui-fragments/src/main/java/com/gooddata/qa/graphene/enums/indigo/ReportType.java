@@ -40,7 +40,8 @@ public enum ReportType {
         public String getStackByMessage() {
             return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE ATTRIBUTE IN VIEW BY";
         }
-    };
+    },
+    COMBO_CHART("combo2");
 
     private String label;
 

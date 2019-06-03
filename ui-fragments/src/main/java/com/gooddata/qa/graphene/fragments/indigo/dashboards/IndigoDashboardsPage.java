@@ -103,7 +103,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = LEGEND_ITEM_ICON)
     private List<WebElement> legendIcons;
 
-    @FindBy(className = ".dash-item-action-delete")
+    @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteInsightItemButton;
 
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";

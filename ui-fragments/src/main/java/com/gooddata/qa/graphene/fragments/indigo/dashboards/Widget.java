@@ -46,6 +46,19 @@ public class Widget extends AbstractFragment {
                 .collect(toList());
     }
 
+    public void clickLegend(String nameLegend) {
+        clickLegend(nameLegend, 0);
+    }
+
+    //using index to specific Legend which has the same name
+    public void clickLegend(String nameLegend, int index) {
+        waitForCollectionIsNotEmpty(legendNames)
+            .stream()
+            .filter(e -> nameLegend.equals(e.getText()))
+            .collect(toList())
+            .get(index).click();
+    }
+
     public String getHeadline() {
         return waitForElementVisible(headline).getText().replace("\n", " ");
     }

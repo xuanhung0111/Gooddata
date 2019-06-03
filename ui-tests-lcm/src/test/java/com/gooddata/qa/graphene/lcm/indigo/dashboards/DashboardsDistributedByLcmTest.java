@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket.Type;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -47,7 +48,6 @@ import java.util.List;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
@@ -56,6 +56,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.COLORS;
@@ -87,6 +89,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1_" + generateHashString();
     private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
     private final String EXPORT_VISUALIZED_DATA_INSIGHT = "Export visualized insight" + generateHashString();
+    private final String COMBO_CHART_INSIGHT = "Combo Chart insight" + generateHashString();
     private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
     private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
@@ -119,6 +122,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         getMetricCreator().createOppFirstSnapshotMetric();
         getMetricCreator().createAmountMetric();
         getMetricCreator().createBestCaseMetric();
+        getMetricCreator().createAvgAmountMetric();
         
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -147,6 +151,13 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                         CategoryBucket.Type.ATTRIBUTE),
                     CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
                         CategoryBucket.Type.COLUMNS))));
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(COMBO_CHART_INSIGHT, ReportType.COMBO_CHART)
+                .setMeasureBucket(asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT), Type.SECONDARY_MEASURES)))
+                .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket(
+                    getAttributeByTitle(ATTR_DEPARTMENT), CategoryBucket.Type.ATTRIBUTE))));
 
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
@@ -387,6 +398,20 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             deleteIfExists(Paths.get(testParams.getExportFilePath(
                 EXPORT_VISUALIZED_DATA_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName())));
         }
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightAnalyseWithComboChart() {
+        ChartReport chartReport = initAnalysePage().openInsight(COMBO_CHART_INSIGHT)
+            .waitForReportComputing().getChartReport();
+
+        assertEquals(chartReport.getTrackerType(0, 0), "rect");
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+            asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(METRIC_AMOUNT, "$80,406,324.96")));
+
+        assertEquals(chartReport.getTrackerType(1, 0), "path");
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
+            asList(asList(ATTR_DEPARTMENT, "Inside Sales"), asList(METRIC_AVG_AMOUNT, "$18,329.52")));
     }
 
     @AfterClass(alwaysRun = true)

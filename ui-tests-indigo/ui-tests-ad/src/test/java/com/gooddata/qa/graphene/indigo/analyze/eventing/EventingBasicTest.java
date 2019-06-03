@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
+import static com.gooddata.qa.graphene.enums.indigo.ReportType.COMBO_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.TABLE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -25,6 +27,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -717,6 +721,42 @@ public class EventingBasicTest extends AbstractEventingTest {
         verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingComboReport() throws IOException {
+        String insightUri = createComboInsight("combo_insight", COMBO_CHART,
+            singletonList(METRIC_AMOUNT), singletonList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_DEPARTMENT);
+
+        final String amountUri = getMetricByTitle(METRIC_AMOUNT).getUri();
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final JSONArray uris = new JSONArray() {{
+            put(amountUri);
+            put(activityUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(0, 0));
+        JSONObject content = getLatestPostMessageObj();
+        verifyColumnDrillContext(content);
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 2);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_AMOUNT, amountUri);
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(1, 0));
+        content = getLatestPostMessageObj();
+        verifyLineDrillContext(content);
+
+        drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 2);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
         String uri = intersection.getJSONObject("header").getString("uri");
         String title = intersection.getString("title");
@@ -728,6 +768,14 @@ public class EventingBasicTest extends AbstractEventingTest {
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getString("type"), "column");
         assertEquals(drillContext.getString("element"), "bar");
+        assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
+        assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
+    }
+
+    private void verifyLineDrillContext(JSONObject content) {
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        assertEquals(drillContext.getString("type"), "line");
+        assertEquals(drillContext.getString("element"), "point");
         assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
         assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
     }
