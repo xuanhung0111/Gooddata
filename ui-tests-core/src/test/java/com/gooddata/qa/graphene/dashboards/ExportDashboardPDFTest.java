@@ -355,7 +355,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
             assertThat(contents, not(hasItems("Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid")));
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
+                    exportedDashboardName));
         }
     }
 
@@ -382,7 +382,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
             assertThat(contents, not(hasItems("Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid")));
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
+                    exportedDashboardName));
         }
     }
 
@@ -408,7 +408,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
             assertThat(contents, hasItem("PRODUCT"));
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
+                    exportedDashboardName));
         }
     }
 

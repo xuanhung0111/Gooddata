@@ -177,7 +177,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
             verifyDashboardExport(exportedDashboardName, "First Tab");
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
+                    exportedDashboardName));
         }
     }
 
@@ -204,7 +204,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         embededDashboard.printDashboardTab();
         try {
             checkRedBar(browser);
-            verifyDashboardExport(firstTab, firstTab);
+            verifyDashboardExport(firstTab + ".pdf", "First Tab");
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
                     firstTab + "." + ExportFormat.PDF.getName()));

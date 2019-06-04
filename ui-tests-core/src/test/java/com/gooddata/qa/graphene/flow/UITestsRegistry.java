@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.dashboards.ExportDashboardPDFTest;
 import com.gooddata.qa.graphene.dashboards.ExportDashboardXLSXTest;
 import com.gooddata.qa.graphene.dashboards.ExportDashboardXLSXAdvancedTest;
 import com.gooddata.qa.graphene.dashboards.ExportEmbeddedDashboardXLSXTest;
+import com.gooddata.qa.graphene.dashboards.ExportDashboardAndComparePDFBasicTest;
 import com.gooddata.qa.graphene.dashboards.PrintDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
@@ -304,6 +305,7 @@ public class UITestsRegistry {
             ExportDashboardXLSXAdvancedTest.class,
             ExportEmbeddedDashboardXLSXTest.class,
             PrintDashboardTest.class,
+            ExportDashboardAndComparePDFBasicTest.class,
             "testng-imap-GoodSales-email-unsubscribe.xml",
             "testng-imap-GoodSales-email-schedule-full.xml",
             "testng-imap-GoodSales-email-schedule-dashboard.xml",

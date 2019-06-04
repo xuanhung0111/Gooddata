@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.utils.PdfUtils;
+import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,6 +39,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -264,7 +266,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             return;
         }
 
-        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName);
         System.out.println("pdfExport = " + pdfExport);
         Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.exists() && pdfExport.length() != 0;
         Graphene.waitGui()
@@ -621,5 +623,18 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public enum EmbeddedType {
         IFRAME, URL
+    }
+
+    public boolean comparePDF(String exportedDashboardName) throws IOException {
+        String PDFTemplateName = exportedDashboardName.replaceAll("_[a-z0-9]{5}", "");
+        File PDFExport = new File(testParams.getExportFilePath(exportedDashboardName));
+        if (!PDFExport.exists()) {
+            throw new RuntimeException("Exported PDF File " + exportedDashboardName + " not found ");
+        }
+        File PDFTemplate = new File("src/test/resources/pdfTemplate/" + PDFTemplateName);
+        if (!PDFTemplate.exists()) {
+            throw new RuntimeException("Template PDF File " + PDFTemplateName + " not found ");
+        }
+        return PdfUtils.comparePDF(PDFExport.getPath(), PDFTemplate.getPath());
     }
 }
