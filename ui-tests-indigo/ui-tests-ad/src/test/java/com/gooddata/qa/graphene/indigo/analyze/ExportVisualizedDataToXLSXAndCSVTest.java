@@ -14,10 +14,12 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisP
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.DataProvider;
@@ -70,6 +72,9 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
         metrics.createAmountBOPMetric();
 
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ACTIVE_FILTER_CONTEXT, false);
     }
 
     @Test(dependsOnGroups = "createProject")
