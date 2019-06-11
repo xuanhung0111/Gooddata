@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc.projects;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static java.util.stream.Collectors.toList;
@@ -96,6 +97,10 @@ public class ProjectDetailPage extends AbstractFragment {
 
     public boolean hasProcess(String processName) {
         return findProcess(Restriction.NAME, processName).isPresent();
+    }
+
+    public boolean isDeployProcessFormVisible() {
+        return isElementVisible(DeployProcessForm.LOCATOR, browser);
     }
 
     public DeployProcessForm clickDeployButton() {

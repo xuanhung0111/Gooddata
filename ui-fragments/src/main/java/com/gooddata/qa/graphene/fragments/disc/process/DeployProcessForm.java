@@ -21,7 +21,10 @@ import com.gooddata.qa.browser.BrowserUtils;
 
 public class DeployProcessForm extends AbstractFragment {
 
-    private static final By LOCATOR = By.className("ait-process-deploy-fragment");
+    public static final By LOCATOR = By.className("ait-process-deploy-fragment");
+
+    @FindBy(className = "deploy-process-dialog-area")
+    private WebElement dialogArea;
 
     @FindBy(css = "input[value='ZIP']")
     private WebElement zipFileOption;
@@ -61,6 +64,9 @@ public class DeployProcessForm extends AbstractFragment {
 
     @FindBy(css = ".form-title .input-checkbox")
     private WebElement s3ServerSideEncryptionInput;
+
+    @FindBy(className = "process-type-link-to-help")
+    private WebElement learnMore;
 
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
@@ -209,6 +215,10 @@ public class DeployProcessForm extends AbstractFragment {
         return this;
     }
 
+    public DeploySDDProcessDialog selectADDProcess() {
+        selectProcessType(ProcessType.AUTOMATED_DATA_DISTRIBUTION);
+        return DeploySDDProcessDialog.getInstance(browser);
+    }
     public String getS3ConfigurationPath() {
         return waitForElementVisible(s3ConfigurationPathInput).getAttribute("value");
     }
@@ -220,6 +230,11 @@ public class DeployProcessForm extends AbstractFragment {
     public String getS3Region() {
         expandAdditionalParamsArea();
         return waitForElementVisible(s3RegionInput).getAttribute("value");
+    }
+
+    public String getRedirectedPageFromLearnMore() {
+        return waitForElementVisible(learnMore.findElement(By.className("action-important-link")))
+                .getAttribute("href");
     }
 
     public boolean isAdditionalParamsExpand() {
@@ -307,7 +322,8 @@ public class DeployProcessForm extends AbstractFragment {
         GOOGLE_ANALYTICS_DOWNLOADER("gdc-etl-ga-downloader", "Google Analytics Downloader"),
         SALESFORCE_DOWNLOADER("gdc-etl-salesforce-downloader", "Salesforce Downloader"),
         ADS_INTEGRATOR("gdc-etl-ads-integrator", "ADS Integrator"),
-        SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor");
+        SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor"),
+        AUTOMATED_DATA_DISTRIBUTION("gdc-data-distribution", "Automated Data Distribution");
 
         private String value;
         private String title;
