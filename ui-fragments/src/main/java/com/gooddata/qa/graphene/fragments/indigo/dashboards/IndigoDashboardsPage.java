@@ -85,7 +85,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "dash-title")
     private WebElement dashboardTitle;
 
-    @FindBy(className = "button-text")
+    @FindBy(className = "gd-button-text")
     private WebElement dashboardTitleOnMobile;
 
     @FindBy(className = "navigation-list")
