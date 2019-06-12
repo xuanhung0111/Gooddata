@@ -224,19 +224,15 @@ public class TableTest extends AbstractAdE2ETest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        try {
-            setExtendedStackingFlag(false);
-            assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
-                        analysisPage.getAttributesBucket().getRoot())
-                .getAttributesBucket()
-                .getItemNames()
-                .size(), 1);
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+    public void should_not_be_possible_to_drag_more_than_two_attributes_to_bar__view_by() {
+        assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
+                    analysisPage.getAttributesBucket().getRoot())
+            .getAttributesBucket()
+            .getItemNames()
+            .size(), 2);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -269,9 +265,5 @@ public class TableTest extends AbstractAdE2ETest {
 
     private Integer unformatNumber(String number) {
         return new Integer(number.replace(",", ""));
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

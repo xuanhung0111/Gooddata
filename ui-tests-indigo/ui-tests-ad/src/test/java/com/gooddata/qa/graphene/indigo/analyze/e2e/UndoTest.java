@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -43,27 +42,25 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_one_version_per_user_action() {
-        try {
-            setExtendedStackingFlag(false);
-            // 1st version
-            MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        // 1st version
+        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
-            // 2nd version
-            analysisPage.addDate();
+        // 2nd version
+        analysisPage.addDate();
 
-            // 3rd version
-            configuration.showPercents();
+        // 3rd version
+        configuration.showPercents();
 
-            // 4th version -- switch category and turn off pop
-            analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+        // 4th version
+        analysisPage.addAttribute(ATTR_DEPARTMENT);
 
-            IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        // 5th version -- switch category and turn off pop
+        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+
+        IntStream.rangeClosed(0, 4).forEach(i -> analysisPage.undo());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -124,9 +121,5 @@ public class UndoTest extends AbstractAdE2ETest {
             .removeAttribute(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isFilterVisible(ATTR_ACTIVITY_TYPE));
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
