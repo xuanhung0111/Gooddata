@@ -99,6 +99,7 @@ public class FilterTest extends AbstractReactSdkTest {
                 Pair.of("anotherElementOfAttribute", getAttributeElementUri(ATTR_ACTIVITY_TYPE, IN_PERSON_MEETING))
         );
         replaceContentAppJSFrom(TEMPLATE_ATTR_FILTER_INSIGHT_HAS_MEASURE_FILTER_ATTR);
+        initDashboardsPage(); //clear cache of localhost:3000
         SDKAnalysisPage sdkAnalysisPage = initSDKAnalysisPage();
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();

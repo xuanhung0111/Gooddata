@@ -101,6 +101,8 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
         dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         try {
+            assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMetricFormat(),
+                    Formatter.DEFAULT.toString());
             assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271.00");
         } finally {
             dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), "#,##0");
