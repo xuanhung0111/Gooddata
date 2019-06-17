@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -66,16 +67,16 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
 
-    @FindBy(css = ".highcharts-stack-labels text")
+    @FindBy(css = ".highcharts-stack-labels text tspan.highcharts-text-outline")
     private List<WebElement> totalsStackedColumn;
 
-    private static final By BY_X_AXIS_TITLE = className("highcharts-xaxis-title");
-    private static final By BY_Y_AXIS_TITLE = className("highcharts-yaxis-title");
+    private static final By BY_X_AXIS_TITLE = cssSelector(".highcharts-xaxis .highcharts-axis-title");
+    private static final By BY_Y_AXIS_TITLE = cssSelector(".highcharts-yaxis .highcharts-axis-title");
     private static final By BY_LEGEND = className("viz-static-legend-wrap");
-    private static final By BY_PRIMARY_Y_AXIS_TITLE = By.className("s-highcharts-primary-yaxis");
-    private static final By BY_SECONDARY_Y_AXIS_TITLE = By.className("s-highcharts-secondary-yaxis");
-    private static final By BY_PRIMARY_Y_AXIS = By.className("s-highcharts-primary-yaxis-labels");
-    private static final By BY_SECONDARY_Y_AXIS = By.className("s-highcharts-secondary-yaxis-labels");
+    private static final By BY_PRIMARY_Y_AXIS_TITLE = cssSelector(".highcharts-yaxis.s-highcharts-primary-yaxis");
+    private static final By BY_SECONDARY_Y_AXIS_TITLE = cssSelector(".highcharts-yaxis.s-highcharts-secondary-yaxis");
+    private static final By BY_PRIMARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-primary-yaxis");
+    private static final By BY_SECONDARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-secondary-yaxis");
 
     public static ChartReport getInstance(SearchContext context) {
         return Graphene.createPageFragment(ChartReport.class,
@@ -100,7 +101,7 @@ public class ChartReport extends AbstractFragment {
 
     public void clickOnDataLabel(Pair<Integer, Integer> position) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot().findElements(
-                By.cssSelector(String.format(".highcharts-data-labels.highcharts-series-%s g", position.getLeft()))));
+                cssSelector(String.format(".highcharts-data-labels.highcharts-series-%s g", position.getLeft()))));
         WebElement element = list.get(position.getRight());
         getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
     }
@@ -209,11 +210,11 @@ public class ChartReport extends AbstractFragment {
     }
 
     public boolean areLegendsHorizontal() {
-        return isElementVisible(By.cssSelector(".viz-legend.position-top"), browser);
+        return isElementVisible(cssSelector(".viz-legend.position-top"), browser);
     }
 
     public boolean areLegendsVertical() {
-        return isElementVisible(By.cssSelector(".viz-legend.position-right"), browser);
+        return isElementVisible(cssSelector(".viz-legend.position-right"), browser);
     }
 
     public boolean isShortenNameInLegend(String measureName, int width) {
@@ -247,7 +248,7 @@ public class ChartReport extends AbstractFragment {
     }
 
     public Boolean isLegendIndicatorPresent() {
-        return isElementPresent(By.cssSelector(LEGEND_INDICATOR), getRoot());
+        return isElementPresent(cssSelector(LEGEND_INDICATOR), getRoot());
     }
 
     public List<String> getLegendColors() {
@@ -335,9 +336,9 @@ public class ChartReport extends AbstractFragment {
     }
 
     private List<List<String>> getTooltipText() {
-        return waitForCollectionIsNotEmpty(tooltip.findElements(By.cssSelector("tr"))).stream()
-                .map(row -> asList(row.findElement(By.cssSelector(".title")).getText(),
-                        row.findElement(By.cssSelector(".value")).getText()))
+        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector("tr"))).stream()
+                .map(row -> asList(row.findElement(cssSelector(".title")).getText(),
+                        row.findElement(cssSelector(".value")).getText()))
                 .collect(Collectors.toList());
     }
 
@@ -350,7 +351,7 @@ public class ChartReport extends AbstractFragment {
 
     private WebElement getTracker(int groupIndex, int index) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
-                .findElements(By.cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
+                .findElements(cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
                         ".highcharts-series-%s.highcharts-tracker path," +
                         ".highcharts-series-%s.highcharts-tracker circle", groupIndex, groupIndex, groupIndex))));
         return list.get(index);
