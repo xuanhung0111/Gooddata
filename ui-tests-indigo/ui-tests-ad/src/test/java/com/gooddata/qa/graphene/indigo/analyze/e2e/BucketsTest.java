@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
@@ -12,7 +13,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -156,24 +156,19 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_not_swap_if_date_dimension_is_present() {
-        try {
-            setExtendedStackingFlag(false);
-            initAnalysePage().addDate()
+        initAnalysePage().addDate().addAttribute(ATTR_DEPARTMENT)
                 .addStack(ATTR_ACTIVITY_TYPE)
                 // Drag date to stack by
                 .tryToDrag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
 
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE));
-            assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE, ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
 
-            // Drag stacking attribute to x-axis category
-            analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
+        // Drag stacking attribute to x-axis category
+        analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
 
-            assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -208,33 +203,28 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_disable_stack_bucket_when_trending_recommendation_and_compare_are_applied() {
-        try {
-            setExtendedStackingFlag(false);
-            MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .getMetricsBucket()
-                    .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-                    .expandConfiguration();
+        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .getMetricsBucket()
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
 
-            assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
 
-            Graphene.createPageFragment(RecommendationContainer.class,
-                    waitForElementVisible(RecommendationContainer.LOCATOR, browser))
-                    .getRecommendation(RecommendationStep.SEE_TREND).apply();
+        Graphene.createPageFragment(RecommendationContainer.class,
+                waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+                .getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-            analysisPage.waitForReportComputing();
-            assertTrue(configuration.showPercents().isShowPercentSelected());
-            assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
+        analysisPage.waitForReportComputing();
+        assertTrue(configuration.showPercents().isShowPercentSelected());
+        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
 
-            analysisPage.getFilterBuckets()
-                    .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
-            analysisPage.waitForReportComputing();
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
+        analysisPage.waitForReportComputing();
 
-            assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
-            assertEquals(analysisPage.getStacksBucket().getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
+        assertEquals(analysisPage.getStacksBucket().getWarningMessage(), ReportType.COLUMN_CHART.getExtendedStackByMessage());
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -252,29 +242,22 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_categories() {
-        try {
-            setExtendedStackingFlag(false);
-            assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
-                    .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_ACCOUNT)
-                    .getAttributesBucket()
-                    .getItemNames(), asList(ATTR_ACCOUNT));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
-
+        assertEquals(initAnalysePage()
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_ACCOUNT)
+            .getAttributesBucket()
+            .getItemNames(), asList(ATTR_ACCOUNT, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_category_with_date() {
-        try {
-            setExtendedStackingFlag(false);
-            assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
-                .replaceAttributeWithDate(ATTR_ACTIVITY_TYPE)
-                .getAttributesBucket()
-                .getItemNames(), asList(DATE));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertEquals(initAnalysePage()
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .replaceAttributeWithDate(ATTR_ACTIVITY_TYPE)
+            .getAttributesBucket()
+            .getItemNames(), asList(DATE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -283,9 +266,5 @@ public class BucketsTest extends AbstractAdE2ETest {
             .replaceStack(ATTR_ACCOUNT)
             .getStacksBucket()
             .getAttributeName(), ATTR_ACCOUNT);
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
