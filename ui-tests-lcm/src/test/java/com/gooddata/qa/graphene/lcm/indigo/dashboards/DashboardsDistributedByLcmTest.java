@@ -230,7 +230,6 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightWithColorPickerConfiguration() {
         setCustomColorPickerFlag(true);
-        setExtendedStackingFlag(false);
         try {
             ChartReport chartReport = initAnalysePage().openInsight(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER)
                     .waitForReportComputing().getChartReport();
@@ -240,7 +239,6 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             assertEquals(chartReport.getLegendColors(), asList(ColorPalette.YELLOW.toString(), ColorPalette.GREEN.toString()));
         }finally {
             setCustomColorPickerFlag(false);
-            setExtendedStackingFlag(true);
         }
     }
 
@@ -441,7 +439,6 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     private void createInsightToTestCustomColorPicker() {
         setCustomColorPickerFlag(true);
-        setExtendedStackingFlag(false);
         try {
             createInsightHasAttributeOnStackByAndViewBy(INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER,
                     METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
@@ -453,7 +450,6 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             analysisPage.waitForReportComputing().saveInsight();
         } finally {
             setCustomColorPickerFlag(false);
-            setExtendedStackingFlag(true);
         }
     }
 
@@ -466,16 +462,11 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                         CategoryBucket.Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
-                                        CategoryBucket.Type.ATTRIBUTE))));
+                                        CategoryBucket.Type.STACK))));
     }
 
     private void setCustomColorPickerFlag(boolean status) {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CUSTOM_COLOR_PICKER, status);
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

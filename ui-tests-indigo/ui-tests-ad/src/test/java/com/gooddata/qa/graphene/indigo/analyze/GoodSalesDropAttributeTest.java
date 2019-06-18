@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -60,22 +61,17 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void dropThirdAttributeToBucket() {
-        setExtendedStackingFlag(false);
-        try {
-            dropAttributeToReportHaveOneMetric();
+    public void dropFourthAttributeToBucket() {
+        dropAttributeToReportHaveOneMetric();
 
-            analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
-            Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
-            assertThat(addedAttributes, hasItem(PRIORITY));
-            assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
+        analysisPage.addAttribute(ATTR_IS_CLOSED).replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
+        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
+        assertThat(addedAttributes, hasItem(PRIORITY));
+        assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
 
-            analysisPage.replaceStack(REGION);
-            assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
-            checkingOpenAsReport("dropThirdAttributeToBucket");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        analysisPage.replaceStack(REGION);
+        assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
+        checkingOpenAsReport("dropThirdAttributeToBucket");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -157,9 +153,5 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
         analysisPage.redo().redo();
         assertEquals(stacksBucket.getAttributeName(), REGION);
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
