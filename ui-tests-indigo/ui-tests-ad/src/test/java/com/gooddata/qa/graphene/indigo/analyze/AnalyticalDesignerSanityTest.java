@@ -36,6 +36,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP_YEAR_AGO;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -44,6 +45,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -120,77 +122,67 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
-        setExtendedStackingFlag(false);
-        try {
-            ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .addAttribute(ATTR_ACTIVITY_TYPE)
-                    .waitForReportComputing()
-                    .getChartReport();
-            assertEquals(report.getTrackersCount(), 4);
-            RecommendationContainer recommendationContainer =
-                    Graphene.createPageFragment(RecommendationContainer.class,
-                            waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-            assertTrue(recommendationContainer
-                    .isRecommendationVisible(RecommendationStep.SEE_PERCENTS), "Recommendation should be visible");
-            recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-            assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
-                    "Report type should be " + ReportType.BAR_CHART);
-            assertEquals(report.getTrackersCount(), 4);
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
+                .getChartReport();
+        assertEquals(report.getTrackersCount(), 4);
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer
+                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS), "Recommendation should be visible");
+        recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
+                "Report type should be " + ReportType.BAR_CHART);
+        assertEquals(report.getTrackersCount(), 4);
 
-            MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                    .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
-                    .expandConfiguration();
-            assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
-            assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
 
-            assertTrue(analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing()
-                    .isReportTypeSelected(ReportType.BAR_CHART), "Report type should be " + ReportType.BAR_CHART);
-            assertEquals(report.getTrackersCount(), 2);
-            assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
-            assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
-            checkingOpenAsReport("testSimpleContribution");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        assertTrue(analysisPage.addAttribute(ATTR_IS_CLOSED).replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT)
+                .waitForReportComputing()
+                .isReportTypeSelected(ReportType.BAR_CHART), "Report type should be " + ReportType.BAR_CHART);
+        assertEquals(report.getTrackersCount(), 2);
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
+        checkingOpenAsReport("testSimpleContribution");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
-        setExtendedStackingFlag(false);
-        try {
-            ChartReport report = initAnalysePage()
-                    .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .waitForReportComputing()
-                    .getChartReport();
-            assertEquals(report.getTrackersCount(), 1);
-            RecommendationContainer recommendationContainer =
-                    Graphene.createPageFragment(RecommendationContainer.class,
-                            waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
-                    "Recommendation should be visible");
+        ChartReport report = initAnalysePage()
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
+        assertEquals(report.getTrackersCount(), 1);
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
-            ComparisonRecommendation comparisonRecommendation =
-                    recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-            comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-            assertThat(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames(),
-                    hasItem(ATTR_ACTIVITY_TYPE));
-            assertEquals(parseFilterText(analysisPage.getFilterBuckets()
-                    .getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
-            assertEquals(report.getTrackersCount(), 4);
-            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
-                    "Recommendation should be visible");
+        ComparisonRecommendation comparisonRecommendation =
+                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
+        comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
+        assertThat(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames(),
+                hasItem(ATTR_ACTIVITY_TYPE));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+                .getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
+        assertEquals(report.getTrackersCount(), 4);
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
-            analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-            assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(ATTR_DEPARTMENT));
-            assertEquals(parseFilterText(analysisPage.getFilterBuckets()
-                    .getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
-            assertEquals(report.getTrackersCount(), 2);
-            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
-                    "Recommendation should be visible");
-            checkingOpenAsReport("testSimpleComparison");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        analysisPage.addAttribute(ATTR_IS_CLOSED).replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT)
+            .waitForReportComputing();
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItems(ATTR_DEPARTMENT, ATTR_IS_CLOSED));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+                .getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
+        assertEquals(report.getTrackersCount(), 2);
+        checkingOpenAsReport("testSimpleComparison");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -324,9 +316,5 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
         analysisPage.addStack(ATTR_DEPARTMENT);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 8);
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

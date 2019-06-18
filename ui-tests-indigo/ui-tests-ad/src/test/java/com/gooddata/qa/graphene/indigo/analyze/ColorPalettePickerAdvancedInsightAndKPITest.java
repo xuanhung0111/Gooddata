@@ -195,7 +195,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
     @Test(dependsOnGroups = {"createProject"})
     public void testDisableCustomColorPickerFlagWithPaletteColorOnGreyPageTurnOff() {
         setCustomColorPickerFlag(false);
-        setExtendedStackingFlag(false);
         try {
             createInsightHasAttributeOnStackByAndViewBy(DEFAULT_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
@@ -229,13 +228,11 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                     ColorPalette.YELLOW.toString(), ColorPalette.LIME_GREEN.toString()));
         } finally {
             setCustomColorPickerFlag(false);
-            setExtendedStackingFlag(true);
         }
     }
 
     @Test(dependsOnMethods = {"testDisableCustomColorPickerFlagWithPaletteColorOnGreyPageTurnOff"})
     public void testDisableCustomColorPickerFlagWithPaletteColorOnGreyPageTurnOn() {
-        setExtendedStackingFlag(false);
         try {
             createInsightHasAttributeOnStackByAndViewBy(NEW_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
                     ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
@@ -259,7 +256,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                     ColorPalette.YELLOW.toString(), ColorPalette.GREEN.toString()));
         } finally {
             deleteColorPaletteOnGrayPage();
-            setExtendedStackingFlag(true);
         }
     }
 
@@ -334,27 +330,22 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
 
     @Test(dependsOnGroups = {"createProject"})
     public void testApplyColorPalettePickerOnKpi() {
-        setExtendedStackingFlag(false);
-        try {
-            createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PROJECT_WITH_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
-                    ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-            initAnalysePage().openInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForReportComputing()
-                    .openConfigurationPanelBucket().openColorConfiguration()
-                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
-                    .selectColor(ColorPalette.PURPLE.toReportFormatString());
-            analysisPage.saveInsight();
-            IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
-                    .addInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForWidgetsLoading()
-                    .selectDateFilterByName(DATE_FILTER_ALL_TIME).clickDashboardBody()
-                    .changeDashboardTitle(KPI_DASHBOARD)
-                    .saveEditModeWithWidgets();
-            assertEquals(indigoDashboardsPage.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
-            assertEquals(indigoDashboardsPage.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
-            assertEquals(indigoDashboardsPage.getKpiLegendColors(), asList(
-                    ColorPalette.PURPLE.toString(), ColorPalette.LIME_GREEN.toString()));
-        }finally {
-            setExtendedStackingFlag(true);
-        }
+        createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PROJECT_WITH_INSIGHT, METRIC_NUMBER_OF_ACTIVITIES,
+                ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        initAnalysePage().openInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
+        analysisPage.saveInsight();
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
+                .addInsight(IMPORT_EXPORT_PROJECT_WITH_INSIGHT).waitForWidgetsLoading()
+                .selectDateFilterByName(DATE_FILTER_ALL_TIME).clickDashboardBody()
+                .changeDashboardTitle(KPI_DASHBOARD)
+                .saveEditModeWithWidgets();
+        assertEquals(indigoDashboardsPage.checkColorColumn(0, 0), ColorPalette.PURPLE.toString());
+        assertEquals(indigoDashboardsPage.checkColorColumn(1, 0), ColorPalette.LIME_GREEN.toString());
+        assertEquals(indigoDashboardsPage.getKpiLegendColors(), asList(
+                ColorPalette.PURPLE.toString(), ColorPalette.LIME_GREEN.toString()));
     }
 
     @Test(dependsOnMethods = {"testApplyColorPalettePickerOnKpi"})
@@ -363,7 +354,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
         String exportToken = exportProject(
                 true, true, true, statusPollingCheckIterations);
         testParams.setProjectId(targetProjectId);
-        setExtendedStackingFlag(false);
         try {
             importProject(exportToken, statusPollingCheckIterations);
             IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets()
@@ -376,7 +366,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                     ColorPalette.PURPLE.toString(), ColorPalette.LIME_GREEN.toString()));
         } finally {
             testParams.setProjectId(sourceProjectId);
-            setExtendedStackingFlag(true);
         }
     }
 
@@ -384,7 +373,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
     public void testPartialExportAndImportWithInsight() {
         String exportToken = exportPartialProject();
         testParams.setProjectId(targetProjectId);
-        setExtendedStackingFlag(false);
         try {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             ChartReport chartReport = initAnalysePage().openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT)
@@ -396,7 +384,6 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                     ColorPalette.CYAN.toString(), ColorPalette.LIME_GREEN.toString()));
         } finally {
             testParams.setProjectId(sourceProjectId);
-            setExtendedStackingFlag(true);
             if (nonNull(targetProjectId)) {
                 deleteProject(targetProjectId);
             }
@@ -423,16 +410,11 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                                     CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                             CategoryBucket.Type.ATTRIBUTE),
                                     CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
-                                            CategoryBucket.Type.ATTRIBUTE))));
+                                            CategoryBucket.Type.STACK))));
     }
 
     private void setCustomColorPickerFlag(boolean status) {
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CUSTOM_COLOR_PICKER, status);
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 
     private void applyColorPaletteOnGrayPage() {
@@ -443,18 +425,13 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
         indigoRestRequest.deleteColorsPalette();
     }
 
-    private String exportPartialProject(){
-        setExtendedStackingFlag(false);
-        try {
-            String insight = createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT,
-                    METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-            initAnalysePage().openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT).waitForReportComputing()
-                    .openConfigurationPanelBucket().openColorConfiguration()
-                    .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
-                    .selectColor(ColorPalette.PURPLE.toReportFormatString());
-            return exportPartialProject(insight, DEFAULT_PROJECT_CHECK_LIMIT);
-        }finally {
-            setExtendedStackingFlag(true);
-        }
+    private String exportPartialProject() {
+        String insight = createInsightHasAttributeOnStackByAndViewBy(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT,
+                METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        initAnalysePage().openInsight(IMPORT_EXPORT_PARTIAL_PROJECT_WITH_INSIGHT).waitForReportComputing()
+                .openConfigurationPanelBucket().openColorConfiguration()
+                .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
+                .selectColor(ColorPalette.PURPLE.toReportFormatString());
+        return exportPartialProject(insight, DEFAULT_PROJECT_CHECK_LIMIT);
     }
 }

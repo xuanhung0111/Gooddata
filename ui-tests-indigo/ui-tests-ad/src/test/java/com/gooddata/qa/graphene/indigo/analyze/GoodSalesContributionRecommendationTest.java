@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -41,38 +42,34 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
-        setExtendedStackingFlag(false);
-        try {
-            ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .addAttribute(ATTR_ACTIVITY_TYPE)
-                    .waitForReportComputing()
-                    .getChartReport();
-            assertEquals(report.getTrackersCount(), 4);
-            RecommendationContainer recommendationContainer =
-                    Graphene.createPageFragment(RecommendationContainer.class,
-                            waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS),
-                    "See trend recommendation should display");
-            recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-            assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
-                    "Report type should be bar chart");
-            assertEquals(report.getTrackersCount(), 4);
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
+                .getChartReport();
+        assertEquals(report.getTrackersCount(), 4);
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS),
+                "See trend recommendation should display");
+        recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
+                "Report type should be bar chart");
+        assertEquals(report.getTrackersCount(), 4);
 
-            MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                    .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
-                    .expandConfiguration();
-            assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
-            assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
 
-            analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-            assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART), "Should be bar chart");
-            assertEquals(report.getTrackersCount(), 2);
-            assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
-            assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
-            checkingOpenAsReport("testSimpleContribution");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        analysisPage.addAttribute(ATTR_REGION).replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT)
+            .waitForReportComputing();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART), "Should be bar chart");
+        assertEquals(report.getTrackersCount(), 4);
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
+        checkingOpenAsReport("testSimpleContribution");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -95,9 +92,5 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS),
                 "See trend recommendation should display");
         checkingOpenAsReport("testAnotherApproachToShowContribution");
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

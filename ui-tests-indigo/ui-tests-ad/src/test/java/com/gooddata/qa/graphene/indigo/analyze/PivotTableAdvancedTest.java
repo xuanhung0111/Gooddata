@@ -615,8 +615,4 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                         .setMeasureBucket(
                                 singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))));
     }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
-    }
 }

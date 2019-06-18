@@ -1,13 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONArray;
 import org.testng.annotations.Test;
 
@@ -44,33 +41,21 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testVisualizationOfDrillingUrisReports() throws IOException {
-        try {
-            setExtendedStackingFlag(false);
-
-            JSONArray uris = new JSONArray() {{
-                put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri());
-            }};
-            final String file = createTemplateHtmlFile(insightObjectId, uris.toString());
-            verifyUnderlineAndHighlight(file);
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        JSONArray uris = new JSONArray() {{
+            put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri());
+        }};
+        final String file = createTemplateHtmlFile(insightObjectId, uris.toString());
+        verifyUnderlineAndHighlight(file);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testVisualizationOfDrillingIdentifiersReports() throws IOException {
-        try {
-            setExtendedStackingFlag(false);
-            
-            JSONArray identifiers = new JSONArray() {{
-                put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getIdentifier());
-            }};
-            final String file = createTemplateHtmlFile(insightObjectId,
-                    "[]", identifiers.toString());
-            verifyUnderlineAndHighlight(file);
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        JSONArray identifiers = new JSONArray() {{
+            put(getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getIdentifier());
+        }};
+        final String file = createTemplateHtmlFile(insightObjectId,
+                "[]", identifiers.toString());
+        verifyUnderlineAndHighlight(file);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -143,10 +128,5 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
         assertTrue(chartReport
                         .isColumnHighlighted(getColumnPosition(chartReport, "East Coast", "Email")),
                 "Chart(East Coast, Email) should be highlighted");
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }

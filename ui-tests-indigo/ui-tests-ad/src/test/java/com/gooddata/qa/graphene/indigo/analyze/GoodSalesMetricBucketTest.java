@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -200,38 +201,29 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void compareIsStillActiveWhenReplaceAttribute() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addDate();
-            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                    "Tracker should display");
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addDate().addAttribute(ATTR_IS_CLOSED);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
-            analysisPage.getFilterBuckets()
-                    .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
-            analysisPage.waitForReportComputing();
+        analysisPage.waitForReportComputing();
 
-            assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                    asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
+                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
-            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                    "Tracker should display");
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
-            analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-            assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
-                    "Tracker should display");
-            assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                    asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-            checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
-        } finally {
-            setExtendedStackingFlag(true);
-        }
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
+        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
+                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_IS_CLOSED));
+        checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
     }
 }

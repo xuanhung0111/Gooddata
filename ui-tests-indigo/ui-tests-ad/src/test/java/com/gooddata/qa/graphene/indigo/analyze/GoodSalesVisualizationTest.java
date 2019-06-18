@@ -46,6 +46,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
@@ -214,122 +215,96 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasOneMetricManyAttributes() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addAttribute(ATTR_DEPARTMENT)
-                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TABLE)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                .forEach(type -> {
-                    analysisPage.changeReportType(type);
-                    takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
-                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
-                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                    assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
-                    analysisPage.undo();
-            });
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
+                assertEquals(analysisPage.getStacksBucket().getAttributeName(), EMPTY);
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+                analysisPage.undo();
+        });
 
-            analysisPage.changeReportType(ReportType.COLUMN_CHART)
-                .changeReportType(ReportType.TABLE);
-            takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .changeReportType(ReportType.TABLE);
+        takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasManyMetricsManyAttributes() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addAttribute(ATTR_DEPARTMENT)
-                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addMetric(METRIC_QUOTA)
-                .waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TABLE)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_QUOTA)
+            .waitForReportComputing();
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                .forEach(type -> {
-                    analysisPage.changeReportType(type);
-                    takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
-                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-                    assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
-                    analysisPage.undo();
-            });
-            analysisPage.changeReportType(ReportType.COLUMN_CHART)
-                .changeReportType(ReportType.TABLE);
-            takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+                assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getExtendedStackByMessage());
+                analysisPage.undo();
+        });
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .changeReportType(ReportType.TABLE);
+        takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributesAtFirstPosition() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE)
-                    .addDate()
-                    .addAttribute(ATTR_ACTIVITY_TYPE)
-                    .addAttribute(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.TABLE)
+                .addDate()
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT);
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                    .forEach(type -> {
-                        analysisPage.changeReportType(type);
-                        takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
-                        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
-                        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
-                    });
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
+                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE, ATTR_ACTIVITY_TYPE));
+                });
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributesAtSecondPosition() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE)
-                    .addAttribute(ATTR_ACTIVITY_TYPE)
-                    .addDate()
-                    .addAttribute(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.TABLE)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .addDate()
+                .addAttribute(ATTR_DEPARTMENT);
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                    .forEach(type -> {
-                        analysisPage.changeReportType(type);
-                        takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
-                        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
-                        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
-                    });
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+                .forEach(type -> {
+                    analysisPage.changeReportType(type);
+                    takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
+                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, DATE));
+                });
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributesAtThirdPosition() {
-        setExtendedStackingFlag(false);
-        try {
-            initAnalysePage().changeReportType(ReportType.TABLE)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addAttribute(ATTR_DEPARTMENT)
-                .addDate();
+        initAnalysePage().changeReportType(ReportType.TABLE)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addDate();
 
-            Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
-                .forEach(type -> {
-                    analysisPage.changeReportType(type);
-                    takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
-                    assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
-                    assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
-            });
-        } finally {
-            setExtendedStackingFlag(true);
-        }
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
+                assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE, ATTR_ACTIVITY_TYPE));
+        });
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -369,9 +344,5 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
             .collect(toList());
         assertEquals(headers, Stream.of(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS,
                 METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_WON_OPPS).map(String::toLowerCase).collect(toList()));
-    }
-
-    private void setExtendedStackingFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXTENDED_STACKING, status);
     }
 }
