@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -29,6 +30,9 @@ public class SplashScreen extends AbstractFragment {
         // wait until initial animation (css-based) is finished before clicking
         sleepTightInSeconds(1);
         waitForElementVisible(createKpiDashboardButton).click();
+        waitForElementNotVisible(createKpiDashboardButton);
+        //Splash screen is fading, not disappear immediately
+        waitForElementNotVisible(By.className("splashscreen-content"), getRoot());
         return IndigoDashboardsPage.getInstance(browser);
     }
 
