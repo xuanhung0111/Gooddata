@@ -65,6 +65,7 @@ public class EditorPermissionTest extends AbstractReactSdkTest {
         String treemap = "Treemap " + generateHashString();
         createInsight(treemap, ReportType.TREE_MAP, singletonList(METRIC_NUMBER_OF_ACTIVITIES),
                 singletonList(ATTR_DEPARTMENT));
+        initAnalysePage().openInsight(treemap);
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
