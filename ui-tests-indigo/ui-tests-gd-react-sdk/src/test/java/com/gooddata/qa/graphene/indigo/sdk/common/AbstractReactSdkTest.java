@@ -4,6 +4,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -40,7 +41,15 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         File appFile = appPath.toFile();
         Files.copy(Paths.get(getFilePathFromResource("/" + fileName)), appPath, REPLACE_EXISTING);
         log.info("Waiting for updating " + appFile.getAbsolutePath());
-        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(browser -> appFile.exists() && appFile.length() > 0);
+        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
+                browser -> appFile.isFile() && appFile.exists() && appFile.length() > 0);
+        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
+                browser -> {
+                    long length = appFile.length();
+                    Sleeper.sleepTightInSeconds(1);
+                    return length == appFile.length();
+                }
+        );
         log.info("Update completely");
     }
 

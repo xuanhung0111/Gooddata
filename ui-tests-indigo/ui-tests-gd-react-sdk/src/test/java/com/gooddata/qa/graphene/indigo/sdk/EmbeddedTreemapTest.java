@@ -258,6 +258,8 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         try {
+            assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMetricFormat(),
+                    Formatter.DEFAULT.toString());
             ChartReport chartReport = initSDKAnalysisPage().getChartReport();
             assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                     asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054.00")));

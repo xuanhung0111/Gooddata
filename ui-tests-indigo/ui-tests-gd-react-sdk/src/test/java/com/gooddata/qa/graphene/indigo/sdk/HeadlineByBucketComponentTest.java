@@ -102,6 +102,7 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
                 Pair.of("aliasMeasureTitle", alias));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_ALIAS_MEASURES);
 
+        initDashboardsPage(); //clear cache of localhost:3000
         Headline headline = initSDKAnalysisPage().getHeadline();
         assertEquals(headline.getPrimaryItem(), "154,271");
         assertEquals(headline.getSecondItem(), asList("$20,286.22", alias));
