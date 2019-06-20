@@ -19,6 +19,21 @@ public class Tab implements MdObject {
         return this;
     }
 
+    public Tab addWidget(Widget widget){
+        items.add(widget.getMdObject());
+        return this;
+    }
+
+    public Tab addText(Text text){
+        items.add(text.getMdObject());
+        return this;
+    }
+
+    public Tab addWebContent(WebContent webContent){
+        items.add(webContent.getMdObject());
+        return this;
+    }
+
     public Tab addItems(List<? extends TabItem> tabItems) {
         items.addAll(tabItems.stream().map(TabItem::getMdObject).collect(toList()));
         return this;

@@ -18,64 +18,72 @@ public class ExportDashboardDefinition {
         return projectName;
     }
 
-    public void setProjectName(String projectName) {
+    public ExportDashboardDefinition setProjectName(String projectName) {
         this.projectName = projectName;
+        return this;
     }
 
     public String getDashboardName() {
         return dashboardName;
     }
 
-    public void setDashboardName(String dashboardName) {
+    public ExportDashboardDefinition setDashboardName(String dashboardName) {
         this.dashboardName = dashboardName;
+        return this;
     }
 
     public String getTabName() {
         return tabName;
     }
 
-    public void setTabName(String tabName) {
+    public ExportDashboardDefinition setTabName(String tabName) {
         this.tabName = tabName;
+        return this;
     }
 
     public String getReportName() {
         return reportName;
     }
 
-    public void setReportName(String reportName) {
+    public ExportDashboardDefinition setReportName(String reportName) {
         this.reportName = reportName;
+        return this;
     }
 
     public String getCopyright() {
         return copyright;
     }
 
-    public void setCopyright(String copyright) {
+    public ExportDashboardDefinition setCopyright(String copyright) {
         this.copyright = copyright;
+        return this;
     }
 
     public String getPageOfTotal() {
         return pageOfTotal;
     }
 
-    public void setPageOfTotal(String pageOfTotal) {
+    public ExportDashboardDefinition setPageOfTotal(String pageOfTotal) {
         this.pageOfTotal = pageOfTotal;
+        return this;
     }
 
     public String getRemark() {
         return remark;
     }
 
-    public void setRemark(String remark) {
+    public ExportDashboardDefinition setRemark(String remark) {
         this.remark = remark;
+        return this;
     }
 
     public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public ExportDashboardDefinition setCreateDate(Date createDate) {
         this.createDate = createDate;
+        return this;
     }
 
     public void ExportDashboardDefinition() {

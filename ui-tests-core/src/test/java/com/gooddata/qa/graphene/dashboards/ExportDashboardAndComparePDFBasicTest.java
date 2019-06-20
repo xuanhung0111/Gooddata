@@ -35,13 +35,10 @@ public class ExportDashboardAndComparePDFBasicTest extends AbstractDashboardWidg
         Metrics metrics = getMetricCreator();
         metrics.createNumberOfActivitiesMetric();
         metrics.createOppFirstSnapshotMetric();
-        ExportDashboardDefinition exportDashboardDefinition = new ExportDashboardDefinition();
-        exportDashboardDefinition.setProjectName("%PROJECT_NAME");
-        exportDashboardDefinition.setDashboardName("%DASHBOARD_NAME");
-        exportDashboardDefinition.setReportName("%REPORT_NAME");
-        exportDashboardDefinition.setTabName("%TAB_NAME");
-        DashboardRestRequest dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
-        dashboardRequest.exportDashboardSetting(exportDashboardDefinition);
+        ExportDashboardDefinition exportDashboardDefinition = new ExportDashboardDefinition().setProjectName("%PROJECT_NAME")
+                .setDashboardName("%DASHBOARD_NAME").setReportName("%REPORT_NAME").setTabName("%TAB_NAME");
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .exportDashboardSetting(exportDashboardDefinition);
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .updateProjectConfiguration("newUIEnabled", "classic");
 
