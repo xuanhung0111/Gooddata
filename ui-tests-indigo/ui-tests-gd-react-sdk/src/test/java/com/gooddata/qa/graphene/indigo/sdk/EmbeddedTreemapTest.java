@@ -119,6 +119,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         createInsight(treemap, ReportType.TREE_MAP, singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_DEPARTMENT));
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
+        initSDKAnalysisPage(); //refresh SDK page to apply change
         initAnalysePage().openInsight(treemap).addStack(ATTR_IS_CLOSED).changeReportType(ReportType.TABLE).saveInsight();
         assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
                 asList(ATTR_IS_CLOSED, "TRUE", ATTR_DEPARTMENT, METRIC_NUMBER_OF_ACTIVITIES));
