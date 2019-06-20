@@ -13,47 +13,53 @@ public class ConnectionInfo {
         return warehouse;
     }
 
-    public void setWarehouse(String warehouse) {
+    public ConnectionInfo setWarehouse(String warehouse) {
         this.warehouse = warehouse;
+        return this;
     }
 
     public String getSchema() {
         return schema;
     }
 
-    public void setSchema(String schema) {
+    public ConnectionInfo setSchema(String schema) {
         this.schema = schema;
+        return this;
     }
 
     public String getDatabase() {
         return database;
     }
 
-    public void setDatabase(String database) {
+    public ConnectionInfo setDatabase(String database) {
         this.database = database;
+        return this;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public ConnectionInfo setUserName(String userName) {
         this.userName = userName;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public ConnectionInfo setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public ConnectionInfo setUrl(String url) {
         this.url = url;
+        return this;
     }
 }

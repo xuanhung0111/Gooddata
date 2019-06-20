@@ -4,14 +4,17 @@ import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataSourceRestRequest extends CommonRestRequest {
 
-    private static final String DATA_SOURCE_REST_URI = "/gdc/dataload/dataSources";
+    public static final String DATA_SOURCE_REST_URI = "/gdc/dataload/dataSources";
 
     public DataSourceRestRequest(RestClient restClient, String projectId) {
         super(restClient, projectId);
@@ -24,7 +27,7 @@ public class DataSourceRestRequest extends CommonRestRequest {
      * @param commonRestClient
      * @return data source identify
      */
-    public static String createDataSource(final CommonRestRequest commonRestClient,
+    public String createDataSource(final CommonRestRequest commonRestClient,
                                           HttpRequestBase setupDataSourceRequest) throws IOException {
         JSONObject jsonObj = commonRestClient.getJsonObject(setupDataSourceRequest, HttpStatus.CREATED);
         // execute then return data source Id
@@ -80,5 +83,17 @@ public class DataSourceRestRequest extends CommonRestRequest {
     public void deleteDataSource(String dataSourceId) {
         HttpRequestBase deleteRequest = RestRequest.initDeleteRequest(DATA_SOURCE_REST_URI + "/" + dataSourceId);
         restClient.execute(deleteRequest, HttpStatus.NO_CONTENT);
+    }
+
+    public List<String> getAllDataSourceNames() throws IOException {
+        final JSONObject json = getJsonObject(
+            RestRequest.initGetRequest(DATA_SOURCE_REST_URI + "?offset=0&limit=300"));
+        JSONArray items = json.getJSONObject("dataSources").getJSONArray("items");
+        List<String> dataSourceTitles = new ArrayList<>();
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i).getJSONObject("dataSource");
+            dataSourceTitles.add(item.getString("name"));
+        }
+        return dataSourceTitles;
     }
 }
