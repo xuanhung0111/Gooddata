@@ -64,7 +64,6 @@ public class VisualizationTest extends AbstractReactSdkTest {
                 Pair.of("secondVisualizationName", headline));
         createCatalogExportConfig(targetProjectId, "other-catalog.json");
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATIONS_OF_PROJECTS_BY_IDENTIFIER);
-        initDashboardsPage(); //clear cache of localhost:3000
         SDKAnalysisPage sdkAnalysisPage = initSDKAnalysisPage();
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
