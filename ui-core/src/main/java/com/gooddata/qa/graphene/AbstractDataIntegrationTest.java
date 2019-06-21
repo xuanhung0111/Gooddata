@@ -77,7 +77,7 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
     }
 
     protected ProcessService getProcessService() {
-        return new RestClient(getProfile(Profile.ADMIN)).getProcessService();
+        return getAdminRestClient().getProcessService();
     }
 
     private Schedule getScheduleByName(DataloadProcess process, String scheduleName) {
