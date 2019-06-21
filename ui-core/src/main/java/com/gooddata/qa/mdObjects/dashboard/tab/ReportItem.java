@@ -10,6 +10,12 @@ import java.util.List;
 public class ReportItem extends TabItem {
     private String objUri;
     private List<String> appliedFilterIds = new ArrayList<>();
+    private ItemSize itemSize;
+
+    public ReportItem setItemSize(ItemSize itemSize) {
+        this.itemSize = itemSize;
+        return this;
+    }
 
     public ReportItem setObjUri(String objUri) {
         this.objUri = objUri;
@@ -39,6 +45,6 @@ public class ReportItem extends TabItem {
 
     @Override
     protected void getSizeByItemType() {
-        mapItemSize(ItemSize.REPORT_ITEM);
+        mapItemSize(itemSize != null ? ItemSize.REPORT_ITEM_CUSTOMIZE : ItemSize.REPORT_ITEM);
     }
 }
