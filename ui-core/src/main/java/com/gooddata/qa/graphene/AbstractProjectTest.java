@@ -285,7 +285,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected RestClient getAdminRestClient() {
-        if (Objects.isNull(restClient)) {
+        // if rest client is not created yet or the user of current rest client and the current admin user
+        // is not the same, need to create new rest client
+        if (Objects.isNull(restClient) || !restClient.getAccountService().getCurrent().getLogin().equals(getProfile(ADMIN).getUsername())) {
+            log.info("Creating new rest client for current admin user: " + getProfile(ADMIN).getUsername());
             restClient = new RestClient(getProfile(ADMIN));
         }
         return restClient;
