@@ -117,7 +117,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(
-                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+                getAdminRestClient(), testParams.getProjectId());
         projectRestRequest.updateProjectTitle(projectTitle);
         log.info("Project title: " + projectTitle);
     }
@@ -222,7 +222,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected void createNewProject() throws Throwable{
         if (Objects.isNull(appliedFixture)) {
             log.info("Using REST api to create an empty project.");
-            testParams.setProjectId(createNewEmptyProject(projectTitle));
+            testParams.setProjectId(createNewEmptyProject(getAdminRestClient(), projectTitle));
         } else {
             log.info("Using fixture named " + appliedFixture.getPath() + " to create project");
             testParams.setProjectId(createProjectUsingFixture(projectTitle, appliedFixture));
@@ -238,11 +238,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected MetadataService getMdService() {
-        return new RestClient(getProfile(ADMIN)).getMetadataService();
+        return getAdminRestClient().getMetadataService();
     }
 
     protected Project getProject() {
-        return new RestClient(getProfile(ADMIN)).getProjectService().getProjectById(testParams.getProjectId());
+        return getAdminRestClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
     /**
@@ -253,22 +253,31 @@ public abstract class AbstractProjectTest extends AbstractUITest {
      * @return project id
      */
     protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture) {
-        return createProjectUsingFixture(title, appliedFixture, testParams.getUser());
+        return createProjectUsingFixture(title, appliedFixture, getAdminRestClient());
     }
 
     /**
-     *
      * @param title project title
      * @param appliedFixture fixture which is applied to an empty project
      * @param user Using to create project
      * @return project id
      */
     protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture, String user) {
+        final RestClient restClient = new RestClient(
+                new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
+        return createProjectUsingFixture(title, appliedFixture, restClient);
+    }
+
+    /**
+     * @param title project title
+     * @param appliedFixture fixture which is applied to an empty project
+     * @param restClient Using to create project
+     * @return project id
+     */
+    protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture, RestClient restClient) {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
-        final RestClient restClient = new RestClient(
-                new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
         return new Fixture(appliedFixture)
                 .setRestClient(restClient)
                 .deploy(title, testParams.getAuthorizationToken(),
@@ -276,9 +285,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected RestClient getAdminRestClient() {
-        if (Objects.isNull(restClient))
+        if (Objects.isNull(restClient)) {
             restClient = new RestClient(getProfile(ADMIN));
-
+        }
         return restClient;
     }
 
@@ -288,7 +297,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {
-        return createReportViaRest(new RestClient(getProfile(ADMIN)), defination);
+        return createReportViaRest(getAdminRestClient(), defination);
     }
 
     protected Report createReportViaRest(RestClient restClient, ReportDefinition definition) {
@@ -298,14 +307,14 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     public void setupMaql(String maql) {
-        new RestClient(getProfile(ADMIN))
+       getAdminRestClient()
                 .getModelService()
                 .updateProjectModel(getProject(), maql)
                 .get();
     }
 
     public void setupDataViaRest(String datasetId, InputStream dataset) {
-        new RestClient(getProfile(ADMIN))
+        getAdminRestClient()
                 .getDatasetService()
                 .loadDataset(getProject(), datasetId, dataset)
                 .get();
@@ -324,7 +333,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
             String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-            new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+            new RolapRestRequest(getAdminRestClient(), testParams.getProjectId())
                     .postEtlPullIntegration(integrationEntry);
         } catch (JSONException | IOException | URISyntaxException e) {
             throw new RuntimeException("There is error while setupData");
@@ -387,7 +396,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected List<String> getObjIdentifiers(List<String> uris) {
         try {
-            JSONArray array = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+            JSONArray array = new CommonRestRequest(getAdminRestClient(), testParams.getProjectId())
                     .getJsonObject(
                     RestRequest.initPostRequest(
                             String.format("/gdc/md/%s/identifiers", testParams.getProjectId()),
@@ -486,7 +495,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Metric createMetric(String name, String expression, String format) {
-        return createMetric(new RestClient(getProfile(ADMIN)), name, expression, format);
+        return createMetric(getAdminRestClient(), name, expression, format);
     }
 
     protected Metric createMetric(RestClient restClient, String name, String expression, String format) {
@@ -515,7 +524,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected String createNewEmptyProject(final String projectTitle) {
-        return createNewEmptyProject(getProfile(ADMIN), projectTitle);
+        return createNewEmptyProject(getAdminRestClient(), projectTitle);
     }
 
     protected void deleteProject(final RestProfile profile, final String projectId) {
@@ -532,7 +541,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     private String getWebDavServerUrl(final String serverRootUrl)
             throws IOException, JSONException {
-        final JSONArray links = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+        final JSONArray links = new CommonRestRequest(getAdminRestClient(), testParams.getProjectId())
                 .getJsonObject("/gdc", HttpStatus.OK)
                 .getJSONObject("about")
                 .getJSONArray("links");
