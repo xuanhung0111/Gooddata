@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.ItemSize;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.WebContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.Widget;
@@ -309,34 +310,39 @@ public class ExportDashboardAndComparePDFAdvanceTest extends AbstractDashboardWi
 
     private Tab initTabHaveWidgetAndText(String name, String reportName, String headline) {
         return Builder.of(Tab::new).with(tab -> {
-            tab.setTitle(name);
-            tab.addItem(Builder.of(ReportItem::new).with(report -> report.setObjUri(getReportByTitle(reportName).getUri())).build());
-            tab.addItem(Builder.of(Widget::new).with(widget -> widget.setWidgetTopMiddle()).build());
-            tab.addItem(Builder.of(Text::new).with(text -> text.setHeadline(headline)).build());
+            tab.setTitle(name).addItems(asList(
+                    Builder.of(ReportItem::new).with(report -> report.setItemSize(ItemSize.REPORT_ITEM_CUSTOMIZE)
+                            .setObjUri(getReportByTitle(reportName).getUri())).build(),
+                    Builder.of(Widget::new).with(widget -> widget.setWidgetTopMiddle()).build(),
+                    Builder.of(Text::new).with(text -> text.setHeadline(headline)).build()));
         }).build();
     }
 
     private Tab initTabHaveWebContentAndText(String name, String reportName, String url, String headline) {
         return Builder.of(Tab::new).with(tab -> {
-            tab.setTitle(name);
-            tab.addItem(Builder.of(ReportItem::new).with(report -> report.setObjUri(getReportByTitle(reportName).getUri())).build());
-            tab.addItem(Builder.of(WebContent::new).with(content -> content.setWebContent(url)).build());
-            tab.addItem(Builder.of(Text::new).with(text -> text.setHeadline(headline)).build());
+            tab.setTitle(name).addItems(asList(
+                    Builder.of(ReportItem::new).with(report -> report.setItemSize(ItemSize.REPORT_ITEM_CUSTOMIZE)
+                            .setObjUri(getReportByTitle(reportName).getUri())).build(),
+                    Builder.of(WebContent::new).with(content -> content.setWebContent(url)).build(),
+                    Builder.of(Text::new).with(text -> text.setHeadline(headline)).build()));
         }).build();
     }
 
     private Tab initTabHavaWebContentAndTextForPaging(String name, String reportName, String url, String headline) {
         return Builder.of(Tab::new).with(tab -> {
-            tab.setTitle(name);
-            tab.addItem(Builder.of(ReportItem::new).with(report -> report.setObjUri(getReportByTitle(reportName).getUri())).build());
-            tab.addItem(Builder.of(WebContent::new).with(content -> content.setWebContentForPaging(url)).build());
-            tab.addItem(Builder.of(Text::new).with(text -> text.setHeadline(headline)).build());
+            tab.setTitle(name).addItems(asList(
+                    Builder.of(ReportItem::new).with(report -> report.setItemSize(ItemSize.REPORT_ITEM_CUSTOMIZE)
+                            .setObjUri(getReportByTitle(reportName).getUri())).build(),
+                    Builder.of(WebContent::new).with(content -> content.setWebContentForPaging(url)).build(),
+                    Builder.of(Text::new).with(text -> text.setHeadline(headline)).build()));
         }).build();
     }
 
     private Tab initTab(String name, String areaReport, String tableReport) {
         ReportItem tableReportItem = createReportItem(getReportByTitle(areaReport).getUri());
+        tableReportItem.setItemSize(ItemSize.REPORT_ITEM_CUSTOMIZE);
         ReportItem areaReportItem = createReportItem(getReportByTitle(tableReport).getUri());
+        areaReportItem.setItemSize(ItemSize.REPORT_ITEM_CUSTOMIZE);
         areaReportItem.setPosition(TabItem.ItemPosition.TOP_RIGHT);
         return new Tab().setTitle(name).addItems(Stream.of(asList(areaReportItem, tableReportItem)).flatMap(List::stream)
                 .collect(Collectors.toList()));
