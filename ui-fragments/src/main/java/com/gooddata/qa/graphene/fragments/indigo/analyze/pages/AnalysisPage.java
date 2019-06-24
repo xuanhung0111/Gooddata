@@ -136,6 +136,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, recommendation);
     }
 
+    public AnalysisPage moveAttributeFromRowsToColumnsBucket(String attributeTitle) {
+        WebElement target = getAttributesBucket().get(attributeTitle);
+        WebElement source = getAttributesColumnsBucket().getInvitation();
+        return drag(target, source);
+    }
+
     public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
         startDrag(source);
         try {
