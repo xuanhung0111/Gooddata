@@ -154,6 +154,7 @@ public abstract class AbstractSndPanel extends AbstractFragment {
 
         howToSelect.accept(itemElement);
         waitForElementAttributeContainValue(itemElement, "class", "sndInReport");
+        waitForElementNotVisible(By.className("busyMask"));
         return this;
     }
 
