@@ -34,7 +34,7 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
     private static final String NON_MUF_USER_USERDESCRIPTION = "User .* can see all data. How to set Data Permissions";
     private static final String MUF_USER_DESCRIPTION = "Following filters define what .* can see. How to set Data Permissions";
-    private static final String SET_DATA_PERMISSIONS_LINK = "https://help.gooddata.com/display/developer/Data+Permissions+for+Beginners";
+    private static final String SET_DATA_PERMISSIONS_LINK = "https://help.gooddata.com/display/doc/Data+Permissions";
 
     private static final String MUF_NAME = "Muf";
     private static final String EXPRESSION = "[%s] = [%s]";
