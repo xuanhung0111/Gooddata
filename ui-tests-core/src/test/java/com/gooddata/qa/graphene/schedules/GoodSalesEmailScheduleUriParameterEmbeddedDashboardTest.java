@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -256,6 +257,7 @@ public class GoodSalesEmailScheduleUriParameterEmbeddedDashboardTest extends Abs
         initEmbeddedDashboard().editDashboard();
         DashboardEditWidgetToolbarPanel
                 .removeWidget(embeddedDashboard.getFilterWidgetByName(FILTER_DATE_DIMENSION).getRoot(), browser);
+        embeddedDashboard.getContent().getReport(thirdReport, TableReport.class).waitForLoaded();
         embeddedDashboard.saveDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
@@ -279,8 +281,9 @@ public class GoodSalesEmailScheduleUriParameterEmbeddedDashboardTest extends Abs
 
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
         embeddedDashboard.editDashboard()
-                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_YEAR_SNAPSHOT)
-                .saveDashboard();
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_YEAR_SNAPSHOT);
+        embeddedDashboard.getContent().getReport(thirdReport, TableReport.class).waitForLoaded();
+        embeddedDashboard.saveDashboard();
         embeddedDashboard.showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
