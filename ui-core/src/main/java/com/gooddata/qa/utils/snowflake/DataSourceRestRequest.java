@@ -64,8 +64,12 @@ public class DataSourceRestRequest extends CommonRestRequest {
                         put("schema", connectionInfo.getSchema());
                         put("database", connectionInfo.getDatabase());
                         put("url", connectionInfo.getUrl());
-                        put("userName", connectionInfo.getUserName());
-                        put("password", connectionInfo.getPassword());
+                        put("authentication", new JSONObject() {{
+                            put("basic", new JSONObject() {{
+                                put("userName", connectionInfo.getUserName());
+                                put("password", connectionInfo.getPassword());
+                            }});
+                        }});
                     }});
                 }});
             }});
