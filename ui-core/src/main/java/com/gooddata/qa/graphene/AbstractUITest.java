@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -52,6 +53,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -514,10 +516,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public SDKAnalysisPage initSDKAnalysisPage() {
-        openNodeJsUrl(testParams.getLocalhostSDK());
-        //Just using a default link localhost:3000 to access page
-        //so that page will not refresh.
-        browser.navigate().refresh();
+        try {
+            openNodeJsUrl(testParams.getLocalhostSDK());
+            //Just using a default link localhost:3000 to access page
+            //so that page will not refresh.
+            browser.navigate().refresh();
+            waitForElementVisible(id("root"), browser);
+        } catch (WebDriverException e) {
+            browser.navigate().refresh();
+        }
         return SDKAnalysisPage.getInstance(browser);
     }
 
