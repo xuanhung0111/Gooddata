@@ -33,9 +33,6 @@ import java.util.logging.Logger;
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
 
-    protected Properties testVariables;
-    private String propertiesPath;
-
     protected TestParameters testParams;
 
     @Drone
@@ -52,20 +49,7 @@ public abstract class AbstractTest extends Arquillian {
 
     @BeforeClass(alwaysRun = true)
     public void loadProperties() {
-        propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
-                "/ui-tests-core/src/test/resources/variables-env-test.properties".replace("/",
-                        System.getProperty("file.separator")));
-        System.out.println("User properties: " + propertiesPath);
-
-        testVariables = new Properties();
-        try {
-            FileInputStream in = new FileInputStream(propertiesPath);
-            testVariables.load(in);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Properties weren't loaded from path: " + propertiesPath);
-        }
-
-        testParams = new TestParameters(testVariables);
+        testParams = TestParameters.getInstance();
     }
 
     @AfterClass(alwaysRun = true)

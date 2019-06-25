@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.snowflake;
 
 public class DatabaseColumn {
+
     String title;
     String dataType;
     String extraParams = "";

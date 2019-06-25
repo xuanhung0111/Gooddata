@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.snowflake;
 
 public class SnowflakeTableUtils {
+
     public static final String PK_CUSKEY = "custkey";
     public static final String ATTR_NAME = "name";
     public static final String FACT_AGE = "age";

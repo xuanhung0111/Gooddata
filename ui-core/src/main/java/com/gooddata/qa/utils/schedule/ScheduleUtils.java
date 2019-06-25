@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.datasource.DataDistributionProcess;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.gooddata.dataload.processes.DataloadProcess;
@@ -16,16 +17,17 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
-import com.gooddata.qa.utils.datasource.DataDistributionProcess;
+
 import com.gooddata.qa.utils.http.RestClient;
 
 public class ScheduleUtils {
 
     protected RestClient restClient;
     protected TestParameters testParams;
+    private static final String SEGMENT_URI = "/gdc/domains/%s/dataproducts/%s/segments/%s";
 
-    public ScheduleUtils(final TestParameters testParameters, RestClient restClient) {
-        this.testParams = testParameters;
+    public ScheduleUtils(RestClient restClient) {
+        this.testParams = TestParameters.getInstance();
         this.restClient = restClient;
     }
 
@@ -34,10 +36,10 @@ public class ScheduleUtils {
     }
 
     public DataloadProcess createDataDistributionProcess(Project serviceProject, String processName, String datasourceId,
-            String segmentUri, String segmentId, String dataproduct, String version) {
+                                                         String segmentId, String dataproduct, String version) {
         return getProcessService().createProcess(serviceProject,
-                DataDistributionProcess.createDataDistributionProcess(processName, datasourceId,
-                        String.format(segmentUri, testParams.getUserDomain(), dataproduct, segmentId), version));
+                new DataDistributionProcess(processName, datasourceId,
+                        String.format(SEGMENT_URI, testParams.getUserDomain(), dataproduct, segmentId), version));
     }
 
     public DataloadProcess getDataloadProcess(String processName, Project serviceProject) {
@@ -47,16 +49,6 @@ public class ScheduleUtils {
     public Schedule createSchedule(String name, SyncDatasets datasetToSynchronize, String crontimeExpression, String processName,
             Project serviceproject) {
         return createScheduleWithTriggerType(name, datasetToSynchronize, crontimeExpression, processName, serviceproject);
-    }
-
-    public boolean hasDataloadProcess(String processName, Project serviceproject) {
-        return findDataloadProcess(processName, serviceproject).isPresent();
-    }
-
-    // This method is used to create a 'real' manual schedule
-    public Schedule createManualTriggeredSchedule(String name, SyncDatasets datasetToSynchronize, String processName,
-            Project serviceproject) {
-        return createSchedule(name, datasetToSynchronize, "", processName, serviceproject);
     }
 
     public Schedule createSchedule(String name, SyncDatasets datasetToSynchronize, Schedule triggeringSchedule,

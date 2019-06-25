@@ -86,7 +86,7 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
                 .enterS3ConfigurationPath("")
                 .enterS3AccessKey("")
                 .enterS3SecretKey("")
-                .tryToSubmit();
+                .clickSubmitButton();
 
         assertTrue(deployForm.isS3ConfigurationPathError(), "S3 configuration path should show error");
         assertTrue(deployForm.isS3AccessKeyError(), "S3 access key should show error");

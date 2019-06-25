@@ -6,27 +6,22 @@ import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.utils.datasource.DataDistributionProcess;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
-
 public class ProcessUtils {
-    protected RestClient restClient;
-    protected DataloadProcess dataloadProcess;
-    protected String executable;
+
+    private RestClient restClient;
+    private DataloadProcess dataloadProcess;
+    private String executable;
 
     public ProcessUtils(RestClient restClient, DataloadProcess dataloadProcess) {
         this.restClient = restClient;

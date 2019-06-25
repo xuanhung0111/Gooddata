@@ -1,4 +1,5 @@
 package com.gooddata.qa.graphene.flow;
+import com.gooddata.qa.graphene.snowflake.DeployProcessTest;
 import com.gooddata.qa.graphene.snowflake.SegmentForceLoadTest;
 import com.gooddata.qa.graphene.snowflake.SegmentLoadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
@@ -13,7 +14,8 @@ public class UITestsRegistry {
 
         suites.put("all", new Object[] {
                 SegmentForceLoadTest.class,
-                SegmentLoadTest.class
+                SegmentLoadTest.class,
+                DeployProcessTest.class
         });
 
         TestsRegistry.getInstance()

@@ -2,9 +2,11 @@ package com.gooddata.qa.graphene.fragments.disc.process;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -43,7 +45,7 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     }
 
     public String getRedirectedPageFromManageDataSource() {
-        return waitForElementVisible(manageDataSourceButton.findElement(By.className("action-important-link")))
+        return waitForElementVisible(manageDataSourceButton).findElement(By.className("action-important-link"))
                 .getAttribute("href");
     }
 
@@ -56,11 +58,10 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     }
 
     public DeploySDDProcessDialog selectSegment(String title) {
-        segments.stream()
-                .filter(dataProduct -> dataProduct.getAttribute("value").contains(title))
-                .findFirst()
-                .get()
-                .click();
+        By selector = By.cssSelector(".s-" + simplifyText(title));
+        ElementUtils.scrollElementIntoView(
+                By.cssSelector(".deploy-sdd-process-distribute-data-segment .ember-view.ember-list-view"), selector, browser, 50);
+        waitForElementVisible(selector, browser).click();
         return this;
     }
 
@@ -76,6 +77,10 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     public DeploySDDProcessDialog selectDataSource(String dataSourceTitle) {
         getDataSourceDropdown().expand().selectDataSource(dataSourceTitle);
         return this;
+    }
+
+    public boolean isSelectedSegment(String title) {
+        return waitForElementVisible(By.cssSelector(".s-" + simplifyText(title) + " input"), browser).isSelected();
     }
 
     private DataSourceDropdown getDataSourceDropdown() {
