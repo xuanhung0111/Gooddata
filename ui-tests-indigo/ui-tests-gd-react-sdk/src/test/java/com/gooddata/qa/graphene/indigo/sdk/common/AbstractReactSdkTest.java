@@ -1,14 +1,18 @@
 package com.gooddata.qa.graphene.indigo.sdk.common;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.utils.Sleeper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,14 +47,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         log.info("Waiting for updating " + appFile.getAbsolutePath());
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
                 browser -> appFile.isFile() && appFile.exists() && appFile.length() > 0);
-        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
-                browser -> {
-                    long length = appFile.length();
-                    Sleeper.sleepTightInSeconds(1);
-                    return length == appFile.length();
-                }
-        );
-        log.info("Update completely");
+        log.info("File updated completely with size " + appFile.length());
     }
 
     public void createTestingVariable(Pair<String, String>... variables) {
@@ -73,6 +70,13 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/" + fileName);
         Files.deleteIfExists(file.toPath());
         Graphene.waitGui().until(browser -> !file.exists());
+        try {
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS)
+                    .until(browser -> isElementPresent(By.tagName("iframe"), browser));
+        } catch(TimeoutException e) {
+            //do nothing
+        }
+
         List<String> commands = new LinkedList<>();
         commands.add("gdc-catalog-export");
         commands.add("--project-id");
@@ -95,8 +99,9 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
             while ((inputStream = reader.readLine()) != null) {
                 System.out.println(inputStream);
             }
-            log.info("Created a new file: " + file.getAbsolutePath());
             Graphene.waitGui().until(browser -> file.isFile() && file.exists() && file.length() > 0);
+            log.info(format("Created a new file: %s with size %s", file.getAbsolutePath(), file.length()));
+            waitForElementNotPresent(By.tagName("iframe"), browser);
             return file;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("there is an error while creating catalog.json", e);

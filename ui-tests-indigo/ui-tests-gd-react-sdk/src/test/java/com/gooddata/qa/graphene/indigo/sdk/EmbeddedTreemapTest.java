@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_EMPTY_VISIUALIZATION;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATIONS;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_ABSOLUTE_DATE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS;
@@ -68,7 +67,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 singletonList(ATTR_DEPARTMENT));
         createCatalogJSON(Pair.of("visualizationName", treemap), Pair.of("visualizationUrl", insightUrl));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        ChartReport chartReport = ChartReport.getInstance(browser);
+        ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
@@ -84,9 +83,6 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
-
-        replaceContentAppJSFrom(TEMPLATE_EMPTY_VISIUALIZATION);
-        assertEquals(initSDKAnalysisPage().getAppIntro(), "To get started, edit src/App.js and save to reload.");
     }
 
     @Test(dependsOnMethods = "login")
