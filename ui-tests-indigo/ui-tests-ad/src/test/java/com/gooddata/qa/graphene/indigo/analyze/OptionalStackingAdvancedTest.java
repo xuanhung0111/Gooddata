@@ -89,7 +89,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void theAxisScaleIsAutoResetWhenUncheckStackToPercentWithSettingMinMax() {
-        String rightMin = "10000000";
+        String rightMin = "40000000";
         String rightMax = "60000000";
         String insight = "Insight: " + generateHashString();
 
@@ -119,14 +119,14 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertThat(chartReport.getValueSecondaryYaxis().stream()
             .flatMap(List::stream)
-            .collect(Collectors.toList()), hasItems("10M", "60M"));
+            .collect(Collectors.toList()), hasItems("40M", "60M"));
 
         metricsBucket.expandMeasureConfigurationPanel();
         stacksBucket.uncheckOption(OptionalStacking.PERCENT);
         analysisPage.waitForReportComputing();
         assertThat(chartReport.getValueSecondaryYaxis().stream()
             .flatMap(List::stream)
-            .collect(Collectors.toList()), hasItems("0", "70.7M"));
+            .collect(Collectors.toList()), hasItems("0", "16M"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -155,7 +155,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(analysisPage.getChartReport().getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("0", "70.7M"));
+                .collect(Collectors.toList()), hasItems("0", "72M"));
     }
 
     @Test(dependsOnGroups = {"createProject"})

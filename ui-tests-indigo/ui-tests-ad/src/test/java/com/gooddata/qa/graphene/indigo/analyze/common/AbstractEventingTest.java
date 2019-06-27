@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -158,13 +159,13 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         List<MeasureBucket> measureBuckets = metrics.stream()
             .map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))
             .collect(Collectors.toList());
-        insightMDConfiguration.setMeasureBucket(measureBuckets);
 
         List<MeasureBucket> secondaryMeasureBuckets = secondaryMetrics.stream()
             .map(metric -> MeasureBucket.createMeasureBucket(
                 getMetricByTitle(metric), MeasureBucket.Type.SECONDARY_MEASURES))
             .collect(Collectors.toList());
-        insightMDConfiguration.setMeasureBucket(secondaryMeasureBuckets);
+        insightMDConfiguration.setMeasureBucket(Stream.concat(measureBuckets.stream(), secondaryMeasureBuckets.stream())
+            .collect(Collectors.toList()));
 
         CategoryBucket categoryBucket = CategoryBucket.createCategoryBucket(
             getAttributeByTitle(attribute), Type.ATTRIBUTE);
