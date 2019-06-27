@@ -397,10 +397,10 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void recalculateMinMaxValueByFormulaOnChart() {
-        String rightMin = "-15";
-        String rightMax = "130";
+        String rightMin = "-10";
+        String rightMax = "90";
         String leftMin = "-10";
-        String leftMax = "200";
+        String leftMax = "30";
         createInsightHasTwoMeasure(INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE, ReportType.COLUMN_CHART,
                 METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT);
 
@@ -412,18 +412,19 @@ public class SecondaryAxisTest extends AbstractAnalyseTest {
                 .getItemConfiguration(Y_AXIS.toString() + " (Right)").expandConfiguration().setMinMaxValueOnAxis(rightMin, rightMax);
         analysisPage.openConfigurationPanelBucket()
                 .getItemConfiguration(Y_AXIS.toString() + " (Left)").expandConfiguration().setMinMaxValueOnAxis(leftMin, leftMax);
-        rightMin = "-14.9";
-        rightMax = "130";
-        leftMin = "-23";
-        leftMax = "200";
+
+        String expectedRightMin = "-20";
+        String expectedRightMax = "80";
+        String expectedLeftMin = "-8";
+        String expectedLeftMax = "32";
         ChartReport chartReport = analysisPage.getChartReport();
         assertThat(chartReport.getValuePrimaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems(leftMin, leftMax));
+                .collect(Collectors.toList()), hasItems(expectedLeftMin, expectedLeftMax));
 
         assertThat(chartReport.getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems(rightMin, rightMax));
+                .collect(Collectors.toList()), hasItems(expectedRightMin, expectedRightMax));
     }
 
     private void createSimpleInsight(String title, String metric, ReportType reportType) {

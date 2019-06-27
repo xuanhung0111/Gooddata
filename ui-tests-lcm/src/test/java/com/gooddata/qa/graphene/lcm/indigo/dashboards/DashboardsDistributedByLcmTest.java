@@ -409,7 +409,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
         assertEquals(chartReport.getTrackerType(1, 0), "path");
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
-            asList(asList(ATTR_DEPARTMENT, "Inside Sales"), asList(METRIC_AVG_AMOUNT, "$18,329.52")));
+            asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(METRIC_AVG_AMOUNT, "$21,310.98")));
     }
 
     @AfterClass(alwaysRun = true)
