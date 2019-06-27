@@ -152,6 +152,27 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return indigoRestRequest.createInsight(insightMDConfiguration);
     }
 
+    protected String createComboInsight(String title, ReportType reportType,
+                                        List<String> metrics, List<String> secondaryMetrics, String attribute) {
+        InsightMDConfiguration insightMDConfiguration = new InsightMDConfiguration(title, reportType);
+        List<MeasureBucket> measureBuckets = metrics.stream()
+            .map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))
+            .collect(Collectors.toList());
+        insightMDConfiguration.setMeasureBucket(measureBuckets);
+
+        List<MeasureBucket> secondaryMeasureBuckets = secondaryMetrics.stream()
+            .map(metric -> MeasureBucket.createMeasureBucket(
+                getMetricByTitle(metric), MeasureBucket.Type.SECONDARY_MEASURES))
+            .collect(Collectors.toList());
+        insightMDConfiguration.setMeasureBucket(secondaryMeasureBuckets);
+
+        CategoryBucket categoryBucket = CategoryBucket.createCategoryBucket(
+            getAttributeByTitle(attribute), Type.ATTRIBUTE);
+        insightMDConfiguration.setCategoryBucket(singletonList(categoryBucket));
+
+        return indigoRestRequest.createInsight(insightMDConfiguration);
+    }
+
     protected String createInsight(String title, ReportType reportType,
                                    List<String> metrics, List<String> attributes) {
         return createInsight(title, reportType, metrics, attributes, "");

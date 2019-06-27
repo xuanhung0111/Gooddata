@@ -15,7 +15,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 public class ExportToSelect extends AbstractReactDropDown {
 
     @FindBy(className = "s-gd-export-menu-open-report")
-    private WebElement exportToReportButton;
+    private WebElement openAsReportButton;
 
     @Override
     protected String getDropdownCssSelector() {
@@ -35,13 +35,22 @@ public class ExportToSelect extends AbstractReactDropDown {
         return !isElementDisabled(waitForElementVisible(By.className(type.toString()), getRoot()));
     }
 
+    public boolean isOpenAsReportButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(openAsReportButton));
+    }
+
     public void exportReport() {
         final int numberOfWindows = browser.getWindowHandles().size();
-        waitForElementVisible(exportToReportButton).click();
+        waitForElementVisible(openAsReportButton).click();
 
         //make sure the new window is displayed to prevent unexpected errors
         Function<WebDriver, Boolean> hasNewWindow = browser -> browser.getWindowHandles().size() == numberOfWindows + 1;
         Graphene.waitGui().until(hasNewWindow);
+    }
+
+    public String getExportButtonTooltipText() {
+        getActions().moveToElement(openAsReportButton).perform();
+        return waitForElementVisible(By.cssSelector(".gd-bubble .content"), browser).getText().trim();
     }
 
     public enum DataType {

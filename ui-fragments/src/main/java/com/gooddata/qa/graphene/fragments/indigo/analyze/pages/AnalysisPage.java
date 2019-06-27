@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Metrics
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -64,8 +65,11 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-visualization-picker")
     private VisualizationReportTypePicker reportTypePicker;
 
-    @FindBy(className = "s-bucket-measures")
+    @FindBy(className = MEASURES_BUCKET_CLASS_NAME)
     private MetricsBucket metricsBucket;
+
+    @FindBy(className = MEASURES_BUCKET_CLASS_NAME)
+    private MeasureAsColumnBucket  measureAsColumnBucket;
 
     @FindBy(className = "s-bucket-secondary_measures")
     private MetricsBucket metricsSecondaryBucket;
@@ -93,6 +97,7 @@ public class AnalysisPage extends AbstractFragment {
     private static final By BY_TRASH_PANEL = className("s-trash");
 
     private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
+    private static final String MEASURES_BUCKET_CLASS_NAME = "s-bucket-measures";
 
     public static AnalysisPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(AnalysisPage.class,
@@ -424,6 +429,10 @@ public class AnalysisPage extends AbstractFragment {
     //using this fragment when applying the Headline insight(Headline Report Type) for Analysis Page
     public MetricsBucket getMetricsSecondaryBucket() {
         return waitForFragmentVisible(metricsSecondaryBucket);
+    }
+
+    public MeasureAsColumnBucket getMeasureAsColumnBucketBucket() {
+        return waitForFragmentVisible(measureAsColumnBucket);
     }
 
     public AttributesBucket getAttributesBucket() {

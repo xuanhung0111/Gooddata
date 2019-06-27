@@ -9,12 +9,11 @@ public class MeasureBucket {
     private final String localIdentifier = generateHashString();
     private String measureFilters;
     private String title;
-    private String type;
+    private Type type;
     private String objectUri;
     private boolean showInPercent;
 
-    private MeasureBucket(String measureFilters, String title, boolean showInPercent, String type,
-            String objectUri) {
+    private MeasureBucket(String measureFilters, String title, boolean showInPercent, Type type, String objectUri) {
         this.measureFilters = measureFilters;
         this.title = title;
         this.showInPercent = showInPercent;
@@ -23,11 +22,19 @@ public class MeasureBucket {
     }
 
     public static MeasureBucket createSimpleMeasureBucket(Metric metric) {
-        return new MeasureBucket("", metric.getTitle(),  false, "metric", metric.getUri());
+        return createMeasureBucket(metric, Type.MEASURES);
+    }
+
+    public static MeasureBucket createMeasureBucket(Metric metric, Type type) {
+        return new MeasureBucket("", metric.getTitle(), false, type, metric.getUri());
+    }
+
+    public enum Type {
+        MEASURES, SECONDARY_MEASURES
     }
 
     public static MeasureBucket createMeasureBucketWithShowInPercent (Metric metric, boolean hasShowInPercent) {
-        return new MeasureBucket("", metric.getTitle(),  hasShowInPercent, "metric", metric.getUri());
+        return new MeasureBucket("", metric.getTitle(),  hasShowInPercent, Type.MEASURES, metric.getUri());
     }
 
     public String getLocalIdentifier() {
@@ -46,7 +53,7 @@ public class MeasureBucket {
         return showInPercent;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 

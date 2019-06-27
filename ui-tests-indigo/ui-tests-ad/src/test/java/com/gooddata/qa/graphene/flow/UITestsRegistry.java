@@ -80,6 +80,7 @@ import com.gooddata.qa.graphene.indigo.analyze.OptionalStackingAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVTest;
 import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.PieChartReportTest;
+import com.gooddata.qa.graphene.indigo.analyze.ComboChartReportTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -182,6 +183,7 @@ public class UITestsRegistry {
             ExportVisualizedDataToXLSXAndCSVTest.class,
             ExportVisualizedDataToXLSXAndCSVAdvancedTest.class,
             PieChartReportTest.class,
+            ComboChartReportTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

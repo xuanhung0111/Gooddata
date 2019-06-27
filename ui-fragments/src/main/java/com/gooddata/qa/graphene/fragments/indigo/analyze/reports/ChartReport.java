@@ -259,6 +259,9 @@ public class ChartReport extends AbstractFragment {
     }
 
     public List<String> getDataLabels() {
+        if (dataLabels.isEmpty()) {
+            return Collections.emptyList();
+        }
         return getLabels(dataLabels);
     }
 
@@ -347,6 +350,10 @@ public class ChartReport extends AbstractFragment {
         if (index < 0 || index >= trackers.size()) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    public String getTrackerType(int groupIndex, int index) {
+        return getTracker(groupIndex, index).getTagName();
     }
 
     private WebElement getTracker(int groupIndex, int index) {
