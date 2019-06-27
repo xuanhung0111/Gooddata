@@ -312,7 +312,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             });
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void exportInsightContainsRestrictedData() {
         String factUri = factRestRequest.getFactByTitle(METRIC_AMOUNT).getUri();
         try {

@@ -486,7 +486,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void createPivotTableHasRestrictedFact() throws IOException {
         String factUri = factRestRequest.getFactByTitle(METRIC_AMOUNT).getUri();
         try {

@@ -212,7 +212,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop", enabled = false)
     public void checkAlertOnRestrictedData() throws JSONException, IOException {
 
         final String metricExpression = format("SELECT SUM([%s])", numberFactUri);
