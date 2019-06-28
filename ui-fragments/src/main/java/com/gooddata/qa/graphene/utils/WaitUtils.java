@@ -175,11 +175,6 @@ public final class WaitUtils {
         return element;
     }
 
-    public static void waitForElementNotSelected(By byElement, SearchContext searchContext, int timeout) {
-        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(searchContext, byElement)
-                .is().not().selected();
-    }
-
     public static WebElement waitForElementPresent(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(searchContext, byElement).is().present();
         return searchContext.findElement(byElement);

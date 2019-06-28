@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.analyze.dialog;
+package com.gooddata.qa.graphene.fragments.indigo;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractDialog;
 import org.jboss.arquillian.graphene.Graphene;
@@ -7,9 +7,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotSelected;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public class ExportXLSXDialog extends AbstractDialog {
@@ -28,16 +26,18 @@ public class ExportXLSXDialog extends AbstractDialog {
     }
 
     public ExportXLSXDialog uncheckOption(OptionalExport optional) {
-        if (isOptionCheck(optional)) {
-            waitForElementVisible(By.cssSelector(optional.getOptionLabel()), getRoot()).click();
-        }
-        waitForElementNotSelected(By.cssSelector(optional.toString()), getRoot(), 3);
-        assertFalse(isOptionCheck(optional), "Option should be not checked");
-        return this;
+        return setOption(optional, false);
+    }
+
+    public ExportXLSXDialog checkOption(OptionalExport optional) {
+        return setOption(optional, true);
     }
 
     public enum OptionalExport {
-        CELL_MERGED("input[name*='mergeHeaders']", "input[name*='mergeHeaders'] + span.input-label-text");
+        CELL_MERGED("input[name*='mergeHeaders']",
+            "input[name*='mergeHeaders'] + span.input-label-text"),
+        FILTERS_CONTEXT("input[name*='includeFilterContext']",
+            "input[name*='includeFilterContext'] + span.input-label-text");
 
         private String option;
         private String optionLabel;
@@ -53,6 +53,13 @@ public class ExportXLSXDialog extends AbstractDialog {
         }
 
         public String getOptionLabel() { return optionLabel; }
+    }
+
+    private ExportXLSXDialog setOption(OptionalExport optional, boolean isChecked) {
+        if (isOptionCheck(optional) != isChecked) {
+            waitForElementVisible(By.cssSelector(optional.getOptionLabel()), getRoot()).click();
+        }
+        return this;
     }
 
     private Boolean isOptionCheck(OptionalExport optional) {

@@ -17,8 +17,8 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
+import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -43,7 +43,6 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -369,10 +368,10 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     public void exportNewInsightAnalyseToXLSX() throws IOException {
         try {
             AnalysisPage analysisPage = initAnalysePage();
-            analysisPage.openInsight(EXPORT_VISUALIZED_DATA_INSIGHT).waitForReportComputing().exportTo(DataType.XLSX)
+            analysisPage.openInsight(EXPORT_VISUALIZED_DATA_INSIGHT).waitForReportComputing().exportTo(File.XLSX)
                 .getExportXLSXDialog().uncheckOption(ExportXLSXDialog.OptionalExport.CELL_MERGED).confirmExport();
 
-            final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + EXPORT_VISUALIZED_DATA_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName());
 
             waitForExporting(exportFile);

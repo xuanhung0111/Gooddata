@@ -13,7 +13,7 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket.DisplayAsSelect;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -470,9 +470,9 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
                 .setCategoryBucket(singletonList(
                     CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT), CategoryBucket.Type.ATTRIBUTE))));
 
-        ExportToSelect exportToSelect = initAnalysePage().openInsight(insight).getPageHeader().clickOptionsButton();
-        assertFalse(exportToSelect.isOpenAsReportButtonEnabled(), "Open as Report option should be disabled");
-        assertEquals(exportToSelect.getExportButtonTooltipText(),
+        OptionalExportMenu optionalExportMenu = initAnalysePage().openInsight(insight).getPageHeader().clickOptionsButton();
+        assertFalse(optionalExportMenu.isOpenAsReportButtonEnabled(), "Open as Report option should be disabled");
+        assertEquals(optionalExportMenu.getExportButtonTooltipText(),
             "The insight is not compatible with Report Editor. To open the insight as a report, " +
                 "select another insight type.");
     }

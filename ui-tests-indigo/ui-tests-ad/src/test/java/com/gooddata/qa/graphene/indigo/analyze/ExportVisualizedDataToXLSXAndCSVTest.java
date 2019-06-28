@@ -7,9 +7,9 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog.OptionalExport;
+import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog.OptionalExport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -148,7 +148,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     public void exportInsightsIntoXLSXFormatWithOptionMergeCells(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(DataType.XLSX)
+            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX)
                 .getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
@@ -166,7 +166,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     public void exportInsightsIntoXLSXFormatWithOptionUnMergeCells(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(DataType.XLSX)
+            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX)
                 .getExportXLSXDialog().uncheckOption(OptionalExport.CELL_MERGED).confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
@@ -183,7 +183,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getSavedInsightCSV")
     public void exportInsightsIntoCSVFormat(String insight, List<List<String>> expectedResult) throws IOException {
         try {
-            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(DataType.CSV);
+            initAnalysePage().openInsight(insight).waitForReportComputing().exportTo(OptionalExportMenu.File.CSV);
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.CSV.getName());
@@ -200,8 +200,9 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     public void exportNewInsight() throws IOException {
         try {
             initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT)
-                    .addColumnsAttribute(ATTR_FORECAST_CATEGORY).waitForReportComputing().exportTo(DataType.XLSX)
-                    .getExportXLSXDialog().uncheckOption(OptionalExport.CELL_MERGED).confirmExport();
+                    .addColumnsAttribute(ATTR_FORECAST_CATEGORY).waitForReportComputing()
+                    .exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog()
+                    .uncheckOption(OptionalExport.CELL_MERGED).confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + UNTITLED_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -224,7 +225,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     public void exportUnsavedInsight()throws IOException {
         try {
             initAnalysePage().openInsight(INSIGHT_HAS_SOME_METRICS).changeReportType(ReportType.TABLE)
-                .addAttribute(ATTR_DEPARTMENT).waitForReportComputing().exportTo(DataType.XLSX)
+                .addAttribute(ATTR_DEPARTMENT).waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX)
                 .getExportXLSXDialog().uncheckOption(OptionalExport.CELL_MERGED).confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
@@ -248,7 +249,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
             embedAdToWrapperPage(getEmbeddedAdUrl());
             getEmbeddedAnalysisPage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_DEPARTMENT).addColumnsAttribute(ATTR_FORECAST_CATEGORY)
-                .waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog()
+                .waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog()
                 .uncheckOption(OptionalExport.CELL_MERGED).confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()

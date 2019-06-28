@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.analyze;
+package com.gooddata.qa.graphene.fragments.indigo;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import org.jboss.arquillian.graphene.Graphene;
@@ -12,7 +12,7 @@ import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-public class ExportToSelect extends AbstractReactDropDown {
+public class OptionalExportMenu extends AbstractReactDropDown {
 
     @FindBy(className = "s-gd-export-menu-open-report")
     private WebElement openAsReportButton;
@@ -27,12 +27,14 @@ public class ExportToSelect extends AbstractReactDropDown {
         return ".gd-list-item:not([class*='item-header'])";
     }
 
-    public void exportTo(DataType type) {
-        waitForElementVisible(By.className(type.toString()), getRoot()).click();
+    public void exportTo(File file) {
+        waitForElementVisible(
+            By.cssSelector("[class*='menu-export-" + file.toString().toLowerCase() + "']"), getRoot()).click();
     }
 
-    public boolean isExportToButtonEnabled(DataType type) {
-        return !isElementDisabled(waitForElementVisible(By.className(type.toString()), getRoot()));
+    public boolean isExportToButtonEnabled(File file) {
+        return !isElementDisabled(waitForElementVisible(
+            By.cssSelector("[class*='menu-export-" + file.toString().toLowerCase() + "']"), getRoot()));
     }
 
     public boolean isOpenAsReportButtonEnabled() {
@@ -53,18 +55,7 @@ public class ExportToSelect extends AbstractReactDropDown {
         return waitForElementVisible(By.cssSelector(".gd-bubble .content"), browser).getText().trim();
     }
 
-    public enum DataType {
-        CSV("gd-export-menu-export-csv"),
-        XLSX("gd-export-menu-export-xlsx");
-
-        private String type;
-
-        DataType(String type) {
-            this.type = type;
-        }
-
-        public String toString() {
-            return type;
-        }
+    public enum File {
+        CSV, XLSX;
     }
 }

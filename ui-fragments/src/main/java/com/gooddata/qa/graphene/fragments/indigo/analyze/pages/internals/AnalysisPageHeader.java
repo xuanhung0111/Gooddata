@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -73,9 +73,9 @@ public class AnalysisPageHeader extends AbstractFragment {
         Graphene.waitGui().until(hasNewWindow);
     }
 
-    public ExportToSelect clickOptionsButton() {
+    public OptionalExportMenu clickOptionsButton() {
         waitForElementVisible(optionsButton).click();
-        return Graphene.createPageFragment(ExportToSelect.class,
+        return Graphene.createPageFragment(OptionalExportMenu.class,
             waitForElementVisible(By.className("s-gd-export-menu-overlay"), browser));
     }
 
