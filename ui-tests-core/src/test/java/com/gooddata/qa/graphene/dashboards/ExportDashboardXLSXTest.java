@@ -230,7 +230,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 asList("Dec", "2487.0", "12083.3418324391", "2.824990059E7", "2.927793726E7")));
     }
 
-    @Test(dependsOnGroups = "createProject")
+    @Test(dependsOnGroups = "createProject", enabled = false)
     public void exportDashboardHasReportContainsRestrictedDataToXLSX() throws IOException {
         FactRestRequest factRestRequest = new FactRestRequest(getAdminRestClient(), testParams.getProjectId());
         factRestRequest.setFactRestricted(getFactByTitle(FACT_AMOUNT).getUri());

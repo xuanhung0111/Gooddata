@@ -223,7 +223,6 @@ public class UITestsRegistry {
                     GoodSalesEditEmbeddedDashboardTest.class,
                     GoodSalesDefaultFilterMiscTest.class,
                     GoodSalesSavedViewWithAllValuesTest.class,
-                    GoodSalesDashboardRestrictedFacts.class,
                     GoodSalesHideDateRangeSelectionTest.class,
                     DashboardDateFilterSelectRangeTest.class,
                     FiscalDateFilterFromAndToTest.class,

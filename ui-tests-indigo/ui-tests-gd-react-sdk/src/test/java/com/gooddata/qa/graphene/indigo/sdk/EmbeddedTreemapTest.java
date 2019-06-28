@@ -179,7 +179,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "17,283")));
     }
 
-    @Test(dependsOnMethods = "login")
+    @Test(dependsOnMethods = "login", enabled = false)
     public void embedTreemapHasRestrictedFact() throws IOException {
         FactRestRequest factRestRequest = new FactRestRequest(getAdminRestClient(), testParams.getProjectId());
         factRestRequest.setFactRestricted(getFactByTitle(FACT_AMOUNT).getUri());
