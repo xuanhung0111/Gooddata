@@ -5,9 +5,11 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.java.RetryCommand;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.Test;
@@ -459,9 +461,18 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         // retry is just a workaround
         RetryCommand retryCommand = new RetryCommand(2);
         JSONObject content = retryCommand.retryOnException(TimeoutException.class, () -> {
-            cleanUpLogger();
-            insight.getChartReport().clickOnElement(position);
-            return getLatestPostMessageObj();
+            try {
+                cleanUpLogger();
+                insight.getChartReport().clickOnElement(position);
+                return getLatestPostMessageObj();
+            } catch (JSONException e) {
+                // Json exception thrown when eventing data is empty
+                // move to top left corner to close all opening popup
+                ElementUtils.moveToTopLetCorner();
+                // then force a retry
+                throw new TimeoutException(e);
+            }
+
         });
 
         verifyColumnDrillContext(content);
