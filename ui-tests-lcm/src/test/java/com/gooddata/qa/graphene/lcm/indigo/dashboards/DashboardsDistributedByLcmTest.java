@@ -29,6 +29,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.utils.XlsxUtils;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
@@ -93,6 +94,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
     private final String EXPORT_VISUALIZED_DATA_INSIGHT = "Export visualized insight" + generateHashString();
     private final String COMBO_CHART_INSIGHT = "Combo Chart insight" + generateHashString();
+    private final String TREEMAP_CHART_INSIGHT = "TreeMap Chart Insight" + generateHashString();
     private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
     private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
@@ -165,6 +167,12 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                     getAttributeByTitle(ATTR_DEPARTMENT), CategoryBucket.Type.ATTRIBUTE))));
         createInsightHasDualAxis();
         createInsightHasGroupingAndSubtotals();
+
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(TREEMAP_CHART_INSIGHT, ReportType.TREE_MAP)
+                        .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES))))
+                        .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket(
+                                getAttributeByTitle(ATTR_ACTIVITY_TYPE), CategoryBucket.Type.ATTRIBUTE))));
 
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
@@ -411,6 +419,17 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             asList("Sum", "$33,562,482.51", "$46,843,842.45", "Sum", "$15,370,157.08", "$20,848,974.50"));
         assertEquals(pivotTableReport.getGrandTotalsContent(),
             singletonList(asList("Sum", EMPTY, "$48,932,639.59", "$67,692,816.95")));
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightAnalyseWithTreeMapChart() {
+        AnalysisPage analysisPage = initAnalysePage().openInsight(TREEMAP_CHART_INSIGHT).waitForReportComputing();
+        Screenshots.takeScreenshot(browser, "testInsightAnalyseWithTreeMapChart", getClass());
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("Email (33,920)", "In Person Meeting (35,975)",
+                "Phone Call (50,780)", "Web Meeting (33,596)"));
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
+        assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList("Activity Type", "Email"), asList("# of Activities", "33,920")));
     }
 
     @AfterClass(alwaysRun = true)

@@ -16,6 +16,7 @@ import com.gooddata.qa.graphene.indigo.analyze.RedesigningDateFilterDialogOnFilt
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportTest;
+import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ReferencePointAndVisSwitchingTest;
 import com.gooddata.qa.graphene.indigo.analyze.SecondaryAxisTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
@@ -174,6 +175,7 @@ public class UITestsRegistry {
             SecondaryAxisTest.class,
             PivotTableAdvancedTest.class,
             TreeMapChartReportTest.class,
+            TreeMapChartReportAdvancedTest.class,
             ReferencePointAndVisSwitchingTest.class,
             ApplyColorPaletteOnAnalyzePageTest.class,
             ColorPalettePickerBasicInsightAndKPITest.class,
