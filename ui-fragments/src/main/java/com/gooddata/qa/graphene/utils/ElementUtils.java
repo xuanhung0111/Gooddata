@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 public final class ElementUtils {
 
-    public static final By BY_BUBBLE_CONTENT = By.cssSelector(".bubble-content .content");
+    public static final By BY_BUBBLE_CONTENT = By.cssSelector(".gd-bubble:not(.s-gd-configuration-bubble) .bubble-content .content");
 
     private ElementUtils() {
     }

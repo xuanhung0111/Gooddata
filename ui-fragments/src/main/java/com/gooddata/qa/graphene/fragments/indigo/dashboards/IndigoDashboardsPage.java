@@ -67,9 +67,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = "." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)")
     private WebElement enabledSaveButton;
 
-    @FindBy(css = ".dash-nav-right .configuration-panel")
-    private ConfigurationPanel configurationPanel;
-
     @FindBy(className = "s-attribute_select")
     private AttributeSelect attributeSelect;
 
@@ -192,7 +189,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public ConfigurationPanel getConfigurationPanel() {
-        return waitForFragmentVisible(configurationPanel);
+        return ConfigurationPanel.getInstance(browser);
     }
 
     public IndigoDashboardsPage clickDashboardBody() {
@@ -302,7 +299,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage addKpi(KpiConfiguration config) {
         dragAddKpiPlaceholder();
-        configurationPanel
+        ConfigurationPanel configurationPanel = getConfigurationPanel()
             .selectMetricByName(config.getMetric())
             .selectDateDataSetByName(config.getDataSet());
 

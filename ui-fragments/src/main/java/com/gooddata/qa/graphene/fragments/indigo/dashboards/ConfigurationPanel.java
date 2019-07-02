@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 
 public class ConfigurationPanel extends AbstractFragment {
 
+    private static final String CONFIGURATION_PANEL_ROOT = ".s-gd-configuration-bubble .configuration-panel";
     private static final By BY_DRILL_TO_SELECT = By.className("s-drill_to_select");
 
     @FindBy(className = "s-metric_select")
@@ -57,6 +59,11 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-date-filter-by-item")
     private FilterByItem filterByDateFilter;
+
+    public static ConfigurationPanel getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ConfigurationPanel.class,
+                waitForElementVisible(By.cssSelector(CONFIGURATION_PANEL_ROOT), context));
+    }
 
     public List<FilterByItem> getFilterByAttributeFilters() {
         return filterByAttributeFilters;
