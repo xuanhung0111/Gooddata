@@ -18,8 +18,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ConfigurationPanel extends AbstractFragment {
 
@@ -81,6 +83,13 @@ public class ConfigurationPanel extends AbstractFragment {
                 browser -> !dataSetSelectLoaded.getAttribute("class").contains("is-loading");
         Graphene.waitGui().until(dataSetLoaded);
         return this;
+    }
+
+    public List<String> getListDateDataset(){
+        waitForVisDateDataSetsLoaded();
+        waitForElementVisible(dataSetSelectLoaded).click();
+        return waitForCollectionIsNotEmpty(browser.findElements(By.className("gd-list-item-shortened"))
+                .stream().map(e->e.getText()).collect(Collectors.toList()));
     }
 
     public ConfigurationPanel waitForButtonsLoaded() {

@@ -23,6 +23,7 @@ public class AttributesBucket extends AbstractBucket {
     private static final By BY_DATE_DATASET_SELECT = By.className("adi-date-dataset-switch");
     private static final By BY_DATE_GRANULARITY_SELECT = By.className("adi-date-granularity-switch");
     private static final By BY_VIEW_BY_WARNING = className("adi-stack-warn");
+    private static final String BUCKET_WITH_WARN_MESSAGE = "bucket-with-warn-message";
 
     public List<String> getItemNames() {
         return getElementTexts(items, e -> e.findElement(BY_HEADER));
@@ -72,5 +73,20 @@ public class AttributesBucket extends AbstractBucket {
     private DateDimensionSelect getDateGranularitySelect() {
         return Graphene.createPageFragment(DateDimensionSelect.class,
                 waitForElementVisible(BY_DATE_GRANULARITY_SELECT, browser));
+    }
+
+    public String getAttributeName() {
+        if (isEmpty()) {
+            return "";
+        }
+        return waitForElementVisible(BY_HEADER, get()).getText().trim();
+    }
+
+    public WebElement get() {
+        return waitForElementVisible(items.get(0));
+    }
+
+    public boolean isDisabled() {
+        return getRoot().getAttribute("class").contains(BUCKET_WITH_WARN_MESSAGE);
     }
 }

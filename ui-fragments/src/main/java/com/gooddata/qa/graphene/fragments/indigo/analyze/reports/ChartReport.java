@@ -46,6 +46,9 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-markers *")
     private List<WebElement> markers;
 
+    @FindBy(css = ".highcharts-series rect")
+    private List<WebElement> rectTrackers;
+
     @FindBy(css = LEGEND_ITEM_ICON)
     private List<WebElement> legendIcons;
 
@@ -174,13 +177,19 @@ public class ChartReport extends AbstractFragment {
     }
 
     public int getTrackersCount() {
-        if (isLineChart()) {
+        if (isLineChart() || isColumnChart() || isDonutChart()) {
             return waitForCollectionIsNotEmpty(trackers).size();
         }
 
         if (isPieChart()) {
             return (int) waitForCollectionIsNotEmpty(trackers).stream()
                     .filter(e -> isElementVisible(e))
+                    .count();
+        }
+
+        if (isTreeMapChart()) {
+            return (int) waitForCollectionIsNotEmpty(rectTrackers).stream()
+                    .map(e -> isElementVisible(e))
                     .count();
         }
 
@@ -322,6 +331,18 @@ public class ChartReport extends AbstractFragment {
 
     private boolean isPieChart() {
         return getRoot().getAttribute("class").contains("visualization-pie");
+    }
+
+    private boolean isDonutChart() {
+        return getRoot().getAttribute("class").contains("visualization-donut");
+    }
+
+    private boolean isColumnChart() {
+        return getRoot().getAttribute("class").contains("visualization-column");
+    }
+
+    private boolean isTreeMapChart() {
+        return getRoot().getAttribute("class").contains("visualization-treemap");
     }
 
     private List<String> getLabels(Collection<WebElement> labels) {

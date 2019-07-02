@@ -295,6 +295,13 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public List<String> getlistRecommended(){
+        MetricFilterByDatePicker filterByDatePicker = expandFilterByDate();
+        filterByDatePicker.expandDateDimension();
+        return waitForCollectionIsNotEmpty(browser.findElements(className("gd-list-item-shortened")))
+                .stream().map(e-> e.getText()).collect(Collectors.toList());
+    }
+
     public void addFilterWithLargeNumberValues(String attribute, String... unselectedValues) {
         addFilter(attribute, attributeFilterPicker ->
                 attributeFilterPicker.selectAll().selectItems(unselectedValues).apply(), unselectedValues);
