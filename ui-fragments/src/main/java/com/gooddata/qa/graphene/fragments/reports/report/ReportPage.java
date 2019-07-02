@@ -346,6 +346,7 @@ public class ReportPage extends AbstractFragment {
         float filterCountAfter = getNumber(textOnFilterButton);
         assertEquals(filterCountAfter, filterCountBefore + 1, "Filter wasn't added");
         waitForReportExecutionProgress();
+        waitForElementEnabled(getRoot().findElement(className("s-btn-add_filter")));
         return this;
     }
 

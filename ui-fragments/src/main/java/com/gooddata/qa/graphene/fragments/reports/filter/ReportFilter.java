@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports.filter;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -9,7 +10,6 @@ import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -49,7 +49,9 @@ public class ReportFilter extends AbstractFragment {
     private List<WebElement> existingFilters;
 
     public void addFilter(FilterItem filterItem) {
-        clickAddFilter();
+        if (existingFilters.size() != 0) {
+            clickAddFilter();
+        }
 
         if(filterItem instanceof AttributeFilterItem) {
             openAttributeFilterFragment().addFilter(filterItem);
@@ -69,9 +71,7 @@ public class ReportFilter extends AbstractFragment {
     }
 
     public ReportFilter clickAddFilter() {
-        Optional.of(waitForElementVisible(addFilterButton))
-                .filter(e -> !e.getAttribute("class").contains("disabled"))
-                .ifPresent(WebElement::click);
+        waitForElementEnabled(addFilterButton).click();
         return this;
     }
 

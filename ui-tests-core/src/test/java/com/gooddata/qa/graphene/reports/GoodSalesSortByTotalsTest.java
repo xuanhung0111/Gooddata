@@ -109,8 +109,8 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
         assertEquals(table.getMetricValues(), asList(886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f,
                 886.15f, 2432.09f, 0.0f));
 
-        reportPage.openFilterPanel().addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
-        reportPage.waitForReportExecutionProgress();
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011))
+                .waitForReportExecutionProgress();
         assertEquals(table.getMetricValues(), asList(886.15f, 0.0f));
     }
 

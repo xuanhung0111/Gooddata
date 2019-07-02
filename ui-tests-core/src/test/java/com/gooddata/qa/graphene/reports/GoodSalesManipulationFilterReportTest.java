@@ -56,7 +56,6 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
     public void addNumericVariableFilter() {
         initVariablePage().createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));
         Collection<String> variables = initReport().openFilterPanel()
-                .clickAddFilter()
                 .openPromptFilterFragment()
                 .getVariables();
         assertThat(variables, not(hasItem(VARIABLE_NAME)));

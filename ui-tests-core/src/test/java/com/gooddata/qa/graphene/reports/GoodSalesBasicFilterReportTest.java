@@ -80,7 +80,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     public void addFilterBySpecifyingAttributeValues() {
         AttributeFilterFragment filterFragment = initReport(REPORT_NAME + System.currentTimeMillis())
                 .openFilterPanel()
-                .clickAddFilter()
                 .openAttributeFilterFragment();
 
         AttributeFilterItem filterItem = FilterItem.Factory.createAttributeFilter(ATTR_STAGE_NAME, "Interest",
@@ -109,7 +108,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         int rangeNumber = getCurrentYear() - 2012;
 
         initReport(REPORT_NAME + System.currentTimeMillis()).openFilterPanel()
-                .clickAddFilter()
                 .openAttributeFilterFragment()
                 .searchAndSelectAttribute(ATTR_YEAR_SNAPSHOT)
                 .selectFloatingTime(Time.THIS_YEAR)
