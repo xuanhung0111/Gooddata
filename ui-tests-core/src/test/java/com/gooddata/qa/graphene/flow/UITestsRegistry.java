@@ -57,6 +57,7 @@ import com.gooddata.qa.graphene.filters.FiscalDateFilterFromAndToTest;
 import com.gooddata.qa.graphene.filters.FiscalDateFilterNameTest;
 import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
+import com.gooddata.qa.graphene.library.CreateDataloadProcessAndUploadTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.BulkPermissionMetricSetting;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
@@ -122,6 +123,7 @@ public class UITestsRegistry {
 
         suites.put("basic", new HashMap<String, Object[]>() {{
             put("basicTest", new Object[] {
+                    CreateDataloadProcessAndUploadTest.class,
                     SimpleProjectEtlTest.class,
                     GoodSalesDashboardTest.class,
                     GoodSalesReportsTest.class,
