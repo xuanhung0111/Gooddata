@@ -53,6 +53,7 @@ public class AttributeSndPanel extends AbstractSndPanel {
         if (!posElement.getAttribute("class").contains(position.getDirection())) {
             waitForElementVisible(posElement).click();
             waitForElementAttributeContainValue(posElement, "class", position.getDirection());
+            waitForApplyingChange();
         }
 
         return this;

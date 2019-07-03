@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.utils.PdfUtils;
-import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.apache.commons.lang3.tuple.Pair;

@@ -178,7 +178,6 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 metricAlias + " is not the only one");
 
         reportPage.openFilterPanel()
-                .clickAddFilter()
                 .openRankingFilterFragment()
                 .openSelectMetricPopupPanel();
 
@@ -254,10 +253,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
         table.drillOn(YEAR_2011, CellType.ATTRIBUTE_VALUE);
 
-        reportPage.waitForReportExecutionProgress().openFilterPanel()
-                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011));
-
-        reportPage.waitForReportExecutionProgress();
+        reportPage.waitForReportExecutionProgress()
+                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011))
+                .waitForReportExecutionProgress();
         takeScreenshot(browser, "drill-on-report-containing-running-totals", getClass());
         assertTrue(table.getAttributeHeaders().contains(ATTR_QUARTER_YEAR_SNAPSHOT) && table.getAttributeValues()
                 .containsAll(asList(Q1_2011, Q2_2011)), "The drill values are not displayed");
