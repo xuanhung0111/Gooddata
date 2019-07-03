@@ -61,7 +61,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
             {Formatter.DEFAULT, "11.61", false},
             {Formatter.TRUNCATE_NUMBERS, "$12", false},
             {Formatter.COLORS, "$11.61", false},
-            {Formatter.UTF_8, Formatter.UTF_8.toString(), false}
+            {Formatter.UTF_8, "'11.61 kiểm tra nghiêm khắc", false}
         };
     }
 

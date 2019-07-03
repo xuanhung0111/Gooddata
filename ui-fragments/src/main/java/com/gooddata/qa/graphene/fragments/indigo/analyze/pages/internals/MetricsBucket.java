@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
@@ -15,6 +17,14 @@ public class MetricsBucket extends AbstractBucket {
 
     @FindBy(className = "adi-bucket-item")
     protected List<MetricConfiguration> metrics;
+
+    @FindBy(className = "s-bucket-add-arithmetic-measure-button-measures")
+    private WebElement addArithmeticMeasureButton;
+
+    public MetricsBucket createCalculatedMeasure() {
+        waitForElementVisible(addArithmeticMeasureButton).click();
+        return this;
+    }
 
     public MetricConfiguration getMetricConfiguration(final String metric) {
         return waitForCollectionIsNotEmpty(metrics).stream()
