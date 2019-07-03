@@ -358,9 +358,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
         //minimize number of metrics to 1 to avoid handling scroll bar
         reportPage.openWhatPanel().deselectItem(METRIC_PROBABILITY).done();
-        reportPage.openFilterPanel()
-                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
-        reportPage.waitForReportExecutionProgress();
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011))
+                .waitForReportExecutionProgress();
 
         table.openContextMenuFrom(CLOSED_LOST, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(AggregationType.ROLLUP, OF_ALL_COLUMNS);

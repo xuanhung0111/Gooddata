@@ -1,13 +1,16 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -17,6 +20,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -137,7 +141,6 @@ public abstract class AbstractSndPanel extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-
     // Use to search when expected item out of viewport.
     // Not recommend when item container shows lack of item because Scrollbar is not visible in this context.
     private void search(String item) {
@@ -155,7 +158,19 @@ public abstract class AbstractSndPanel extends AbstractFragment {
         howToSelect.accept(itemElement);
         waitForElementAttributeContainValue(itemElement, "class", "sndInReport");
         waitForElementNotVisible(By.className("busyMask"));
+        waitForApplyingChange();
         return this;
+    }
+
+    public void waitForApplyingChange() {
+        By loadingWheel = By.className("s-loading");
+        try {
+            Graphene.waitGui().withTimeout(1, TimeUnit.SECONDS).until(browser ->
+                    isElementVisible(loadingWheel, getRoot()));
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+        waitForElementNotPresent(loadingWheel, getRoot());
     }
 
     private boolean isItemFullyVisible(By itemLocator) {
