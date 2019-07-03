@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
@@ -32,6 +31,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 
 public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
+
     private static final String SINGLE_METRIC_APPLY_COLOR_PALETTE = "Single_Metric_Apply_Color_Palette";
     private static final String MULTI_METRIC_APPLY_COLOR_PALETTE = "Multi_Metric_Apply_Color_Palette";
     private static final String NEW_INSIGHT_APPLY_COLOR_PALETTE = "New_Insight_Apply_Color_Palette";
@@ -39,6 +39,7 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
     private static final String DATE_FILTER_THIS_MONTH = "This month";
     private static List<Pair<String, ColorPalette>> listColorPalettes = Arrays.asList(Pair.of("guid1", ColorPalette.RED),
             Pair.of("guid2", ColorPalette.GREEN), Pair.of("guid3", ColorPalette.BLUE), Pair.of("guid4", ColorPalette.YELLOW));
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -53,15 +54,9 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
         getMetricCreator().createSnapshotBOPMetric();
-        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+        indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         indigoRestRequest.setColor(initColorPalette(listColorPalettes));
-    }
-
-    public void deleteIndigoRestRequestColorsPalette() {
-        IndigoRestRequest indigoRestDeleteRequest = new IndigoRestRequest(
-                new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId());
-        indigoRestDeleteRequest.deleteColorsPalette();
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -125,14 +120,12 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
     public void checkReportInsightApplyColorPalette() throws AWTException {
         BrowserUtils.zoomBrowser(browser);
         browser.navigate().refresh();
-        AnalysisPage analysisPage = initAnalysePage();
-        analysisPage.openInsight(SAVE_AS_INSIGHT_APPLY_COLOR_PALETTE).waitForReportComputing();
-        analysisPage.exportReport();
+        initAnalysePage().openInsight(SAVE_AS_INSIGHT_APPLY_COLOR_PALETTE).waitForReportComputing().exportReport();
         BrowserUtils.switchToLastTab(browser);
         try {
             waitForAnalysisPageLoaded(browser);
             takeScreenshot(browser, "checkReportInsightApplyColorPalette", getClass());
-            assertEquals(reportPage.checkColorColumn(0), ColorPalette.RED.toReportFormatString());
+            assertEquals(reportPage.waitForReportExecutionProgress().checkColorColumn(0), ColorPalette.RED.toReportFormatString());
             assertEquals(reportPage.getReportLegendColors(), asList(ColorPalette.RED.toReportFormatString(), ColorPalette.GREEN.toReportFormatString()));
         } finally {
             BrowserUtils.resetZoomBrowser(browser);
@@ -237,7 +230,7 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"checkDeleteInsightApplyColorPalette"})
     public void singleAndMultiInsightNotApplyColorPalette() {
-        deleteIndigoRestRequestColorsPalette();
+        indigoRestRequest.deleteColorsPalette();
         ChartReport chartReport = initAnalysePage().openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
                 .waitForReportComputing()
                 .getChartReport();
