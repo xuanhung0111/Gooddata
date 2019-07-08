@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DeleteAttributeFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ExtendedDateFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardPostMessageTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
@@ -192,6 +193,7 @@ public class UITestsRegistry {
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
             KpiCompareToPreviousPeriodTest.class,
+            ExtendedDateFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-mobile-AttributeFiltering.xml",

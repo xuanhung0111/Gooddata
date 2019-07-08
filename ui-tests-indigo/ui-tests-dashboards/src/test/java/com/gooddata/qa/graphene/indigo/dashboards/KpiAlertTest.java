@@ -226,7 +226,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
                 .applyAlertFilters();
 
             String dateFilterSelection = indigoDashboardsPage
-                .waitForDateFilter()
+                .getDateFilter()
                 .getSelection();
             assertEquals(dateFilterSelection, DATE_FILTER_THIS_MONTH);
 

@@ -27,7 +27,8 @@ public enum ProjectFeatureFlags {
     ENABLE_PIVOT_TABLE("enablePivot"),
     ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker"),
     IS_REDIRECTED_FOR_ONE_PROJECT("isRedirectedForOneProject"),
-    CASCADING_FILTERS_BOOSTING_ENABLE("cascadingFiltersBoostingEnabled");
+    CASCADING_FILTERS_BOOSTING_ENABLE("cascadingFiltersBoostingEnabled"),
+    ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS("enableKPIDashboardExtendedDateFilters");
 
     private final String featureFlag;
 
