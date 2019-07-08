@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;

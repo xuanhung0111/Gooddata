@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket.Type;
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -21,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.ExportXLSXDialog
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -34,6 +36,7 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LcmRestUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -54,6 +57,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNA
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
@@ -94,6 +98,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
     private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
             "Insight Has View By And Stack By Apply Custom Color Picker" + generateHashString();
+    private final String INSIGHT_HAS_DUAL_AXIS = "Insight test dual axis";
+    private final String INSIGHT_HAS_GROUPING_AND_SUBTOTAL = "Grouping and subtotal";
     private static List<Pair<String, ColorPalette>> listColorPalettes = Arrays.asList(Pair.of("guid1", ColorPalette.RED),
             Pair.of("guid2", ColorPalette.GREEN), Pair.of("guid3", ColorPalette.BLUE), Pair.of("guid4", ColorPalette.YELLOW));
 
@@ -158,6 +164,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                     MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_AVG_AMOUNT), Type.SECONDARY_MEASURES)))
                 .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket(
                     getAttributeByTitle(ATTR_DEPARTMENT), CategoryBucket.Type.ATTRIBUTE))));
+        createInsightHasDualAxis();
+        createInsightHasGroupingAndSubtotals();
 
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
@@ -342,30 +350,13 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightAnalyseWithDualAxis() {
-        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
         final List<String> itemsConfigurationPanelColumnChart =
                 asList(COLORS.toString(), X_AXIS.toString(), Y_AXIS.toString() + " (Left)",
                         Y_AXIS.toString() + " (Right)", LEGEND.toString(), CANVAS.toString());
-        final String INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE = "Two measure and attribute";
-
-        indigoRestRequest.createInsight(
-                new InsightMDConfiguration(INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(
-                                asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
-                                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BEST_CASE))))
-                        .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                        CategoryBucket.Type.ATTRIBUTE))));
 
         AnalysisPage analysisPage = initAnalysePage();
-        MetricsBucket metricsBucket = analysisPage.openInsight(INSIGHT_HAS_TWO_MEASURE_AND_ATTRIBUTE)
-                .waitForReportComputing().getMetricsBucket();
-        metricsBucket.getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().checkShowOnSecondaryAxis();
-        metricsBucket.getMetricConfiguration(METRIC_BEST_CASE).expandConfiguration().uncheckShowOnSecondaryAxis();
-        analysisPage.waitForReportComputing();
+        ChartReport chartReport = analysisPage.openInsight(INSIGHT_HAS_DUAL_AXIS).getChartReport();
 
-        ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getPrimaryYaxisTitle(), METRIC_BEST_CASE);
         assertTrue(chartReport.isPrimaryYaxisVisible(), "Rerender insight should have primary axis");
         assertEquals(chartReport.getSecondaryYaxisTitle(), METRIC_AMOUNT);
@@ -410,6 +401,17 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertEquals(chartReport.getTrackerType(1, 0), "path");
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
             asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(METRIC_AVG_AMOUNT, "$21,310.98")));
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightPivotTableHasGroupingAndSubtotals() {
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_GROUPING_AND_SUBTOTAL)
+            .waitForReportComputing().getPivotTableReport();
+
+        assertEquals(pivotTableReport.getSubTotalsContent(),
+            asList("Sum", "$33,562,482.51", "$46,843,842.45", "Sum", "$15,370,157.08", "$20,848,974.50"));
+        assertEquals(pivotTableReport.getGrandTotalsContent(),
+            singletonList(asList("Sum", EMPTY, "$48,932,639.59", "$67,692,816.95")));
     }
 
     @AfterClass(alwaysRun = true)
@@ -476,6 +478,46 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         } finally {
             setCustomColorPickerFlag(false);
         }
+    }
+
+    private void createInsightHasDualAxis() {
+        new IndigoRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId())
+            .createInsight(new InsightMDConfiguration(INSIGHT_HAS_DUAL_AXIS, ReportType.COLUMN_CHART)
+                .setMeasureBucket(
+                    asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BEST_CASE))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE))));
+
+        AnalysisPage analysisPage = initAnalysePage();
+        MetricsBucket metricsBucket = analysisPage.openInsight(INSIGHT_HAS_DUAL_AXIS)
+            .waitForReportComputing().getMetricsBucket();
+        metricsBucket.getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().checkShowOnSecondaryAxis();
+        metricsBucket.getMetricConfiguration(METRIC_BEST_CASE).expandConfiguration().uncheckShowOnSecondaryAxis();
+        analysisPage.saveInsight().waitForReportComputing();
+    }
+
+    private void createInsightHasGroupingAndSubtotals() {
+        new IndigoRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId())
+            .createInsight(new InsightMDConfiguration(INSIGHT_HAS_GROUPING_AND_SUBTOTAL, ReportType.TABLE)
+                .setMeasureBucket(singletonList(MeasureBucket
+                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_REGION),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.COLUMNS))));
+
+        AnalysisPage analysisPage = initAnalysePage();
+        PivotTableReport pivotTableReport = analysisPage.openInsight(INSIGHT_HAS_GROUPING_AND_SUBTOTAL)
+            .waitForReportComputing().getPivotTableReport();
+        pivotTableReport.addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0).hoverItem(AggregationItem.SUM)
+            .selectRowsItem("within " + ATTR_DEPARTMENT);
+        analysisPage.saveInsight().waitForReportComputing();
     }
 
     private void createInsightHasAttributeOnStackByAndViewBy(String title, String metric, String attribute, String stack) {

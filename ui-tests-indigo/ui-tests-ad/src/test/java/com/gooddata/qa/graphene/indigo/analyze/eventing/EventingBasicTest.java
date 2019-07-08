@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
+import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -24,6 +26,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
@@ -31,6 +34,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class EventingBasicTest extends AbstractEventingTest {
 
@@ -755,6 +759,37 @@ public class EventingBasicTest extends AbstractEventingTest {
         intersection = drillContext.getJSONArray("intersection");
         assertEquals(intersection.length(), 2);
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableWithGroupingAndSubtotals() throws IOException {
+        String insightUri = createInsight("grouping_and_subtotals_on_pivot", TABLE,
+            Collections.singletonList(METRIC_AMOUNT), Arrays.asList(ATTR_DEPARTMENT, ATTR_REGION), ATTR_FORECAST_CATEGORY);
+
+        final String departmentUri = getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(departmentUri);
+            put(regionUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        PivotTableReport pivotTableReport = embeddedAnalysisPage.getPivotTableReport();
+        pivotTableReport.addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        pivotTableReport.getCellElement(0, 0).click();
+        JSONObject content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_DEPARTMENT, departmentUri);
+
+        cleanUpLogger();
+        pivotTableReport.getCellElement(1, 0).click();
+        content = getLatestPostMessageObj();
+        verifyTableReport(content, ATTR_REGION, regionUri);
+
+        assertFalse(pivotTableReport.isTotalCellUnderlined(2, 0),
+            "The total table should not be underlined");
     }
 
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
