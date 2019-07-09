@@ -14,7 +14,17 @@ public enum ReportType {
         }
     },
 
-    TREE_MAP("treemap"),
+    TREE_MAP("treemap"){
+        @Override
+        public String getMetricMessage() {
+            return "TO ADD ADDITIONAL MEASURE, REMOVE FROM VIEW BY";
+        }
+
+        @Override
+        public String getViewbyByMessage() {
+            return "TO VIEW BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
+        }
+    },
     STACKS_AREA_CHART("area"),
     HEADLINE("headline"),
     SCATTER_PLOT("scatter"),
@@ -51,6 +61,10 @@ public enum ReportType {
 
     public By getLocator() {
         return By.cssSelector(".gd-vis-type-" + label);
+    }
+
+    public String getFormat() {
+        return "s-vis-button-" + label;
     }
 
     public String getMetricMessage() {

@@ -33,6 +33,13 @@ public class MetricsBucket extends AbstractBucket {
             .get();
     }
 
+    public String getMetricName() {
+        if (isEmpty()) {
+            return "";
+        }
+        return waitForElementVisible(BY_HEADER, getMetricItem()).getText().trim();
+    }
+
     public MetricConfiguration getLastMetricConfiguration() {
         return waitForCollectionIsNotEmpty(metrics).get(metrics.size()-1);
     }
@@ -43,6 +50,10 @@ public class MetricsBucket extends AbstractBucket {
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + name))
             .getRoot();
+    }
+
+    private WebElement getMetricItem() {
+        return waitForElementVisible(items.get(0));
     }
 
     public List<String> getItemNames() {
