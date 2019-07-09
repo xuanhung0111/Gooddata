@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
@@ -34,9 +33,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_TIMELINE;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
-import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -79,8 +76,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     protected void chooseTreeMapOnVisualizationBucket() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_AMOUNT)
-                .addAttribute(ATTR_DEPARTMENT).addStack(ATTR_STAGE_NAME).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT)
+                .addStack(ATTR_STAGE_NAME).waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT));
         assertEquals(analysisPage.getAttributesBucket().getAttributeName(), ATTR_DEPARTMENT);
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_STAGE_NAME);
@@ -98,7 +96,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasMetricAndSecondaryAttributeOnViewByAndSegmentBy() {
-        ChartReport report = initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), ReportType.TREE_MAP.getMetricMessage());
         assertEquals(report.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
@@ -112,7 +111,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasSecondaryMetricAndAttributeOnSegment() {
-        ChartReport report = initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(analysisPage.getAttributesBucket().getWarningMessage(), ReportType.TREE_MAP.getViewbyByMessage());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT));
@@ -124,7 +124,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasSecondaryMetric() {
-        ChartReport report = initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(analysisPage.getAttributesBucket().getWarningMessage(), ReportType.TREE_MAP.getViewbyByMessage());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT));
@@ -136,8 +137,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasSecondaryAttributeOnViewByAndSegmentBy() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP)
-                .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(analysisPage.getMainEditor().getCanvasMessage(), "NO MEASURE IN YOUR INSIGHT\n" +
                 "Add a measure to your insight, or switch to table view.\n" +
                 "Once done, you'll be able to save it.");
@@ -145,7 +146,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasAttributeOnViewBy() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertEquals(analysisPage.getMainEditor().getCanvasMessage(), "NO MEASURE IN YOUR INSIGHT\n" +
                 "Add a measure to your insight, or switch to table view.\n" +
                 "Once done, you'll be able to save it.");
@@ -153,7 +155,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasAttributeOnSegmentBy() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addStack(ATTR_DEPARTMENT).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addStack(ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(analysisPage.getMainEditor().getCanvasMessage(), "NO MEASURE IN YOUR INSIGHT\n" +
                 "Add a measure to your insight, or switch to table view.\n" +
                 "Once done, you'll be able to save it.");
@@ -161,7 +164,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testTooLargeReport() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACCOUNT).addStack(ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(analysisPage.getMainEditor().getCanvasMessage(),
                 "TOO MANY DATA POINTS TO DISPLAY\nAdd a filter, or switch to table view.");
@@ -169,7 +173,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testNoDataInsight() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         analysisPage.addFilter(ATTR_ACCOUNT).getFilterBuckets().configAttributeFilter(ATTR_ACCOUNT, "1000Bulbs.com");
         analysisPage.addFilter(ATTR_DEPARTMENT).getFilterBuckets().configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
@@ -179,24 +184,26 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDragAndDropMetricToCanvas() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetricToRecommendedStepsPanelOnCanvas(METRIC_NUMBER_OF_ACTIVITIES)
-                .waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetricToRecommendedStepsPanelOnCanvas(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertTrue(analysisPage.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasTheSameObjectsOnMeasureViewByAndSegment() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetricByAttribute(ATTR_ACTIVITY_TYPE).addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetricByAttribute(ATTR_ACTIVITY_TYPE).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         ExportToSelect exportToSelect = analysisPage.getPageHeader().clickOptionsButton();
         assertEquals(exportToSelect.getExportButtonTooltipText(),
-                "The insight is not compatible with Report Editor. To open the insight as a report, select another insight type.");
+                "The insight is not compatible with Report Editor. " +
+                        "To open the insight as a report, select another insight type.");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInComputedChartInsight() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP)
-                .addAttribute(ATTR_ACTIVITY_TYPE).addMetricByAttribute(ATTR_ACCOUNT).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).addMetricByAttribute(ATTR_ACCOUNT).waitForReportComputing();
         assertEquals(analysisPage.getMainEditor().getCanvasMessage(),
                 "SORRY, WE CAN'T DISPLAY THIS INSIGHT\n" +
                         "Try applying different filters, or using different measures or attributes.\n" +
@@ -205,7 +212,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     protected void testInteractionWithLegendAnToolTipOnTreeMapChartReport() {
-        ChartReport chartReport = initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        ChartReport chartReport = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT).waitForReportComputing()
                 .saveInsight("INSIGHT HAVE A METRIC AND TWO ATTRIBUTE ON VIEW BY AND SEGMENT BY").getChartReport();
         assertEquals(chartReport.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
@@ -220,8 +228,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .addDateFilter().getFilterBuckets().openDateFilterPickerPanel()
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.waitForReportComputing();
-        analysisPage.changeReportType(ReportType.PIE_CHART).getMetricsBucket()
-                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration().showPercents();
+        analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing();
+        analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                .expandConfiguration().showPercents();
         analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getDataLabels(),
                 asList("Email (21.99%)", "In Person Meeting (23.32%)", "Phone Call (32.92%)", "Web Meeting (21.78%)"));
@@ -238,7 +247,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testTreeMapChartAppliedDateFilterAndAttributeFilterUnderMetric() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing().getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).
                 expandConfiguration().addFilterByDate(DATE_DATASET_CREATED, "01/01/2010", "01/01/2019");
@@ -250,8 +260,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testTreeMapChartAppliedDateFilterAndAttributeFilterOnFilterBucket() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing().addDateFilter().getFilterBuckets()
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing().addDateFilter().getFilterBuckets()
                 .configDateFilter("01/01/2010", "01/01/2019");
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email");
         analysisPage.waitForReportComputing();
@@ -260,7 +271,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testTreeMapChartAssociateFiltersBetweenGlobalFilterAndMetricFilter() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing().getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CREATED, "01/01/2010", "01/01/2019");
@@ -273,34 +285,39 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    protected void TestRecommendedDateDimensionOnAD() {
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
+    protected void testRecommendedDateDimensionOnAD() {
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT)
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
         analysisPage.waitForReportComputing().saveInsight("TEST RECOMMENDED DATE CLOSED");
-        initAnalysePage().changeReportType(ReportType.TREE_MAP).addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT)
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CREATED, DateRange.LAST_YEAR.toString());
         analysisPage.waitForReportComputing().saveInsight("TEST RECOMMENDED DATE CREATED");
-        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.TREE_MAP)
+        MetricConfiguration metricConfiguration = initAnalysePage()
+                .changeReportType(ReportType.TREE_MAP).waitForReportComputing()
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT).expandConfiguration();
         assertEquals(metricConfiguration.getlistRecommended(), listRecommendedDate);
     }
 
     @Test(dependsOnMethods = {"TestRecommendedDateDimensionOnAD"})
-    protected void TestRecommendedDateDimensionOnKD() {
+    protected void testRecommendedDateDimensionOnKD() {
         ConfigurationPanel configurationPanel;
-        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CLOSED").getConfigurationPanel();
+        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CLOSED")
+                .waitForWidgetsLoading().getConfigurationPanel();
         assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
-        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CREATED").getConfigurationPanel();
+        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CREATED")
+                .waitForWidgetsLoading().getConfigurationPanel();
         assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testActionWithTreeMapChartOnInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
-                .changeReportType(ReportType.TREE_MAP).waitForReportComputing().saveInsight(INSIGHT_TEST);
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).saveInsight(INSIGHT_TEST);
         analysisPage.openInsight(INSIGHT_TEST).waitForReportComputing().saveInsightAs(INSIGHT_TEST_SAVE);
         analysisPage.openInsight(INSIGHT_TEST_SAVE).waitForReportComputing();
         assertTrue(analysisPage.searchInsight(INSIGHT_TEST), INSIGHT_TEST + " is available");
@@ -319,9 +336,10 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchingBetweenColumnChartAndTreeMapChartOnInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
-                .addMetric(METRIC_SNAPSHOT_BOP).addAttribute(ATTR_ACTIVITY_TYPE).addAttribute(ATTR_DEPARTMENT)
-                .changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addMetric(METRIC_SNAPSHOT_BOP).addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 24);
         analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getMetricName(), "M1\n" + METRIC_NUMBER_OF_ACTIVITIES);
@@ -335,8 +353,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchingBetweenBarChartAndTreeMapChartOnInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
-                .addMetric(METRIC_SNAPSHOT_BOP).changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT, METRIC_SNAPSHOT_BOP));
@@ -349,7 +368,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchingBetweenPieChartAndTreeMapChartOnInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter();
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter().waitForReportComputing();
         analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing();
         analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getMetricName(), "M1\n" + METRIC_NUMBER_OF_ACTIVITIES);
@@ -362,9 +382,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSwitchingBetweenTableChartAndTreeMapChartOnInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
-                .addAttribute(ATTR_DEPARTMENT).addDateFilter();
-        analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.TABLE).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+                .addAttribute(ATTR_DEPARTMENT).addDateFilter().waitForReportComputing();
         analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getMetricName(), "M1\n" + METRIC_NUMBER_OF_ACTIVITIES);
         assertEquals(analysisPage.getAttributesBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);

@@ -79,10 +79,10 @@ public class AttributesBucket extends AbstractBucket {
         if (isEmpty()) {
             return "";
         }
-        return waitForElementVisible(BY_HEADER, get()).getText().trim();
+        return waitForElementVisible(BY_HEADER, getAttributeItem()).getText().trim();
     }
 
-    public WebElement get() {
+    private WebElement getAttributeItem() {
         return waitForElementVisible(items.get(0));
     }
 

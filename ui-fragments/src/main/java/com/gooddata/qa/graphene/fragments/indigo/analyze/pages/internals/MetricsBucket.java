@@ -37,7 +37,7 @@ public class MetricsBucket extends AbstractBucket {
         if (isEmpty()) {
             return "";
         }
-        return waitForElementVisible(BY_HEADER, get()).getText().trim();
+        return waitForElementVisible(BY_HEADER, getMetricItem()).getText().trim();
     }
 
     public MetricConfiguration getLastMetricConfiguration() {
@@ -52,7 +52,7 @@ public class MetricsBucket extends AbstractBucket {
             .getRoot();
     }
 
-    public WebElement get() {
+    private WebElement getMetricItem() {
         return waitForElementVisible(items.get(0));
     }
 
