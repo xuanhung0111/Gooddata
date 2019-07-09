@@ -303,7 +303,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
         assertEquals(metricConfiguration.getlistRecommended(), listRecommendedDate);
     }
 
-    @Test(dependsOnMethods = {"TestRecommendedDateDimensionOnAD"})
+    @Test(dependsOnMethods = {"testRecommendedDateDimensionOnAD"})
     protected void testRecommendedDateDimensionOnKD() {
         ConfigurationPanel configurationPanel;
         configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CLOSED")
