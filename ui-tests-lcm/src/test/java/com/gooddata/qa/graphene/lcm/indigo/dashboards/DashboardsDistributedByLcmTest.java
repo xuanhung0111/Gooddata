@@ -95,6 +95,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String EXPORT_VISUALIZED_DATA_INSIGHT = "Export visualized insight" + generateHashString();
     private final String COMBO_CHART_INSIGHT = "Combo Chart insight" + generateHashString();
     private final String TREEMAP_CHART_INSIGHT = "TreeMap Chart Insight" + generateHashString();
+    private final String HEATMAP_CHART_INSIGHT = "HeatMap Chart Insight" + generateHashString();
     private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
     private final String INSIGHT_HAS_VIEW_BY_AND_STACK_BY_APPLY_CUSTOM_COLOR_PICKER =
@@ -167,13 +168,11 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                     getAttributeByTitle(ATTR_DEPARTMENT), CategoryBucket.Type.ATTRIBUTE))));
         createInsightHasDualAxis();
         createInsightHasGroupingAndSubtotals();
-
-        indigoRestRequest.createInsight(
-                new InsightMDConfiguration(TREEMAP_CHART_INSIGHT, ReportType.TREE_MAP)
-                        .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES))))
-                        .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket(
-                                getAttributeByTitle(ATTR_ACTIVITY_TYPE), CategoryBucket.Type.ATTRIBUTE))));
-
+        
+        createInsightHasMetricAndAttribute(indigoRestRequest, TREEMAP_CHART_INSIGHT,
+                ReportType.TREE_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE);
+        createInsightHasMetricAndAttribute(indigoRestRequest, HEATMAP_CHART_INSIGHT,
+                ReportType.HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE);
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
                 testParams.getDomainUser());
@@ -371,7 +370,6 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertEquals(analysisPage.openConfigurationPanelBucket().getItemNames(), itemsConfigurationPanelColumnChart);
     }
 
-
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void exportNewInsightAnalyseToXLSX() throws IOException {
         try {
@@ -425,12 +423,23 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightAnalyseWithTreeMapChart() {
-        AnalysisPage analysisPage = initAnalysePage().openInsight(TREEMAP_CHART_INSIGHT).waitForReportComputing();
+        ChartReport chartReport = initAnalysePage().openInsight(TREEMAP_CHART_INSIGHT)
+                .waitForReportComputing().getChartReport();
         Screenshots.takeScreenshot(browser, "testInsightAnalyseWithTreeMapChart", getClass());
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("Email (33,920)", "In Person Meeting (35,975)",
+        assertEquals(chartReport.getDataLabels(), asList("Email (33,920)", "In Person Meeting (35,975)",
                 "Phone Call (50,780)", "Web Meeting (33,596)"));
-        assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTrackersCount(), 4);
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList("Activity Type", "Email"), asList("# of Activities", "33,920")));
+    }
+
+    @Test (dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightAnalyseWithHeatMapChart(){
+        ChartReport chartReport = initAnalysePage().openInsight(HEATMAP_CHART_INSIGHT)
+                .waitForReportComputing().getChartReport();
+        Screenshots.takeScreenshot(browser, "testInsightAnalyseWithHeatMapChart", getClass());
+        assertEquals(chartReport.getTrackersCount(),4);
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList("Activity Type", "Email"), asList("# of Activities", "33,920")));
     }
 
@@ -550,6 +559,15 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                                         CategoryBucket.Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack),
                                         CategoryBucket.Type.STACK))));
+    }
+
+    private void createInsightHasMetricAndAttribute(IndigoRestRequest indigoRestRequest, String title, ReportType reportType, String metric, String attribute){
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(title, reportType)
+                        .setMeasureBucket(singletonList(
+                                MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
+                        .setCategoryBucket(singletonList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), CategoryBucket.Type.ATTRIBUTE))));
     }
 
     private void setCustomColorPickerFlag(boolean status) {

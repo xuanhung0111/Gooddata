@@ -4,8 +4,10 @@ import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,6 +23,7 @@ import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COMBO_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.TABLE;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.TREE_MAP;
+import static com.gooddata.qa.graphene.enums.indigo.ReportType.HEAT_MAP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
@@ -32,10 +35,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 public class EventingBasicTest extends AbstractEventingTest {
 
@@ -823,6 +826,118 @@ public class EventingBasicTest extends AbstractEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReport() throws IOException {
+        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight", HEAT_MAP,
+                METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_REGION);
+
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(activityTypeUri);
+            put(regionUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+
+        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+        chartReport.clickOnElement(Pair.of(0, 0));
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList("Activity Type", "Email"), asList("Region", "West Coast"), asList("# of Activities", "23,854")));
+        assertEquals(chartReport.getTrackersCount(), 8);
+        Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
+        
+        JSONObject content = getLatestPostMessageObj();
+        log.info("content" + content);
+        verifyHeatMapChartDrillContext(content);
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReportWithDateAttributeOnRows() throws IOException {
+        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight_has_date_on_rows",
+                HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE);
+
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
+        final String yearActivityUri = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(yearActivityUri);
+            put(activityTypeUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+
+        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+        chartReport.clickOnElement(Pair.of(0, 0));
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList("Year (Activity)", "2008"), asList("Activity Type", "In Person Meeting"), asList("# of Activities", "48")));
+        Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
+
+        JSONObject content = getLatestPostMessageObj();
+        log.info("content" + content);
+        verifyHeatMapChartDrillContext(content);
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReportHasDateAttributeOnColumns() throws IOException {
+        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight_has_date_on_columns",
+                HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_YEAR_ACTIVITY);
+
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
+        final String yearActivityUri = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(activityTypeUri);
+            put(yearActivityUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+
+        ChartReport chartReport = embeddedAnalysisPage.getChartReport();
+        chartReport.clickOnElement(Pair.of(0, 0));
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+                asList(asList("Activity Type", "Email"), asList("Year (Activity)", "2009"), asList("# of Activities", "772")));
+        Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
+
+        JSONObject content = getLatestPostMessageObj();
+        log.info("content" + content);
+        verifyHeatMapChartDrillContext(content);
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
         String uri = intersection.getJSONObject("header").getString("uri");
         String title = intersection.getString("title");
@@ -855,6 +970,12 @@ public class EventingBasicTest extends AbstractEventingTest {
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getString("type"), "treemap");
         assertEquals(drillContext.getString("element"), "slice");
+    }
+
+    private void verifyHeatMapChartDrillContext(JSONObject content) {
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        assertEquals(drillContext.getString("type"), "heatmap");
+        assertEquals(drillContext.getString("element"), "cell");
     }
 
     private void verifyLineDrillContext(JSONObject content) {

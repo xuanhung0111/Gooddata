@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.indigo.analyze.PivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.HeatMapTest;
+import com.gooddata.qa.graphene.indigo.analyze.HeatMapAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ReferencePointAndVisSwitchingTest;
 import com.gooddata.qa.graphene.indigo.analyze.SecondaryAxisTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
@@ -180,6 +181,7 @@ public class UITestsRegistry {
             TreeMapChartReportTest.class,
             TreeMapChartReportAdvancedTest.class,
             HeatMapTest.class,
+            HeatMapAdvancedTest.class,
             ReferencePointAndVisSwitchingTest.class,
             ApplyColorPaletteOnAnalyzePageTest.class,
             ColorPalettePickerBasicInsightAndKPITest.class,

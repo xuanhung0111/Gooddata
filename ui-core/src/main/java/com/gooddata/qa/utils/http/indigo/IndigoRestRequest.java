@@ -182,6 +182,16 @@ public class IndigoRestRequest extends CommonRestRequest{
                     .getString("uri");
     }
 
+    public String updateDeprecated(String type, int value, String visualizationUri) throws IOException {
+        if (visualizationUri == "") {
+            visualizationUri = getVisualizationClassUri(type);
+        }
+        JSONObject visualizationJson = getJsonObject(visualizationUri);
+        visualizationJson.getJSONObject("visualizationClass").getJSONObject("meta").put("deprecated", value);
+        executeRequest(initPutRequest(visualizationUri, visualizationJson.toString()), HttpStatus.OK);
+        return visualizationUri;
+    }
+
     /**
      * Get uri of the visualizationClass for given visualization type (GD custom visualizations)
      * Currently visualizationClass's content.url for gd visualizations is "local:<visualizationType>"

@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
@@ -36,6 +37,13 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
 
     @FindBy(className = "s-unlistedIcon")
     private WebElement eyeIcon;
+
+    @FindBy(className = "s-btn-add_tags")
+    private WebElement addButtonTag;
+
+    @FindBy(className = "bd")
+    protected DialogTagName dialogTagName;
+
 
     private static final By VISIBILITY_CHECKBOX = By.id("settings-visibility");
     private static final By SAVE_PERMISSION_SETTING_BUTTON =
@@ -166,5 +174,25 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
         waitForElementVisible(deleteButtonLocator, browser).click();
         waitForElementNotVisible(deleteButtonLocator, browser);
         return this;
+    }
+
+    public DialogTagName getDialogTagName(){
+         waitForElementVisible(addButtonTag).click();
+         return waitForFragmentVisible(dialogTagName);
+    }
+
+     public class DialogTagName extends ObjectPropertiesPage{
+        @FindBy(className = "ipeEditor")
+        private WebElement inputTagName;
+
+        @FindBy(className = "s-ipeSaveButton")
+        private WebElement addTagName;
+
+
+        public DialogTagName addTagNameToMetric(String name){
+            waitForElementVisible(inputTagName).sendKeys(name);
+            waitForElementVisible(addTagName).click();
+            return this;
+        }
     }
 }

@@ -201,6 +201,17 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
                                         Type.VIEW))));
     }
 
+    protected String createSimpleInsightWithAttributeHasColumnBucket(String title, ReportType reportType,
+                                                         String metric, String attribute, String columns) {
+        return indigoRestRequest.createInsight(
+                new InsightMDConfiguration(title, reportType)
+                        .setMeasureBucket(singletonList(MeasureBucket
+                                .createSimpleMeasureBucket(getMetricByTitle(metric))))
+                        .setCategoryBucket(Arrays.asList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.ROWS),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(columns), Type.COLUMNS))));
+    }
+
     protected JSONObject getLatestPostMessageObj() {
         String contentStr = getLoggerContent();
         log.info(contentStr);

@@ -613,6 +613,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public String getDeprecatedMessage(){
+        WebElement webElement = waitForElementVisible(browser.findElement(By.cssSelector(".gd-message-text div:first-child")));
+        return webElement.getText();
+    }
+
     public boolean isDialogDropdownBoxVisible() {
         return isElementVisible(className("gd-color-drop-down"), browser);
     }
