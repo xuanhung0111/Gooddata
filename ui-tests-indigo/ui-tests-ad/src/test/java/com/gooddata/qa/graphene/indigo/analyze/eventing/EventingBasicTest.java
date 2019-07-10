@@ -739,7 +739,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         cleanUpLogger();
         embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(0, 0));
         JSONObject content = getLatestPostMessageObj();
-        verifyColumnDrillContext(content);
+        verifyComboChartDrillContext(content, "column");
 
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         JSONArray intersection = drillContext.getJSONArray("intersection");
@@ -749,7 +749,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         cleanUpLogger();
         embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(1, 0));
         content = getLatestPostMessageObj();
-        verifyLineDrillContext(content);
+        verifyComboChartDrillContext(content, "point");
 
         drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         intersection = drillContext.getJSONArray("intersection");
@@ -768,6 +768,19 @@ public class EventingBasicTest extends AbstractEventingTest {
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         assertEquals(drillContext.getString("type"), "column");
         assertEquals(drillContext.getString("element"), "bar");
+        assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
+        assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
+    }
+
+    private void verifyComboChartDrillContext(JSONObject content, String typeElement) {
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        assertEquals(drillContext.getString("type"), "combo");
+
+        if (typeElement.equals("column")) {
+            assertEquals(drillContext.getString("element"), "bar");
+        } else {
+            assertEquals(drillContext.getString("element"), "point");
+        }
         assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
         assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
     }

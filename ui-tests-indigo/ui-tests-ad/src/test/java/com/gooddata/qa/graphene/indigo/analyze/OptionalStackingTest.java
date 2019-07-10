@@ -629,7 +629,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
 
         assertThat(chartReport.getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("70.7M", "0"));
+                .collect(Collectors.toList()), hasItems("72M", "0"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, dependsOnMethods = "checkDualAxisChartWithSomeMeasures")
@@ -651,15 +651,13 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
 
         assertThat(chartReport.getValuePrimaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("2M", "16M"));
+                .collect(Collectors.toList()), hasItems("1.5M", "16.5M"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, dependsOnMethods = "checkDualAxisChartWithSomeMeasures")
     public void setMinMaxValueForRightAxisChart() {
-        String rightMin = "1000000";
-        String rightMax = "70000000";
-        String leftMin = "2000000";
-        String leftMax = "16000000";
+        String rightMin = "30000000";
+        String rightMax = "50000000";
 
         MetricsBucket metricsBucket = initAnalysePage().openInsight(INSIGHT_HAS_SOME_MEASURES_AND_SOME_ATTRIBUTES)
                 .waitForReportComputing().getMetricsBucket();
@@ -670,16 +668,12 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         analysisPage.openConfigurationPanelBucket()
                 .getItemConfiguration(Y_AXIS.toString() + " (Right)").expandConfiguration()
                 .setMinMaxValueOnAxis(rightMin, rightMax);
-        analysisPage.openConfigurationPanelBucket()
-                .getItemConfiguration(Y_AXIS.toString() + " (Left)").expandConfiguration()
-                .setMinMaxValueOnAxis(leftMin, leftMax);
 
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
 
         assertThat(chartReport.getValueSecondaryYaxis().stream()
                 .flatMap(List::stream)
-                .collect(Collectors.toList()), hasItems("1M", "70M"));
-        assertFalse(chartReport.isPrimaryYaxisVisible(), "Min & max on left axis should be disabled");
+                .collect(Collectors.toList()), hasItems("30M", "50M"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
