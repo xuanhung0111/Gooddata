@@ -140,7 +140,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         assertEquals(pivotTableReport.getBodyContent(), expectedValues);
 
         expectedValues = singletonList(
-                asList("新年快樂", "null value!", "$5,617,913,709 " +
+                asList("5617913'708.72 kiểm tra nghiêm khắc", "null value!", "$5,617,913,709 " +
                         "long format long format long format long format long format long format long format"));
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_APPLY_NUMBER_FORMAT, ReportType.TABLE)

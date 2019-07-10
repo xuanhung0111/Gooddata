@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
@@ -27,6 +28,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,6 +65,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "adi-bucket-item-sequence-number")
     private WebElement itemSequenceNumber;
 
+    @FindBy(className = "s-adi-am-operator-selector-title")
+    private WebElement outcomeOfOperator;
+
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
@@ -77,6 +82,20 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String SHOW_ON_SECONDARY_AXIS_CLASS_NAME = "s-show-on-secondary-axis";
 
     private static final String DISABLED = "is-disabled";
+
+    public MetricConfiguration chooseArithmeticMeasureA(String measureName) {
+        return chooseArithmeticMeasure("s-arithmetic-measure-operand-0-dropdown-button", measureName);
+    }
+    
+    public MetricConfiguration chooseArithmeticMeasureB(String measureName) {
+        return chooseArithmeticMeasure("s-arithmetic-measure-operand-1-dropdown-button", measureName);
+    }
+
+    public MetricConfiguration chooseOperator(OperatorCalculated typeOperator) {
+        waitForElementVisible(outcomeOfOperator).click();
+        waitForElementVisible(className(typeOperator.toString()), browser).click();
+        return this;
+    }
 
     public List<String> getByDateAndAttributeFilterButton() {
         return byDateAndAddAttributeFilter.stream().map(WebElement::getText).collect(Collectors.toList());
@@ -276,6 +295,13 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public List<String> getlistRecommended(){
+        MetricFilterByDatePicker filterByDatePicker = expandFilterByDate();
+        filterByDatePicker.expandDateDimension();
+        return waitForCollectionIsNotEmpty(browser.findElements(className("gd-list-item-shortened")))
+                .stream().map(e-> e.getText()).collect(Collectors.toList());
+    }
+
     public void addFilterWithLargeNumberValues(String attribute, String... unselectedValues) {
         addFilter(attribute, attributeFilterPicker ->
                 attributeFilterPicker.selectAll().selectItems(unselectedValues).apply(), unselectedValues);
@@ -332,6 +358,17 @@ public class MetricConfiguration extends AbstractFragment {
     private MetricFilterByDatePicker getMetricFilterByDatePicker() {
         return Graphene.createPageFragment(MetricFilterByDatePicker.class,
                 waitForElementVisible(BY_DATE_BY_FILTER_PICKER, browser));
+    }
+
+    private MetricConfiguration chooseArithmeticMeasure(String dropdownButtonClassName, String measureName) {
+        waitForElementVisible(className(format(dropdownButtonClassName)), getRoot()).click();
+
+        waitForCollectionIsNotEmpty(browser.findElements(className("gd-list-item")))
+            .stream()
+            .filter(e -> Objects.equals(measureName, e.getText()))
+            .findFirst()
+            .get().click();
+        return this;
     }
 
     public static class AttributeFilterPicker extends AbstractPicker {
@@ -456,6 +493,26 @@ public class MetricConfiguration extends AbstractFragment {
             //Click action on element does not affect sometimes, so switch to use java script executor.
             BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(cancelButton));
             waitForElementNotVisible(getRoot());
+        }
+    }
+
+    public enum OperatorCalculated {
+
+        SUM("s-adi-am-operator-selector-item-sum"),
+        DIFFERENCE("s-adi-am-operator-selector-item-difference"),
+        PRODUCT ("s-adi-am-operator-selector-item-multiplication"),
+        RATIO("s-adi-am-operator-selector-item-ratio"),
+        CHANGE("s-adi-am-operator-selector-item-change");
+
+        private String type;
+
+        OperatorCalculated(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
         }
     }
 }

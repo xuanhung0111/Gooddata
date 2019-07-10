@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
@@ -16,11 +18,26 @@ public class MetricsBucket extends AbstractBucket {
     @FindBy(className = "adi-bucket-item")
     protected List<MetricConfiguration> metrics;
 
+    @FindBy(className = "s-bucket-add-arithmetic-measure-button-measures")
+    private WebElement addArithmeticMeasureButton;
+
+    public MetricsBucket createCalculatedMeasure() {
+        waitForElementVisible(addArithmeticMeasureButton).click();
+        return this;
+    }
+
     public MetricConfiguration getMetricConfiguration(final String metric) {
         return waitForCollectionIsNotEmpty(metrics).stream()
             .filter(input -> metric.equals(input.getHeader()))
             .findFirst()
             .get();
+    }
+
+    public String getMetricName() {
+        if (isEmpty()) {
+            return "";
+        }
+        return waitForElementVisible(BY_HEADER, getMetricItem()).getText().trim();
     }
 
     public MetricConfiguration getLastMetricConfiguration() {
@@ -33,6 +50,10 @@ public class MetricsBucket extends AbstractBucket {
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + name))
             .getRoot();
+    }
+
+    private WebElement getMetricItem() {
+        return waitForElementVisible(items.get(0));
     }
 
     public List<String> getItemNames() {

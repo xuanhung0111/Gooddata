@@ -83,6 +83,10 @@ public class AnalysisPageHeader extends AbstractFragment {
         return !isElementDisabled(waitForElementVisible(exportToReportButton));
     }
 
+    public boolean isExportButtonDisabled() {
+        return isElementDisabled(waitForElementVisible(exportToReportButton));
+    }
+
     public boolean isExportButtonPresent() {
         return isElementPresent(className(EXPORT_BUTTON_CLASS), getRoot());
     }
@@ -103,6 +107,10 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public boolean isRedoButtonEnabled() {
         return !isElementDisabled(waitForElementVisible(redoButton));
+    }
+
+    public boolean isRedoButtonDisabled() {
+        return isElementDisabled(waitForElementVisible(redoButton));
     }
 
     public boolean isResetButtonEnabled() {

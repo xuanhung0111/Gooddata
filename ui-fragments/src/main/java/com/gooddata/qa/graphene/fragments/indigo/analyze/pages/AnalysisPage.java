@@ -35,8 +35,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -44,6 +46,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForIndigoMessageDisappear;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
@@ -92,6 +95,9 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-configuration-panel")
     private ConfigurationPanelBucket configurationPanelBucket;
 
+    @FindBy(css = ".s-visualization-picker button")
+    private List<WebElement> visualization;
+
     public static final String MAIN_CLASS = "adi-editor";
 
     private static final By BY_TRASH_PANEL = className("s-trash");
@@ -136,6 +142,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, recommendation);
     }
 
+    public AnalysisPage moveAttributeFromRowsToColumnsBucket(String attributeTitle) {
+        WebElement target = getAttributesBucket().get(attributeTitle);
+        WebElement source = getAttributesColumnsBucket().getInvitation();
+        return drag(target, source);
+    }
+
     public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
         startDrag(source);
         try {
@@ -176,6 +188,10 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage addMetric(String metric) {
         return addMetric(metric, FieldType.METRIC);
+    }
+
+    public AnalysisPage addMetricByAttribute(String attribute) {
+        return addMetric(attribute, FieldType.ATTRIBUTE);
     }
 
     public AnalysisPage addMetric(String data, FieldType type) {
@@ -406,6 +422,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage clear() {
+        getPageHeader().getResetButton().click();
+        return this;
+    }
+
     public TableReport getTableReport() {
         return getMainEditor().getTableReport();
     }
@@ -458,6 +479,12 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPageHeader getPageHeader() {
         return waitForFragmentVisible(pageHeader);
+    }
+
+    public List<String> getListVisualization() {
+        return waitForCollectionIsNotEmpty(visualization).stream()
+                .map(e -> e.getAttribute("class").replaceAll("\\s(.*)",""))
+                .collect(Collectors.toList());
     }
 
     public AnalysisPage switchProject(String name) {

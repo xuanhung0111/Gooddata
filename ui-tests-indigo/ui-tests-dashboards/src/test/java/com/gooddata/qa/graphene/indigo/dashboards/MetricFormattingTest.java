@@ -48,7 +48,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             {Formatter.DEFAULT, "154,271.00", false},
             {Formatter.TRUNCATE_NUMBERS, "$154.3 K", false},
             {Formatter.COLORS, "$154,271", false},
-            {Formatter.UTF_8, Formatter.UTF_8.toString(), false}
+            {Formatter.UTF_8, "154'271.00 kiểm tra nghiêm khắc", false}
         };
     }
 
