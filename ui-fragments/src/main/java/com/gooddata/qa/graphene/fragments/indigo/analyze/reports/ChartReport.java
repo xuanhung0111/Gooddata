@@ -177,7 +177,7 @@ public class ChartReport extends AbstractFragment {
     }
 
     public int getTrackersCount() {
-        if (isLineChart() || isColumnChart() || isDonutChart()) {
+        if (isLineChart()) {
             return waitForCollectionIsNotEmpty(trackers).size();
         }
 
@@ -331,14 +331,6 @@ public class ChartReport extends AbstractFragment {
 
     private boolean isPieChart() {
         return getRoot().getAttribute("class").contains("visualization-pie");
-    }
-
-    private boolean isDonutChart() {
-        return getRoot().getAttribute("class").contains("visualization-donut");
-    }
-
-    private boolean isColumnChart() {
-        return getRoot().getAttribute("class").contains("visualization-column");
     }
 
     private boolean isTreeMapChart() {
