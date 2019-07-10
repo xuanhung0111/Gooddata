@@ -39,6 +39,7 @@ public class ChartReport extends AbstractFragment {
     public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
+    private static final String HEATMAP_LEGEND = ".heatmap-legend .box";
 
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
@@ -58,6 +59,9 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = LEGEND_INDICATOR)
     private List<WebElement> legendIndicators;
 
+    @FindBy(css = HEATMAP_LEGEND)
+    private List<WebElement> heatmapLegend;
+
     @FindBy(css = "div.highcharts-tooltip")
     private WebElement tooltip;
 
@@ -69,6 +73,9 @@ public class ChartReport extends AbstractFragment {
 
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
+
+    @FindBy(css = ".highcharts-yaxis-labels text[text-anchor = 'middle'], .highcharts-yaxis-labels text[text-anchor = 'end']")
+    private List<WebElement> yAxisLabels;
 
     @FindBy(css = ".highcharts-stack-labels text tspan.highcharts-text-outline")
     private List<WebElement> totalsStackedColumn;
@@ -260,6 +267,12 @@ public class ChartReport extends AbstractFragment {
         return isElementPresent(cssSelector(LEGEND_INDICATOR), getRoot());
     }
 
+    public int getTrackerLegends() {
+        return waitForCollectionIsNotEmpty(heatmapLegend).stream()
+                .map(ElementUtils::isElementVisible)
+                .collect(toList()).size();
+    }
+
     public List<String> getLegendColors() {
         return waitForCollectionIsNotEmpty(legendIcons).stream()
             .map(e -> e.getAttribute(LEGEND_COLOR_ATTRIBUTE))
@@ -288,6 +301,14 @@ public class ChartReport extends AbstractFragment {
             return Collections.emptyList();
         }
         return getLabels(xAxisLabels);
+    }
+
+    public List<String> getYaxisLabels() {
+        // Axis labels will be empty in case report has no attribute.
+        if (yAxisLabels.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return getLabels(yAxisLabels);
     }
 
     public String getChartType() {

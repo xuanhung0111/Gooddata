@@ -304,6 +304,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
+    public AnalysisPage reorderRowAndColumn(String sourceAttribute, String targetAttribute) {
+        WebElement source = getStacksBucket().get(sourceAttribute);
+        WebElement target = getAttributesBucket().get(targetAttribute);
+        return drag(source, target);
+    }
+
     public AnalysisPage replaceAttributeWithDate(String oldAttr) {
         WebElement source = getCataloguePanel().getDate();
         WebElement target = getAttributesBucket().get(oldAttr);
