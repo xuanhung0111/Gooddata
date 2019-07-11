@@ -55,7 +55,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
     public void checkDateFilterDefaultState() {
         // Dashboard created via REST api has no date filter settings which
         // is identical to the stored "All time" date filter
-        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
         String dateFilterSelection = dateFilter.getSelection();
 
         takeScreenshot(browser, "checkDateFilterDefaultState-all-time", getClass());
@@ -65,7 +65,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkDateFilterChangeValue() {
-        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
 
         dateFilter.selectByName(DATE_FILTER_THIS_YEAR);
 
@@ -79,7 +79,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = "desktop")
     public void testInfoMessage() {
         DateFilter dateFilter = initIndigoDashboardsPage()
-                .waitForDateFilter();
+                .getDateFilter();
 
         dateFilter.ensureDropdownOpen();
 
@@ -88,7 +88,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
 
         dateFilter = waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
-                .waitForDateFilter();
+                .getDateFilter();
 
         dateFilter.ensureDropdownOpen();
 
@@ -100,18 +100,18 @@ public class DateFilteringTest extends AbstractDashboardTest {
     public void testDateFilterSwitchToEditMode() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .waitForDateFilter()
+                .getDateFilter()
                 .selectByName(DATE_FILTER_THIS_YEAR);
 
         waitForFragmentVisible(indigoDashboardsPage)
             .leaveEditMode()
             .waitForWidgetsLoading()
-            .waitForDateFilter()
+            .getDateFilter()
             .selectByName(DATE_FILTER_ALL_TIME);
 
         String selectionAfterEditModeSwitch = indigoDashboardsPage
                 .switchToEditMode()
-                .waitForDateFilter()
+                .getDateFilter()
                 .getSelection();
 
         takeScreenshot(browser, "testDateFilterSwitchToEditMode", getClass());
@@ -132,7 +132,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
                 createKpiUsingRest(createDefaultKpiConfiguration(filteredOutMetric, DATE_DATASET_SNAPSHOT)));
 
         try {
-            DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+            DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
             dateFilter.getValues()
                     .forEach(filter -> {
                         dateFilter.selectByName(filter);
@@ -160,24 +160,24 @@ public class DateFilteringTest extends AbstractDashboardTest {
     public void checkDefaultDateInterval(String dateFilterValue) throws JSONException {
         setDefaultDateFilter(dateFilterValue);
 
-        DateFilter dateFilter = waitForFragmentVisible(indigoDashboardsPage).waitForDateFilter();
+        DateFilter dateFilter = waitForFragmentVisible(indigoDashboardsPage).getDateFilter();
         takeScreenshot(browser, "Date interval applied", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
         initDashboardsPage();
-        dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
 
         takeScreenshot(browser, "Default date interval when switch to another page then go back", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
-        dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
 
         takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-        dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();
 
         takeScreenshot(browser, "Default date interval after logout then sign in again", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
@@ -188,7 +188,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
         logoutAndLoginAs(true, UserRoles.EDITOR);
 
         try {
-            initIndigoDashboardsPageWithWidgets().switchToEditMode().waitForDateFilter()
+            initIndigoDashboardsPageWithWidgets().switchToEditMode().getDateFilter()
                     .selectByName(DATE_FILTER_THIS_YEAR);
             
             Kpi kpi = indigoDashboardsPage.selectLastWidget(Kpi.class);
@@ -241,7 +241,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
     private void setDefaultDateFilter(String dateFilterValue) {
         DateFilter dateFilter = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .waitForDateFilter();
+                .getDateFilter();
 
         dateFilter.selectByName(dateFilterValue);
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();

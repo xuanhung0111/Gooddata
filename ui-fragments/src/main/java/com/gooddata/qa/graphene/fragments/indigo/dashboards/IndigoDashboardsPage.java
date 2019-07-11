@@ -319,15 +319,21 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return isElementPresent(buttonVisible, browser);
     }
 
-    public DateFilter waitForDateFilter() {
+    public DateFilter getDateFilter() {
         return waitForFragmentVisible(dateFilter);
+    }
+
+    public ExtendedDateFilterPanel openExtendedDateFilterPanel() {
+        if (!isElementPresent(className("is-active"), dateFilter.getRoot())) {
+            dateFilter.getRoot().click();
+        }
+        return ExtendedDateFilterPanel.getInstance(browser);
     }
 
     public IndigoDashboardsPage selectDateFilterByName(String dateFilterName) {
         waitForWidgetsLoading();
 
-        waitForFragmentVisible(dateFilter)
-            .selectByName(dateFilterName);
+        waitForFragmentVisible(dateFilter).selectByName(dateFilterName);
 
         return waitForWidgetsLoading();
     }

@@ -154,13 +154,13 @@ public class SplashScreenTest extends AbstractDashboardTest {
             .saveEditModeWithWidgets();
 
         String dateFilterSelection = initIndigoDashboardsPageWithWidgets()
-                .waitForDateFilter()
+                .getDateFilter()
                 .getSelection();
 
         takeScreenshot(browser, "checkDefaultDateFilterWhenCreatingDashboard-" + dateFilterDefault, getClass());
         assertEquals(dateFilterSelection, dateFilterDefault);
 
-        DateFilter dateFilterAfterRefresh = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
+        DateFilter dateFilterAfterRefresh = initIndigoDashboardsPageWithWidgets().getDateFilter();
 
         takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page-" + dateFilterDefault, getClass());
         assertEquals(dateFilterAfterRefresh.getSelection(), dateFilterDefault);

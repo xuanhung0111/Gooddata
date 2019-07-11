@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.DataProvider;
@@ -20,6 +21,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 public class KpiPopTest extends AbstractDashboardTest {
@@ -49,7 +51,7 @@ public class KpiPopTest extends AbstractDashboardTest {
         // When project is created by REST API (and not using SplashScreen)
         // "All time" is the initial filter --> switch to "This month"
         indigoDashboardsPage
-                .waitForDateFilter()
+                .getDateFilter()
                 .selectByName(DATE_FILTER_THIS_MONTH);
 
         takeScreenshot(browser, "checkKpiPopInMobile-thisMonth", getClass());
@@ -114,17 +116,27 @@ public class KpiPopTest extends AbstractDashboardTest {
     public Object[][] popProvider() {
         return new Object[][] {
             // comparison type, date filter, prev. title for the date filter
-            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_THIS_MONTH, "prev. year"},
-            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_THIS_MONTH, "prev. month"},
-            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_THIS_QUARTER, "prev. year"},
-            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_THIS_QUARTER, "prev. quarter"},
-            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_ALL_TIME, "prev. year"},
-            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_ALL_TIME, "prev. period"}
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.THIS_MONTH, "prev. month"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.THIS_QUARTER, "prev. quarter"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.ALL_TIME, "prev. period"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.LAST_7_DAYS, "prev. 7d"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.LAST_12_MONTHS, "prev. 12m"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.LAST_4_QUARTERS, "prev. 4q"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.THIS_YEAR, "prev. year"},
+            {ComparisonType.PREVIOUS_PERIOD, DateRange.LAST_YEAR, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.THIS_MONTH, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.THIS_QUARTER, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.ALL_TIME, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.LAST_7_DAYS, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.LAST_12_MONTHS, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.LAST_4_QUARTERS, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.THIS_YEAR, "prev. year"},
+            {ComparisonType.LAST_YEAR, DateRange.LAST_YEAR, "prev. year"}
         };
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "popProvider", groups = {"desktop"})
-    public void checkKpiPopSection(Kpi.ComparisonType comparisonType, String dateFilter, String expectedPeriodTitle) {
+    public void checkKpiPopSection(ComparisonType comparisonType, DateRange dateFilter, String expectedPeriodTitle) {
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
@@ -136,7 +148,7 @@ public class KpiPopTest extends AbstractDashboardTest {
 
         Kpi kpi = waitForFragmentVisible(indigoDashboardsPage).getLastWidget(Kpi.class);
 
-        indigoDashboardsPage.selectDateFilterByName(dateFilter);
+        indigoDashboardsPage.selectDateFilterByName(dateFilter.toString());
 
         takeScreenshot(browser, "checkKpiPopSection-" + comparisonType + "-" + dateFilter + "-" + expectedPeriodTitle, getClass());
         assertEquals(kpi.getPopSection().getChangeTitle(), "change");

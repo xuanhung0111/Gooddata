@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAdjusters;
 public enum DateRange {
     ALL_TIME("All time"),
     STATIC_PERIOD("Static period"),
+    FLOATING_RANGE("Floating range"),
     LAST_7_DAYS("Last 7 days"),
     LAST_30_DAYS("Last 30 days"),
     LAST_90_DAYS("Last 90 days"),
