@@ -379,10 +379,10 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(css = ".gd-checkbox-selection")
         private WebElement selectAllCheckbox;
 
-        @FindBy(css = ".button-small.s-apply:not(.disabled)")
+        @FindBy(css = ".gd-button-small.s-apply:not(.disabled)")
         private WebElement applyButton;
 
-        @FindBy(css = ".button-small.s-cancel:not(.disabled)")
+        @FindBy(css = ".gd-button-small.s-cancel:not(.disabled)")
         private WebElement cancelButton;
 
         private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");

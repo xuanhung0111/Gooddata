@@ -69,7 +69,7 @@ public class Dataset extends AbstractFragment {
     }
 
     public boolean isDetailButtonVisible() {
-        return isElementVisible(BY_DETAIL_BUTTON, getRoot()); 
+        return isElementVisible(BY_DETAIL_BUTTON, getRoot());
     }
 
     public boolean isUpdateButtonVisible() {

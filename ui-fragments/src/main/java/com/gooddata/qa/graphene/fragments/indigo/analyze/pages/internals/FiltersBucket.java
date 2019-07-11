@@ -24,15 +24,15 @@ import static org.testng.Assert.assertTrue;
  * Locator for filters differs in React app.
  */
 public class FiltersBucket extends AbstractBucket {
-    
+
     private static final String DATE_RANGE_REGEX = ".*\n:\n[A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
 
-    @FindBy(css = ".adi-bucket-item .button")
+    @FindBy(css = ".adi-bucket-item .gd-button")
     private List<WebElement> filters;
 
     private static final String LOADING = "...";
-    private static final By BY_FILTER_TEXT = By.cssSelector(".button-text");
-    
+    private static final By BY_FILTER_TEXT = By.cssSelector(".gd-button-text");
+
     private DateFilterPickerPanel getFilterPickerPanel() {
         return Graphene.createPageFragment(
             DateFilterPickerPanel.class,
@@ -60,7 +60,7 @@ public class FiltersBucket extends AbstractBucket {
     /**
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
-     * @throws ParseException 
+     * @throws ParseException
      */
     public FiltersBucket configDateFilter(String from, String to) {
         WebElement filter = getDateFilter();
@@ -145,7 +145,7 @@ public class FiltersBucket extends AbstractBucket {
         openDatePanelOfFilter(getDateFilter()).changeDateDimension(switchDimension);
         getFilterPickerPanel().apply();
         return this;
-    } 
+    }
 
     public boolean isDateFilterVisible() {
         if (filters.isEmpty()) {
