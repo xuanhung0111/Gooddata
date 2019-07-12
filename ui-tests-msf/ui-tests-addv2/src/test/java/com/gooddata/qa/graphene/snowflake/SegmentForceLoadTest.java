@@ -60,6 +60,7 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import com.gooddata.qa.utils.snowflake.ConnectionInfo;
 import com.gooddata.qa.utils.snowflake.DatabaseColumn;
@@ -111,6 +112,8 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         lcmBrickFlowBuilder.setDevelopProject(devProjectId).setSegmentId(SEGMENT_ID).setClient(CLIENT_ID_1, clientProjectId1)
                 .setClient(CLIENT_ID_2, clientProjectId2).buildLcmProjectParameters();
         lcmBrickFlowBuilder.runLcmFlow();
+        addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId1);
+        addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId2);
     }
 
     @Test(dependsOnGroups = { "createProject" }, groups = { "precondition" })
