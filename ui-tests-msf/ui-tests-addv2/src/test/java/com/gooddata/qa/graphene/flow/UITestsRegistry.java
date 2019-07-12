@@ -1,4 +1,6 @@
 package com.gooddata.qa.graphene.flow;
+import com.gooddata.qa.graphene.snowflake.SegmentForceLoadTest;
+import com.gooddata.qa.graphene.snowflake.SegmentLoadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -10,6 +12,8 @@ public class UITestsRegistry {
         Map<String, Object> suites = new HashMap<>();
 
         suites.put("all", new Object[] {
+                SegmentForceLoadTest.class,
+                SegmentLoadTest.class
         });
 
         TestsRegistry.getInstance()

@@ -29,11 +29,15 @@ public class AbstractAutomatedDataDistributionTest extends AbstractDataIntegrati
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        domainRestClient = new RestClient(getProfile(DOMAIN));
-        adminRestClient = new RestClient(getProfile(Profile.ADMIN));
-        domainScheduleUtils = new ScheduleUtils(testParams, domainRestClient);
-        datasourceUtils = new DataSourceUtils(testParams);
+        try {
+            super.customizeProject();
+            domainRestClient = new RestClient(getProfile(DOMAIN));
+            adminRestClient = new RestClient(getProfile(Profile.ADMIN));
+            domainScheduleUtils = new ScheduleUtils(testParams, domainRestClient);
+            datasourceUtils = new DataSourceUtils(testParams);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
     }
 
