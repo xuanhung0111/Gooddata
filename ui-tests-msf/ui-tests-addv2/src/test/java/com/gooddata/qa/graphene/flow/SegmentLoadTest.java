@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.sdd;
+package com.gooddata.qa.graphene.flow;
 
 import static com.gooddata.md.Restriction.identifier;
 import static org.hamcrest.MatcherAssert.assertThat;
