@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardPostMessageTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExportDataToXLSXAndCSVDashboardsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ExportDataToXLSXAndCSVDashboardsAdvancedTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InvalidDateDataSetTest;
@@ -126,6 +127,7 @@ public class UITestsRegistry {
             ReportPageApplyColorPaletteTest.class,
             KpiApplyColorPaletteTest.class,
             ExportDataToXLSXAndCSVDashboardsTest.class,
+            ExportDataToXLSXAndCSVDashboardsAdvancedTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

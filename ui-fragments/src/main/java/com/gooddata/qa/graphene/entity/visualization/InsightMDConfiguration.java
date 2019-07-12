@@ -13,6 +13,7 @@ public class InsightMDConfiguration {
     private List<MeasureBucket> measureBuckets = new ArrayList<MeasureBucket>();
     private List<CategoryBucket> categoryBuckets = new ArrayList<CategoryBucket>();
     private List<TotalsBucket> totalsBuckets = new ArrayList<TotalsBucket>();
+    private List<FilterAttribute> filterAttribute;
 
     public InsightMDConfiguration(String title, ReportType type) {
         this.title = title;
@@ -31,6 +32,11 @@ public class InsightMDConfiguration {
 
     public InsightMDConfiguration setTotalsBucket(List<TotalsBucket> totalsBuckets) {
         this.totalsBuckets = totalsBuckets;
+        return this;
+    }
+
+    public InsightMDConfiguration setFilter(List<FilterAttribute> filterAttribute) {
+        this.filterAttribute = filterAttribute;
         return this;
     }
 
@@ -53,4 +59,6 @@ public class InsightMDConfiguration {
     public List<TotalsBucket> getTotalsBuckets() {
         return totalsBuckets;
     }
+
+    public List<FilterAttribute> getFilters() { return filterAttribute; }
 }
