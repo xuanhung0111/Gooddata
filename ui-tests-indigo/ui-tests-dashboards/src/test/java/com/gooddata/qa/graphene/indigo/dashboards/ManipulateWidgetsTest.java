@@ -219,7 +219,7 @@ public class ManipulateWidgetsTest extends AbstractDashboardTest {
         takeScreenshot(browser, "Kpi does not show hint before hover to headline", this.getClass());
         assertFalse(kpi.hasHintForEditName(), "Kpi shows hint although headline is not hovered");
 
-        String hintColor = kpi.hoverToHeadline();
+        String hintColor = kpi.hoverToEditHeadline();
         takeScreenshot(browser, "Kpi shows hint for editable name when hover to headline", this.getClass());
         assertTrue(hintColor.matches(HINT_FOR_EDIT_NAME_BORDER_COLOR),
                 "Hint color not matches! Expected: " + HINT_FOR_EDIT_NAME_BORDER_COLOR + " but actual: " + hintColor);

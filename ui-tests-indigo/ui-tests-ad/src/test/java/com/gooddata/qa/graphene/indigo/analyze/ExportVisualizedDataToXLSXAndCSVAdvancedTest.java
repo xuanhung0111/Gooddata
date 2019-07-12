@@ -12,17 +12,15 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect.DataType;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.XlsxUtils;
-import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -107,7 +105,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
             dateFilterPickerPanel.changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
 
-            analysisPage.waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
+            analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -134,7 +132,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
                 .addFilter(ATTR_DEPARTMENT, "Direct Sales")
                 .addFilterByDate(DATE_DATASET_CLOSED, "01/01/2012", "01/01/2013");
 
-            analysisPage.waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
+            analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -163,7 +161,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             FiltersBucket filterBucket = analysisPage.getFilterBuckets();
             filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).configTimeFilter("01/01/2012", "01/01/2013");
 
-            analysisPage.waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
+            analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -189,7 +187,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
                 .addFilterByDate(DATE_DATASET_CLOSED, "01/01/2012", "01/01/2013");
 
             analysisPage.getFilterBuckets().configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
-            analysisPage.waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
+            analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -215,7 +213,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
 
             assertEquals(metricConfiguration.expandFilterByDate().getRoot().getText(),
                 "No data available\n5 unrelated dates hidden");
-            analysisPage.waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog()
+            analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog()
                 .confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
@@ -246,7 +244,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE)
                 .waitForReportComputing().getPivotTableReport();
             pivotTableReport.addTotal(AggregationItem.SUM, METRIC_AMOUNT, 0);
-            analysisPage.saveInsight().waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog()
+            analysisPage.saveInsight().waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog()
                 .confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
@@ -278,11 +276,11 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
                 .setMeasureBucket(
                     singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metricNullValue)))));
 
-        ExportToSelect exportToSelect = initAnalysePage().openInsight(insight).waitForReportComputing().
+        OptionalExportMenu optionalExportMenu = initAnalysePage().openInsight(insight).waitForReportComputing().
             getPageHeader().clickOptionsButton();
-        assertFalse(exportToSelect.isExportToButtonEnabled(DataType.CSV),
+        assertFalse(optionalExportMenu.isExportToButtonEnabled(OptionalExportMenu.File.CSV),
             "Export to CSV options should be disabled");
-        assertFalse(exportToSelect.isExportToButtonEnabled(DataType.XLSX),
+        assertFalse(optionalExportMenu.isExportToButtonEnabled(OptionalExportMenu.File.XLSX),
             "Export to XLSX options should be disabled");
     }
 
@@ -318,7 +316,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
         try {
             factRestRequest.setFactRestricted(factUri);
             initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT, FieldType.FACT)
-                .waitForReportComputing().exportTo(DataType.XLSX).getExportXLSXDialog().confirmExport();
+                .waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             assertEquals(ElementUtils.getErrorMessage(browser), "You cannot export this insight because it contains restricted data.");
         } finally {
@@ -334,11 +332,11 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             logoutAndLoginAs(true, UserRoles.EDITOR);
 
             factRestRequest.setFactProtected(attributeUri);
-            ExportToSelect exportToSelect = initAnalysePage().changeReportType(ReportType.TABLE)
+            OptionalExportMenu optionalExportMenu = initAnalysePage().changeReportType(ReportType.TABLE)
                 .addAttribute(ATTR_STAGE_NAME).waitForReportComputing().clickOptionsButton();
-            assertFalse(exportToSelect.isExportToButtonEnabled(DataType.XLSX),
+            assertFalse(optionalExportMenu.isExportToButtonEnabled(OptionalExportMenu.File.XLSX),
                 "Export to XLSX options should be disabled");
-            assertFalse(exportToSelect.isExportToButtonEnabled(DataType.CSV),
+            assertFalse(optionalExportMenu.isExportToButtonEnabled(OptionalExportMenu.File.CSV),
                 "Export to CSV options should be disabled");
         } finally {
             factRestRequest.unsetFactProtected(attributeUri);
@@ -354,8 +352,8 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
         testParams.setProjectId(targetProjectId);
         try {
             importProject(exportToken, statusPollingCheckIterations);
-            initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE).waitForReportComputing().exportTo(DataType.XLSX)
-                .getExportXLSXDialog().confirmExport();
+            initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE).waitForReportComputing()
+                .exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + INSIGHT_HAS_TOTAL_VALUE + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -379,8 +377,8 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
         testParams.setProjectId(targetProjectId);
         try {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-            initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE).waitForReportComputing().exportTo(DataType.XLSX)
-                .getExportXLSXDialog().confirmExport();
+            initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE).waitForReportComputing()
+                .exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
 
             final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + INSIGHT_HAS_TOTAL_VALUE + "." + ExportFormat.EXCEL_XLSX.getName());
@@ -404,7 +402,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
 
     private void exportInsightsAndCheckDataFile(ReportType type, String insight, String metricNegativeValue)
             throws IOException {
-        analysisPage.changeReportType(type).waitForReportComputing().exportTo(DataType.XLSX)
+        analysisPage.changeReportType(type).waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX)
             .getExportXLSXDialog().confirmExport();
         final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
             + insight + "." + ExportFormat.EXCEL_XLSX.getName());

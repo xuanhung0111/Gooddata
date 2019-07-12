@@ -5,7 +5,7 @@ import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.ExportToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
@@ -84,7 +84,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_STAGE_NAME);
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 18);
         AnalysisPageHeader analysisPageHeader = analysisPage.getPageHeader();
-        ExportToSelect exportToSelect = analysisPageHeader.clickOptionsButton();
+        OptionalExportMenu exportToSelect = analysisPageHeader.clickOptionsButton();
         assertTrue(analysisPageHeader.isUndoButtonEnabled(), "Undo button should be enabled");
         assertTrue(analysisPageHeader.isOpenButtonEnabled(), "Open button should be enabled");
         assertTrue(analysisPageHeader.isResetButtonEnabled(), "Clear button should be enabled");
@@ -194,7 +194,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
         initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         analysisPage.addMetricByAttribute(ATTR_ACTIVITY_TYPE).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        ExportToSelect exportToSelect = analysisPage.getPageHeader().clickOptionsButton();
+        OptionalExportMenu exportToSelect = analysisPage.getPageHeader().clickOptionsButton();
         assertEquals(exportToSelect.getExportButtonTooltipText(),
                 "The insight is not compatible with Report Editor. " +
                         "To open the insight as a report, select another insight type.");

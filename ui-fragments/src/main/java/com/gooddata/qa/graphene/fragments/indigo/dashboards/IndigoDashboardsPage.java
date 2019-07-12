@@ -24,6 +24,7 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;

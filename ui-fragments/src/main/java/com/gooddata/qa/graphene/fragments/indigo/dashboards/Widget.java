@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
@@ -8,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.tagName;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -39,6 +42,18 @@ public class Widget extends AbstractFragment {
 
     @FindBy(css = ".item-headline .s-editable-label textarea")
     private WebElement headlineTextarea;
+
+    @FindBy(className = "s-dash-item-action-options")
+    private WebElement optionsButton;
+
+    public Widget exportTo(File file) {
+        openOptionsMenu().exportTo(file);
+        return this;
+    }
+
+    public void hoverOnOptionsButton() {
+        getActions().moveToElement(optionsButton).moveByOffset(1, 1).perform();
+    }
 
     public List<String> getLegends() {
         return waitForCollectionIsNotEmpty(legendNames).stream()
@@ -89,10 +104,15 @@ public class Widget extends AbstractFragment {
         waitForElementVisible(headlineInplaceEdit);
     }
 
-    public String hoverToHeadline() {
+    public String hoverToEditHeadline() {
         new Actions(browser).moveToElement(headlineInplaceEdit).perform();
         return waitForElementVisible(getRoot().findElement(HINT_LOCATOR))
                 .getCssValue("border-top-color");
+    }
+
+    public Widget hoverToHeadline() {
+        new Actions(browser).moveToElement(headline).perform();
+        return this;
     }
 
     public void clickDeleteButton() {
@@ -123,5 +143,11 @@ public class Widget extends AbstractFragment {
         public String getCss() {
             return this.css;
         }
+    }
+
+    private OptionalExportMenu openOptionsMenu() {
+        waitForElementVisible(optionsButton).click();
+        return Graphene.createPageFragment(OptionalExportMenu.class,
+            waitForElementVisible(By.className("s-options-menu-bubble"), browser));
     }
 }
