@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -109,7 +110,7 @@ public final class LCMServiceProject {
         }
     }
 
-    public String getProjectId() {
+    public String getServiceProjectId() {
         return projectId;
     }
 
@@ -177,8 +178,7 @@ public final class LCMServiceProject {
      * @param clientProjectIds
      * @return
      */
-    public JSONObject createProvisionDatasource(final String segmentId,
-                                                final String clientId, String... clientProjectIds) {
+    public JSONObject createProvisionDatasource(final String segmentId, final String clientId, String... clientProjectIds) {
         CsvFile csvFile = new CsvFile("clients")
                 .columns(new Column("segment_id"), new Column("client_id"), new Column("project_id"));
         Arrays.stream(clientProjectIds).forEach(
@@ -191,6 +191,20 @@ public final class LCMServiceProject {
             put("query", "SELECT segment_id, client_id, project_id FROM clients;");
         }};
     }
+
+    public JSONObject createProvisionDatasource(final String segmentId, final Map<String,String> clients) {
+        CsvFile csvFile = new CsvFile("clients")
+        .columns(new Column("segment_id"), new Column("client_id"), new Column("project_id"));
+        for(String clientId : clients.keySet()) {
+            csvFile.rows(segmentId, clientId, String.format("/gdc/projects/%s", clients.get(clientId)));
+        }
+        createAdsTableFromFile(csvFile);
+        return new JSONObject() {{
+        put("type", "ads");
+        put("query", "SELECT segment_id, client_id, project_id FROM clients;");
+        }};
+    }
+
 
     public Parameters getReleaseParamsTemplate() {
         return releaseProcess.getDefaultParameters();
@@ -365,8 +379,12 @@ public final class LCMServiceProject {
                         testParameters.getPassword(), true));
     }
 
-    private void deleteProject(final String projectId) {
+    public void deleteProject(final String projectId) {
         final ProjectService service = restClient.getProjectService();
         service.removeProject(service.getProjectById(projectId));
+    }
+
+    public String getMasterProject(final String domain, final String segmentId) {
+        return LcmRestUtils.getMasterProjectId(this.restClient,domain , segmentId);
     }
 }
