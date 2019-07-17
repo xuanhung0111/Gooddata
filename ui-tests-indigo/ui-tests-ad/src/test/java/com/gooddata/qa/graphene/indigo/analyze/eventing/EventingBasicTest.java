@@ -20,6 +20,7 @@ import java.util.Collections;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COMBO_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.TABLE;
+import static com.gooddata.qa.graphene.enums.indigo.ReportType.TREE_MAP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
@@ -792,6 +793,36 @@ public class EventingBasicTest extends AbstractEventingTest {
             "The total table should not be underlined");
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingTreeMapReport() throws IOException {
+        String insightUri = createSimpleInsight("tree_map_insight", TREE_MAP,
+                METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_REGION);
+
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(activityTypeUri);
+            put(regionUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(0, 0));
+        JSONObject content = getLatestPostMessageObj();
+        verifyTreeMapChartDrillContext(content);
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
         String uri = intersection.getJSONObject("header").getString("uri");
         String title = intersection.getString("title");
@@ -818,6 +849,12 @@ public class EventingBasicTest extends AbstractEventingTest {
         }
         assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
         assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
+    }
+
+    private void verifyTreeMapChartDrillContext(JSONObject content) {
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        assertEquals(drillContext.getString("type"), "treemap");
+        assertEquals(drillContext.getString("element"), "slice");
     }
 
     private void verifyLineDrillContext(JSONObject content) {
