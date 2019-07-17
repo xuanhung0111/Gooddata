@@ -5,6 +5,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.schedule.ScheduleUtils;
 import com.gooddata.qa.utils.snowflake.DataSourceUtils;
 import com.gooddata.qa.utils.snowflake.ProcessUtils;
@@ -15,6 +17,7 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 /* Abstract class use for segment data distribution process 
  * interact with datasource , schedule 
@@ -52,5 +55,13 @@ public class AbstractAutomatedDataDistributionTest extends AbstractDataIntegrati
 
     protected void addUsersToServiceProject() throws JSONException, IOException {
         addUserToProject(testParams.getUser(), UserRoles.ADMIN);
+    }
+
+    protected void addUserToSpecificProject(String email, UserRoles userRole, String projectId) throws ParseException, IOException, JSONException {
+        final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                projectId);
+        userManagementRestRequest.addUserToProject(email, userRole);
     }
 }
