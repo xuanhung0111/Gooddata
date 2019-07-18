@@ -145,7 +145,7 @@ public class Widget extends AbstractFragment {
         }
     }
 
-    private OptionalExportMenu openOptionsMenu() {
+    public OptionalExportMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,
             waitForElementVisible(By.className("s-options-menu-bubble"), browser));

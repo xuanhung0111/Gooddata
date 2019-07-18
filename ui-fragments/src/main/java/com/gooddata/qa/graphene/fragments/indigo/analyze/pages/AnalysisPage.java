@@ -391,10 +391,6 @@ public class AnalysisPage extends AbstractFragment {
         return getPageHeader().clickOptionsButton();
     }
 
-    public ExportXLSXDialog getExportXLSXDialog() {
-        return ExportXLSXDialog.getInstance(browser);
-    }
-
     public String getExplorerMessage() {
         return getMainEditor().getExplorerMessage();
     }

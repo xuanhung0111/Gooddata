@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
@@ -299,7 +300,8 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
         pivotTableReport.openAggregationPopup(METRIC_AMOUNT, 0).hoverItem(AggregationItem.SUM)
             .selectRowsItem("within " + ATTR_DEPARTMENT);
 
-        analysisPage.exportTo(OptionalExportMenu.File.XLSX).getExportXLSXDialog().confirmExport();
+        analysisPage.exportTo(OptionalExportMenu.File.XLSX);
+        ExportXLSXDialog.getInstance(browser).confirmExport();
 
         final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
             + INSIGHT_EXPORTED + "." + ExportFormat.EXCEL_XLSX.getName());

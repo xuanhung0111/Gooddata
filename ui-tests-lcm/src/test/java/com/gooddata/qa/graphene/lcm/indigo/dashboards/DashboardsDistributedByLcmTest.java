@@ -376,8 +376,10 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     public void exportNewInsightAnalyseToXLSX() throws IOException {
         try {
             AnalysisPage analysisPage = initAnalysePage();
-            analysisPage.openInsight(EXPORT_VISUALIZED_DATA_INSIGHT).waitForReportComputing().exportTo(File.XLSX)
-                .getExportXLSXDialog().uncheckOption(ExportXLSXDialog.OptionalExport.CELL_MERGED).confirmExport();
+            analysisPage.openInsight(EXPORT_VISUALIZED_DATA_INSIGHT).waitForReportComputing().exportTo(File.XLSX);
+
+            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+            exportXLSXDialog.uncheckOption(ExportXLSXDialog.OptionalExport.CELL_MERGED).confirmExport();
 
             final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + EXPORT_VISUALIZED_DATA_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName());

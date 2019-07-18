@@ -83,6 +83,8 @@ import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVT
 import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.PieChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.ComboChartReportTest;
+import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTest;
+import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -188,6 +190,8 @@ public class UITestsRegistry {
             ExportVisualizedDataToXLSXAndCSVAdvancedTest.class,
             PieChartReportTest.class,
             ComboChartReportTest.class,
+            GroupingAndSubTotalsPivotTableTest.class,
+            GroupingAndSubTotalsPivotTableAdvancedTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

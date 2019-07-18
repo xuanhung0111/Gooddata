@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,10 +24,10 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
-import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 
+import static com.gooddata.qa.graphene.entity.visualization.FilterAttribute.initFilters;
 import static com.gooddata.qa.utils.http.RestRequest.initPutRequest;
 import static java.lang.String.format;
 
@@ -484,8 +485,8 @@ public class IndigoRestRequest extends CommonRestRequest{
                 .getJSONObject("content").getJSONArray("widgets").length();
     }
 
-    private JSONObject initInsightObject(final String visualizationClassUri,
-            final InsightMDConfiguration insightConfig) throws JSONException {
+    private JSONObject initInsightObject(final String visualizationClassUri, final InsightMDConfiguration insightConfig)
+        throws JSONException {
         return new JSONObject() {{
             put("visualizationObject", new JSONObject() {{
                 put("content", new JSONObject() {{
@@ -493,7 +494,12 @@ public class IndigoRestRequest extends CommonRestRequest{
                         put("uri", visualizationClassUri);
                     }});
                     put("buckets", initBuckets(insightConfig.getMeasureBuckets(), insightConfig.getCategoryBuckets()));
-                    put("filters", new JSONArray());
+
+                    if (Objects.isNull(insightConfig.getFilters())) {
+                        put("filters", new JSONArray());
+                    } else {
+                        put("filters", initFilters(insightConfig.getFilters()));
+                    }
                 }});
                 put("meta", new JSONObject() {{
                     put("title", insightConfig.getTitle());
