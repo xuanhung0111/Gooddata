@@ -100,6 +100,12 @@ public class CsvFile {
         return this;
     }
 
+    public CsvFile rows(final List<String> data) {
+        this.data.add(data);
+        dataRowCount++;
+        return this;
+    }
+
     public String saveToDisc(final String path) throws IOException {
         final File file = new File(path, getFileName());
         final File parent = file.getParentFile();

@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -187,5 +189,45 @@ public class SnowflakeUtils {
 
         String connectStr = connectionInfo.getUrl();
         return DriverManager.getConnection(connectStr, properties);
+    }
+
+    public void updateColumn(String tableName, String column, String value) {
+        try {
+            executeSql("UPDATE " + tableName + "SET " + column + "= " + value);
+        } catch(SQLException e) {
+            logger.error("Update column" + column + "with value" + value +  "failed");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResultSet getRecords(String tableName, String column) {
+        try {
+            String sqlStr = "SELECT " + column + " FROM " + tableName;
+            return getResult(sqlStr);
+        } catch (SQLException e) {
+            logger.error("get Records error" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public ResultSet getRecordsInRangeTimeStamp(String tableName, String column, String from, String to ) throws SQLException {
+        String sqlStr = String.format("SELECT %s FROM %s WHERE X__TIMESTAMP BETWEEN '%s' AND '%s'",column,tableName,from,to);
+        logger.info("SQL Record in range:" + sqlStr);
+        return  getResult(sqlStr);
+    }
+
+    public ResultSet getResult(String sqlStr) throws SQLException {
+        // create JDBC connection to Snowflake
+        Connection connection = buildConnection(snowflakeConnectionInfo);
+        // create statements
+        Statement statement = connection.createStatement();
+        // execute SQL commands
+        logger.info("Executing the SQL statements");
+        ResultSet result = statement.executeQuery(sqlStr);
+        logger.info("Done executing the SQL statements");
+        statement.close();
+        connection.close();
+        return result;
     }
 }

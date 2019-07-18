@@ -102,6 +102,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return findDataloadProcess().get();
     }
 
+    @Deprecated
     protected boolean hasDataloadProcess() {
         return findDataloadProcess().isPresent();
     }
@@ -120,18 +121,22 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     }
 
     //This method is used to create a 'real' manual schedule
+    @Deprecated
     protected Schedule createManualTriggeredSchedule(String name, SyncDatasets datasetToSynchronize) {
         return createSchedule(name, datasetToSynchronize, "");
     }
 
+    @Deprecated
     protected Schedule createSchedule(String name, SyncDatasets datasetToSynchronize, Schedule triggeringSchedule) {
         return createScheduleWithTriggerType(name, datasetToSynchronize, triggeringSchedule);
     }
 
+    @Deprecated
     protected ScheduleExecution executeSchedule(Schedule schedule) {
         return executeSchedule(schedule, LoadMode.DEFAULT);
     }
 
+    @Deprecated
     protected ScheduleExecution executeSchedule(Schedule schedule, LoadMode loadMode) {
         schedule.addParam("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", loadMode.toString());
         getProcessService().updateSchedule(schedule);
@@ -154,11 +159,13 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(pattern));
     }
 
+    @Deprecated
     private Optional<DataloadProcess> findDataloadProcess() {
         return getProcessService().listProcesses(getProject())
                 .stream().filter(p -> p.getType().equals(DATALOAD_PROCESS_TYPE)).findFirst();
     }
 
+    @Deprecated
     private Schedule createScheduleWithTriggerType(String name, SyncDatasets datasetToSynchronize,
             Object triggerType) {
         Schedule schedule = null;
