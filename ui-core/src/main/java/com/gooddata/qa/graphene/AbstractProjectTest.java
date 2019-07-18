@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.GoodDataRestException;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
@@ -35,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -80,6 +82,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected boolean useDynamicUser;
 
     private RestClient restClient;
+    private List<String> createdProjects = new ArrayList<>();
 
     @BeforeClass(alwaysRun = true)
     public void enableDynamicUser() {
@@ -187,13 +190,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (projectId != null && projectId.length() > 0) {
             switch (testParams.getDeleteMode()) {
                 case DELETE_ALWAYS:
-                    log.info("Project will be deleted: " + projectId);
-                    deleteProject(getProfile(ADMIN), projectId);
+                    log.info("Project will be deleted: ");
+                    deleteCreatedProject();
                     break;
                 case DELETE_IF_SUCCESSFUL:
                     if (context.getFailedTests().size() == 0) {
-                        log.info("Test was successful, project will be deleted: " + projectId);
-                        deleteProject(getProfile(ADMIN), projectId);
+                        log.info("Test was successful, project will be deleted: ");
+                        deleteCreatedProject();
                     } else {
                         log.info("Test wasn't successful, project won't be deleted...");
                     }
@@ -278,10 +281,12 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
-        return new Fixture(appliedFixture)
+        String projectId = new Fixture(appliedFixture)
                 .setRestClient(restClient)
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        createdProjects.add(projectId);
+        return projectId;
     }
 
     protected RestClient getAdminRestClient() {
@@ -523,7 +528,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         project.setDriver(testParams.getProjectDriver());
         project.setEnvironment(testParams.getProjectEnvironment());
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        String projectId = restClient.getProjectService().createProject(project).get().getId();
+        createdProjects.add(projectId);
+        return projectId;
     }
 
     protected String createNewEmptyProject(final String projectTitle) {
@@ -598,5 +605,21 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     private void setWindowSize(final int width, final int height) {
         log.info("resizing window to " + width + "x" + height);
         browser.manage().window().setSize(new Dimension(width, height));
+    }
+
+    private void deleteCreatedProject() {
+        RestProfile domainRestProfile = new RestProfile(testParams.getHost(), testParams.getDomainUser(), testParams.getPassword(), true);
+        List<String> domainProjects = new RestClient(domainRestProfile).getProjectService().getProjects().stream()
+                .map(Project::getId).collect(toList());
+        createdProjects.stream()
+                .filter(createdProjectId -> domainProjects.contains(createdProjectId))
+                .forEach(createdProjectId -> {
+                    try {
+                        deleteProject(domainRestProfile, createdProjectId);
+                    } catch (GoodDataRestException | RestClientException e) {
+                        return;
+                    }
+                    log.info(createdProjectId + " is removed project");
+                });
     }
 }
