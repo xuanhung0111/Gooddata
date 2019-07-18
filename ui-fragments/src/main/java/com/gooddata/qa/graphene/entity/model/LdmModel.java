@@ -6,9 +6,13 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LdmModel {
 
     private List<Dataset> datasets;
+    private static final Logger logger = LoggerFactory.getLogger(LdmModel.class);
 
     public LdmModel() {
         this.datasets = new ArrayList<>();
@@ -25,5 +29,11 @@ public class LdmModel {
 
     public String buildMaql() {
         return datasets.stream().map(Dataset::buildMaql).collect(joining());
+    }
+
+    //Function use for create MAQL with Primary key 
+    public String buildMaqlUsingPrimaryKey() {
+        logger.info("MAQL update Model has Primary key: " + datasets.stream().map(Dataset::buildMaqlUsingPrimaryKey).collect(joining()));
+        return datasets.stream().map(Dataset::buildMaqlUsingPrimaryKey).collect(joining());
     }
 }

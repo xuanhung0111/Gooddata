@@ -10,17 +10,24 @@ public class Dataset {
 
     private String name;
 
+    private String primarykey ;
     private List<String> attributes;
     private List<String> facts;
 
     public Dataset(String name) {
         this.name = name;
+        this.primarykey = null;
         this.attributes = new ArrayList<>();
         this.facts = new ArrayList<>();
     }
 
     public Dataset withAttributes(String... attributes) {
         this.attributes.addAll(asList(attributes));
+        return this;
+    }
+
+    public Dataset withPrimaryKey(String primarykey) {
+        this.primarykey = primarykey;
         return this;
     }
 
@@ -34,7 +41,7 @@ public class Dataset {
                 .append("CREATE FOLDER {dim.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE ATTRIBUTE;")
                 .append("CREATE FOLDER {ffld.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE FACT;")
                 .append("CREATE DATASET {dataset.${dataset}} VISUAL(TITLE \"${dataset}\");")
-                .append("CREATE ATTRIBUTE {attr.${dataset}.factsof} VISUAL(TITLE \"Records of ${dataset}\", "
+                .append("CREATE ATTRIBUTE {attr.${dataset}.factsof} VISUAL(TITLE \"Records of ${dataset}\","
                         + "FOLDER {dim.${dataset}}) AS KEYS {f_${dataset}.id} FULLSET;")
                 .append("ALTER DATASET {dataset.${dataset}} ADD {attr.${dataset}.factsof};")
                 .append(buildAttributes())
@@ -42,6 +49,31 @@ public class Dataset {
                 .append("SYNCHRONIZE {dataset.${dataset}};")
                 .toString()
                 .replace("${dataset}", getName());
+    }
+
+    public String buildMaqlUsingPrimaryKey() {
+        return new StringBuilder()
+                .append("CREATE FOLDER {dim.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE ATTRIBUTE;")
+                .append("CREATE FOLDER {ffld.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE FACT;")
+                .append("CREATE DATASET {dataset.${dataset}} VISUAL(TITLE \"${dataset}\");")
+                .append(buildAttributes())
+                .append(buildFacts())
+                .append(primarykey == null ? "" : buildPrimaryKey())
+                .append("SYNCHRONIZE {dataset.${dataset}};")
+                .toString()
+                .replace("${dataset}", getName());
+    }
+
+    public String buildPrimaryKey() {
+        return new StringBuilder()
+                .append("CREATE ATTRIBUTE {attr.${dataset}.${primarykey}} VISUAL(TITLE \"${primarykey}\", FOLDER {dim.${dataset}})"
+                        + " AS KEYS {f_${dataset}.id} FULLSET;")
+                .append("ALTER DATASET {dataset.${dataset}} ADD {attr.${dataset}.${primarykey}};")
+                .append("ALTER ATTRIBUTE {attr.${dataset}.${primarykey}} ADD LABELS {label.${dataset}.${primarykey}}"
+                        + "VISUAL(TITLE \"${primarykey}\") AS {f_${dataset}.nm_${primarykey}};")
+                .toString()
+                .replace("${dataset}", getName())
+                .replace("${primarykey}", primarykey);
     }
 
     private String getName() {
