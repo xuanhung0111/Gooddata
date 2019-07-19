@@ -28,6 +28,7 @@ public class TestParameters {
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private Environment projectEnvironment = Environment.TESTING;
+    private int retentionDays;
     private String testIdentification;
     private String downloadFolder;
     private String csvFolder;
@@ -57,6 +58,7 @@ public class TestParameters {
         authorizationToken = loadProperty("project.authorizationToken");
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
+        retentionDays = Integer.parseInt(loadProperty("project.retentionDayNumber"));
         downloadFolder = loadProperty("browserDownloadFolder");
         csvFolder = loadProperty("csvFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));
@@ -161,6 +163,10 @@ public class TestParameters {
 
     public Environment getProjectEnvironment() {
         return projectEnvironment;
+    }
+
+    public int getRetentionDays() {
+        return retentionDays;
     }
 
     public DeleteMode getDeleteMode() {
