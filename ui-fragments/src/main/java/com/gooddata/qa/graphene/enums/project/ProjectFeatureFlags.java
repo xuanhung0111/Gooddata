@@ -29,7 +29,8 @@ public enum ProjectFeatureFlags {
     IS_REDIRECTED_FOR_ONE_PROJECT("isRedirectedForOneProject"),
     CASCADING_FILTERS_BOOSTING_ENABLE("cascadingFiltersBoostingEnabled"),
     ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS("enableKPIDashboardExtendedDateFilters"),
-    ENABLE_KPI_DASHBOARD_WEEK_FILTERS("enableKPIDashboardWeekFilters");
+    ENABLE_KPI_DASHBOARD_WEEK_FILTERS("enableKPIDashboardWeekFilters"),
+    ENABLE_LAYOUTS_DASHBOARD("enableLayouts");
 
     private final String featureFlag;
 
