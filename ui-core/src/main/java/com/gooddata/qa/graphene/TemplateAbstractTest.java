@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
@@ -91,6 +92,6 @@ public class TemplateAbstractTest extends AbstractProjectTest{
         project.setDriver(projectDriver);
         project.setEnvironment(environment);
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
     }
 }

@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -282,6 +283,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             throw new FixtureException("Fixture can't be null");
         }
         String projectId = new Fixture(appliedFixture)
+                .setCreateProjectTimeout(testParams.getCreateProjectTimeout())
                 .setRestClient(restClient)
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
@@ -528,7 +530,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         project.setDriver(testParams.getProjectDriver());
         project.setEnvironment(testParams.getProjectEnvironment());
 
-        String projectId = restClient.getProjectService().createProject(project).get().getId();
+        String projectId = restClient.getProjectService().createProject(project)
+                .get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
         createdProjects.add(projectId);
         return projectId;
     }

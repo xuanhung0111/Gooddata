@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import static java.util.stream.Collectors.joining;
@@ -370,7 +371,7 @@ public final class LCMServiceProject {
         project.setDriver(testParameters.getProjectDriver());
         project.setEnvironment(testParameters.getProjectEnvironment());
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get(testParameters.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
     }
 
     private RestClient createDomainRestClient(final TestParameters testParameters) {

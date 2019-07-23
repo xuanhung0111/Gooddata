@@ -14,6 +14,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.gooddata.project.Project;
 import com.gooddata.qa.utils.http.RestClient;
@@ -255,6 +256,6 @@ public class UserAccountSettingTest extends AbstractUITest {
         project.setDriver(testParams.getProjectDriver());
         project.setEnvironment(testParams.getProjectEnvironment());
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
     }
 }
