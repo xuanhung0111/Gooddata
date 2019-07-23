@@ -145,11 +145,11 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         DatabaseColumn deletedColumn = new DatabaseColumn(COLUMN_X_DELETED, BOOLEAN_TYPE);
         DatabaseColumn clientIdColumn = new DatabaseColumn(COLUMN_X_CLIENT_ID, VARCHAR_TYPE);
 
-        List<DatabaseColumn> listColumn1 = Arrays.asList(custkeyColumn, nameColumn, ageColumn, timestampColumn,
-                deletedColumn, clientIdColumn);
+        List<DatabaseColumn> listColumn1 = Arrays.asList(custkeyColumn, nameColumn, ageColumn, timestampColumn, deletedColumn,
+                clientIdColumn);
         List<DatabaseColumn> listColumnOnlyTimestamp = Arrays.asList(custkeyColumn, nameColumn, ageColumn, timestampColumn);
-        List<DatabaseColumn> listColumnTimestampClientId = Arrays.asList(custkeyColumn, nameColumn, ageColumn,
-                timestampColumn, clientIdColumn);
+        List<DatabaseColumn> listColumnTimestampClientId = Arrays.asList(custkeyColumn, nameColumn, ageColumn, timestampColumn,
+                clientIdColumn);
         List<DatabaseColumn> listColumnTimestampDeleted = Arrays.asList(custkeyColumn, nameColumn, ageColumn, timestampColumn,
                 deletedColumn);
         snowflakeUtils.createTable(TABLE_CUSTOMERS, listColumn1);
@@ -162,7 +162,19 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         lcmBrickFlowBuilder.deleteMasterProject();
         lcmBrickFlowBuilder.runLcmFlow();
         lastSuccessful = LocalDateTime.now().withNano(0);
-        timeForceFullLoad = parseToTimeStampFormat(LocalDateTime.now());
+        timeForceFullLoad = parseToTimeStampFormat(lastSuccessful);
+        timeLoadFrom = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(3));
+        timeLoadTo = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(5));
+        timeOverRange = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(7));
+    }
+
+    @DataProvider
+    public Object[][] dataFirstLoadHasClientId() throws IOException {
+        return new Object[][] {
+                { TABLE_CUSTOMERS, datasetNormal(), DATASET_CUSTOMERS, PKCOLUMN_CUSKEY, PK_CUSKEY,
+                        asList("CUS1", "User", "28", timeForceFullLoad, "0", CLIENT_ID_1) },
+                { TABLE_CUSTOMERS_TIMESTAMP_CLIENTID, datasetTimeStampClientId(), DATASET_CUSTOMERS_TIMESTAMP_CLIENTID,
+                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS6", "Phong", "28", timeForceFullLoad, CLIENT_ID_1) } };
     }
 
     @Test(dependsOnMethods = { "initData" }, dataProvider = "dataFirstLoadHasClientId")
@@ -192,49 +204,64 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
     }
 
+    @DataProvider
+    public Object[][] dataFirstLoadNoClientId() throws IOException {
+        return new Object[][] {
+                { TABLE_CUSTOMERS_ONLY_TIMESTAMP, datasetOnlyTimeStamp(), DATASET_CUSTOMERS_ONLY_TIMESTAMP, PKCOLUMN_CUSKEY,
+                        PK_CUSKEY, asList("CUS4", "Phong", "28", timeForceFullLoad) },
+                { TABLE_CUSTOMERS_TIMESTAMP_DELETED, datasetTimeStampDeleted(), DATASET_CUSTOMERS_TIMESTAMP_DELETED,
+                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS8", "Phong", "28", timeForceFullLoad, "0") } };
+    }
+
     @Test(dependsOnMethods = { "checkForceFullLoadHasClientId" }, dataProvider = "dataFirstLoadNoClientId")
     public void checkForceFullLoadNoClientId(String table, CsvFile csvfile, String dataset, String column, String attribute,
             List<String> data) throws SQLException, IOException {
-        try {
-            csvfile.rows(data);
-            csvfile.saveToDisc(testParams.getCsvFolder());
-            log.info("This is path of CSV File :" + csvfile.getFilePath());
-            snowflakeUtils.uploadCsv2Snowflake(LOCAL_STAGE, "", table, csvfile.getFilePath());
-            // RUN SCHEDULE
-            JSONObject jsonDataset = domainProcessUtils.setModeFullDataset(dataset);
-            String valueParam = domainProcessUtils.getDataset(jsonDataset);
-            Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
-                    .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "FULL");
-            ProcessExecutionDetail detail = domainProcessUtils.execute(parameters);
-            String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), serviceProjectId);
-            // GET RESULT FROM Snowflake
-            List<String> custkeyValues = new ArrayList<String>();
-            ResultSet result = snowflakeUtils.getRecords(table, column);
-            while (result.next()) {
-                custkeyValues.add(result.getString(column));
-            }
-            assertThat(executionLog,
-                    containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
-                            clientProjectId1, CLIENT_ID_1, dataset)));
-            Attribute attributeCustkey = getMdService().getObj(project1, Attribute.class,
-                    identifier("attr." + dataset + "." + attribute));
-            assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
-            assertThat(executionLog,
-                    containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
-                            clientProjectId2, CLIENT_ID_2, dataset)));
-            Attribute attributeCustkeyClient2 = getMdService().getObj(project2, Attribute.class,
-                    identifier("attr." + dataset + "." + attribute));
-            assertThat(getAttributeValues(attributeCustkeyClient2), containsInAnyOrder(custkeyValues.toArray()));
-        } finally {
-            timeLoadFrom = parseToTimeStampFormat(LocalDateTime.now());
-            timeLoadTo = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(3));
-            timeOverRange = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(5));
+        csvfile.rows(data);
+        csvfile.saveToDisc(testParams.getCsvFolder());
+        log.info("This is path of CSV File :" + csvfile.getFilePath());
+        snowflakeUtils.uploadCsv2Snowflake(LOCAL_STAGE, "", table, csvfile.getFilePath());
+        // RUN SCHEDULE
+        JSONObject jsonDataset = domainProcessUtils.setModeFullDataset(dataset);
+        String valueParam = domainProcessUtils.getDataset(jsonDataset);
+        Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
+                .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "FULL");
+        ProcessExecutionDetail detail = domainProcessUtils.execute(parameters);
+        String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), serviceProjectId);
+        // GET RESULT FROM Snowflake
+        List<String> custkeyValues = new ArrayList<String>();
+        ResultSet result = snowflakeUtils.getRecords(table, column);
+        while (result.next()) {
+            custkeyValues.add(result.getString(column));
         }
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+                clientProjectId1, CLIENT_ID_1, dataset)));
+        Attribute attributeCustkey = getMdService().getObj(project1, Attribute.class,
+                identifier("attr." + dataset + "." + attribute));
+        assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+                clientProjectId2, CLIENT_ID_2, dataset)));
+        Attribute attributeCustkeyClient2 = getMdService().getObj(project2, Attribute.class,
+                identifier("attr." + dataset + "." + attribute));
+        assertThat(getAttributeValues(attributeCustkeyClient2), containsInAnyOrder(custkeyValues.toArray()));
+    }
+
+    @DataProvider
+    public Object[][] dataIncrementalLoadHasClientId() throws IOException {
+        return new Object[][] {
+                { TABLE_CUSTOMERS, datasetNormal(), DATASET_CUSTOMERS, PKCOLUMN_CUSKEY, PK_CUSKEY,
+                        asList("CUS1B", "User", "30", timeLoadFrom, "0", CLIENT_ID_1),
+                        asList("CUS1C", "User", "30", timeLoadTo, "0", CLIENT_ID_1),
+                        asList("CUS1D", "User", "30", timeOverRange, "0", CLIENT_ID_1) },
+                { TABLE_CUSTOMERS_TIMESTAMP_CLIENTID, datasetTimeStampClientId(), DATASET_CUSTOMERS_TIMESTAMP_CLIENTID,
+                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS6B", "Phong", "30", timeLoadFrom, CLIENT_ID_1),
+                        asList("CUS6C", "Phong", "30", timeLoadTo, CLIENT_ID_1),
+                        asList("CUS6D", "Phong", "30", timeOverRange, CLIENT_ID_1) } };
     }
 
     @Test(dependsOnMethods = { "checkForceFullLoadNoClientId" }, dataProvider = "dataIncrementalLoadHasClientId")
     public void checkForceIncrementalLoadHasClientId(String table, CsvFile csvfile, String dataset, String column,
-            String attribute, List<String> dataFrom, List<String> dataTo, List<String> dataOverRange) throws SQLException, IOException {
+            String attribute, List<String> dataFrom, List<String> dataTo, List<String> dataOverRange)
+            throws SQLException, IOException {
         csvfile.rows(dataFrom).rows(dataTo).rows(dataOverRange);
         csvfile.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
@@ -263,6 +290,17 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         Attribute attributeCustkey = getMdService().getObj(project1, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
+    }
+
+    @DataProvider
+    public Object[][] dataIncrementalLoadNoClientId() throws IOException {
+        return new Object[][] {
+                { TABLE_CUSTOMERS_ONLY_TIMESTAMP, datasetOnlyTimeStamp(), DATASET_CUSTOMERS_ONLY_TIMESTAMP, PKCOLUMN_CUSKEY,
+                        PK_CUSKEY, asList("CUS4B", "Phong", "30", timeLoadFrom), asList("CUS4C", "Phong", "30", timeLoadTo),
+                        asList("CUS4D", "Phong", "30", timeOverRange) },
+                { TABLE_CUSTOMERS_TIMESTAMP_DELETED, datasetTimeStampDeleted(), DATASET_CUSTOMERS_TIMESTAMP_DELETED,
+                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS8B", "Phong", "30", timeLoadFrom, "0"),
+                        asList("CUS8C", "Phong", "30", timeLoadTo, "0"), asList("CUS8D", "Phong", "30", timeOverRange, "0") } };
     }
 
     @Test(dependsOnMethods = { "checkForceIncrementalLoadHasClientId" }, dataProvider = "dataIncrementalLoadNoClientId")
@@ -304,48 +342,6 @@ public class SegmentForceLoadTest extends AbstractAutomatedDataDistributionTest 
         Attribute attributeCustkeyClient2 = getMdService().getObj(project2, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkeyClient2), containsInAnyOrder(custkeyValues.toArray()));
-    }
-
-    @DataProvider
-    public Object[][] dataIncrementalLoadHasClientId() throws IOException {
-        return new Object[][] {
-                { TABLE_CUSTOMERS, datasetNormal(), DATASET_CUSTOMERS, PKCOLUMN_CUSKEY, PK_CUSKEY,
-                        asList("CUS1B", "User", "30", timeLoadFrom, "0", CLIENT_ID_1),
-                        asList("CUS1C", "User", "30", timeLoadTo, "0", CLIENT_ID_1),
-                        asList("CUS1D", "User", "30", timeOverRange, "0", CLIENT_ID_1) },
-                { TABLE_CUSTOMERS_TIMESTAMP_CLIENTID, datasetTimeStampClientId(), DATASET_CUSTOMERS_TIMESTAMP_CLIENTID,
-                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS6B", "Phong", "30", timeLoadFrom, CLIENT_ID_1),
-                        asList("CUS6C", "Phong", "30", timeLoadTo, CLIENT_ID_1),
-                        asList("CUS6D", "Phong", "30", timeOverRange, CLIENT_ID_1) } };
-    }
-
-    @DataProvider
-    public Object[][] dataIncrementalLoadNoClientId() throws IOException {
-        return new Object[][] {
-                { TABLE_CUSTOMERS_ONLY_TIMESTAMP, datasetOnlyTimeStamp(), DATASET_CUSTOMERS_ONLY_TIMESTAMP, PKCOLUMN_CUSKEY,
-                        PK_CUSKEY, asList("CUS4B", "Phong", "30", timeLoadFrom), asList("CUS4C", "Phong", "30", timeLoadTo),
-                        asList("CUS4D", "Phong", "30", timeOverRange) },
-                { TABLE_CUSTOMERS_TIMESTAMP_DELETED, datasetTimeStampDeleted(), DATASET_CUSTOMERS_TIMESTAMP_DELETED,
-                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS8B", "Phong", "30", timeLoadFrom, "0"),
-                        asList("CUS8C", "Phong", "30", timeLoadTo, "0"), asList("CUS8D", "Phong", "30", timeOverRange, "0") } };
-    }
-
-    @DataProvider
-    public Object[][] dataFirstLoadHasClientId() throws IOException {
-        return new Object[][] {
-                { TABLE_CUSTOMERS, datasetNormal(), DATASET_CUSTOMERS, PKCOLUMN_CUSKEY, PK_CUSKEY,
-                        asList("CUS1", "User", "28", timeForceFullLoad, "0", CLIENT_ID_1) },
-                { TABLE_CUSTOMERS_TIMESTAMP_CLIENTID, datasetTimeStampClientId(), DATASET_CUSTOMERS_TIMESTAMP_CLIENTID,
-                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS6", "Phong", "28", timeForceFullLoad, CLIENT_ID_1) } };
-    }
-
-    @DataProvider
-    public Object[][] dataFirstLoadNoClientId() throws IOException {
-        return new Object[][] {
-                { TABLE_CUSTOMERS_ONLY_TIMESTAMP, datasetOnlyTimeStamp(), DATASET_CUSTOMERS_ONLY_TIMESTAMP, PKCOLUMN_CUSKEY,
-                        PK_CUSKEY, asList("CUS4", "Phong", "28", timeForceFullLoad) },
-                { TABLE_CUSTOMERS_TIMESTAMP_DELETED, datasetTimeStampDeleted(), DATASET_CUSTOMERS_TIMESTAMP_DELETED,
-                        PKCOLUMN_CUSKEY, PK_CUSKEY, asList("CUS8", "Phong", "28", timeForceFullLoad, "0") } };
     }
 
     @AfterClass(alwaysRun = true)
