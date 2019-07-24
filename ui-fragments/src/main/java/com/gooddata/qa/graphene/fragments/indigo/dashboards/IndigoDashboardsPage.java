@@ -71,7 +71,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-attribute_select")
     private AttributeSelect attributeSelect;
 
-    @FindBy(className = "dash-filters-date")
+    @FindBy(className = DATE_FILTER_SELECTOR)
     private DateFilter dateFilter;
 
     @FindBy(className = DELETE_BUTTON_CLASS_NAME)
@@ -107,6 +107,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
+    private static final String DATE_FILTER_SELECTOR = "dash-filters-date";
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
@@ -318,6 +319,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public boolean isEditButtonVisible() {
         By buttonVisible = By.className(EDIT_BUTTON_CLASS_NAME);
         return isElementPresent(buttonVisible, browser);
+    }
+
+    public boolean hasDateFilter() {
+        return isElementVisible(className(DATE_FILTER_SELECTOR), getRoot());
     }
 
     public DateFilter getDateFilter() {
