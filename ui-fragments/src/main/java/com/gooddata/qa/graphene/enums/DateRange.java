@@ -32,7 +32,6 @@ public enum DateRange {
         this.date = date;
     }
 
-
     public static LocalDate now() {
         return LocalDate.now(ZONE_ID);
     }

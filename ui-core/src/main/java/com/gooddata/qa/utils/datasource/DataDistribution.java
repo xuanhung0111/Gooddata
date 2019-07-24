@@ -13,6 +13,10 @@ public class DataDistribution {
         this.target = target;
     }
 
+    public DataDistribution(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @JsonProperty("dataSource")
     private String dataSource;
     @JsonProperty("target")

@@ -32,7 +32,7 @@ final public class LcmBrickFlowBuilder {
     public LcmBrickFlowBuilder(final TestParameters testParameters, boolean useK8sExecutor) {
         this.testParams = testParameters;
         this.devProjectId = testParams.getProjectId();
-        this.clients = new HashMap<String, String>();
+        this.clients = new HashMap<>();
         this.lcmServiceProject = LCMServiceProject.newWorkFlow(testParams, useK8sExecutor);
     }
 
@@ -76,7 +76,7 @@ final public class LcmBrickFlowBuilder {
         if (clients.isEmpty()) {
             datasource = lcmServiceProject.createProvisionDatasource(segmentId, clientId, clientProjectIds);
         } else {
-            datasource = lcmServiceProject.createProvisionDatasource(segmentId,clients);
+            datasource = lcmServiceProject.createProvisionDatasource(segmentId, clients);
         }
         segmentFilters = new JSONArray() {{
             put(segmentId);
@@ -112,6 +112,9 @@ final public class LcmBrickFlowBuilder {
         ProcessExecutionDetail detail = lcmServiceProject.rollout(segmentFilters);
         verifyExecutionLog(detail);
         log.info("----Finished rolling--------------");
+        final String executionLog = lcmServiceProject.getExecutionLog(detail.getLogUri());
+        log.info("----executionLog------");
+        log.info(executionLog);
         return this;
     }
 
@@ -133,8 +136,6 @@ final public class LcmBrickFlowBuilder {
 
     private void verifyExecutionLog(final ProcessExecutionDetail detail) {
         final String executionLog = lcmServiceProject.getExecutionLog(detail.getLogUri());
-        System.out.println("----executionLog------");
-        System.out.println(executionLog);
         assertTrue(executionLog.contains("INFO -- : Pipeline ending"), "execution log does not contain valid ending message");
         assertTrue(executionLog.contains("GoodData::LCM2"), "execution log does not contain LCM2");
         assertTrue(executionLog.contains(LcmRestUtils.ATT_LCM_DATA_PRODUCT), "execution log does not contain a expected data product");

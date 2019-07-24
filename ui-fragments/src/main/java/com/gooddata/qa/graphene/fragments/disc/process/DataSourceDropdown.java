@@ -46,7 +46,8 @@ public class DataSourceDropdown extends AbstractDropDown {
 
     public DataSourceDropdown selectDataSource(String dataSourceTitle) {
         By selector = By.cssSelector(".s-" + simplifyText(dataSourceTitle));
-        ElementUtils.scrollElementIntoView(By.cssSelector(".ember-view.ember-list-view"), selector, browser, 50);
+        ElementUtils.scrollElementIntoView(
+                By.cssSelector(".datasource-selection-dropdown .ember-view.ember-list-view"), selector, browser, 50);
         waitForElementVisible(selector, browser).click();
         return this;
     }

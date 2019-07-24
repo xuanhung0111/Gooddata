@@ -6,6 +6,8 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -49,7 +51,27 @@ public class TestParameters {
     private String localhostSDK;
     private String brickAppstore;
     private String lcmDataloadProcessComponentVersion;
+    private static TestParameters testParameters;
 
+    public static TestParameters getInstance() {
+        if (testParameters == null) {
+            String propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
+                    "/ui-tests-core/src/test/resources/variables-env-test.properties".replace("/",
+                            System.getProperty("file.separator")));
+            System.out.println("User properties: " + propertiesPath);
+
+            Properties testVariables = new Properties();
+            try {
+                FileInputStream in = new FileInputStream(propertiesPath);
+                testVariables.load(in);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Properties weren't loaded from path: " + propertiesPath);
+            }
+
+            testParameters = new TestParameters(testVariables);
+        }
+        return testParameters;
+    }
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;

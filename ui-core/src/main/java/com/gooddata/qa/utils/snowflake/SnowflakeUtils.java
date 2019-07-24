@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -109,13 +108,14 @@ public class SnowflakeUtils {
      * @param tableName     name of table.
      * @param listOfColumns need at least one column to create table.
      */
-    public void createTable(String tableName, List<DatabaseColumn> listOfColumns) throws SQLException {
+    public SnowflakeUtils createTable(String tableName, List<DatabaseColumn> listOfColumns) throws SQLException {
         // setup columns
         String columnsOfTable = setupColumnsOfTable(listOfColumns);
 
         // create table
         executeSql("CREATE TABLE " + tableName + "(" + columnsOfTable + ")");
         logger.info("Created table with name: " + tableName);
+        return this;
     }
 
     /**

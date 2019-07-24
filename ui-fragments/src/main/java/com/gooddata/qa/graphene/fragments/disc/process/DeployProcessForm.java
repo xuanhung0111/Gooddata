@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc.process;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -41,7 +43,7 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(xpath = ".//*[text()='PROCESS NAME']/following::input")
     private WebElement processNameInput;
 
-    @FindBy(css = "button:first-child")
+    @FindBy(className = "ait-deploy-process-confirm-btn")
     private WebElement deployButton;
 
     @FindBy(className = "ait-component-selection-dropdown-button")
@@ -219,6 +221,7 @@ public class DeployProcessForm extends AbstractFragment {
         selectProcessType(ProcessType.AUTOMATED_DATA_DISTRIBUTION);
         return DeploySDDProcessDialog.getInstance(browser);
     }
+
     public String getS3ConfigurationPath() {
         return waitForElementVisible(s3ConfigurationPathInput).getAttribute("value");
     }
@@ -271,12 +274,16 @@ public class DeployProcessForm extends AbstractFragment {
         return waitForElementVisible(s3SecretKeyInput).getAttribute("class").contains("has-error");
     }
 
-    public void tryToSubmit() {
-        waitForElementVisible(deployButton).click();
+    public boolean isSubmitButtonDisabled() {
+        return isElementDisabled(deployButton);
+    }
+
+    public void clickSubmitButton() {
+        waitForElementEnabled(deployButton).click();
     }
 
     public void submit() {
-        tryToSubmit();
+        clickSubmitButton();
         waitForFragmentNotVisible(this);
     }
 
