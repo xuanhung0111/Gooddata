@@ -17,7 +17,7 @@ import static com.gooddata.qa.utils.EnumUtils.lookup;
 public class TestParameters {
 
     private Properties testVariables;
-
+    private long createProjectTimeout;
     private String host;
     private String projectId;
     private String domainUser = null;
@@ -75,6 +75,7 @@ public class TestParameters {
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
+        this.createProjectTimeout = Long.parseLong(loadProperty("createProjectTimeout"));
         host = loadProperty("host");
         user = loadProperty("user");
         password = loadProperty("password");
@@ -125,6 +126,14 @@ public class TestParameters {
             return property;
         }
         return testVariables.getProperty(propertyKey);
+    }
+
+    public long getCreateProjectTimeout() {
+        return createProjectTimeout;
+    }
+
+    public void setCreateProjectTimeout(long createNewProjectTimeout) {
+        this.createProjectTimeout = createNewProjectTimeout;
     }
 
     public String getHost() {

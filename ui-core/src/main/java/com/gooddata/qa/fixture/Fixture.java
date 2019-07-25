@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -53,6 +54,7 @@ import static java.util.Objects.isNull;
 
 public class Fixture {
 
+    private long createProjectTimeout = 0;
     private ResourceTemplate fixture;
     private int version;
 
@@ -74,6 +76,11 @@ public class Fixture {
 
     public Fixture setRestClient(RestClient restClient) {
         this.restClient = restClient;
+        return this;
+    }
+
+    public Fixture setCreateProjectTimeout(long timeout) {
+        this.createProjectTimeout = timeout;
         return this;
     }
 
@@ -283,7 +290,7 @@ public class Fixture {
         project.setDriver(projectDriver);
         project.setEnvironment(environment);
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get(createProjectTimeout, TimeUnit.MINUTES).getId();
     }
 
     /**

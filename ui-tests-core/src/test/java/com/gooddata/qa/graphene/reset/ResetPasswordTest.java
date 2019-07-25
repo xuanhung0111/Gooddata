@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 
@@ -178,6 +179,6 @@ public class ResetPasswordTest extends AbstractUITest {
         project.setDriver(testParams.getProjectDriver());
         project.setEnvironment(testParams.getProjectEnvironment());
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
     }
 }
