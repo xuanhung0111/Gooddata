@@ -43,7 +43,7 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(xpath = ".//*[text()='PROCESS NAME']/following::input")
     private WebElement processNameInput;
 
-    @FindBy(className = "ait-deploy-process-confirm-btn")
+    @FindBy(className = "button-positive")
     private WebElement deployButton;
 
     @FindBy(className = "ait-component-selection-dropdown-button")
