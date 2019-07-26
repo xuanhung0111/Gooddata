@@ -27,6 +27,9 @@ public class TestParameters {
     private String snowflakeUserName;
     private String snowflakeJdbcUrl;
     private String editorUser;
+    private String editorInvitationsUser;
+    private String editorAdminUser;
+    private String explorerUser;
     private String viewerUser;
     private String dashboardOnlyUser;
     private String authorizationToken;
@@ -192,6 +195,30 @@ public class TestParameters {
         return editorUser;
     }
 
+    public void setEditorInvitationsUser(String editorInvitationsUser) {
+        this.editorInvitationsUser = editorInvitationsUser;
+    }
+
+    public String getEditorInvitationsUser() {
+        return editorInvitationsUser;
+    }
+
+    public void setEditorAdminUser(String editorAdminUser) {
+        this.editorAdminUser = editorAdminUser;
+    }
+
+    public String getEditorAdminUser() {
+        return editorAdminUser;
+    }
+
+    public void setExplorerUser(String explorerUser) {
+        this.explorerUser = explorerUser;
+    }
+
+    public String getExplorerUser() {
+        return explorerUser;
+    }
+
     public void setViewerUser(String viewerUser) {
         this.viewerUser = viewerUser;
     }
@@ -346,6 +373,18 @@ public class TestParameters {
                 break;
             case EDITOR:
                 user = getEditorUser();
+                password = getPassword();
+                break;
+            case EDITOR_AND_INVITATIONS:
+                user = getEditorInvitationsUser();
+                password = getPassword();
+                break;
+            case EDITOR_AND_USER_ADMIN:
+                user = getEditorAdminUser();
+                password = getPassword();
+                break;
+            case EXPLORER:
+                user = getExplorerUser();
                 password = getPassword();
                 break;
             case VIEWER:

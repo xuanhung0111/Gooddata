@@ -284,6 +284,15 @@ public abstract class AbstractGreyPageTest extends AbstractTest {
             case EDITOR:
                 testParams.setEditorUser(dynamicUser);
                 return dynamicUser;
+            case EDITOR_AND_INVITATIONS:
+                testParams.setEditorInvitationsUser(dynamicUser);
+                return dynamicUser;
+            case EDITOR_AND_USER_ADMIN:
+                testParams.setEditorAdminUser(dynamicUser);
+                return dynamicUser;
+            case EXPLORER:
+                testParams.setExplorerUser(dynamicUser);
+                return dynamicUser;
             case VIEWER:
                 testParams.setViewerUser(dynamicUser);
                 return dynamicUser;
