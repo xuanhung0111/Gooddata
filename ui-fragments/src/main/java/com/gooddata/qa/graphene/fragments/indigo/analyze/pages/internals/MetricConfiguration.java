@@ -206,6 +206,10 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public boolean isShowInPercentHidden(){
+        return isElementPresent(By.className(".s-show-in-percent"), getRoot());
+    }
+
     public void collapseConfiguration() {
         if (isConfigurationCollapsed()) {
             return;
