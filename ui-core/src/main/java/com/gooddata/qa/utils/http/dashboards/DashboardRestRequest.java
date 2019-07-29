@@ -463,6 +463,29 @@ public class DashboardRestRequest extends CommonRestRequest {
         executeRequest(initPostRequest(dashboardEditModeURI, json.toString()), HttpStatus.OK);
     }
 
+    public JSONObject prepareDataDashboardJson(String name){
+        JSONObject dashboardObj = new JSONObject() {{
+            put("projectDashboard", new JSONObject() {{
+                put("content", new JSONObject() {{
+                    put("rememberFilters", 0);
+                    put("tabs", new JSONArray() {{
+                        put(new JSONObject() {{
+                            put("title", "First Tab");
+                            put("items", new JSONArray());
+                        }});
+                    }});
+                    put("filters", new JSONArray());
+                }});
+                put("meta", new JSONObject() {{
+                    put("title", name);
+                    put("locked", 0);
+                    put("unlisted", 1); // need this value to display unlisted/eye icon
+                }});
+            }});
+        }};
+        return dashboardObj;
+    }
+
     public enum FormatLabel {
         SHORT_LABEL("Short"),
         LONG_LABEL("Long"),

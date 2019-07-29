@@ -31,6 +31,7 @@ public class TestParameters {
     private String editorAdminUser;
     private String explorerUser;
     private String viewerUser;
+    private String viewerDisabledExport;
     private String dashboardOnlyUser;
     private String authorizationToken;
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
@@ -229,6 +230,14 @@ public class TestParameters {
         return viewerUser;
     }
 
+    public void setViewerDisabledExport(String viewerDisabledExport) {
+        this.viewerDisabledExport = viewerDisabledExport;
+    }
+
+    public String getViewerDisabledExport() {
+        return viewerDisabledExport;
+    }
+
     public String getAuthorizationToken() {
         return authorizationToken;
     }
@@ -395,6 +404,10 @@ public class TestParameters {
                 break;
             case VIEWER:
                 user = getViewerUser();
+                password = getPassword();
+                break;
+            case VIEWER_DISABLED_EXPORT:
+                user = getViewerDisabledExport();
                 password = getPassword();
                 break;
             case DASHBOARD_ONLY:

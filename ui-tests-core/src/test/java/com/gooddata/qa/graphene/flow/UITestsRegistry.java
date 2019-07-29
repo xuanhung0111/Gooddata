@@ -4,7 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.aqe.ValidElementsResourceTest;
-import com.gooddata.qa.graphene.dashboards.*;
+import com.gooddata.qa.graphene.dashboards.DrillFromCopiedDashboardTest;
+import com.gooddata.qa.graphene.dashboards.DrillToDashboardFromDrilledReportTest;
+import com.gooddata.qa.graphene.dashboards.DrillToDashBoardTabByDateDimensionTest;
+import com.gooddata.qa.graphene.dashboards.DashboardAndTabManipulationTest;
+import com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest;
+import com.gooddata.qa.graphene.dashboards.DashboardPermissionsBasicTest;
+import com.gooddata.qa.graphene.dashboards.DashboardPermissionsAdvancedTest;
+import com.gooddata.qa.graphene.dashboards.DashboardRolePermissionsTest;
 import com.gooddata.qa.graphene.account.GoodSalesMufOnUserProfileTest;
 import com.gooddata.qa.graphene.account.InviteUserInOtherDomainsTest;
 import com.gooddata.qa.graphene.account.ManageUserTest;
@@ -222,6 +229,9 @@ public class UITestsRegistry {
                     GoodSalesPersonalObjectsInDashboardWidgetTest.class,
                     GoodSalesReportWidgetOnDashboardTest.class,
                     DashboardPermissionsTest.class,
+                    DashboardPermissionsBasicTest.class,
+                    DashboardPermissionsAdvancedTest.class,
+                    DashboardRolePermissionsTest.class,
                     GoodSalesEditEmbeddedDashboardTest.class,
                     GoodSalesDefaultFilterMiscTest.class,
                     GoodSalesSavedViewWithAllValuesTest.class,

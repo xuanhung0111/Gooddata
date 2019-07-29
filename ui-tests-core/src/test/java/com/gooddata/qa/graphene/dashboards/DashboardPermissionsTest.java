@@ -25,9 +25,7 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -39,7 +37,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.google.common.collect.Lists;
 
 public class DashboardPermissionsTest extends GoodSalesAbstractTest {
@@ -323,8 +320,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldShowWaringMessagePage() throws Exception {
         String dashboardName = "Show warning page when access SAC dashboard";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, false, true);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasSAC();
         try {
             signInAndAccessDashboardWithEditor(dashboardUri);
 
@@ -351,8 +348,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void editorLoginLogoutSACdashboard() throws Exception {
         String dashboardName = "Editor login/logout SAC dashboard";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, false, true);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasSAC();
         try {
             signInAndAccessDashboardWithEditor(dashboardUri);
 
@@ -513,8 +510,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldVisibleDashboardSharedNotSAC() throws Exception {
         String dashboardName = "Dashboard Shared and not SAC to Editor";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, true, false);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasNotSAC();
+        addUserShare(testParams.getEditorUser());
         try {
             signInAndInitDashboardWithEdior();
 
@@ -534,8 +532,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldVisibleDashboardSharedhasSAC() throws Exception {
         String dashboardName = "Dashboard Shared and SAC to Editor";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, true, true);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasSAC();
+        addUserShare(testParams.getEditorUser());
         try {
             signInAndInitDashboardWithEdior();
 
@@ -555,8 +554,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldNotVisibleDashboardNotSharedAndNotSAC() throws Exception {
         String dashboardName = "Dashboard did not Shared and did not SAC to Editor";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, false, false);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasNotSAC();
         try {
             signInAndInitDashboardWithEdior();
 
@@ -576,8 +575,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldNotVisibleDashboardNotSharedAndSAC() throws Exception {
         String dashboardName = "Dashboard did not Shared and did SAC to Editor";
-        String dashboardUri = prepareDashboardSharedOrNotSharedToEditor(dashboardName, false, true);
-
+        String dashboardUri = preparePrivateDashboard(dashboardName);
+        dashboardsPage.hasSAC();
         try {
             signInAndInitDashboardWithEdior();
 
@@ -1054,29 +1053,16 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         }
     }
 
-    private String prepareDashboardSharedOrNotSharedToEditor(String dashboardName,
-            boolean isShare, boolean isSAC) throws JSONException, IOException {
+    private String preparePrivateDashboard(String dashboardName) throws JSONException, IOException {
         String dashboardUri = createTestDashboard(dashboardName);
         dashboardRequest.setPrivateDashboard(dashboardName, true);
+        return dashboardUri;
+    }
 
+    private void addUserShare(String userRoles){
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
-        assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
-
-        if (isShare) {
-            selectCandidatesAndShare(addGranteesDialog, testParams.getEditorUser());
-            assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
-        }
-
-        if (isSAC) {
-            permissionsDialog.toggleStrictAccessDashboard();
-        }
-
-        if (isShare || isSAC) {
-            permissionsDialog.submit();
-        }
-
-        return dashboardUri;
+        dashboardsPage.addUserGroup(permissionsDialog, addGranteesDialog, userRoles);
     }
 
     private void signInAndAccessDashboardWithEditor(String dashboardUri) {
@@ -1087,34 +1073,5 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private void signInAndInitDashboardWithEdior() {
         logoutAndLoginAs(false, UserRoles.EDITOR);
         initDashboardsPage();
-    }
-
-    private String createTestDashboard(String name) throws JSONException, IOException {
-        JSONObject dashboardObj = new JSONObject() {{
-            put("projectDashboard", new JSONObject() {{
-                put("content", new JSONObject() {{
-                    put("rememberFilters", 0);
-                    put("tabs", new JSONArray() {{
-                        put(new JSONObject() {{
-                            put("title", "First Tab");
-                            put("items", new JSONArray());
-                        }});
-                    }});
-                    put("filters", new JSONArray());
-                }});
-                put("meta", new JSONObject() {{
-                    put("title", name);
-                    put("locked", 0);
-                    put("unlisted", 1); // need this value to display unlisted/eye icon
-                }});
-            }});
-        }};
-
-        String dashboardURI = dashboardRequest.createDashboard(dashboardObj);
-
-        //refresh page to update the dashboards has just been created
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardURI);
-        WaitUtils.waitForDashboardPageLoaded(browser);
-        return dashboardURI;
     }
 }

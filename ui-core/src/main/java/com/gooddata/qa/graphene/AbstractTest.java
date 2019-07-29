@@ -154,6 +154,10 @@ public abstract class AbstractTest extends Arquillian {
                 username = testParams.getViewerUser();
                 password = testParams.getPassword();
                 break;
+            case VIEWER_DISABLED_EXPORT:
+                username = testParams.getViewerDisabledExport();
+                password = testParams.getPassword();
+                break;
             default:
                 username = testParams.getUser();
                 password = testParams.getPassword();
@@ -170,6 +174,7 @@ public abstract class AbstractTest extends Arquillian {
         EDITOR_AND_INVITATIONS,
         EDITOR_AND_USER_ADMIN,
         EXPLORER,
-        VIEWER
+        VIEWER,
+        VIEWER_DISABLED_EXPORT
     }
 }
