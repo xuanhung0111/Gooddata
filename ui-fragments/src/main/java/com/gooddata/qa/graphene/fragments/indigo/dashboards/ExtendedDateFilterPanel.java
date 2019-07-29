@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
@@ -50,6 +51,9 @@ public class ExtendedDateFilterPanel extends AbstractFragment {
     @FindBy(className = "gd-filter-list-item-selected")
     private WebElement selectedFilter;
 
+    @FindBy(className = "gd-filter-list-item")
+    private List<WebElement> listItem;
+
     public static ExtendedDateFilterPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(ExtendedDateFilterPanel.class,
                 waitForElementVisible(className("s-extended-date-filters-body"), context));
@@ -88,6 +92,10 @@ public class ExtendedDateFilterPanel extends AbstractFragment {
                 .filter(dateRange -> waitForElementVisible(selectedFilter).getText().equals(dateRange.toString()))
                 .findFirst()
                 .get();
+    }
+
+    public List<String> getDateRangeOptions() {
+        return waitForCollectionIsNotEmpty(listItem).stream().map(WebElement::getText).collect(toList());
     }
 
     public enum DateGranularity {

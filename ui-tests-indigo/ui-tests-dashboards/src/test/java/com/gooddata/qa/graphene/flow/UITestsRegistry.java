@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.flow;
 import com.gooddata.qa.graphene.indigo.dashboards.CommonDateFilteringTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DateFilterConfigurationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DeleteAttributeFilterTest;
@@ -198,6 +199,7 @@ public class UITestsRegistry {
             MultipleAttributeFilterManipulationTest.class,
             KpiCompareToPreviousPeriodTest.class,
             ExtendedDateFilterTest.class,
+            DateFilterConfigurationTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-mobile-AttributeFiltering.xml",

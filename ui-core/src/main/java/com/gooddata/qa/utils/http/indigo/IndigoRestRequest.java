@@ -105,9 +105,8 @@ public class IndigoRestRequest extends CommonRestRequest{
      * @param dashboardTitle dashboard title / name
      * @return Uri of analytical dashboard
      * @throws JSONException
-     * @throws IOException
      */
-    public String getAnalyticalDashboardUri(final String dashboardTitle) throws JSONException, IOException {
+    public String getAnalyticalDashboardUri(final String dashboardTitle) throws JSONException {
         return getMdObjectValue("analyticaldashboard",
                 jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
     }
@@ -117,10 +116,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @return list of analytical dashboard links
      * @throws org.json.JSONException
-     * @throws java.io.IOException
      */
     public List<String> getAnalyticalDashboards()
-            throws JSONException, IOException {
+            throws JSONException {
         return getMdObjectValues("analyticaldashboard", jsonObj -> jsonObj.getString("link"));
     }
 
@@ -130,9 +128,8 @@ public class IndigoRestRequest extends CommonRestRequest{
      * @param dashboardTitle dashboard title / name
      * @return identifier of analytical dashboard
      * @throws JSONException
-     * @throws IOException
      */
-    public String getAnalyticalDashboardIdentifier(final String dashboardTitle) throws JSONException, IOException {
+    public String getAnalyticalDashboardIdentifier(final String dashboardTitle) throws JSONException {
         return getMdObjectValue("analyticaldashboard",
                 jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("identifier"));
     }
@@ -344,9 +341,8 @@ public class IndigoRestRequest extends CommonRestRequest{
      * @param insight
      * @return
      * @throws JSONException
-     * @throws IOException
      */
-    public String getInsightUri(final String insight) throws JSONException, IOException {
+    public String getInsightUri(final String insight) throws JSONException {
         return getMdObjectValue("visualizationobjects",
                 jsonObj -> insight.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
     }
@@ -365,10 +361,8 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @return list of titles. Otherwise, return empty list
      * @throws JSONException
-     * @throws IOException
      */
-    public List<String> getInsightWidgetTitles()
-            throws JSONException, IOException {
+    public List<String> getInsightWidgetTitles() throws JSONException {
         return getMdObjectValues("visualizationwidgets",
                 jsonObj -> jsonObj.getString("title"));
     }
@@ -382,8 +376,7 @@ public class IndigoRestRequest extends CommonRestRequest{
         executeRequest(RestRequest.initDeleteRequest(dashboardUri), HttpStatus.NO_CONTENT);
     }
 
-    public String getKpiUri(final String kpi)
-            throws JSONException, IOException {
+    public String getKpiUri(final String kpi) throws JSONException {
         return getMdObjectValue("kpi", jsonObj -> kpi.equals(jsonObj.getString("title")),
                 jsonObj -> jsonObj.getString("link"));
     }
@@ -416,10 +409,8 @@ public class IndigoRestRequest extends CommonRestRequest{
      * This method helps us clean up environment
      *
      * @throws JSONException
-     * @throws IOException
      */
-    public void deleteDashboardsUsingCascade()
-            throws JSONException, IOException {
+    public void deleteDashboardsUsingCascade() throws JSONException {
         final List<String> dashboardUris = getAnalyticalDashboards();
         deleteObjectsUsingCascade(dashboardUris.toArray(new String[dashboardUris.size()]));
     }
@@ -479,8 +470,7 @@ public class IndigoRestRequest extends CommonRestRequest{
         executeRequest(RestRequest.initPostRequest(uri + "?mode=edit", dashboard.toString()), HttpStatus.OK);
     }
 
-    private int getDashboardWidgetCount(final String dashboardUri)
-            throws JSONException, IOException {
+    private int getDashboardWidgetCount(final String dashboardUri) throws JSONException, IOException {
         return getJsonObject(dashboardUri).getJSONObject("analyticalDashboard")
                 .getJSONObject("content").getJSONArray("widgets").length();
     }
