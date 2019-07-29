@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.TABLE;
+import static com.gooddata.qa.graphene.enums.indigo.ReportType.HEAT_MAP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -27,13 +28,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
-
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_table_insight", TABLE,
@@ -521,6 +522,150 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         assertEquals(intersection.getJSONObject(0).getJSONObject("header").get("identifier"), "");
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReport() throws IOException {
+        String insightUri = createInsight("test_view_date_has_stack_heatmap_insight", HEAT_MAP,
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_ACTIVITY_TYPE), ATTR_DEPARTMENT);
+        final String dashboardUri = createAnalyticalDashboard("kpi_eventing_17", insightUri);
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
+        final String departmentUri = getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(activityTypeUri);
+            put(departmentUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
+
+        Pair<Integer, Integer> position = Pair.of(0,0);
+
+        // Firefox have issue with moveToElement which make application cannot catch 'drill' event at first click,
+        // retry is just a workaround
+        RetryCommand retryCommand = new RetryCommand(2);
+        JSONObject content = retryCommand.retryOnException(TimeoutException.class, () -> {
+            try {
+                cleanUpLogger();
+                insight.getChartReport().clickOnElement(position);
+                return getLatestPostMessageObj();
+            } catch (JSONException e) {
+                // Json exception thrown when eventing data is empty
+                // move to top left corner to close all opening popup
+                ElementUtils.moveToTopLetCorner();
+                // then force a retry
+                throw new TimeoutException(e);
+            }
+
+        });
+
+        verifyHeadMapDrillContext(content);
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        verifyColumnIntersection(intersection.getJSONObject(1), "Direct Sales", departmentUri);
+        verifyColumnIntersection(intersection.getJSONObject(2), "Email", activityTypeUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReportWithDateOnRows() throws IOException {
+        String insightUri = createInsight("test_view_date_has_stack_heatmap_insight", HEAT_MAP,
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_YEAR_ACTIVITY), ATTR_REGION);
+        final String dashboardUri = createAnalyticalDashboard("kpi_eventing_17", insightUri);
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(yearActivity);
+            put(regionUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
+
+        Pair<Integer, Integer> position = Pair.of(0,0);
+
+        // Firefox have issue with moveToElement which make application cannot catch 'drill' event at first click,
+        // retry is just a workaround
+        RetryCommand retryCommand = new RetryCommand(2);
+        JSONObject content = retryCommand.retryOnException(TimeoutException.class, () -> {
+            try {
+                cleanUpLogger();
+                insight.getChartReport().clickOnElement(position);
+                return getLatestPostMessageObj();
+            } catch (JSONException e) {
+                // Json exception thrown when eventing data is empty
+                // move to top left corner to close all opening popup
+                ElementUtils.moveToTopLetCorner();
+                // then force a retry
+                throw new TimeoutException(e);
+            }
+
+        });
+
+        verifyHeadMapDrillContext(content);
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        verifyColumnIntersection(intersection.getJSONObject(1), "East Coast", regionUri);
+        verifyColumnIntersection(intersection.getJSONObject(2), "2008", yearActivity);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingHeatMapReportWithDateOnColumns() throws IOException {
+        String insightUri = createInsight("test_view_date_has_stack_heatmap_insight", HEAT_MAP,
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_REGION), ATTR_YEAR_ACTIVITY);
+        final String dashboardUri = createAnalyticalDashboard("kpi_eventing_17", insightUri);
+        final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+        final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
+        final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
+        JSONArray uris = new JSONArray() {{
+            put(activityUri);
+            put(yearActivity);
+            put(regionUri);
+        }};
+
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
+
+        Pair<Integer, Integer> position = Pair.of(0,0);
+
+        // Firefox have issue with moveToElement which make application cannot catch 'drill' event at first click,
+        // retry is just a workaround
+        RetryCommand retryCommand = new RetryCommand(2);
+        JSONObject content = retryCommand.retryOnException(TimeoutException.class, () -> {
+            try {
+                cleanUpLogger();
+                insight.getChartReport().clickOnElement(position);
+                return getLatestPostMessageObj();
+            } catch (JSONException e) {
+                // Json exception thrown when eventing data is empty
+                // move to top left corner to close all opening popup
+                ElementUtils.moveToTopLetCorner();
+                // then force a retry
+                throw new TimeoutException(e);
+            }
+
+        });
+
+        verifyHeadMapDrillContext(content);
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        verifyColumnIntersection(intersection.getJSONObject(1), "2008", yearActivity);
+        verifyColumnIntersection(intersection.getJSONObject(2), "East Coast", regionUri);
+    }
+
     private void verifyTableReport(JSONObject content, String columnTitle, String expectedUri) {
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         JSONArray intersection = drillContext.getJSONArray("intersection");
@@ -548,5 +693,12 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         assertEquals(drillContext.getString("element"), "bar");
         assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
         assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
+    }
+
+    private void verifyHeadMapDrillContext(JSONObject content) {
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        log.info("drillContext : " + drillContext);
+        assertEquals(drillContext.getString("type"), "heatmap");
+        assertEquals(drillContext.getString("element"), "cell");
     }
 }

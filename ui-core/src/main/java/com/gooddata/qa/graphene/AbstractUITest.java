@@ -660,4 +660,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
         return PdfUtils.comparePDFFromPageToPage(PDFExport.getPath(), PDFTemplate.getPath(), pageFrom, pageTo);
     }
+
+    public AnalysisPage openAnalyzeEmbeddedPage(String type, String name) {
+        String hasIdPart = browser.getCurrentUrl().split(testParams.getProjectId() + "/")[1];
+        openUrl("analyze/embedded/#/" + testParams.getProjectId() + "/" + hasIdPart + "?" + type + "=[" + name + "]");
+        return AnalysisPage.getInstance(browser);
+    }
 }
