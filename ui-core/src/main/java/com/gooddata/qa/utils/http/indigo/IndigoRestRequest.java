@@ -301,6 +301,73 @@ public class IndigoRestRequest extends CommonRestRequest{
     }
 
     /**
+     * Add widget to analytical dashboard
+     *
+     * @param dashboardUri
+     * @param widgetUri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
+     */
+    public void addWidgetToWorkingDashboardFluidLayout(final String dashboardUri, final String widgetUri, int indexRow)
+        throws JSONException, IOException {
+
+        final JSONObject dashboard = getJsonObject(dashboardUri);
+
+        final JSONObject contentObject = dashboard.getJSONObject("analyticalDashboard").getJSONObject("content");
+        if (contentObject.has("layout")) {
+
+            dashboard.getJSONObject("analyticalDashboard").getJSONObject("content")
+                .getJSONObject("layout")
+                .getJSONObject("fluidLayout")
+                .getJSONArray("rows")
+                .getJSONObject(indexRow)
+                .getJSONArray("columns")
+                .put(initWidget(widgetUri));
+
+        } else {
+            JSONObject newLayout = new JSONObject() {{
+                put("fluidLayout", new JSONObject() {{
+                    put("rows", new JSONArray() {{
+                        JSONObject temt = new JSONObject();
+                        temt.put("columns", new JSONArray() {{
+                            put(initWidget(widgetUri));
+                        }});
+                        put(temt);
+
+                    }});
+                }});
+            }};
+            dashboard.getJSONObject("analyticalDashboard")
+                .getJSONObject("content").put("layout", newLayout);
+        }
+        dashboard.getJSONObject("analyticalDashboard")
+            .getJSONObject("content")
+            .getJSONArray("widgets")
+            .put(widgetUri);
+
+        executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    private JSONObject initWidget(String uriWidget) throws JSONException, IOException {
+        final Integer widthWidget = getJsonObject(uriWidget).has("kpi") ? 2 : 6;
+
+        return new JSONObject() {{
+            put("size", new JSONObject() {{
+                put("xl", new JSONObject() {{
+                    put("width", widthWidget);
+                }});
+            }});
+            put("content", new JSONObject() {{
+                put("widget", new JSONObject() {{
+                    put("qualifier", new JSONObject() {{
+                        put("uri", uriWidget);
+                    }});
+                }});
+            }});
+        }};
+    }
+
+    /**
      * Create new analytical dashboard
      *
      * @param widgetUris
@@ -310,9 +377,9 @@ public class IndigoRestRequest extends CommonRestRequest{
     public String createAnalyticalDashboard(final Collection<String> widgetUris, final String title) {
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
-        final String content = ANALYTICAL_DASHBOARD_BODY.get()
-                .replace("\"widgets\":[]", "\"widgets\":" + widgets)
-                .replace("${title}", title);
+        final String content = initialAnalyticalDashboardBody(widgetUris).toString()
+            .replace("\"widgets\":[]", "\"widgets\":" + widgets)
+            .replace("${title}", title);
         String uri;
         try {
             uri = getJsonObject(
@@ -324,6 +391,36 @@ public class IndigoRestRequest extends CommonRestRequest{
             throw new RuntimeException("There is error while getting JSON object", e);
         }
         return uri;
+    }
+
+    private JSONObject initialAnalyticalDashboardBody(final Collection<String> widgetUris) {
+        try {
+            return new JSONObject() {{
+                put("analyticalDashboard", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                        put("content", new JSONObject() {{
+                            put("layout", new JSONObject() {{
+                            put("fluidLayout", new JSONObject() {{
+                                put("rows", new JSONArray() {{
+                                    JSONObject temp = new JSONObject();
+                                    temp.put("columns", new JSONArray() {{
+                                        for(String widgetUri : widgetUris) {
+                                            put(initWidget(widgetUri));
+                                        }
+                                    }});
+                                    put(temp);
+                                }});
+                            }});
+                        }});
+                        put("widgets", new JSONArray());
+                    }});
+                }});
+            }};
+        } catch (JSONException | IOException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
     }
 
     /**

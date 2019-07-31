@@ -81,10 +81,11 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 new InsightMDConfiguration(anotherInsight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_LOST_OPPS)))));
 
-        addWidgetToWorkingDashboard(anotherInsightUri);
+        addWidgetToWorkingDashboardFluidLayout(anotherInsightUri, 0);
 
         try {
-            initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
+            initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .selectWidgetByHeadline(Insight.class,
                     TEST_INSIGHT);
 
             indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
@@ -218,7 +219,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
-        addWidgetToWorkingDashboard(widgetUri);
+        addWidgetToWorkingDashboardFluidLayout(widgetUri, 0);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
@@ -242,10 +243,11 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
-        addWidgetToWorkingDashboard(widgetUri);
+        addWidgetToWorkingDashboardFluidLayout(widgetUri, 0);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
+            takeScreenshot(browser, "123456", getClass());
             indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().enableDateFilter().selectDateDataSetByName(SNAPSHOT);
             indigoDashboardsPage.saveEditModeWithWidgets();
 
@@ -276,7 +278,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 createInsightWidget(new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
-        addWidgetToWorkingDashboard(widgetUri);
+        addWidgetToWorkingDashboardFluidLayout(widgetUri, 0);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);

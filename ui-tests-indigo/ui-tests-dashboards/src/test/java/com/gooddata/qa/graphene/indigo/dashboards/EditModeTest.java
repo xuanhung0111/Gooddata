@@ -172,7 +172,7 @@ public class EditModeTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNumberOfAlertAreSet() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -208,7 +208,7 @@ public class EditModeTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertKeptAfterEditedByAnotherUser() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             initIndigoDashboardsPageWithWidgets();
