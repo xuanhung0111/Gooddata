@@ -2,11 +2,14 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static java.lang.String.format;
+import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -37,6 +40,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
@@ -45,11 +49,13 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -62,6 +68,8 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     private final String INSIGHT_HAS_NO_OR_INVALID_DATA = "No or invalid data";
     private final String INSIGHT_HAS_CONTAINS_NOT_COMPUTED_DATA = "Not computed data";
     private final String INSIGHT_HAS_CONTAINS_RESTRICTED_DATA = "Restricted data";
+    private static final String INSIGHT_EXPORTED_CSV = "CSV";
+    private static final String INSIGHT_EXPORTED_XLSX = "XLSX";
 
     private String sourceProjectId;
     private String targetProjectId;
@@ -84,6 +92,9 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     @Override
     protected void addUsersWithOtherRolesToProject() throws JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_INVITATIONS);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_USER_ADMIN);
+        createAndAddUserToProject(UserRoles.EXPLORER);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -184,7 +195,7 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
         assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
             asList(asList("Department", "Year (Closed)",
                 "Amount, Closed: Jan 1, 2012 - Jan 1, 2013 (Department: Direct Sales)"),
-                    asList("Direct Sales", "2012", "2.517027098E7")));
+                asList("Direct Sales", "2012", "2.517027098E7")));
     }
 
     @Test(dependsOnMethods = "prepareInsights")
@@ -323,7 +334,74 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
         }
     }
 
-    private String createInsightHasOnlyMetric(String insightTitle, ReportType reportType, List<String> metricsTitle) {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getRolesUserAndPrepareInsight")
+    public void exportCSVInsightWithAllRoles(UserRoles userRole) throws IOException {
+        try {
+            logoutAndLoginAs(true, userRole);
+
+            initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_EXPORTED_CSV).saveEditModeWithWidgets()
+                .selectDateFilterByName("All time").waitForWidgetsLoading();
+            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.CSV);
+
+            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder()
+                + testParams.getFolderSeparator() + INSIGHT_EXPORTED_CSV + "." + ExportFormat.CSV.getName());
+
+            waitForExporting(exportFile);
+            log.info(INSIGHT_EXPORTED_CSV + ":" + CSVUtils.readCsvFile(exportFile));
+            assertEquals(CSVUtils.readCsvFile(exportFile), asList(
+                asList(null, METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP),
+                asList("Values", "116625456.54", "20286.2161315011", "5134397.65")));
+        } finally {
+            deleteIfExists(Paths.get(testParams.getExportFilePath(INSIGHT_EXPORTED_CSV + "."
+                + ExportFormat.CSV.getName())));
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getRolesUserAndPrepareInsight")
+    public void exportXLSXInsightWithAllRoles(UserRoles userRole) throws IOException {
+        try {
+            logoutAndLoginAs(true, userRole);
+
+            initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_EXPORTED_XLSX).saveEditModeWithWidgets()
+                .selectDateFilterByName("All time").waitForWidgetsLoading();
+            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.XLSX);
+            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+            exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).uncheckOption(OptionalExport.FILTERS_CONTEXT)
+                .confirmExport();
+
+            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder()
+                + testParams.getFolderSeparator() + INSIGHT_EXPORTED_XLSX + "." + ExportFormat.EXCEL_XLSX.getName());
+
+            waitForExporting(exportFile);
+            log.info(INSIGHT_EXPORTED_XLSX + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
+                asList(asList("", METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP),
+                    asList("Values", "1.1662545654E8", "20286.2161315011", "5134397.65")));
+        } finally {
+            deleteIfExists(Paths.get(testParams.getExportFilePath(INSIGHT_EXPORTED_XLSX + "."
+                + ExportFormat.EXCEL_XLSX.getName())));
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @DataProvider(name = "getRolesUserAndPrepareInsight")
+    private Object[][] getRolesUserAndPrepareInsight() {
+        createInsightHasOnlyMetric(INSIGHT_EXPORTED_CSV, ReportType.TABLE, asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT,
+            METRIC_AMOUNT_BOP));
+        createInsightHasOnlyMetric(INSIGHT_EXPORTED_XLSX, ReportType.TABLE, asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT,
+            METRIC_AMOUNT_BOP));
+
+        return new Object[][]{
+            {UserRoles.EDITOR},
+            {UserRoles.EDITOR_AND_INVITATIONS},
+            {UserRoles.EDITOR_AND_USER_ADMIN},
+            {UserRoles.EXPLORER},
+        };
+    }
+
+    private String createInsightHasOnlyMetric(String insightTitle, ReportType
+        reportType, List<String> metricsTitle) {
         return indigoRestRequest.createInsight(
             new InsightMDConfiguration(insightTitle, reportType)
                 .setMeasureBucket(metricsTitle.stream()

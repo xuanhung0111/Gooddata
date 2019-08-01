@@ -138,6 +138,18 @@ public abstract class AbstractTest extends Arquillian {
                 username = testParams.getEditorUser();
                 password = testParams.getPassword();
                 break;
+            case EDITOR_AND_INVITATIONS:
+                username = testParams.getEditorInvitationsUser();
+                password = testParams.getPassword();
+                break;
+            case EDITOR_AND_USER_ADMIN:
+                username = testParams.getEditorAdminUser();
+                password = testParams.getPassword();
+                break;
+            case EXPLORER:
+                username = testParams.getExplorerUser();
+                password = testParams.getPassword();
+                break;
             case VIEWER:
                 username = testParams.getViewerUser();
                 password = testParams.getPassword();
@@ -155,6 +167,9 @@ public abstract class AbstractTest extends Arquillian {
         DOMAIN,
         ADMIN,
         EDITOR,
+        EDITOR_AND_INVITATIONS,
+        EDITOR_AND_USER_ADMIN,
+        EXPLORER,
         VIEWER
     }
 }

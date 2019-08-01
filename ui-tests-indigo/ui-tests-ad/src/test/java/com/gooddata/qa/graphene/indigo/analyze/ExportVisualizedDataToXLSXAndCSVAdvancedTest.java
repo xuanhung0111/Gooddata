@@ -21,12 +21,14 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableRepor
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -55,6 +57,8 @@ import static org.testng.Assert.assertFalse;
 public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_HAS_TOTAL_VALUE = "Total value";
+    private static final String INSIGHT_EXPORTED_CSV = "CSV";
+    private static final String INSIGHT_EXPORTED_XLSX = "XLSX";
 
     private String sourceProjectId;
     private String targetProjectId;
@@ -85,6 +89,9 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
     @Override
     protected void addUsersWithOtherRolesToProject() throws JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_INVITATIONS);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_USER_ADMIN);
+        createAndAddUserToProject(UserRoles.EXPLORER);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -367,7 +374,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
 
             waitForExporting(exportFile);
             takeScreenshot(browser, INSIGHT_HAS_TOTAL_VALUE + " ExportAndImport", getClass());
-            log.info(INSIGHT_HAS_TOTAL_VALUE+ " ExportAndImport:" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+            log.info(INSIGHT_HAS_TOTAL_VALUE + " ExportAndImport:" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
             assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     asList("Exclude", "4.893263959E7", "16972.8198369754"),
@@ -394,7 +401,7 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
             waitForExporting(exportFile);
             takeScreenshot(browser, INSIGHT_HAS_TOTAL_VALUE + " PartialExportAndImport", getClass());
             log.info(INSIGHT_HAS_TOTAL_VALUE + " PartialExportAndImport:"
-                    + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+                + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
             assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     asList("Exclude", "4.893263959E7", "16972.8198369754"),
@@ -408,8 +415,92 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
         }
     }
 
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getRolesUserAndPrepareInsight")
+    public void exportXLSXInsightWithAllRoles(UserRoles userRole) throws IOException {
+        try {
+            logoutAndLoginAs(true, userRole);
+
+            initAnalysePage().openInsight(INSIGHT_EXPORTED_XLSX).waitForReportComputing()
+                .exportTo(OptionalExportMenu.File.XLSX);
+
+            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+            exportXLSXDialog.uncheckOption(ExportXLSXDialog.OptionalExport.CELL_MERGED).confirmExport();
+
+            final java.io.File exportFile = new java.io.File(
+                testParams.getDownloadFolder() + testParams.getFolderSeparator()
+                    + INSIGHT_EXPORTED_XLSX + "." + ExportFormat.EXCEL_XLSX.getName());
+
+            waitForExporting(exportFile);
+            log.info(INSIGHT_EXPORTED_XLSX + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
+                asList(asList(ATTR_FORECAST_CATEGORY, "Exclude", "Include"),
+                    asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
+                    asList("Direct Sales", "3.356248251E7", "4.684384245E7"),
+                    asList("Inside Sales", "1.537015708E7", "2.08489745E7")));
+        } finally {
+            deleteIfExists(Paths.get(testParams.getExportFilePath(INSIGHT_EXPORTED_XLSX
+                + "." + ExportFormat.EXCEL_XLSX.getName())));
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getRolesUserAndPrepareInsight")
+    public void exportCSVInsightWithAllRoles(UserRoles userRole) throws IOException {
+        try {
+            logoutAndLoginAs(true, userRole);
+
+            initAnalysePage().openInsight(INSIGHT_EXPORTED_CSV).waitForReportComputing().exportTo(OptionalExportMenu.File.CSV);
+
+            final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+                + INSIGHT_EXPORTED_CSV + "." + ExportFormat.CSV.getName());
+
+            waitForExporting(exportFile);
+            log.info(INSIGHT_EXPORTED_CSV + ":" + CSVUtils.readCsvFile(exportFile));
+            assertEquals(CSVUtils.readCsvFile(exportFile), asList(
+                asList(ATTR_FORECAST_CATEGORY, "Exclude", "Include"),
+                asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
+                asList("Direct Sales", "33562482.51", "46843842.45"),
+                asList("Inside Sales", "15370157.08", "20848974.5")));
+        } finally {
+            deleteIfExists(Paths.get(testParams.getExportFilePath(INSIGHT_EXPORTED_CSV + "."
+                + ExportFormat.CSV.getName())));
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @DataProvider(name = "getRolesUserAndPrepareInsight")
+    private Object[][] getRolesUserAndPrepareInsight() {
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(INSIGHT_EXPORTED_XLSX, ReportType.TABLE)
+                .setMeasureBucket(singletonList(MeasureBucket
+                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.COLUMNS))));
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(INSIGHT_EXPORTED_CSV, ReportType.TABLE)
+                .setMeasureBucket(
+                    singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.STACK))));
+
+        return new Object[][]{
+            {UserRoles.EDITOR},
+            {UserRoles.EDITOR_AND_INVITATIONS},
+            {UserRoles.EDITOR_AND_USER_ADMIN},
+            {UserRoles.EXPLORER},
+        };
+    }
+
     private void exportInsightsAndCheckDataFile(ReportType type, String insight, String metricNegativeValue)
-            throws IOException {
+        throws IOException {
         analysisPage.changeReportType(type).waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX);
         ExportXLSXDialog.getInstance(browser).confirmExport();
         final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()

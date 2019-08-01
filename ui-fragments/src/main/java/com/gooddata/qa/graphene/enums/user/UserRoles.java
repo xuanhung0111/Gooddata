@@ -4,6 +4,9 @@ public enum UserRoles {
 
     ADMIN("2", "Admin"),
     EDITOR("5", "Editor"),
+    EDITOR_AND_INVITATIONS("11", "EditorAndInvitations"),
+    EDITOR_AND_USER_ADMIN("10", "EditorAndUserAdmin"),
+    EXPLORER("8", "Explorer"),
     VIEWER("4", "Viewer"),
     DASHBOARD_ONLY("3", "DashboardOnly"),
     UNVERIFIED_ADMIN("1");
