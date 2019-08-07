@@ -210,7 +210,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
                 ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(metric))));
 
-        addWidgetToWorkingDashboard(widgetUri);
+        addWidgetToWorkingDashboardFluidLayout(widgetUri, 0);
 
         try {
             initIndigoDashboardsPage()

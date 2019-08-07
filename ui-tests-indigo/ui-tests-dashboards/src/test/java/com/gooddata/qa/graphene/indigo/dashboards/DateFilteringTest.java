@@ -124,12 +124,12 @@ public class DateFilteringTest extends AbstractDashboardTest {
         Metric timeMacrosMetric = createTimeMacrosMetric();
         Metric filteredOutMetric = createFilteredOutMetric();
 
-        String attributeFilterKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(attributeFilterMetric, DATE_DATASET_CREATED)));
-        String timeMacrosKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(timeMacrosMetric, DATE_DATASET_SNAPSHOT)));
-        String filteredOutKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(filteredOutMetric, DATE_DATASET_SNAPSHOT)));
+        String attributeFilterKpiUri = addWidgetToWorkingDashboardFluidLayout(
+                createKpiUsingRest(createDefaultKpiConfiguration(attributeFilterMetric, DATE_DATASET_CREATED)), 0);
+        String timeMacrosKpiUri = addWidgetToWorkingDashboardFluidLayout(
+                createKpiUsingRest(createDefaultKpiConfiguration(timeMacrosMetric, DATE_DATASET_SNAPSHOT)), 0);
+        String filteredOutKpiUri = addWidgetToWorkingDashboardFluidLayout(
+                createKpiUsingRest(createDefaultKpiConfiguration(filteredOutMetric, DATE_DATASET_SNAPSHOT)), 0);
 
         try {
             DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().getDateFilter();

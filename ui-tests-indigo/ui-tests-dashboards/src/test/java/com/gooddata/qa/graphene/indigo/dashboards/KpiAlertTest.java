@@ -112,7 +112,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkAddKpiAlert() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             initIndigoDashboardsPageWithWidgets();
@@ -127,7 +127,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertUpdate() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             String updatedThreshold = "200";
@@ -165,8 +165,8 @@ public class KpiAlertTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDialogWithPercentMetric() throws JSONException, IOException {
         Metric percentMetric = createMetric(METRIC_IN_PERCENT, "SELECT 1", "#,##0%");
-        addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(percentMetric, DATE_DATASET_CREATED)));
+        addWidgetToWorkingDashboardFluidLayout(
+                createKpiUsingRest(createDefaultKpiConfiguration(percentMetric, DATE_DATASET_CREATED)), 0);
 
         try {
             boolean hasPercentSymbol = initIndigoDashboardsPageWithWidgets()
@@ -183,7 +183,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertWithDateFilter() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             KpiAlertDialog kpiAlertDialog = initIndigoDashboardsPageWithWidgets()
@@ -212,7 +212,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertResetFilters() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             initIndigoDashboardsPageWithWidgets().selectDateFilterByName(DATE_FILTER_THIS_MONTH);
@@ -256,7 +256,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "dateFilterProvider")
     public void checkKpiAlertMessageWithDateFilter(String dateFilter, String alertDialogInfoText)
             throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             initIndigoDashboardsPageWithWidgets().selectDateFilterByName(dateFilter);
@@ -290,7 +290,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDelete() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
@@ -311,7 +311,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertValidationNumber() throws JSONException, IOException {
-        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
             KpiAlertDialog dialog = waitForFragmentVisible(indigoDashboardsPage)
@@ -334,7 +334,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
         final Metric numberMetric = createMetric("Metric-" + generateHashString(), "SELECT 100", "#,##0");
         final String numberKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(numberMetric, DATE_DATASET_CREATED));
 
-        addWidgetToWorkingDashboard(numberKpiUri);
+        addWidgetToWorkingDashboardFluidLayout(numberKpiUri, 0);
         logout();
         signInAtGreyPages(imapUser, imapPassword);
 
@@ -389,7 +389,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
         final Metric nullValueMetric = createMetric("Metric-" + generateHashString(), expression, "#,##0");
         final String nullValueKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(nullValueMetric, DATE_DATASET_CREATED));
 
-        addWidgetToWorkingDashboard(nullValueKpiUri);
+        addWidgetToWorkingDashboardFluidLayout(nullValueKpiUri, 0);
 
         try {
             Kpi nullValueKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);

@@ -81,6 +81,18 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         return widgetUri;
     }
 
+    protected String addWidgetToWorkingDashboardFluidLayout(final String widgetUri, int indexRow) throws JSONException, IOException {
+        final IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        if (indigoRestRequest.getAnalyticalDashboards().isEmpty()) {
+            indigoRestRequest.createAnalyticalDashboard(singletonList(widgetUri));
+        } else {
+            indigoRestRequest.addWidgetToWorkingDashboardFluidLayout(getWorkingDashboardUri(), widgetUri, indexRow);
+        }
+        // need widget uri in most of cases which use this helper method
+        return widgetUri;
+    }
+
     protected void setAlertForLastKpi(String triggeredWhen, String threshold) {
         waitForFragmentVisible(indigoDashboardsPage)
             .getLastWidget(Kpi.class)

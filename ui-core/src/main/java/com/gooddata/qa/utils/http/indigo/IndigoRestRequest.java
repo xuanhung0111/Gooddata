@@ -34,13 +34,16 @@ import static java.lang.String.format;
 /**
  * REST request for Indigo task
  */
-public class IndigoRestRequest extends CommonRestRequest{
+public class IndigoRestRequest extends CommonRestRequest {
+    private static final int KPI_COLUMN_WIDTH = 2;
+    private static final int VISUALIZATION_COLUMN_WIDTH = 6;
     private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
     private static final String COLOR_PALETTE_OBJ_LINK = "/gdc/projects/%s/styleSettings";
 
-    public IndigoRestRequest(final RestClient restClient, final String projectId){
+    public IndigoRestRequest(final RestClient restClient, final String projectId) {
         super(restClient, projectId);
     }
+
     private static final Logger log = Logger.getLogger(IndigoRestRequest.class.getName());
 
     private static final Supplier<String> ANALYTICAL_DASHBOARD_BODY = () -> {
@@ -103,7 +106,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Get uri for specific analytical dashboard
      *
      * @param dashboardTitle dashboard title / name
+     *
      * @return Uri of analytical dashboard
+     *
      * @throws JSONException
      */
     public String getAnalyticalDashboardUri(final String dashboardTitle) throws JSONException {
@@ -115,6 +120,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Get analytical dashboards of a project
      *
      * @return list of analytical dashboard links
+     *
      * @throws org.json.JSONException
      */
     public List<String> getAnalyticalDashboards()
@@ -126,7 +132,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Get identifier of analytical dashboard
      *
      * @param dashboardTitle dashboard title / name
+     *
      * @return identifier of analytical dashboard
+     *
      * @throws JSONException
      */
     public String getAnalyticalDashboardIdentifier(final String dashboardTitle) throws JSONException {
@@ -138,7 +146,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Create KPI widget
      *
      * @param kpiConfig
+     *
      * @return KPI uri
+     *
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
@@ -153,8 +163,8 @@ public class IndigoRestRequest extends CommonRestRequest{
             final JSONObject contentJson = new JSONObject(content);
 
             contentJson.getJSONObject("kpi")
-                .getJSONObject("content")
-                .put("comparisonDirection", kpiConfig.getComparisonDirection().toString());
+                    .getJSONObject("content")
+                    .put("comparisonDirection", kpiConfig.getComparisonDirection().toString());
 
             content = contentJson.toString();
         }
@@ -163,20 +173,20 @@ public class IndigoRestRequest extends CommonRestRequest{
             final JSONObject contentJson = new JSONObject(content);
 
             contentJson.getJSONObject("kpi")
-                .getJSONObject("content")
-                .put("drillTo", new JSONObject() {{
-                    put("projectDashboard", kpiConfig.getDrillToDashboard());
-                    put("projectDashboardTab", kpiConfig.getDrillToDashboardTab());
-                }});
+                    .getJSONObject("content")
+                    .put("drillTo", new JSONObject() {{
+                        put("projectDashboard", kpiConfig.getDrillToDashboard());
+                        put("projectDashboardTab", kpiConfig.getDrillToDashboardTab());
+                    }});
 
             content = contentJson.toString();
         }
 
         return getJsonObject(
                 RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
-                    .getJSONObject("kpi")
-                    .getJSONObject("meta")
-                    .getString("uri");
+                .getJSONObject("kpi")
+                .getJSONObject("meta")
+                .getString("uri");
     }
 
     public String updateDeprecated(String type, int value, String visualizationUri) throws IOException {
@@ -194,7 +204,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Currently visualizationClass's content.url for gd visualizations is "local:<visualizationType>"
      *
      * @param type visualization type, e.g. table, bar...
+     *
      * @return visualizationClass uri
+     *
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
@@ -203,8 +215,8 @@ public class IndigoRestRequest extends CommonRestRequest{
         final String localType = "local:" + type;
 
         final JSONArray visualizationClasses = getJsonObject(queryUri)
-            .getJSONObject("objects")
-            .getJSONArray("items");
+                .getJSONObject("objects")
+                .getJSONArray("items");
 
         for (int i = 0, n = visualizationClasses.length(); i < n; i++) {
             final JSONObject visualizationClass = visualizationClasses.getJSONObject(i);
@@ -221,6 +233,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * and stack by.
      *
      * @param insightConfig
+     *
      * @return insight uri
      */
     public String createInsight(final InsightMDConfiguration insightConfig) {
@@ -242,6 +255,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @param insightTitle
      * @param totalsBuckets
+     *
      * @throws ParseException
      * @throws JSONException
      * @throws IOException
@@ -262,7 +276,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @param visualizationTitle
      * @param visualizationUri
+     *
      * @return Visualization widget uri
+     *
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
@@ -276,9 +292,9 @@ public class IndigoRestRequest extends CommonRestRequest{
                 RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content));
 
         return response
-                    .getJSONObject("visualizationWidget")
-                    .getJSONObject("meta")
-                    .getString("uri");
+                .getJSONObject("visualizationWidget")
+                .getJSONObject("meta")
+                .getString("uri");
     }
 
     /**
@@ -286,6 +302,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @param dashboardUri
      * @param widgetUri
+     *
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
@@ -293,11 +310,91 @@ public class IndigoRestRequest extends CommonRestRequest{
             throws JSONException, IOException {
         final JSONObject dashboard = getJsonObject(dashboardUri);
         dashboard.getJSONObject("analyticalDashboard")
-            .getJSONObject("content")
-            .getJSONArray("widgets")
-            .put(widgetUri);
+                .getJSONObject("content")
+                .getJSONArray("widgets")
+                .put(widgetUri);
 
         executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    /**
+     * Add widget to analytical dashboard
+     *
+     * @param dashboardUri URI of the dashboard where should be added the widget
+     * @param widgetUri URI if the widget which should be added
+     * @param indexRow index of the row where should be added the widget
+     *
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
+     */
+    public void addWidgetToWorkingDashboardFluidLayout(final String dashboardUri, final String widgetUri, int indexRow)
+            throws JSONException, IOException {
+
+        final JSONObject dashboard = getJsonObject(dashboardUri);
+
+        if (dashboardHasLayout(dashboard)) {
+            putWidgetIntoExistingLayout(dashboard, indexRow, widgetUri);
+        } else {
+            putWidgetAndCreateLayout(dashboard, indexRow, widgetUri);
+        }
+
+        dashboard.getJSONObject("analyticalDashboard")
+                .getJSONObject("content")
+                .getJSONArray("widgets")
+                .put(widgetUri);
+
+        executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    private static boolean dashboardHasLayout(final JSONObject dashboard) {
+        return dashboard.getJSONObject("analyticalDashboard").getJSONObject("content").has("layout");
+    }
+
+    private void putWidgetIntoExistingLayout(final JSONObject dashboard, final int indexRow, final String widgetUri) throws IOException {
+        dashboard.getJSONObject("analyticalDashboard")
+                .getJSONObject("content")
+                .getJSONObject("layout")
+                .getJSONObject("fluidLayout")
+                .getJSONArray("rows")
+                .getJSONObject(indexRow)
+                .getJSONArray("columns")
+                .put(initWidget(widgetUri));
+    }
+
+    private void putWidgetAndCreateLayout(final JSONObject dashboard, final int indexRow, final String widgetUri) throws IOException {
+        final JSONObject newLayout = new JSONObject() {{
+            put("fluidLayout", new JSONObject() {{
+                put("rows", new JSONArray() {{
+                    final JSONObject content = new JSONObject();
+                    content.put("columns", new JSONArray() {{
+                        put(initWidget(widgetUri));
+                    }});
+                    put(content);
+
+                }});
+            }});
+        }};
+        dashboard.getJSONObject("analyticalDashboard")
+                .getJSONObject("content").put("layout", newLayout);
+    }
+
+    private JSONObject initWidget(String uriWidget) throws JSONException, IOException {
+        final Integer widthWidget = getJsonObject(uriWidget).has("kpi") ? KPI_COLUMN_WIDTH : VISUALIZATION_COLUMN_WIDTH;
+
+        return new JSONObject() {{
+            put("size", new JSONObject() {{
+                put("xl", new JSONObject() {{
+                    put("width", widthWidget);
+                }});
+            }});
+            put("content", new JSONObject() {{
+                put("widget", new JSONObject() {{
+                    put("qualifier", new JSONObject() {{
+                        put("uri", uriWidget);
+                    }});
+                }});
+            }});
+        }};
     }
 
     /**
@@ -305,12 +402,13 @@ public class IndigoRestRequest extends CommonRestRequest{
      *
      * @param widgetUris
      * @param title
+     *
      * @return new analytical dashboard uri
      */
     public String createAnalyticalDashboard(final Collection<String> widgetUris, final String title) {
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
-        final String content = ANALYTICAL_DASHBOARD_BODY.get()
+        final String content = initialAnalyticalDashboardBody(widgetUris).toString()
                 .replace("\"widgets\":[]", "\"widgets\":" + widgets)
                 .replace("${title}", title);
         String uri;
@@ -326,9 +424,41 @@ public class IndigoRestRequest extends CommonRestRequest{
         return uri;
     }
 
+    private JSONObject initialAnalyticalDashboardBody(final Collection<String> widgetUris) {
+        try {
+            return new JSONObject() {{
+                put("analyticalDashboard", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                    put("content", new JSONObject() {{
+                        put("layout", new JSONObject() {{
+                            put("fluidLayout", new JSONObject() {{
+                                put("rows", new JSONArray() {{
+                                    JSONObject temp = new JSONObject();
+                                    temp.put("columns", new JSONArray() {{
+                                        for (String widgetUri : widgetUris) {
+                                            put(initWidget(widgetUri));
+                                        }
+                                    }});
+                                    put(temp);
+                                }});
+                            }});
+                        }});
+                        put("widgets", new JSONArray());
+                    }});
+                }});
+            }};
+        } catch (JSONException | IOException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    }
+
     /**
      * Create new analytical dashboard with default title
+     *
      * @param widgetUris
+     *
      * @return
      */
     public String createAnalyticalDashboard(final Collection<String> widgetUris) {
@@ -349,7 +479,9 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Get insight uri by a specified name
      *
      * @param insight
+     *
      * @return
+     *
      * @throws JSONException
      */
     public String getInsightUri(final String insight) throws JSONException {
@@ -370,6 +502,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * get all insight widget titles
      *
      * @return list of titles. Otherwise, return empty list
+     *
      * @throws JSONException
      */
     public List<String> getInsightWidgetTitles() throws JSONException {
@@ -395,6 +528,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Delete widget and its dependencies and dashboards will be deleted when it contains no widget.
      *
      * @param widgetUris
+     *
      * @throws JSONException
      * @throws IOException
      */
@@ -427,7 +561,9 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     /**
      * Delete attribute filter on Indigo dashboard
+     *
      * @param attributeDisplayFormUri
+     *
      * @throws IOException
      * @throws JSONException
      */
@@ -461,6 +597,7 @@ public class IndigoRestRequest extends CommonRestRequest{
      * Get locked attribute of dashboard, this attribute generated from lcm workflow
      *
      * @param dashboardTitle title of dashboard
+     *
      * @return locked value 1|0
      */
     public int getLockedAttribute(final String dashboardTitle) {
@@ -470,7 +607,8 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     /**
      * @param dashboardTitle title of dashboard
-     * @param value          locked value want to set to dashboard
+     * @param value locked value want to set to dashboard
+     *
      * @throws IOException
      */
     public void setLockedAttribute(final String dashboardTitle, int value) throws IOException {
@@ -486,7 +624,7 @@ public class IndigoRestRequest extends CommonRestRequest{
     }
 
     private JSONObject initInsightObject(final String visualizationClassUri, final InsightMDConfiguration insightConfig)
-        throws JSONException {
+            throws JSONException {
         return new JSONObject() {{
             put("visualizationObject", new JSONObject() {{
                 put("content", new JSONObject() {{
@@ -533,25 +671,25 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private JSONArray initMeasureObjects(final List<MeasureBucket> measureBuckets) throws JSONException {
         return new JSONArray() {{
-                if (!CollectionUtils.isEmpty(measureBuckets)) {
-                    for (MeasureBucket bucket : measureBuckets) {
-                        put(new JSONObject() {{
-                            put("measure", new JSONObject() {{
-                                put("localIdentifier", bucket.getLocalIdentifier());
-                                put("title", bucket.getTitle());
-                                put("definition", new JSONObject() {{
-                                    put("measureDefinition", new JSONObject() {{
-                                        put("item", new JSONObject() {{
-                                            put("uri", bucket.getObjectUri());
-                                        }});
-                                        put("filters", new JSONArray());
-                                        put("computeRatio", bucket.hasShowInPercent());
+            if (!CollectionUtils.isEmpty(measureBuckets)) {
+                for (MeasureBucket bucket : measureBuckets) {
+                    put(new JSONObject() {{
+                        put("measure", new JSONObject() {{
+                            put("localIdentifier", bucket.getLocalIdentifier());
+                            put("title", bucket.getTitle());
+                            put("definition", new JSONObject() {{
+                                put("measureDefinition", new JSONObject() {{
+                                    put("item", new JSONObject() {{
+                                        put("uri", bucket.getObjectUri());
                                     }});
+                                    put("filters", new JSONArray());
+                                    put("computeRatio", bucket.hasShowInPercent());
                                 }});
                             }});
                         }});
-                    }
+                    }});
                 }
+            }
         }};
     }
 
@@ -569,18 +707,18 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private static JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
         return new JSONArray() {{
-                if (!CollectionUtils.isEmpty(categoryBuckets)) {
-                    for (CategoryBucket bucket : categoryBuckets) {
-                        put(new JSONObject() {{
-                            put("visualizationAttribute", new JSONObject() {{
-                                put("localIdentifier", bucket.getLocalIdentifier());
-                                put("displayForm", new JSONObject() {{
-                                    put("uri", bucket.getDisplayForm());
-                                }});
+            if (!CollectionUtils.isEmpty(categoryBuckets)) {
+                for (CategoryBucket bucket : categoryBuckets) {
+                    put(new JSONObject() {{
+                        put("visualizationAttribute", new JSONObject() {{
+                            put("localIdentifier", bucket.getLocalIdentifier());
+                            put("displayForm", new JSONObject() {{
+                                put("uri", bucket.getDisplayForm());
                             }});
                         }});
-                    }
+                    }});
                 }
+            }
         }};
     }
 
@@ -600,7 +738,7 @@ public class IndigoRestRequest extends CommonRestRequest{
     }
 
     private <T> T getMdObjectValue(final String type, final ThrowingPredicate<JSONObject> filter,
-            final ThrowingFunction<JSONObject, T> func) {
+                                   final ThrowingFunction<JSONObject, T> func) {
         try {
             JSONArray jsonArray = getMdObjects(type);
             JSONObject foundObject = null;

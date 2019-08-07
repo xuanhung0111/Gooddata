@@ -94,7 +94,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     }
 
     private String createBlankInsightWrapUsingRest(final String insightTitle) throws JSONException, IOException {
-        String insightUri = indigoRestRequest.createInsight(new InsightMDConfiguration(insightTitle, ReportType.BAR_CHART));
+        String insightUri = indigoRestRequest.createInsight(new InsightMDConfiguration(insightTitle, ReportType.HEADLINE));
 
         return indigoRestRequest.createVisualizationWidget(insightUri, insightTitle);
     }

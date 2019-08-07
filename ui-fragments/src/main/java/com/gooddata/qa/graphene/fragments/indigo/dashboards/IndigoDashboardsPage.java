@@ -575,10 +575,23 @@ public class IndigoDashboardsPage extends AbstractFragment {
      * @return
      */
     public IndigoDashboardsPage addInsight(final String insight) {
+        return this.addInsight(insight, DropZone.LAST);
+    }
+
+    /**
+     * Add an insight to first next position in dashboard by drag and drop mode
+     * @param insight
+     * @return
+     */
+    public IndigoDashboardsPage addInsightNext(final String insight) {
+        return this.addInsight(insight, DropZone.NEXT);
+    }
+
+    private IndigoDashboardsPage addInsight(final String insight, DropZone dropZoneType) {
         dragAndDropWithCustomBackend(browser,
                 convertCSSClassTojQuerySelector(
                         getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
-                DASHBOARD_BODY, DropZone.LAST.getCss());
+                DASHBOARD_BODY, dropZoneType.getCss());
 
         return this;
     }
