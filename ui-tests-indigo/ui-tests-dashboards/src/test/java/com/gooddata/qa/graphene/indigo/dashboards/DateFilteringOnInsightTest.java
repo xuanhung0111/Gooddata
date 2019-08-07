@@ -174,7 +174,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
-        initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading()
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsightNext(insight).waitForWidgetsLoading()
                 .getConfigurationPanel().disableDateFilter();
         assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "Date filter is not disabled");
@@ -197,7 +197,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
-        initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsightNext(insight).waitForWidgetsLoading();
         // this test should not depend on default state of date filter
         indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().disableDateFilter().enableDateFilter();
         assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(), "Date filter is not enabled");
