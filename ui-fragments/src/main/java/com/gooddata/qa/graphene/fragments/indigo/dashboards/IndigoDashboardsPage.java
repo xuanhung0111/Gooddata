@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
+import static com.gooddata.qa.browser.BrowserUtils.tryToDragWithCustomBackend;
+import static com.gooddata.qa.browser.BrowserUtils.moveToBottomOfElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
@@ -16,16 +18,18 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
 import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
+import static java.util.Collections.EMPTY_LIST;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
-import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -35,6 +39,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
@@ -101,6 +106,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = LEGEND_ITEM_ICON)
     private List<WebElement> legendIcons;
 
+    @FindBy(css = ADD_KPI_PLACEHOLDER)
+    private WebElement addKpiPlaceHolder;
+
     @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteInsightItemButton;
 
@@ -114,6 +122,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
     private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
+    private static final String FLUID_LAYOUT_ROWS_CSS = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
     private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-all";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
@@ -176,6 +185,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public SplashScreen getSplashScreen() {
         return waitForFragmentVisible(splashScreen);
+    }
+
+    public WebElement getSaveButton() {
+        return waitForElementVisible(saveButton);
     }
 
     public boolean isSplashScreenPresent() {
@@ -301,19 +314,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage addKpi(KpiConfiguration config) {
         dragAddKpiPlaceholder();
-        ConfigurationPanel configurationPanel = getConfigurationPanel()
-            .selectMetricByName(config.getMetric())
-            .selectDateDataSetByName(config.getDataSet());
 
-        if (config.hasComparison()) {
-            configurationPanel.selectComparisonByName(config.getComparison());
+        return setupConfigurationPanel(config);
+    }
+
+    //Add KPI by order from left to right
+    public IndigoDashboardsPage addKpiToBeginningOfRow(KpiConfiguration config) {
+        if (getWidgets().size() > 0) {
+            dragAndDropWidgetToCreateSameRow(waitForElementPresent(By.cssSelector(ADD_KPI_PLACEHOLDER), browser),
+                getWidgets().get(0).getRoot(), DropZone.PREV);
+        } else {
+            dragAddKpiPlaceholder();
         }
 
-        if (config.hasDrillTo()) {
-            configurationPanel.selectDrillToByName(config.getDrillTo());
-        }
-
-        return waitForWidgetsLoading();
+        return setupConfigurationPanel(config);
     }
 
     public boolean isEditButtonVisible() {
@@ -553,6 +567,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage dragAddKpiToDashboard() {
+        // should fetch dashboard elements to avoid caching in view mode
+        waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
+        tryToDragWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
+
+        return this;
+    }
+
+    public IndigoDashboardsPage tryToDragAndDropKPI(WebElement target) {
+        waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
+        dragAndDropWithCustomBackend(browser, addKpiPlaceHolder, target);
+        return this;
+    }
+
     public IndigoDashboardsPage dragAddAttributeFilterPlaceholder() {
         waitForElementVisible(cssSelector(ADD_ATTRIBUTE_FILTER_PLACEHOLDER), getRoot());
         dragAndDropWithCustomBackend(browser, ADD_ATTRIBUTE_FILTER_PLACEHOLDER, ADD_ATTRIBUTE_FILTER_DROPZONE, ADD_ATTRIBUTE_FILTER_DROPZONE);
@@ -596,6 +624,31 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage addInsightToCreateSameRow(final String newInsight, String oldInsight,
+                                                          DropZone position) {
+        WebElement source = getInsightItemOnSelectionPanel(newInsight);
+        dragAndDropWidgetToCreateSameRow(source, getWidgetFluidLayout(oldInsight, 0), position);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage addInsightToCreateANewRow(final String newInsight, String oldInsight,
+                                                          Widget.FluidLayoutPosition position) {
+        WebElement source = getInsightItemOnSelectionPanel(newInsight);
+        dragAndDropWidgetToCreateANewRow(source, getWidgetFluidLayout(oldInsight, 0), position);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage dragInsightToDashboard(final String insight) {
+        tryToDragWithCustomBackend(browser,
+            convertCSSClassTojQuerySelector(
+                getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
+            DASHBOARD_BODY, DropZone.LAST.getCss());
+
+        return this;
+    }
+
     public IndigoInsightSelectionPanel getInsightSelectionPanel() {
         return IndigoInsightSelectionPanel.getInstance(browser);
     }
@@ -620,6 +673,50 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Dimension getDashboardBodySize() {
         return waitForElementVisible(cssSelector(DASHBOARD_BODY), browser).getSize();
+    }
+
+    public String getDashboardBodyText() {
+        return waitForElementVisible(cssSelector(DASHBOARD_BODY), browser).getText();
+    }
+
+    public List<List<String>> getHeaderWidgetFluidLayout() {
+        List<WebElement> fluidLayoutRows = getRoot().findElements(By.cssSelector(FLUID_LAYOUT_ROWS_CSS));
+        if (fluidLayoutRows.isEmpty()) {
+            return singletonList(EMPTY_LIST);
+        }
+        return fluidLayoutRows.stream()
+            .filter(ElementUtils::isElementVisible)
+            .map(tableRow -> tableRow.findElements(By.cssSelector(".s-fluid-layout-column .s-headline")))
+            .map(cells -> cells.stream().map(WebElement::getText)
+                .collect(toList()))
+            .collect(toList());
+    }
+
+    public WebElement getWidgetFluidLayout(String columnTitle, int cellIndex) {
+        List<WebElement> fluidLayoutRows = getRoot().findElements(By.cssSelector(FLUID_LAYOUT_ROWS_CSS));
+
+        List<List<WebElement>> elements = fluidLayoutRows.stream()
+            .filter(ElementUtils::isElementVisible)
+            .map(tableRow -> tableRow.findElements(By.className("s-fluid-layout-column")))
+            .map(cells -> cells.stream().collect(toList()))
+            .collect(toList());
+
+        List<String> listHeaders = getHeaderWidgetFluidLayout().stream()
+            .flatMap(List::stream)
+            .collect(toList());
+        int columnIndex = listHeaders.indexOf(columnTitle);
+        WebElement cell = elements.get(cellIndex).get(columnIndex);
+        return cell;
+    }
+
+    public String getMinHeightLayoutPlaceHolder() {
+        return getElementFluidLayoutPlaceHolder().findElement(
+            By.xpath("//ancestor::div[@class='gd-fluidlayout-column-container last']")).getAttribute("style");
+    }
+
+    public String getAttributeClassFluidLayout() {
+        return getElementFluidLayoutPlaceHolder().findElement(
+            By.xpath("//ancestor::div[contains(@class,'s-fluid-layout-column')]")).getAttribute("class");
     }
 
     private MobileKpiDashboardSelection getMobileKpiDashboardSelection() {
@@ -705,6 +802,71 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private class MobileKpiDashboardSelection extends AbstractFragment {
         @FindBy(className = "gd-mobile-dropdown-content")
         private WebElement dropdownList;
+    }
+
+    private WebElement getElementFluidLayoutPlaceHolder() {
+        List<WebElement> fluidLayoutRows = getRoot().findElements(By.cssSelector(FLUID_LAYOUT_ROWS_CSS));
+        return waitForCollectionIsNotEmpty(fluidLayoutRows).stream()
+            .map(layoutRow -> layoutRow.findElement(By.cssSelector(".s-fluid-layout-column .can-drop.is-over")))
+            .findFirst()
+            .get();
+    }
+
+    private IndigoDashboardsPage setupConfigurationPanel(KpiConfiguration config) {
+        ConfigurationPanel configurationPanel = getConfigurationPanel()
+            .selectMetricByName(config.getMetric())
+            .selectDateDataSetByName(config.getDataSet());
+
+        if (config.hasComparison()) {
+            configurationPanel.selectComparisonByName(config.getComparison());
+        }
+
+        if (config.hasDrillTo()) {
+            configurationPanel.selectDrillToByName(config.getDrillTo());
+        }
+
+        return waitForWidgetsLoading();
+    }
+
+    private void dragAndDropWidgetToCreateSameRow(WebElement source, WebElement webElementWidget, DropZone position) {
+        Actions driverActions = new Actions(browser);
+        driverActions.clickAndHold(source).perform();
+
+        try {
+            WebElement target = waitForElementVisible(saveButton);
+            driverActions.moveToElement(target).perform();
+
+            WebElement drop = waitForElementPresent(webElementWidget.findElement(By.cssSelector(position.getCss())));
+
+            scrollElementIntoView(drop, browser);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+    }
+
+    private void dragAndDropWidgetToCreateANewRow(WebElement source, WebElement webElementWidget,
+                                                  Widget.FluidLayoutPosition fluidLayoutPosition) {
+        Actions driverActions = new Actions(browser);
+        driverActions.clickAndHold(source).perform();
+
+        try {
+            WebElement target = waitForElementVisible(getInsightSelectionPanel().getRoot());
+            moveToBottomOfElement(browser, target);
+
+            WebElement drop = waitForElementPresent(webElementWidget.findElement(
+                By.xpath(fluidLayoutPosition.getXpath())));
+
+            scrollElementIntoView(drop, browser);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+    }
+
+    private WebElement getInsightItemOnSelectionPanel(String newInsight) {
+        return waitForElementVisible(By.cssSelector(convertCSSClassTojQuerySelector(
+            getInsightSelectionPanel().getInsightItem(newInsight).getRoot().getAttribute("class"))), browser);
     }
 
     /**

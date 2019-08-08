@@ -145,6 +145,21 @@ public class Widget extends AbstractFragment {
         }
     }
 
+    public enum FluidLayoutPosition {
+        TOP("//..//div[contains(@class, 's-fluidlayout-row-separator top')]"),
+        BOTTOM("//..//div[contains(@class, 's-fluidlayout-row-separator bottom')]");
+
+        private String xpath;
+
+        FluidLayoutPosition(final String xpath) {
+            this.xpath = xpath;
+        }
+
+        public String getXpath() {
+            return this.xpath;
+        }
+    }
+
     public OptionalExportMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,

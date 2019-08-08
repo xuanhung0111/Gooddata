@@ -142,6 +142,19 @@ public class BrowserUtils {
         }
     }
 
+    public static void tryToDragWithCustomBackend(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+
+        driverActions.clickAndHold(source).perform();
+
+        WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+        driverActions.moveToElement(target).perform();
+
+        WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+        driverActions.moveToElement(drop).perform();
+    }
+
     public static void dragAndDropWithCustomBackend(WebDriver driver, WebElement from, WebElement dropZone) {
         waitForElementVisible(from);
         Actions driverActions = new Actions(driver);
@@ -203,5 +216,30 @@ public class BrowserUtils {
         if (BrowserUtils.getBrowserContext().toString().contains("chrome")) {
             zoomFontSizeChromeBrowser(browser, 1);
         }
+    }
+
+    public static void moveToBottomOfElement(WebDriver driver, WebElement target) {
+        Actions driverActions = new Actions(driver);
+        if (isChrome()) {
+            driverActions.moveToElement(target, 1, target.getSize().height).perform();
+        } else if (isFirefox()){
+            driverActions.moveToElement(target, 1, target.getSize().height / 2).perform();
+        } else {
+            throw new UnsupportedOperationException("Unsupported another browsers than chrome and firefox");
+        }
+    }
+
+    public static boolean isChrome() {
+        String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
+            .getBrowserName().toLowerCase();
+
+        return browserName.equals("chrome");
+    }
+
+    public static boolean isFirefox() {
+        String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
+            .getBrowserName().toLowerCase();
+
+        return browserName.equals("firefox");
     }
 }
