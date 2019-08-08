@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static org.openqa.selenium.By.className;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -61,7 +62,7 @@ public class DatasetDetailPage extends AbstractFragment {
         }
 
         final Function<WebDriver, Boolean> progressFinished = b -> !message.getAttribute("class").contains("progress");
-        Graphene.waitGui().until(progressFinished);
+        Graphene.waitGui().withTimeout(180, TimeUnit.SECONDS).until(progressFinished);
     }
 
     public String getDatasetAnalyzeLink() {
