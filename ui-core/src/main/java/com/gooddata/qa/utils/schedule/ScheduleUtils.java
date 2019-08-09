@@ -42,6 +42,10 @@ public class ScheduleUtils {
                         String.format(SEGMENT_URI, testParams.getUserDomain(), dataproduct, segmentId), version));
     }
 
+    public DataloadProcess createDataDistributionProcess(Project serviceProject, String processName, String datasourceId, String version) {
+        return getProcessService().createProcess(serviceProject, new DataDistributionProcess(processName, datasourceId, version));
+    }
+
     public DataloadProcess getDataloadProcess(String processName, Project serviceProject) {
         return findDataloadProcess(processName, serviceProject).get();
     }
