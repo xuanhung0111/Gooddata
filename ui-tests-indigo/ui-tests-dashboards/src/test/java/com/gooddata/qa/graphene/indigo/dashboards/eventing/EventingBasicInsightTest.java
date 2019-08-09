@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.TimeoutException;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -35,6 +37,14 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
+
+    private boolean isMobileRunning;
+
+    @BeforeClass(alwaysRun = true)
+    public void addUsersOnDesktopExecution(ITestContext context) {
+        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
+    }
+
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_table_insight", TABLE,
@@ -90,6 +100,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(opportunityUri);
         }};
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -201,6 +214,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -228,6 +244,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -288,6 +307,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
         Pair<Integer, Integer> position = getColumnPosition(insight.getChartReport(), "East Coast", "Email");
@@ -317,6 +339,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -348,6 +373,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -375,6 +403,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -453,6 +484,9 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         }};
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 

@@ -346,6 +346,27 @@ public class IndigoRestRequest extends CommonRestRequest {
         executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
+    public void editWidthOfWidget(final String dashboardUri, int indexRow, int indexColumn, int widthWidget)
+        throws JSONException, IOException {
+
+        final JSONObject dashboard = getJsonObject(dashboardUri);
+
+        JSONObject sizeWidget = dashboard.getJSONObject("analyticalDashboard")
+            .getJSONObject("content")
+            .getJSONObject("layout")
+            .getJSONObject("fluidLayout")
+            .getJSONArray("rows")
+            .getJSONObject(indexRow)
+            .getJSONArray("columns")
+            .getJSONObject(indexColumn)
+            .getJSONObject("size")
+            .getJSONObject("xl");
+        sizeWidget.remove("width");
+        sizeWidget.put("width", widthWidget);
+
+        executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
     private static boolean dashboardHasLayout(final JSONObject dashboard) {
         return dashboard.getJSONObject("analyticalDashboard").getJSONObject("content").has("layout");
     }
@@ -381,6 +402,10 @@ public class IndigoRestRequest extends CommonRestRequest {
     private JSONObject initWidget(String uriWidget) throws JSONException, IOException {
         final Integer widthWidget = getJsonObject(uriWidget).has("kpi") ? KPI_COLUMN_WIDTH : VISUALIZATION_COLUMN_WIDTH;
 
+        return initWidget(uriWidget, widthWidget);
+    }
+
+    private JSONObject initWidget(String uriWidget, Integer widthWidget) throws JSONException {
         return new JSONObject() {{
             put("size", new JSONObject() {{
                 put("xl", new JSONObject() {{
