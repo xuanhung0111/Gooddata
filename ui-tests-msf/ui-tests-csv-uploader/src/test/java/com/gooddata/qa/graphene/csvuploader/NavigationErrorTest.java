@@ -16,7 +16,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
-import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
 
 public class NavigationErrorTest extends AbstractCsvUploaderTest {
@@ -30,7 +29,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         waitForStringInUrl("/projects.html#status=notAuthorized");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv", enabled = false)
     public void showErrorOnUploadsPageWhenInvalidDatasetId() {
         logoutAndLoginAs(false, UserRoles.ADMIN);
         openUrl(format(CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE, testParams.getProjectId(), "nonExistingDataset"));
@@ -39,7 +38,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         assertThat(errorMessage, containsString("The dataset you are looking for no longer exists."));
     }
 
-    @Test(dependsOnMethods = {"showErrorOnUploadsPageWhenInvalidDatasetId"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
         try {
             logoutAndLoginAs(true, UserRoles.VIEWER);
