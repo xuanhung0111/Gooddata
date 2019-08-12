@@ -1,8 +1,12 @@
 package com.gooddata.qa.utils.snowflake;
 
 import net.snowflake.client.jdbc.SnowflakeConnectionV1;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -193,28 +198,75 @@ public class SnowflakeUtils {
 
     public void updateColumn(String tableName, String column, String value) {
         try {
-            executeSql("UPDATE " + tableName + "SET " + column + "= " + value);
+            executeSql("UPDATE " + tableName + " SET " + column + "= " + value);
         } catch(SQLException e) {
             logger.error("Update column" + column + "with value" + value +  "failed");
             throw new RuntimeException(e);
         }
     }
 
-    public ResultSet getRecords(String tableName, String column) {
+    public void dropColumn(String tableName, String column) {
         try {
-            String sqlStr = "SELECT " + column + " FROM " + tableName;
+            executeSql("ALTER TABLE " + tableName + " DROP COLUMN " + column);
+        } catch(SQLException e) {
+            logger.error("Drop column" + column + "failed");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void addColumn(String tableName, String column, String datatype) {
+        try {
+            executeSql("ALTER TABLE " + tableName + " ADD COLUMN " + column + " " + datatype);
+        } catch(SQLException e) {
+            logger.error("Add column" + column + "with datatype " + datatype +  "failed");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResultSet getRecords(String tableName, String column, int limit) {
+        try {
+            String sqlStr = "SELECT " + column + " FROM " + tableName + " LIMIT " + limit;
             return getResult(sqlStr);
         } catch (SQLException e) {
             logger.error("get Records error" + e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 
-    public ResultSet getRecordsInRangeTimeStamp(String tableName, String column, String from, String to ) throws SQLException {
-        String sqlStr = String.format("SELECT %s FROM %s WHERE X__TIMESTAMP BETWEEN '%s' AND '%s'",column,tableName,from,to);
-        logger.info("SQL Record in range:" + sqlStr);
-        return  getResult(sqlStr);
+    /**
+     * Get resul by Snowflake condition .
+     *
+     * @param tableName snowflake Table name.
+     * @param column snowflake column name.
+     * @param conditions condition after where clause. (example: column = "Column 1" , condition = " = 1 ")
+     * @param limit : limit records returns
+     * @return ResultSet apply querry
+     */
+    public ResultSet getRecordsByCondition(String tableName, String column, List<Pair<String, String>> andConditions,
+            List<Pair<String, String>> orConditions, int limit) {
+
+        String andConditionString = andConditions != null
+                ? " ( " + andConditions.stream().map(this::getCondition).collect(joining(" AND ")) + " ) "
+                : "";
+        String orConditionString = orConditions != null
+                ? " ( " + orConditions.stream().map(this::getCondition).collect(joining(" OR ")) + " ) "
+                : "";
+        StringBuilder builder = new StringBuilder();
+        try {
+            String sqlStr = builder.append("SELECT ${column} FROM ${tableName} WHERE ")
+                    .append(andConditionString)
+                    .append((andConditions != null && orConditions != null) ? " AND " : "")
+                    .append(orConditionString)
+                    .append(" LIMIT " + limit)
+                    .toString()
+                    .replace("${tableName}", tableName)
+                    .replace("${column}", column);
+            logger.info("SQL Record in range:" + sqlStr);
+            return getResult(sqlStr);
+        } catch (SQLException e) {
+            logger.error("get Records By Condition error" + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public ResultSet getResult(String sqlStr) throws SQLException {
@@ -229,5 +281,9 @@ public class SnowflakeUtils {
         statement.close();
         connection.close();
         return result;
+    }
+
+    private String getCondition(Pair<String, String> condition) {
+        return String.format("(%s %s)",condition.getLeft(), condition.getRight());
     }
 }

@@ -33,7 +33,26 @@ public class LdmModel {
 
     //Function use for create MAQL with Primary key 
     public String buildMaqlUsingPrimaryKey() {
-        logger.info("MAQL update Model has Primary key: " + datasets.stream().map(Dataset::buildMaqlUsingPrimaryKey).collect(joining()));
-        return datasets.stream().map(Dataset::buildMaqlUsingPrimaryKey).collect(joining());
+        String maql = datasets.stream().map(Dataset::buildMaqlUsingPrimaryKey).collect(joining());
+        logger.info("MAQL update Model has Primary key: " + maql);
+        return maql;
+    }
+
+    public String buildMaqlUsingPrimaryKeyNoMainLabel() {
+        String maql = datasets.stream().map(Dataset::buildMaqlUsingPrimaryKeyNoMainLabel).collect(joining());
+        logger.info("MAQL update Model has Primary key: " + maql);
+        return maql;
+    }
+
+    public String buildMaqlChangeDefaultLabel() {
+        String maql = datasets.stream().map(Dataset::buildDefaultLabels).collect(joining());
+        logger.info("MAQL update Model change default Label: " + maql);
+        return maql;
+    }
+
+    public String buildMaqlFactTableGrain() {
+        String maql = datasets.stream().map(Dataset::buildMaqlFactTableGrain).collect(joining());
+        logger.info("MAQL update Model Fact Table Grain: " + maql);
+        return maql;
     }
 }
