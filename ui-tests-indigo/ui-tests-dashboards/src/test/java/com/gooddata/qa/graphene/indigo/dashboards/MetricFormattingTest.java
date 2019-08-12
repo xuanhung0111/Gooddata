@@ -102,7 +102,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToWorkingDashboardFluidLayout(dashboardUri, kpiUri, 0);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -143,7 +143,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToWorkingDashboardFluidLayout(dashboardUri, kpiUri, 0);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -173,7 +173,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToWorkingDashboardFluidLayout(dashboardUri, kpiUri, 0);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);

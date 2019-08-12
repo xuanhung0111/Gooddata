@@ -26,6 +26,9 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import org.apache.commons.lang.StringUtils;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -57,11 +60,18 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
 
     private String insight;
     private IndigoRestRequest indigoRestRequest;
+    private String dashboardUri;
+    private boolean isMobileRunning;
 
     @Override
     public void initProperties() {
         super.initProperties();
         projectTitle += "Totals-Result-Test";
+    }
+
+    @BeforeClass(alwaysRun = true)
+    public void addUsersOnDesktopExecution(ITestContext context) {
+        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
     @Override
@@ -87,7 +97,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
             .setTotalsBucket(singletonList(totalsBucket)));
         indigoRestRequest.addTotalResults(INSIGHT_IS_ON_MOBILE, singletonList(totalsBucket));
 
-        indigoRestRequest.createAnalyticalDashboard(singletonList(insightWidget), "KPI Dashboard Mobile");
+        dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(insightWidget), "KPI Dashboard Mobile");
     }
 
     @Test(dependsOnMethods = "prepareInsights", groups = "desktop")
@@ -198,7 +208,10 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = "prepareInsights", groups = "mobile")
-    public void checkKpiDashboardHasTotalsResultOnMobile() {
+    public void checkKpiDashboardHasTotalsResultOnMobile(ITestContext context) throws IOException{
+        if (isMobileRunning) {
+            indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
+        }
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().selectKpiDashboard("KPI Dashboard Mobile");
 
         PivotTableReport pivotTableReport = indigoDashboardsPage.waitForAlertsLoaded().getLastWidget(Insight.class).getPivotTableReport();
@@ -206,6 +219,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
         assertTrue(pivotTableReport.containsGrandTotals(), "Grand Totals should be displayed");
 
         List<List<String>> expectedValues = singletonList(asList(AggregationItem.MAX.getRowName(), "101,054"));
+
         assertEquals(pivotTableReport.getGrandTotalsContent(), expectedValues);
     }
 

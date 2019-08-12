@@ -44,7 +44,7 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
     private final String CLIENT_ID = "att_client_" + generateHashString();
     private final String CLIENT_PROJECT_TITLE = "Client project " + generateHashString();
     private static final String EMAIL = "Email";
-    private static final String IN_PERSON_MEETING = "In Person Meeting";
+    private static final String IN_PERSON_MEETING = "In PersonMeeting";
     private static final String PHONE_CALL = "Phone Call";
     private static final String WEB_MEETING = "Web Meeting";
 
