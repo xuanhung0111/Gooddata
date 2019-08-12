@@ -14,4 +14,5 @@
     </test>
 
     <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
 </suite>
