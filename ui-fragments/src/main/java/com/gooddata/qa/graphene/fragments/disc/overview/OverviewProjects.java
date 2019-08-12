@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc.overview;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -70,6 +71,10 @@ public class OverviewProjects extends AbstractFragment {
         waitForElementVisible(disableButton).click();
         ConfirmationDialog.getInstance(browser).confirm();
         return this;
+    }
+
+    public boolean hasProject(String title) {
+        return projectItems.stream().map(OverviewProjectItem::getTitle).collect(toList()).contains(title);
     }
 
     public class OverviewProjectItem extends AbstractFragment {

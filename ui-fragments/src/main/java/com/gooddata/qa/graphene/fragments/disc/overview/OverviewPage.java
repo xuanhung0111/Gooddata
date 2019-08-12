@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.disc.overview;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.toList;
 
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.WaitUtils;
@@ -105,6 +106,10 @@ public class OverviewPage extends AbstractFragment {
 
     public String getOverviewEmptyStateMessage() {
         return waitForElementVisible(overviewSection).findElement(By.className("message")).getText();
+    }
+
+    public boolean hasProject(String title) {
+        return waitForFragmentVisible(overviewProjects).hasProject(title);
     }
 
     private int refreshStateNumber(OverviewState state) {
