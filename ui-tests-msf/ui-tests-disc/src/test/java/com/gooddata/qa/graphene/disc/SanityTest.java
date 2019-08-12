@@ -8,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 import java.time.LocalTime;
 
 import com.gooddata.qa.utils.http.RestClient;
+import org.testng.SkipException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -191,7 +192,6 @@ public class SanityTest extends AbstractProcessTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "specificStatesProvider")
     public void checkOverviewSpecificState(OverviewState state, Executable executable) {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
-
         try {
             Schedule schedule = createSchedule(process, executable, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
@@ -204,7 +204,7 @@ public class SanityTest extends AbstractProcessTest {
 
             initDiscOverviewPage().selectState(state);
             takeScreenshot(browser, "State-" + state + "-shows-correctly", getClass());
-            assertEquals(overviewPage.getStateNumber(state), 1);
+            assertTrue(overviewPage.hasProject(projectTitle), "Project isn't existed in state");
 
         } finally {
             getProcessService().removeProcess(process);
