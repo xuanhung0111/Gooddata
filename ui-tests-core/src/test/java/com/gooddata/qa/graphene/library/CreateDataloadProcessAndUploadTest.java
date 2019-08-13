@@ -6,6 +6,7 @@ import com.gooddata.dataload.processes.ProcessType;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
@@ -16,6 +17,15 @@ import java.io.IOException;
  * instead of the one used to create project
  */
 public class CreateDataloadProcessAndUploadTest extends AbstractProjectTest {
+
+    @Override
+    public void init(String windowSize) {
+        if (testParams.isClientDemoEnvironment()) {
+            validateAfterClass = false;
+            throw new SkipException("Skip testing dataload in client demo env");
+        }
+        super.init(windowSize);
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testCreatingDataloadProcess() {
