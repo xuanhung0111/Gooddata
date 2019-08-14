@@ -16,6 +16,7 @@ import javax.mail.MessagingException;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -59,17 +60,24 @@ public class ResetPasswordTest extends AbstractUITest {
     private static final String NON_REGISTERED_EMAIL = "gooddata@mailinator.com";
 
     private String testUser;
+    private String testHistoryPasswordUser;
+    private int historyPasswordLimit;
+
+    ProjectRestRequest projectRestRequest;
 
     @BeforeClass(alwaysRun = true)
-    public void initImapUser() {
+    public void initImapUser() throws IOException{
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
     }
 
     @Test
     public void prepareUserForTest() throws ParseException, JSONException, IOException {
         testUser = createDynamicUserFrom(imapUser);
+        testHistoryPasswordUser = createDynamicUserFrom(imapUser);
         testParams.setProjectId(createNewEmptyProject("Reset-password-test"));
     }
 
@@ -94,7 +102,7 @@ public class ResetPasswordTest extends AbstractUITest {
         String resetPasswordLink = doActionWithImapClient(imapClient ->
                 LoginFragment.getInstance(browser)
                         .openLostPasswordPage()
-                        .resetPassword(imapClient, testUser));
+                        .resetPassword(imapClient, testHistoryPasswordUser));
         assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
 
         openUrl(resetPasswordLink);
@@ -119,25 +127,51 @@ public class ResetPasswordTest extends AbstractUITest {
         resetPasswordPage.setNewPassword("aaaaaaaa");
         softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
 
-        resetPasswordPage.setNewPassword(testParams.getPassword());
-        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
+        if (isDefaultHistoryPasswordLimit()) {
+            resetPasswordPage.setNewPassword(testParams.getPassword());
+            softAssert.assertEquals(resetPasswordPage.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
 
-        resetPasswordPage.setNewPassword(testUser);
+        } else {
+            // cover for ticket https://jira.intgdc.com/browse/QA-9109
+            String newFirstPassword = "NewPass";
+
+            resetPasswordPage.setNewPassword(newFirstPassword);
+            for (int i = 0; i < historyPasswordLimit - 1; i++) {
+                // When resetting the password greater than 6 times, captcha is required. So don't cover cases.
+                if (i == 6){
+                    break;
+                }
+                resetPasswordLink = doActionWithImapClient(imapClient ->
+                    LoginFragment.getInstance(browser)
+                        .openLostPasswordPage()
+                        .resetPassword(imapClient, testHistoryPasswordUser));
+
+                openUrl(resetPasswordLink);
+
+                String newPassword = "NewPass" + i;
+                log.info("NEW PASSWORD: " + newPassword);
+                resetPasswordPage.setNewPassword(newPassword);
+            }
+            resetPasswordLink = doActionWithImapClient(imapClient ->
+                LoginFragment.getInstance(browser)
+                    .openLostPasswordPage()
+                    .resetPassword(imapClient, testHistoryPasswordUser));
+
+            openUrl(resetPasswordLink);
+            resetPasswordPage.setNewPassword(newFirstPassword);
+            softAssert.assertEquals(resetPasswordPage.getErrorMessage(),
+                "The password must be different from your last " + historyPasswordLimit + " passwords.");
+        }
+
+        resetPasswordPage.setNewPassword(testHistoryPasswordUser);
         softAssert.assertEquals(resetPasswordPage.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
-
         softAssert.assertAll();
 
-        try {
-            resetPasswordPage.setNewPassword(NEW_PASSWORD);
-            assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), RESET_PASSWORD_SUCCESS_MESSAGE);
+        resetPasswordPage.setNewPassword(NEW_PASSWORD);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), RESET_PASSWORD_SUCCESS_MESSAGE);
 
-            LoginFragment.getInstance(browser).login(testUser, NEW_PASSWORD, true);
-            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-
-        } finally {
-            new UserManagementRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
-                    .updateUserPassword(testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
-        }
+        LoginFragment.getInstance(browser).login(testHistoryPasswordUser, NEW_PASSWORD, true);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
     /*
@@ -180,5 +214,9 @@ public class ResetPasswordTest extends AbstractUITest {
         project.setEnvironment(testParams.getProjectEnvironment());
 
         return restClient.getProjectService().createProject(project).get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
+    }
+
+    private boolean isDefaultHistoryPasswordLimit() {
+        return historyPasswordLimit == 1;
     }
 }

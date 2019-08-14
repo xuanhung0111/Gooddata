@@ -10,9 +10,10 @@ import com.gooddata.qa.graphene.fragments.common.AbstractDialog;
 
 public class ChangePasswordDialog extends AbstractDialog {
 
+    public static final String CHANGE_PASSWORD_DIALOG_CLASS_NAME =
+        "//*[contains(@class,'changePasswordDialog')]";
+
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("#gd-overlays div.content");
-    private static final String CHANGE_PASSWORD_DIALOG_CLASS_NAME = 
-            "//*[contains(@class,'changePasswordDialog')]";
 
     @FindBy(xpath = CHANGE_PASSWORD_DIALOG_CLASS_NAME + "/section[1]//input")
     private WebElement oldPasswordInput;

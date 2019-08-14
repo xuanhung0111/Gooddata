@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.account;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAccountPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,8 +21,10 @@ import java.util.concurrent.TimeUnit;
 import com.gooddata.project.Project;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
@@ -66,11 +70,16 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String INVALID_PHONE_NUMBER = "This is not a valid phone number";
 
     private PersonalInfo personalInfo;
-
     private String accountSettingUser;
+    private int historyPasswordLimit;
+
+    ProjectRestRequest projectRestRequest;
 
     @Test
     public void prepareDataForTest() throws ParseException, JSONException, IOException {
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
+
         accountSettingUser = createDynamicUserFrom(testParams.getUser());
         testParams.setProjectId(createNewEmptyProject(accountSettingUser, "Account-setting-test"));
 
@@ -148,17 +157,16 @@ public class UserAccountSettingTest extends AbstractUITest {
         } catch(Exception e) {
             takeScreenshot(browser, "Fail to edit user password", this.getClass());
             throw e;
-
-        } finally {
-            changePassword(NEW_PASSWORD, testParams.getPassword());
         }
     }
 
     @Test(dependsOnMethods = {"prepareDataForTest"})
-    public void editUserPasswordWithInvalidValue() {
+    public void editUserPasswordWithInvalidValue() throws IOException {
+        String accountSettingUser = prepareDataForTestHistoryPassword();
         final SoftAssert softAssert = new SoftAssert();
 
-        ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
+        AccountPage accountPage = initAccountPage();
+        ChangePasswordDialog changePasswordDialog = accountPage.openChangePasswordDialog();
         changePasswordDialog.enterOldPassword(SHORT_PASSWORD)
                 .saveChange();
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
@@ -180,16 +188,45 @@ public class UserAccountSettingTest extends AbstractUITest {
         changePasswordDialog.changePassword(testParams.getPassword(), "aaaaaaaa");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
 
-        changePasswordDialog.changePassword(testParams.getPassword(), testParams.getPassword());
-        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
+        String oldPassword = "";
+        if (isDefaultHistoryPasswordLimit()) {
+            oldPassword = testParams.getPassword();
+            changePasswordDialog.changePassword(testParams.getPassword(), testParams.getPassword());
+            softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
 
-        changePasswordDialog.changePassword(testParams.getPassword(), accountSettingUser);
+        } else {
+            // cover for ticket https://jira.intgdc.com/browse/QA-9109
+            String newFirstPassword = "NewPass";
+            changePasswordDialog.changePassword(testParams.getPassword(), newFirstPassword);
+            waitForElementNotPresent(By.className(ChangePasswordDialog.CHANGE_PASSWORD_DIALOG_CLASS_NAME));
+            oldPassword = newFirstPassword;
+
+            for (int i = 0; i < historyPasswordLimit - 1; i++) {
+                refreshAccountPage().openChangePasswordDialog();
+                String changedPassword = "NewPass" + i;
+                log.info("NEW PASSWORD: " + changedPassword);
+                
+                changePasswordDialog.changePassword(oldPassword, changedPassword);
+                waitForElementNotPresent(By.className(ChangePasswordDialog.CHANGE_PASSWORD_DIALOG_CLASS_NAME));
+                oldPassword = changedPassword;
+            }
+
+            refreshAccountPage().openChangePasswordDialog();
+            changePasswordDialog.changePassword(oldPassword, newFirstPassword);
+            softAssert.assertEquals(changePasswordDialog.getErrorMessage(),
+                "The password must be different from your last " + historyPasswordLimit + " passwords.");
+        }
+
+        refreshAccountPage().openChangePasswordDialog();
+        changePasswordDialog.changePassword(oldPassword, accountSettingUser);
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
 
+        refreshAccountPage().openChangePasswordDialog();
         changePasswordDialog.changePassword(WRONG_PASSWORD, NEW_PASSWORD);
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), WRONG_PASSWORD_ERROR_MESSAGE);
 
-        changePasswordDialog.enterOldPassword(testParams.getPassword())
+        refreshAccountPage().openChangePasswordDialog();
+        changePasswordDialog.enterOldPassword(oldPassword)
                 .enterNewPassword(NEW_PASSWORD)
                 .enterConfirmPassword("")
                 .saveChange();
@@ -257,5 +294,20 @@ public class UserAccountSettingTest extends AbstractUITest {
         project.setEnvironment(testParams.getProjectEnvironment());
 
         return restClient.getProjectService().createProject(project).get(testParams.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
+    }
+
+    private String prepareDataForTestHistoryPassword() throws ParseException, JSONException, IOException {
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
+
+        String accountSettingUser = createDynamicUserFrom(testParams.getUser());
+        testParams.setProjectId(createNewEmptyProject(accountSettingUser, "History-Password-Test"));
+
+        signInAtGreyPages(accountSettingUser, testParams.getPassword());
+        return accountSettingUser;
+    }
+
+    private boolean isDefaultHistoryPasswordLimit() {
+        return historyPasswordLimit == 1;
     }
 }
