@@ -365,6 +365,7 @@ public class SegmentDeleteTableForceLoadTest extends AbstractADDProcessTest {
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);
+        snowflakeUtils.closeSnowflakeConnection();
     }
 
     private void createLCM() throws ParseException, IOException {

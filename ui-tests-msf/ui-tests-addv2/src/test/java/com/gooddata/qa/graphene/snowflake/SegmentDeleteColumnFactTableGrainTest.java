@@ -214,6 +214,7 @@ public class SegmentDeleteColumnFactTableGrainTest extends AbstractADDProcessTes
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);
+        snowflakeUtils.closeSnowflakeConnection();
     }
 
     private void createLCM() throws ParseException, IOException {
