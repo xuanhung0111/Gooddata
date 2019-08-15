@@ -516,10 +516,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public SDKAnalysisPage initSDKAnalysisPage() {
         try {
+            browser.get("https://google.com.vn");
             openNodeJsUrl(testParams.getLocalhostSDK());
-            //Just using a default link localhost:3000 to access page
-            //so that page will not refresh.
-            browser.navigate().refresh();
             waitForElementVisible(id("root"), browser);
         } catch (WebDriverException e) {
             browser.navigate().refresh();
