@@ -34,6 +34,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.md.Restriction.title;
@@ -523,7 +524,7 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
             .addInsight(INSIGHT_IS_ADDED_DASHBOARD)
-            .addInsight(insight)
+            .addInsightNext(insight)
             .selectDateFilterByName("All time").waitForWidgetsLoading();
 
         String newTitle = "New Title:" + generateHashString();
@@ -539,7 +540,7 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
 
         ChartReport chartReport = indigoDashboardsPage.getLastWidget(Insight.class).getChartReport();
         indigoDashboardsPage.getLastWidget(Insight.class).clickLegend(METRIC_AMOUNT);
-        assertEquals(chartReport.getPrimaryYaxisTitle(), StringUtils.EMPTY);
+        assertEquals(chartReport.getValuePrimaryYaxis(), singletonList(Collections.emptyList()));
 
         assertTrue(indigoDashboardsPage.searchInsight(INSIGHT_IS_ADDED_DASHBOARD),
             INSIGHT_IS_ADDED_DASHBOARD + " should exist");
