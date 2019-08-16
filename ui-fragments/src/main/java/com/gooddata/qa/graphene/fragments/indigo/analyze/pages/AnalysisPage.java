@@ -22,7 +22,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Configu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -429,10 +428,6 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage clear() {
         getPageHeader().getResetButton().click();
         return this;
-    }
-
-    public TableReport getTableReport() {
-        return getMainEditor().getTableReport();
     }
 
     public PivotTableReport getPivotTableReport() {

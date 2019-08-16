@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -15,7 +14,6 @@ public class Insight extends Widget {
     public static final String MAIN_SELECTOR = ".dash-item.type-visualization";
 
     private static final By BY_CHART_REPORT = By.className("highcharts-container");
-    private static final By BY_TABLE_REPORT = By.className("gd-base-visualization");
     private static final By BY_PIVOT_TABLE_REPORT = By.className("s-pivot-table");
 
     public static Insight getInstance(final WebElement root) {
@@ -25,11 +23,6 @@ public class Insight extends Widget {
     public ChartReport getChartReport() {
         return Graphene.createPageFragment(ChartReport.class,
                 waitForElementVisible(BY_CHART_REPORT, getRoot()));
-    }
-
-    public TableReport getTableReport() {
-        return Graphene.createPageFragment(TableReport.class,
-                waitForElementVisible(BY_TABLE_REPORT, getRoot()));
     }
 
     public PivotTableReport getPivotTableReport() {

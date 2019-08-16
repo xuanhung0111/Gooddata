@@ -3,8 +3,6 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gooddata.qa.graphene.indigo.analyze.AggregationResultTest;
-import com.gooddata.qa.graphene.indigo.analyze.AggregationPopupManipulationTest;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.BackwardCompatibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest;
@@ -45,7 +43,6 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesProjectNavigationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesRelatedAndUnrelatedDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesSaveInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
-import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoRedoSavedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
@@ -56,7 +53,6 @@ import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
 import com.gooddata.qa.graphene.indigo.analyze.TotalsResultWithInsightTest;
-import com.gooddata.qa.graphene.indigo.analyze.WalkmeOnEmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.ApplyColorPaletteOnAnalyzePageTest;
 import com.gooddata.qa.graphene.indigo.analyze.ColorPalettePickerBasicInsightAndKPITest;
 import com.gooddata.qa.graphene.indigo.analyze.ColorPalettePickerAdvancedInsightAndKPITest;
@@ -71,7 +67,6 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.FactBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.RecommendationsWithoutDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.ResetButtonTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.StackedChartsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.TableTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.UndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.ContributionAndComparisionTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingBasicFiltersTest;
@@ -99,7 +94,6 @@ public class UITestsRegistry {
             RecommendationsWithoutDateDimensionTest.class,
             AttributeFiltersTest.class,
             BucketsTest.class,
-            TableTest.class,
             E2ePivotTableTest.class,
             UndoTest.class,
             AttributeBasedMetricsTest.class,
@@ -143,7 +137,6 @@ public class UITestsRegistry {
             MultipleDatasetsTest.class,
             GoodSalesShortcutRecommendationTest.class,
             SpecialCasesTest.class,
-            GoodSalesTableReportTest.class,
             GoodSalesPivotTableReportTest.class,
             GoodSalesTrendingRecommendationTest.class,
             GoodSalesUndoTest.class,
@@ -160,9 +153,7 @@ public class UITestsRegistry {
             GoodSalesMetricVisibilityTest.class,
             GoodSalesProjectNavigationTest.class,
             GoodSalesOvertimeComparisonTest.class,
-            AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
-            AggregationPopupManipulationTest.class,
             VisualizationMeasureAttributeTest.class,
             EventingBasicTest.class,
             ContributionAndComparisionTest.class,
@@ -222,9 +213,7 @@ public class UITestsRegistry {
         });
 
         suites.put("total-results", new Object[] {
-            AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
-            AggregationPopupManipulationTest.class
         });
 
         suites.put("drill-eventing", new Object[] {

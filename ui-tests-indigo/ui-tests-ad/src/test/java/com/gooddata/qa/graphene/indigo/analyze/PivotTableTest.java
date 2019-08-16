@@ -109,35 +109,12 @@ public class PivotTableTest extends AbstractAnalyseTest {
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        // TODO: BB-1448 enablePivot FF should be removed
-        setPivotFlag(true);
     }
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
         createAndAddUserToProject(UserRoles.VIEWER);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disablePivot_ForOldTableIsRenderedWell() {
-        try {
-            setPivotFlag(false);
-            indigoRestRequest.createInsight(
-                    new InsightMDConfiguration(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES, ReportType.TABLE)
-                            .setMeasureBucket(singletonList(MeasureBucket
-                                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
-                            .setCategoryBucket(asList(
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                            CategoryBucket.Type.ATTRIBUTE),
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
-                                            CategoryBucket.Type.ATTRIBUTE))));
-            AttributesBucket attributesBucket = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES)
-                    .waitForReportComputing().getAttributesBucket();
-            assertEquals(attributesBucket.getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
-        } finally {
-            setPivotFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -155,32 +132,6 @@ public class PivotTableTest extends AbstractAnalyseTest {
                 .waitForReportComputing().getAttributesBucket();
         assertEquals(attributesBucket.getItemNames(), asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY));
         assertEquals(analysisPage.getAttributesColumnsBucket().getItemNames(), emptyList());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disablePivot_ForAttributesOnRowsAndColumnsMappedToAttributesBucket() {
-        try {
-            indigoRestRequest.createInsight(
-                    new InsightMDConfiguration(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES, ReportType.TABLE)
-                            .setMeasureBucket(singletonList(MeasureBucket
-                                    .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
-                            .setCategoryBucket(asList(
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
-                                            CategoryBucket.Type.ATTRIBUTE),
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
-                                            CategoryBucket.Type.ATTRIBUTE),
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_STAGE_NAME),
-                                            CategoryBucket.Type.COLUMNS),
-                                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_OPP_SNAPSHOT),
-                                            CategoryBucket.Type.COLUMNS))));
-            setPivotFlag(false);
-            AttributesBucket attributesBucket = initAnalysePage().openInsight(INSIGHT_HAS_A_METRIC_AND_ATTRIBUTES)
-                    .waitForReportComputing().getAttributesBucket();
-            assertEquals(attributesBucket.getItemNames(),
-                    asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY, ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT));
-        } finally {
-            setPivotFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -770,9 +721,5 @@ public class PivotTableTest extends AbstractAnalyseTest {
         json.getJSONObject("dataSet").getJSONObject("meta").put("title", newTitle);
         restRequest.executeRequest(RestRequest.initPostRequest(datasetUri + "?mode=edit", json.toString()),
                 HttpStatus.OK);
-    }
-
-    private void setPivotFlag(boolean status) {
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
     }
 }

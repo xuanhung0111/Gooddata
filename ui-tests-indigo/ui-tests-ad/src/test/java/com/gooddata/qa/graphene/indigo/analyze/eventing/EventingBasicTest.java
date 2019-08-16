@@ -2,14 +2,11 @@ package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,31 +40,6 @@ import static org.testng.Assert.assertFalse;
 public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportSingleMetric() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("single_metric_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final JSONArray uris = new JSONArray() {{
-                put(activityUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_column_insight", COLUMN_CHART,
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
@@ -88,38 +60,6 @@ public class EventingBasicTest extends AbstractEventingTest {
         JSONArray intersection = drillContext.getJSONArray("intersection");
         assertEquals(intersection.length(), 1);
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportMultipleMetrics() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("multiple_metrics_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-            JSONArray uris = new JSONArray() {{
-                put(activityUri);
-                put(opportunityUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
-            content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -155,132 +95,6 @@ public class EventingBasicTest extends AbstractEventingTest {
         intersection = drillContext.getJSONArray("intersection");
         assertEquals(intersection.length(), 1);
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportSingleAttribute() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("single_attribute_table_insight", TABLE, Collections.emptyList(),
-                Arrays.asList(ATTR_STAGE_NAME));
-            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
-            final JSONArray uris = new JSONArray() {{
-                put(stageUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportMultipleAttributes() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("multiple_attributes_table_insight", TABLE, Collections.emptyList(),
-                Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION));
-            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
-            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-            JSONArray uris = new JSONArray() {{
-                put(stageUri);
-                put(regionUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-            content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_REGION, regionUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportMultipleMetricsSingleAttribute() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("single_attribute__multiple_metric_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
-                Arrays.asList(ATTR_REGION));
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
-            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-            JSONArray uris = new JSONArray() {{
-                put(activityUri);
-                put(opportunityUri);
-                put(regionUri);
-            }};
-
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_REGION, regionUri);
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportSingleMetricSingleAttribute() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("single_attribute_single_metric_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_REGION));
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
-            JSONArray uris = new JSONArray() {{
-                put(activityUri);
-                put(regionUri);
-            }};
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_REGION, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_REGION, regionUri);
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-        }
-        finally {
-            setPivotFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -373,41 +187,6 @@ public class EventingBasicTest extends AbstractEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
         verifyColumnIntersection(intersection.getJSONObject(1), "Email", activityTypeUri);
         verifyColumnIntersection(intersection.getJSONObject(2), "Email", activityTypeUri);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void eventingTableReportSingleMetricViewByDate() throws IOException {
-        try {
-            setPivotFlag(false);
-
-            String insightUri = createInsight("test_view_date_table_insight", TABLE,
-                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-                Arrays.asList(ATTR_YEAR_ACTIVITY));
-
-            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-            final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
-            JSONArray uris = new JSONArray() {{
-                put(activityUri);
-                put(yearActivity);
-            }};
-
-            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
-            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
-            embeddedAnalysisPage.waitForReportComputing();
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
-            JSONObject content = getLatestPostMessageObj();
-            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
-
-            cleanUpLogger();
-            embeddedAnalysisPage.getTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
-            content = getLatestPostMessageObj();
-            verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
-        }
-        finally {
-            setPivotFlag(true);
-        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -978,14 +757,6 @@ public class EventingBasicTest extends AbstractEventingTest {
         assertEquals(drillContext.getString("element"), "cell");
     }
 
-    private void verifyLineDrillContext(JSONObject content) {
-        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
-        assertEquals(drillContext.getString("type"), "line");
-        assertEquals(drillContext.getString("element"), "point");
-        assertFalse(drillContext.isNull("x"), "drill event of column chart should show X");
-        assertFalse(drillContext.isNull("y"), "drill event of column chart should show Y");
-    }
-
     private void verifyTableReport(JSONObject content, String columnTitle, String expectedUri) {
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         JSONArray intersection = drillContext.getJSONArray("intersection");
@@ -998,10 +769,5 @@ public class EventingBasicTest extends AbstractEventingTest {
         assertEquals(drillContext.getString("element"), "cell");
         assertEquals(uri, expectedUri);
         assertEquals(title, columnTitle);
-    }
-
-    private void setPivotFlag(boolean status) {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
     }
 }
