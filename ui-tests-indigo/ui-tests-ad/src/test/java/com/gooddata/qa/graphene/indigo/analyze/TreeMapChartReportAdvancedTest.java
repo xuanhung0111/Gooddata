@@ -217,7 +217,7 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_HAS_METRIC_ATTRIBUTE_SEGMENT)
-                .addInsight(INSIGHT_HAS_METRIC_AND_ATTRIBUTE).selectDateFilterByName("All time").waitForWidgetsLoading();
+                .addInsightNext(INSIGHT_HAS_METRIC_AND_ATTRIBUTE).selectDateFilterByName("All time").waitForWidgetsLoading();
         assertTrue(indigoDashboardsPage.searchInsight(INSIGHT_HAS_METRIC_ATTRIBUTE_SEGMENT),
                 INSIGHT_HAS_METRIC_ATTRIBUTE_SEGMENT + " Insight should be existed");
 
@@ -264,7 +264,7 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST).waitForWidgetsLoading();
-        indigoDashboardsPage.clickDashboardBody();
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_TEST);
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertFalse(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel isn't checked");
         assertFalse(configurationPanel.isDateFilterCheckboxEnabled(),
@@ -283,7 +283,8 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST).selectDateFilterByName("All time")
-                .waitForWidgetsLoading().clickDashboardBody();
+                .waitForWidgetsLoading();
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_TEST);
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel is checked");
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(),
@@ -297,7 +298,8 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
 
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST).selectDateFilterByName("All time")
-                .waitForWidgetsLoading().clickDashboardBody();
+                .waitForWidgetsLoading();
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_TEST);
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel is checked");
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(),
