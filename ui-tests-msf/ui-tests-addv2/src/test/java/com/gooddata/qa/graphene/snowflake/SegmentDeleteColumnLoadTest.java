@@ -55,6 +55,7 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -307,7 +308,7 @@ public class SegmentDeleteColumnLoadTest extends AbstractADDProcessTest {
         // In the second load, take all IDs that X_DELETED <> 1
         String sqlStr = String.format("select %s from %s where %s NOT IN (Select %s from %s where %s = %s) ", column, table,
                 column, column, table, COLUMN_X_DELETED, "1");
-        ResultSet result = snowflakeUtils.getResult(sqlStr);
+        ResultSet result = snowflakeUtils.getSqlResult(sqlStr);
         while (result.next()) {
             custkeyValues.add(result.getString(column));
         }
@@ -345,7 +346,7 @@ public class SegmentDeleteColumnLoadTest extends AbstractADDProcessTest {
         List<String> custkeyValues = new ArrayList<String>();
         String sqlStr = String.format("select %s from %s where %s NOT IN (Select %s from %s where %s = %s) ", column, table,
                 column, column, table, COLUMN_X_DELETED, "1");
-        ResultSet result = snowflakeUtils.getResult(sqlStr);
+        ResultSet result = snowflakeUtils.getSqlResult(sqlStr);
         while (result.next()) {
             custkeyValues.add(result.getString(column));
         }
@@ -376,6 +377,7 @@ public class SegmentDeleteColumnLoadTest extends AbstractADDProcessTest {
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);
+        snowflakeUtils.closeSnowflakeConnection();
     }
 
     private void createLCM() throws ParseException, IOException {

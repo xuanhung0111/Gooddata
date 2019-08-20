@@ -1,12 +1,9 @@
 package com.gooddata.qa.utils.snowflake;
 
 import net.snowflake.client.jdbc.SnowflakeConnectionV1;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,17 +15,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 public class SnowflakeUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SnowflakeUtils.class);
     ConnectionInfo snowflakeConnectionInfo;
+    Connection connection;
 
-    public SnowflakeUtils(ConnectionInfo connectionInfo) {
+    public SnowflakeUtils(ConnectionInfo connectionInfo) throws SQLException {
         snowflakeConnectionInfo = connectionInfo;
+        this.connection = buildConnection(snowflakeConnectionInfo);
     }
 
     /**
@@ -154,9 +154,6 @@ public class SnowflakeUtils {
      * @param sqlStr SQL command or a script (multiple colon-separated commands) to execute.
      */
     public void executeSql(String sqlStr) throws SQLException {
-        // create JDBC connection to Snowflake
-        Connection connection = buildConnection(snowflakeConnectionInfo);
-
         // create statements
         Statement statement = connection.createStatement();
 
@@ -166,9 +163,28 @@ public class SnowflakeUtils {
         statement.executeUpdate(sqlStr);
         logger.info("Done executing the SQL statements");
 
-        // close JDBC connection
+        // close statement
         statement.close();
-        connection.close();
+    }
+
+    /**
+     * Execute SQL statement then return SQL result.
+     *
+     * @param sqlStr SQL command or a script (multiple colon-separated commands) to execute.
+     * @return SQL result
+     */
+    public ResultSet getSqlResult(String sqlStr) throws SQLException {
+        // create statements
+        Statement statement = connection.createStatement();
+
+        // execute SQL commands
+        logger.info("Executing the SQL statements");
+        ResultSet result = statement.executeQuery(sqlStr);
+        logger.info("Done executing the SQL statements");
+
+        // close statement
+        statement.close();
+        return result;
     }
 
     /**
@@ -199,8 +215,8 @@ public class SnowflakeUtils {
     public void updateColumn(String tableName, String column, String value) {
         try {
             executeSql("UPDATE " + tableName + " SET " + column + "= " + value);
-        } catch(SQLException e) {
-            logger.error("Update column" + column + "with value" + value +  "failed");
+        } catch (SQLException e) {
+            logger.error("Update column" + column + "with value" + value + "failed");
             throw new RuntimeException(e);
         }
     }
@@ -208,7 +224,7 @@ public class SnowflakeUtils {
     public void dropColumn(String tableName, String column) {
         try {
             executeSql("ALTER TABLE " + tableName + " DROP COLUMN " + column);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             logger.error("Drop column" + column + "failed");
             throw new RuntimeException(e);
         }
@@ -217,8 +233,8 @@ public class SnowflakeUtils {
     public void addColumn(String tableName, String column, String datatype) {
         try {
             executeSql("ALTER TABLE " + tableName + " ADD COLUMN " + column + " " + datatype);
-        } catch(SQLException e) {
-            logger.error("Add column" + column + "with datatype " + datatype +  "failed");
+        } catch (SQLException e) {
+            logger.error("Add column" + column + "with datatype " + datatype + "failed");
             throw new RuntimeException(e);
         }
     }
@@ -226,7 +242,7 @@ public class SnowflakeUtils {
     public ResultSet getRecords(String tableName, String column, int limit) {
         try {
             String sqlStr = "SELECT " + column + " FROM " + tableName + " LIMIT " + limit;
-            return getResult(sqlStr);
+            return getSqlResult(sqlStr);
         } catch (SQLException e) {
             logger.error("get Records error" + e.getMessage());
             throw new RuntimeException(e);
@@ -234,16 +250,16 @@ public class SnowflakeUtils {
     }
 
     /**
-     * Get resul by Snowflake condition .
+     * Get result by Snowflake condition .
      *
-     * @param tableName snowflake Table name.
-     * @param column snowflake column name.
-     * @param conditions condition after where clause. (example: column = "Column 1" , condition = " = 1 ")
-     * @param limit : limit records returns
+     * @param tableName     snowflake Table name.
+     * @param column        snowflake column name.
+     * @param andConditions condition after where clause. (example: column = "Column 1" , condition = " = 1 ")
+     * @param limit         : limit records returns
      * @return ResultSet apply querry
      */
     public ResultSet getRecordsByCondition(String tableName, String column, List<Pair<String, String>> andConditions,
-            List<Pair<String, String>> orConditions, int limit) {
+                                           List<Pair<String, String>> orConditions, int limit) {
 
         String andConditionString = andConditions != null
                 ? " ( " + andConditions.stream().map(this::getCondition).collect(joining(" AND ")) + " ) "
@@ -262,28 +278,30 @@ public class SnowflakeUtils {
                     .replace("${tableName}", tableName)
                     .replace("${column}", column);
             logger.info("SQL Record in range:" + sqlStr);
-            return getResult(sqlStr);
+            return getSqlResult(sqlStr);
         } catch (SQLException e) {
             logger.error("get Records By Condition error" + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    public ResultSet getResult(String sqlStr) throws SQLException {
-        // create JDBC connection to Snowflake
-        Connection connection = buildConnection(snowflakeConnectionInfo);
-        // create statements
-        Statement statement = connection.createStatement();
-        // execute SQL commands
-        logger.info("Executing the SQL statements");
-        ResultSet result = statement.executeQuery(sqlStr);
-        logger.info("Done executing the SQL statements");
-        statement.close();
-        connection.close();
-        return result;
+    private String getCondition(Pair<String, String> condition) {
+        return String.format("(%s %s)", condition.getLeft(), condition.getRight());
     }
 
-    private String getCondition(Pair<String, String> condition) {
-        return String.format("(%s %s)",condition.getLeft(), condition.getRight());
+    /**
+     * Force to close JDBC connection to snowflake immediately, don't need to wait Java close it automatically.
+     * This will release all Statement, ResultSet, other database resources.
+     */
+    public void closeSnowflakeConnection() {
+        if (connection == null) {
+            logger.info("There is no established connection so nothing to close.");
+            return;
+        }
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            // Ignore because not sense.
+        }
     }
 }
