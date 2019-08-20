@@ -45,7 +45,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER =
             "Insight doesn't apply measure date filter";
     private static final String INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT =
-            "Insight has 2+ measures, some measures are applied measure date filter and some ones aren’t applied";
+        "Insight has 2+ measures, some measures are applied measure date filter and some ones aren’t applied";
     private static final String INSIGHT_HAS_ONLY_ATTRIBUTES = "Insight has only attributes";
     private static final String INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER =
             "Insight has 2 measures (M1 has measure date filter, M2 doesn’t have), Date 1 on View by and Date 1 on Filter";
@@ -228,7 +228,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         assertNotEquals(metricFilterByDatePicker.getToDate(), validToDate);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void backToOtherPeriodsTest() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -238,7 +238,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
-        ElementUtils.makeSureNoPopupVisible();
         metricFilterByDatePicker.backToOtherPeriods();
 
         assertFalse(metricFilterByDatePicker.isDateRangePickerVisible(), "System don't close date range picker");
@@ -246,7 +245,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "System should come back to date filter dropdown");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void changeDateDimensionAfterApplyingStaticPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -255,7 +254,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
-        ElementUtils.makeSureNoPopupVisible();
         metricFilterByDatePicker.backToOtherPeriods().changeDateDimension(DATE_DATASET_SNAPSHOT);
         assertEquals(getListDataChartReportRender(), singletonList("$116,625,456.54"),
                 "Chart does not render correctly");
@@ -280,7 +278,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "Chart does not render correctly");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void undoButtonAfterChangingDateDimension() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -288,7 +286,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate)
                 .expandFilterByDate();
-        ElementUtils.makeSureNoPopupVisible();
         metricFilterByDatePicker.backToOtherPeriods().changeDateDimension(DATE_DATASET_CREATED);
         assertEquals(getListDataChartReportRender(), singletonList("$76,055,152.30"),
                 "Chart does not render correctly");
@@ -298,7 +295,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "Chart does not render correctly");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void undoButtonAfterChangingFloatingPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -309,7 +306,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "Chart does not render correctly");
 
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
-        ElementUtils.makeSureNoPopupVisible();
         metricFilterByDatePicker.backToOtherPeriods();
         metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, TWO_YEARS_AGO);
         assertEquals(getListDataChartReportRender(), singletonList("$3,644.00"),
@@ -509,12 +505,14 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         indigoDashboardsPage.addDashboard().addInsight(insight).waitForWidgetsLoading();
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_MONTH).clickDashboardBody();
+        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_MONTH)
+            .selectWidgetByHeadline(Insight.class, insight);
+
         assertFalse(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel is checked");
         assertFalse(panel.isDateFilterCheckboxEnabled(),
                 "Date checkbox on right panel isn't disabled, changeable");
 
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).clickDashboardBody();
+        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).selectWidgetByHeadline(Insight.class, insight);
         assertFalse(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel is checked");
         assertFalse(panel.isDateFilterCheckboxEnabled(),
                 "Date checkbox on right panel isn't disabled, changeable");
@@ -552,12 +550,13 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         indigoDashboardsPage.addDashboard().addInsight(insight).waitForWidgetsLoading();
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_MONTH).clickDashboardBody();
+        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_MONTH).selectWidgetByHeadline(Insight.class, insight);
+
         assertTrue(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel isn't checked");
         assertTrue(panel.isDateFilterCheckboxEnabled(),
                 "Date checkbox on right panel is disabled, unchangeable");
 
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).clickDashboardBody();
+        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).selectWidgetByHeadline(Insight.class, insight);
         assertTrue(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel isn't checked");
         assertTrue(panel.isDateFilterCheckboxEnabled(),
                 "Date checkbox on right panel is disabled, unchangeable");

@@ -186,22 +186,22 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         createInsightHasMetricAndAttribute(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE);
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE).waitForWidgetsLoading()
-                .addInsight(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE).selectDateFilterByName("All time").waitForWidgetsLoading();
+                .addInsightNext(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE).selectDateFilterByName("All time").waitForWidgetsLoading();
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().searchInsight(INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE),
                 "Insight " + INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE + " should be visible");
 
         Widget firstWidget = indigoDashboardsPage.getFirstWidget(Insight.class);
         Widget lastWidget = indigoDashboardsPage.getLastWidget(Insight.class);
 
-        indigoDashboardsPage.dragWidget(lastWidget, firstWidget, Widget.DropZone.NEXT);
+        indigoDashboardsPage.dragWidget(firstWidget, lastWidget, Widget.DropZone.NEXT);
         assertEquals(indigoDashboardsPage.getInsightTitles(),
-                asList(INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE, INSIGHT_HAS_METRIC_AND_ATTRIBUTTE));
+                asList(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE, INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE));
         firstWidget.setHeadline(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE + " RENAME");
         assertEquals(firstWidget.getHeadline(), INSIGHT_HAS_METRIC_AND_ATTRIBUTTE + " RENAME");
 
-        indigoDashboardsPage.getLastWidget(Insight.class);
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_METRIC_AND_TWO_ATTRIBUTE);
         indigoDashboardsPage.deleteInsightItem();
-        assertEquals(indigoDashboardsPage.getInsightTitles(), asList(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE));
+        assertEquals(indigoDashboardsPage.getInsightTitles(), asList(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE + " RENAME"));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -323,7 +323,8 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST).waitForWidgetsLoading();
         indigoDashboardsPage.addAttributeFilter(ATTR_ACTIVITY_TYPE, "Email").waitForWidgetsLoading()
-                .selectDateFilterByName("All time").clickDashboardBody();
+                .selectDateFilterByName("All time");
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_TEST);
 
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel is checked");
@@ -342,8 +343,9 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight(INSIGHT_TEST).waitForWidgetsLoading();
         indigoDashboardsPage.addAttributeFilter(ATTR_ACTIVITY_TYPE, "Email")
-                .selectDateFilterByName("All time").clickDashboardBody();
+                .selectDateFilterByName("All time");
 
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_TEST);
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel is checked");
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(),
@@ -358,8 +360,9 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()
                 .addInsight("INSIGHT TEST").waitForWidgetsLoading();
         indigoDashboardsPage.addAttributeFilter(ATTR_ACTIVITY_TYPE, "Email")
-                .selectDateFilterByName("All time").clickDashboardBody();
+                .selectDateFilterByName("All time");
 
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, "INSIGHT TEST");
         ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(), "Date checkbox on right panel is checked");
         assertTrue(configurationPanel.isDateFilterCheckboxEnabled(),
