@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static org.openqa.selenium.By.id;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -55,7 +56,8 @@ public class AccountPage extends AbstractFragment {
     }
 
     public ChangePasswordDialog openChangePasswordDialog() {
-        waitForElementVisible(changePasswordLink).click();
+        //Click action on element does not affect sometimes, so switch to use java script executor.
+        BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(changePasswordLink));
         return Graphene.createPageFragment(ChangePasswordDialog.class,
                 waitForElementVisible(CHANGE_PASSWORD_DIALOG_LOCATOR, browser));
     }

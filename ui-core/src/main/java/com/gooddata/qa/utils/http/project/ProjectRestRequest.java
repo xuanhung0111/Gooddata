@@ -136,4 +136,19 @@ public final class ProjectRestRequest extends CommonRestRequest {
         log.info("Current XAE version of Project is: " + xaeVersionProject);
         return xaeVersionProject;
     }
+
+    public int getValuePasswordHistoryLimit() throws IOException {
+        int valueLimited = 1;
+        JSONArray items = this.getJsonObject("/gdc/domains/default/config")
+            .getJSONObject("settings").getJSONArray("items");
+
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
+            if ("security.password.history.limit".equals(jsonObject.getString("key"))) {
+                valueLimited = Integer.valueOf(jsonObject.getString("value"));
+            }
+        }
+        log.info("Value password history limit of Domain is: " + valueLimited);
+        return valueLimited;
+    }
 }
