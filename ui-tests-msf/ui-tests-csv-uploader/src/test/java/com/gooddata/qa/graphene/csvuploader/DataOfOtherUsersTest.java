@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -13,6 +14,9 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -26,6 +30,13 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
     private String newAdminUser;
+
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void checkMyDataAndNoDataOfOthers() {
@@ -190,9 +201,23 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
-        createAndAddUserToProject(UserRoles.EDITOR);
+    @Test(dependsOnMethods = {"checEditorCannotEditDataOfOthers"}, groups = "csv")
+    public void accessToDataOfRemovedUser() throws JSONException, IOException {
+        String removedAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        logout();
+        signInAtGreyPages(removedAdminUser, testParams.getPassword());
+        try {
+            final Dataset dataset = uploadCsv(PAYROLL_REFRESH);
+            String datasetName = dataset.getName();
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            new UserManagementRestRequest(new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId())
+                    .deleteUserByEmail(testParams.getUserDomain(), removedAdminUser);
+            AnalysisPage analysePage = initAnalysePage();
+            checkRedBar(browser);
+            analysePage.getCataloguePanel().changeDataset(datasetName);
+            checkRedBar(browser);
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
     }
 }

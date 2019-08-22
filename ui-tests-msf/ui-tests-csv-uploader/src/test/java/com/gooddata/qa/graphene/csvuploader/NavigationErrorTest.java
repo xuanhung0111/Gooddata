@@ -23,6 +23,11 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
     @FindBy(className = "s-insufficient-access-rights")
     private InsufficientAccessRightsPage insufficientAccessRightsPage;
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.VIEWER);
+    }
+
     @Test(dependsOnMethods = {"redirectToErrorPageWhenInsufficientAccessRights"}, groups = "csv")
     public void navigateToProjectsPageWhenInvalidProjectId() {
         openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, "nonExistingProjectIdL123321"));
@@ -50,10 +55,5 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
-    }
-
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.VIEWER);
     }
 }
