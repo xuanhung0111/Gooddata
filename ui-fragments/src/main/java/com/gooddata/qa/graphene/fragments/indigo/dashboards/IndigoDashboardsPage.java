@@ -322,7 +322,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage addKpiToBeginningOfRow(KpiConfiguration config) {
         if (getWidgets().size() > 0) {
             dragAndDropWidgetToCreateSameRow(waitForElementPresent(By.cssSelector(ADD_KPI_PLACEHOLDER), browser),
-                getWidgets().get(0).getRoot(), DropZone.PREV);
+                getWidgets().get(0).getRoot(), DropZone.PREV, true);
         } else {
             dragAddKpiPlaceholder();
         }
@@ -565,14 +565,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage dragAddKpiToDashboard() {
-        // should fetch dashboard elements to avoid caching in view mode
-        waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
-        tryToDragWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
-
-        return this;
-    }
-
     public IndigoDashboardsPage tryToDragAndDropKPI(WebElement target) {
         waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
         dragAndDropWithCustomBackend(browser, addKpiPlaceHolder, target);
@@ -622,10 +614,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage addInsightToCreateSameRow(final String newInsight, String oldInsight,
-                                                          DropZone position) {
+    public IndigoDashboardsPage addInsightToCreateSameRow(final String newInsight, String oldInsight, DropZone position) {
         WebElement source = getInsightItemOnSelectionPanel(newInsight);
-        dragAndDropWidgetToCreateSameRow(source, getWidgetFluidLayout(oldInsight, 0), position);
+        dragAndDropWidgetToCreateSameRow(source, getWidgetFluidLayout(oldInsight, 0), position, true);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage dragInsightToCreateSameRow(final String newInsight, String oldInsight, DropZone position) {
+        WebElement source = getInsightItemOnSelectionPanel(newInsight);
+        dragAndDropWidgetToCreateSameRow(source, getWidgetFluidLayout(oldInsight, 0), position, false);
 
         return this;
     }
@@ -633,16 +631,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage addInsightToCreateANewRow(final String newInsight, String oldInsight,
                                                           Widget.FluidLayoutPosition position) {
         WebElement source = getInsightItemOnSelectionPanel(newInsight);
-        dragAndDropWidgetToCreateANewRow(source, getWidgetFluidLayout(oldInsight, 0), position);
+        dragAndDropWidgetToCreateANewRow(source, getWidgetFluidLayout(oldInsight, 0), position, true);
 
         return this;
     }
 
-    public IndigoDashboardsPage dragInsightToDashboard(final String insight) {
-        tryToDragWithCustomBackend(browser,
-            convertCSSClassTojQuerySelector(
-                getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
-            DASHBOARD_BODY, DropZone.LAST.getCss());
+    public IndigoDashboardsPage dragInsightToCreateANewRow(final String newInsight, String oldInsight,
+                                                          Widget.FluidLayoutPosition position) {
+        WebElement source = getInsightItemOnSelectionPanel(newInsight);
+        dragAndDropWidgetToCreateANewRow(source, getWidgetFluidLayout(oldInsight, 0), position, false);
 
         return this;
     }
@@ -826,7 +823,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForWidgetsLoading();
     }
 
-    private void dragAndDropWidgetToCreateSameRow(WebElement source, WebElement webElementWidget, DropZone position) {
+    private void dragAndDropWidgetToCreateSameRow(WebElement source, WebElement webElementWidget, DropZone position,
+                                                  boolean isDrop) {
         Actions driverActions = new Actions(browser);
         driverActions.clickAndHold(source).perform();
 
@@ -839,12 +837,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
             scrollElementIntoView(drop, browser);
             driverActions.moveToElement(drop).perform();
         } finally {
-            driverActions.release().perform();
+            if (isDrop) driverActions.release().perform();
         }
     }
 
     private void dragAndDropWidgetToCreateANewRow(WebElement source, WebElement webElementWidget,
-                                                  Widget.FluidLayoutPosition fluidLayoutPosition) {
+                                                  Widget.FluidLayoutPosition fluidLayoutPosition, boolean isDrop) {
         Actions driverActions = new Actions(browser);
         driverActions.clickAndHold(source).perform();
 
@@ -858,7 +856,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
             scrollElementIntoView(drop, browser);
             driverActions.moveToElement(drop).perform();
         } finally {
-            driverActions.release().perform();
+            if (isDrop) driverActions.release().perform();
         }
     }
 
