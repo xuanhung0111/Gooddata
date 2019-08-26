@@ -1,25 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -28,8 +11,22 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.utils.WaitUtils;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.isShortenedTitleDesignByCss;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class ChartReport extends AbstractFragment {
 
@@ -40,6 +37,9 @@ public class ChartReport extends AbstractFragment {
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
     private static final String HEATMAP_LEGEND = ".heatmap-legend .box";
+    private static final String TOOLTIP_ITEM = ".gd-viz-tooltip-item";
+    private static final String TOOLTIP_TITLE = ".gd-viz-tooltip-title";
+    private static final String TOOLTIP_VALUE = ".gd-viz-tooltip-value";
 
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
@@ -218,7 +218,7 @@ public class ChartReport extends AbstractFragment {
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
-        return isShortenedTitleDesignByCss(waitForElementVisible(tooltip.findElement(className("title"))), width);
+        return isShortenedTitleDesignByCss(waitForElementVisible(tooltip.findElement(cssSelector(TOOLTIP_TITLE))), width);
     }
 
     public boolean isLegendVisible() {
@@ -373,9 +373,9 @@ public class ChartReport extends AbstractFragment {
     }
 
     private List<List<String>> getTooltipText() {
-        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector("tr"))).stream()
-                .map(row -> asList(row.findElement(cssSelector(".title")).getText(),
-                        row.findElement(cssSelector(".value")).getText()))
+        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector(TOOLTIP_ITEM))).stream()
+                .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
+                        item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
                 .collect(Collectors.toList());
     }
 
