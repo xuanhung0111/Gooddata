@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricFilterByDatePicker;
@@ -11,7 +10,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.DataProvider;
@@ -38,28 +36,25 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
     private static final String ADD_ATTRIBUTE_FILTER_BUTTON = "Add attribute filter";
     private static final String FILTER_BY_DATE_BUTTON = "Filter by date";
-    private static final String INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER =
-            "Insight has 1 measure and applies measure date filter";
-    private static final String INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER =
-            "Insight has 2+ measures and all measures are applied measure date filters";
-    private static final String INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER =
-            "Insight doesn't apply measure date filter";
-    private static final String INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT =
-        "Insight has 2+ measures, some measures are applied measure date filter and some ones aren’t applied";
-    private static final String INSIGHT_HAS_ONLY_ATTRIBUTES = "Insight has only attributes";
-    private static final String INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER =
-            "Insight has 2 measures (M1 has measure date filter, M2 doesn’t have), Date 1 on View by and Date 1 on Filter";
-    private static final String INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER =
-            "Insight has 2 measures (M1 has measure date filter, M2 doesn’t have), Date 1 on Filter only";
     private static final String TEST_INSIGHT = "Test-Insight";
     private static final String RENAMED_TEST_INSIGHT = "Renamed-Test-Insight";
     private static final String RENAMED_TEST_INSIGHT_AGAIN = "Renamed-Test-Insight-Again";
-    private static final String DATE_FILTER_ALL_TIME = "All time";
-    private static final String DATE_FILTER_THIS_MONTH = "This month";
-    private static final String DATE_FILTER_LAST_YEAR = "Last year";
+    private static final String INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER =
+        "Insight has 1 measure and applies measure date filter";
+    private static final String INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER =
+        "Insight has 2+ measures and all measures are applied measure date filters";
+    private static final String INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER =
+        "Insight doesn't apply measure date filter";
+    private static final String INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT =
+        "Insight has 2+ measures, some measures are applied measure date filter and some ones aren’t applied";
+    private static final String INSIGHT_HAS_ONLY_ATTRIBUTES = "Insight has only attributes";
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
     //Will be changed evert year
     private static final String TWO_YEARS_AGO = "two years ago";
+    private static final String DATE_FILTER_ALL_TIME = "All time";
+    private static final String DATE_FILTER_THIS_MONTH = "This month";
+    //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
+    //Will be changed evert year
 
     @Override
     public void initProperties() {
@@ -228,7 +223,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         assertNotEquals(metricFilterByDatePicker.getToDate(), validToDate);
     }
 
-    @Test(dependsOnGroups = {"createProject"}, enabled = false)
+    @Test(dependsOnGroups = {"createProject"})
     public void backToOtherPeriodsTest() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -245,7 +240,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "System should come back to date filter dropdown");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, enabled = false)
+    @Test(dependsOnGroups = {"createProject"})
     public void changeDateDimensionAfterApplyingStaticPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -278,7 +273,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "Chart does not render correctly");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, enabled = false)
+    @Test(dependsOnGroups = {"createProject"})
     public void undoButtonAfterChangingDateDimension() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -295,7 +290,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 "Chart does not render correctly");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, enabled = false)
+    @Test(dependsOnGroups = {"createProject"})
     public void undoButtonAfterChangingFloatingPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
@@ -480,23 +475,36 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void prepareInsightsApplyDateFilter() {
         initAnalysePage().addMetric(METRIC_AMOUNT).waitForReportComputing().getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
+            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
         analysisPage.saveInsight(INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER);
 
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-                .addFilterByDate(TWO_YEARS_AGO);
+            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
+            .addFilterByDate(TWO_YEARS_AGO);
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AVG_AMOUNT)
-                .expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
+            .expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
         analysisPage.saveInsight(INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER);
     }
 
     @DataProvider(name = "insightApplyDateFilter")
     public Object[][] getSavedInsightDateFilter() {
         return new Object[][]{
-                {INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER},
-                {INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER},
+            {INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER},
+            {INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER},
         };
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void prepareInsightsNotApplyDateFilter() {
+        initAnalysePage().addMetric(METRIC_AMOUNT).waitForReportComputing()
+            .saveInsight(INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER);
+
+        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).getMetricsBucket()
+            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
+            .addFilterByDate(DateRange.LAST_YEAR.toString());
+        analysisPage.saveInsight(INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT);
+
+        initAnalysePage().addMetric(ATTR_ACCOUNT, FieldType.ATTRIBUTE).saveInsight(INSIGHT_HAS_ONLY_ATTRIBUTES);
     }
 
     @Test(dependsOnMethods = {"prepareInsightsApplyDateFilter"}, dataProvider = "insightApplyDateFilter")
@@ -510,37 +518,24 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         assertFalse(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel is checked");
         assertFalse(panel.isDateFilterCheckboxEnabled(),
-                "Date checkbox on right panel isn't disabled, changeable");
+            "Date checkbox on right panel isn't disabled, changeable");
 
         indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).selectWidgetByHeadline(Insight.class, insight);
         assertFalse(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel is checked");
         assertFalse(panel.isDateFilterCheckboxEnabled(),
-                "Date checkbox on right panel isn't disabled, changeable");
+            "Date checkbox on right panel isn't disabled, changeable");
 
         indigoDashboardsPage.saveEditModeWithWidgets();
         waitForOpeningIndigoDashboard();
         checkRedBar(browser);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void prepareInsightsNotApplyDateFilter() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).waitForReportComputing()
-                .saveInsight(INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER);
-
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-                .addFilterByDate(DateRange.LAST_YEAR.toString());
-        analysisPage.saveInsight(INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT);
-
-        initAnalysePage().addMetric(ATTR_ACCOUNT, FieldType.ATTRIBUTE).saveInsight(INSIGHT_HAS_ONLY_ATTRIBUTES);
-    }
-
     @DataProvider
     public Object[][] getSavedInsightNotDateFilter() {
         return new Object[][]{
-                {INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER},
-                {INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT},
-                {INSIGHT_HAS_ONLY_ATTRIBUTES},
+            {INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER},
+            {INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT},
+            {INSIGHT_HAS_ONLY_ATTRIBUTES},
         };
     }
 
@@ -554,252 +549,16 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         assertTrue(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel isn't checked");
         assertTrue(panel.isDateFilterCheckboxEnabled(),
-                "Date checkbox on right panel is disabled, unchangeable");
+            "Date checkbox on right panel is disabled, unchangeable");
 
         indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).selectWidgetByHeadline(Insight.class, insight);
         assertTrue(panel.isDateFilterCheckboxChecked(), "Date checkbox on right panel isn't checked");
         assertTrue(panel.isDateFilterCheckboxEnabled(),
-                "Date checkbox on right panel is disabled, unchangeable");
+            "Date checkbox on right panel is disabled, unchangeable");
 
         indigoDashboardsPage.saveEditModeWithWidgets();
         waitForOpeningIndigoDashboard();
         checkRedBar(browser);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnAllTimeADAndAllTimeKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME);
-
-        List<List<String>> expectedValues = asList(
-                asList("2010", "–", "$15,043.52"),
-                asList("2011", "–", "$20,578.25"),
-                asList("2012", "–", "$21,881.00"),
-                asList("2013", "–", "$66,436.38"),
-                asList("2014", "–", "$8,875.86"),
-                asList("2016", "–", "–"),
-                asList("2017", "$3,644.00", "$3,644.00")
-        );
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        expectedValues = singletonList(asList("$3,644.00", "$20,286.22"));
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnAllTimeADAndThisTimeKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME);
-
-        List<List<String>> expectedValues = singletonList(asList("2017", "$3,644.00", "–"));
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        expectedValues = singletonList(asList("$3,644.00", "–"));
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnThisMonthADAndAllTimeKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-
-        List<List<String>> expectedValues = asList(
-                asList("2010", "–", "$15,043.52"),
-                asList("2011", "–", "$20,578.25"),
-                asList("2012", "–", "$21,881.00"),
-                asList("2013", "–", "$66,436.38"),
-                asList("2014", "–", "$8,875.86"),
-                asList("2016", "–", "–"),
-                asList("2017", "$3,644.00", "$3,644.00")
-        );
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        expectedValues = singletonList(asList("$3,644.00", "$20,286.22"));
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnThisMonthADAndLastYearKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-
-        List<List<String>> expectedValues = singletonList(asList("2017", "$3,644.00", "–"));
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        expectedValues = singletonList(asList("$3,644.00", "–"));
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR, indigoDashboardsPage);
-
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnLastYearADAndThisMonthKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR);
-
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-
-        List<List<String>> expectedValues = singletonList(asList("2017", "$3,644.00", "–"));
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-
-        expectedValues = singletonList(asList("$3,644.00", "–"));
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnLastYearADAndThisMonthKDDifferentDateDimension() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_LAST_YEAR);
-
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnThisMonthADAndLastYearKDDifferentDateDimension() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_LAST_YEAR, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_LAST_YEAR, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnThisMonthADKDDifferentDateDimension() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void combineDateOnThisMonthADAndUncheckedDateKD() {
-        createInsightUsingDateViewByOnAD(
-                INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-        createInsightUsingDateFilterOnAD(
-                INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
-
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
-        Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
-
-        List<List<String>> expectedValues = singletonList(asList("2017", "$3,644.00", "–"));
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-
-        indigoDashboardsPage = initIndigoDashboardsPage();
-        insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, indigoDashboardsPage);
-        configIndigoDashboard(DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
-        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
-
-        expectedValues = singletonList(asList("$3,644.00", "–"));
-        assertEquals(insight.getPivotTableReport().getBodyContent(), expectedValues);
-    }
-
-    private Insight addInsightOnKD(String insight, IndigoDashboardsPage indigoDashboardsPage) {
-        return indigoDashboardsPage.addDashboard().addInsight(insight).getFirstWidget(Insight.class);
-    }
-
-    private void configIndigoDashboard(String dateDimension, String dateRange,
-                                       IndigoDashboardsPage indigoDashboardsPage) {
-        indigoDashboardsPage.selectDateFilterByName(dateRange).selectFirstWidget(Insight.class);
-        indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(dateDimension);
-        indigoDashboardsPage.waitForWidgetsLoading();
-    }
-
-    private void createInsightUsingDateFilterOnAD(String insight, String switchDimension, String periodTime) {
-        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT)
-                .addDateFilter().waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
-        analysisPage.getFilterBuckets().configDateFilter(periodTime);
-        analysisPage.waitForReportComputing();
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().changeDateDimension(switchDimension);
-        analysisPage.waitForReportComputing().saveInsight(insight);
-    }
-
-    private void createInsightUsingDateViewByOnAD(String insight, String switchDimension, String periodTime) {
-        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
-                .addMetric(METRIC_AVG_AMOUNT).addDate().waitForReportComputing().getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-                .addFilterByDate(TWO_YEARS_AGO);
-        analysisPage.getFilterBuckets().configDateFilter(periodTime);
-        analysisPage.waitForReportComputing();
-        analysisPage.getAttributesBucket().changeDateDimension(switchDimension);
-        analysisPage.waitForReportComputing().saveInsight(insight);
     }
 
     private List<String> getListDataChartReportRender() {
