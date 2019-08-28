@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.utils.http.CommonRestRequest;
@@ -162,9 +163,9 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
                 "Date fillter is not applied");
 
-        indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
-        assertEquals(indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT).getChartReport()
-                .getDataLabels(), singletonList("154,271"), "Chart renders incorrectly");
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+        assertEquals(indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, TEST_INSIGHT)
+            .getChartReport().getDataLabels(), singletonList("154,271"), "Chart renders incorrectly");
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -20,6 +20,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
@@ -186,9 +187,9 @@ public class KpiAlertTest extends AbstractDashboardTest {
         String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
-            KpiAlertDialog kpiAlertDialog = initIndigoDashboardsPageWithWidgets()
-                .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
-                .getLastWidget(Kpi.class)
+            initIndigoDashboardsPageWithWidgets().openExtendedDateFilterPanel()
+                .selectPeriod(DateRange.LAST_MONTH).apply();
+            KpiAlertDialog kpiAlertDialog = indigoDashboardsPage.getLastWidget(Kpi.class)
                 .openAlertDialog();
 
             assertFalse(kpiAlertDialog.hasAlertMessage(), "Alert dialog shouldn't have alert message");
@@ -197,9 +198,10 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
 
-            boolean isAlertMessageDisplayed = waitForFragmentVisible(indigoDashboardsPage)
-                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
-                .getLastWidget(Kpi.class)
+            waitForFragmentVisible(indigoDashboardsPage).openExtendedDateFilterPanel()
+                .selectPeriod(DateRange.ALL_TIME).apply();
+
+            boolean isAlertMessageDisplayed = indigoDashboardsPage.getLastWidget(Kpi.class)
                 .openAlertDialog()
                 .hasAlertMessage();
 
@@ -215,20 +217,17 @@ public class KpiAlertTest extends AbstractDashboardTest {
         String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
-            initIndigoDashboardsPageWithWidgets().selectDateFilterByName(DATE_FILTER_THIS_MONTH);
+            initIndigoDashboardsPageWithWidgets().openExtendedDateFilterPanel().selectPeriod(DateRange.THIS_MONTH)
+                .apply();
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            waitForFragmentVisible(indigoDashboardsPage)
-                .selectDateFilterByName(DATE_FILTER_THIS_QUARTER)
-                .getLastWidget(Kpi.class)
-                .openAlertDialog()
-                .applyAlertFilters();
+            waitForFragmentVisible(indigoDashboardsPage).openExtendedDateFilterPanel()
+                .selectPeriod(DateRange.THIS_QUARTER).apply();
+            indigoDashboardsPage.getLastWidget(Kpi.class).openAlertDialog().applyAlertFilters();
 
-            String dateFilterSelection = indigoDashboardsPage
-                .getDateFilter()
-                .getSelection();
-            assertEquals(dateFilterSelection, DATE_FILTER_THIS_MONTH);
+            DateRange dateFilterSelection = indigoDashboardsPage.openExtendedDateFilterPanel().getSelectedDateFilter();
+            assertEquals(dateFilterSelection, DateRange.THIS_MONTH);
 
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
@@ -238,28 +237,28 @@ public class KpiAlertTest extends AbstractDashboardTest {
     @DataProvider(name = "dateFilterProvider")
     public Object[][] dateFilterProvider() {
         return new Object[][] {
-            {DATE_FILTER_ALL_TIME, ""},
-            {"Last 7 days", "in trailing 7 days"},
-            {"Last 30 days", "in trailing 30 days"},
-            {"Last 90 days", "in trailing 90 days"},
-            {DATE_FILTER_THIS_MONTH, "in current month"},
-            {DATE_FILTER_LAST_MONTH, "in previous month"},
-            {"Last 12 months", "in previous 12 months"},
-            {DATE_FILTER_THIS_QUARTER, "in current quarter"},
-            {DATE_FILTER_LAST_QUARTER, "in previous quarter"},
-            {"Last 4 quarters", "in previous 4 quarters"},
-            {"This year", "in current year"},
-            {"Last year", "in previous year"}
+            {DateRange.ALL_TIME, ""},
+            {DateRange.LAST_7_DAYS, "in last 7 days"},
+            {DateRange.LAST_30_DAYS, "in last 30 days"},
+            {DateRange.LAST_90_DAYS, "in last 90 days"},
+            {DateRange.THIS_MONTH, "in this month"},
+            {DateRange.LAST_MONTH, "in last month"},
+            {DateRange.LAST_12_MONTHS, "in last 12 months"},
+            {DateRange.THIS_QUARTER, "in this quarter"},
+            {DateRange.LAST_QUARTER, "in last quarter"},
+            {DateRange.LAST_4_QUARTERS, "in last 4 quarters"},
+            {DateRange.THIS_YEAR, "in this year"},
+            {DateRange.LAST_YEAR, "in last year"}
         };
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "dateFilterProvider")
-    public void checkKpiAlertMessageWithDateFilter(String dateFilter, String alertDialogInfoText)
+    public void checkKpiAlertMessageWithDateFilter(DateRange dateFilter, String alertDialogInfoText)
             throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboardFluidLayout(createAmountKpi(), 0);
 
         try {
-            initIndigoDashboardsPageWithWidgets().selectDateFilterByName(dateFilter);
+            initIndigoDashboardsPageWithWidgets().openExtendedDateFilterPanel().selectPeriod(dateFilter).apply();
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
@@ -273,11 +272,11 @@ public class KpiAlertTest extends AbstractDashboardTest {
             takeScreenshot(browser, "checkKpiAlertMessageWithDateFilter-" + dateFilter, getClass());
             assertEquals(kpiAlertDialogTextBefore, alertDialogInfoText);
 
-            String anotherDateFilter =
-                    dateFilter.equals(DATE_FILTER_LAST_MONTH) ? DATE_FILTER_THIS_MONTH : DATE_FILTER_LAST_MONTH;
-            String kpiAlertDialogTextAfter = waitForFragmentVisible(indigoDashboardsPage)
-                .selectDateFilterByName(anotherDateFilter)
-                .getLastWidget(Kpi.class)
+            DateRange anotherDateFilter =
+                    dateFilter.equals(DateRange.LAST_MONTH) ? DateRange.THIS_MONTH : DateRange.LAST_MONTH;
+            waitForFragmentVisible(indigoDashboardsPage)
+                .openExtendedDateFilterPanel().selectPeriod(anotherDateFilter).apply();
+            String kpiAlertDialogTextAfter = indigoDashboardsPage.getLastWidget(Kpi.class)
                 .openAlertDialog()
                 .getAlertDialogText();
 
