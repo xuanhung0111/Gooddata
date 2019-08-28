@@ -15,6 +15,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.UUID;
 
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.Test;
@@ -47,9 +48,8 @@ public class ManipulateWidgetsTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {
-        Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
-            .selectDateFilterByName(DATE_FILTER_ALL_TIME)
-            .switchToEditMode()
+        initIndigoDashboardsPageWithWidgets().openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+        Kpi selectedKpi = indigoDashboardsPage.switchToEditMode()
             .selectFirstWidget(Kpi.class);
 
         String kpiHeadline = selectedKpi.getHeadline();
