@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
@@ -186,8 +187,26 @@ public class PermissionsDialog extends AbstractFragment {
         waitForElementVisible(specificUsersAccessChoose).click();
     }
 
+    public PermissionsDialog unCheckShareAll(){
+        if(isChecked()) {
+            toggleStrictAccessDashboard();
+        }
+        return this;
+    }
+
+    public PermissionsDialog checkShareAll(){
+        if(!isChecked()) {
+            toggleStrictAccessDashboard();
+        }
+        return this;
+    }
+
     public void toggleStrictAccessDashboard() {
         waitForElementVisible(strictAccessControlCheckBox).click();
+    }
+
+    private boolean isChecked(){
+        return waitForElementPresent(strictAccessControlCheckBox).isSelected();
     }
 
     public void openVisibilityPanel() {

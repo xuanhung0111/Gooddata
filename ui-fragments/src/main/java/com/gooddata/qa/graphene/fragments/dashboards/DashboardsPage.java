@@ -10,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
@@ -27,6 +29,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -68,6 +71,8 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_SETTING_EMBED = By.cssSelector(".s-embed");
     private static final By BY_SETTING_SAVES_AS = By.cssSelector(".s-save_as___");
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
+    private static final By BY_REPORT_LOADED = By.className("yui3-c-reportdashboardwidget-loaded");
+    private static final By STATUS_BAR_SELECTOR = By.className("c-status");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
     protected DashboardTabs tabs;
@@ -170,6 +175,12 @@ public class DashboardsPage extends AbstractFragment {
         waitForFragmentVisible(newDashboardNameDialog).renameDashboard(newName);
 
         return this;
+    }
+
+    public void clickOnAttributeItem(String item) {
+        WebElement webElement = waitForElementVisible(cssSelector(".drillable.s-grid-" + simplifyText(item) + " .captionWrapper"), browser);
+        BrowserUtils.moveToCenterOfElement(browser, webElement);
+        webElement.click();
     }
 
     public DashboardsPage selectDashboard(String dashboardName) {
@@ -307,6 +318,25 @@ public class DashboardsPage extends AbstractFragment {
 
         return Graphene.createPageFragment(EmbedDashboardDialog.class,
                 waitForElementVisible(EmbedDashboardDialog.LOCATOR, browser));
+    }
+
+    public static void waitForReportLoaded(SearchContext searchContext) {
+        waitForElementVisible(BY_REPORT_LOADED, searchContext);
+    }
+
+    public String getStatusMessage() {
+        return waitForElementVisible(STATUS_BAR_SELECTOR, browser)
+                .findElement(By.className("leftContainer")).getText();
+    }
+
+    public EmbeddedDashboard openEmbedDashboard(String embeddedUri) {
+        browser.get(embeddedUri);
+        waitForReportLoaded(browser);
+        return EmbeddedDashboard.getInstance(browser);
+    }
+
+    public String getHeadLine(){
+        return waitForElementVisible(className("yui3-c-textdashboardwidget-label"), browser).getText();
     }
 
     public DashboardsPage addNewTab(String tabName) {
@@ -744,5 +774,39 @@ public class DashboardsPage extends AbstractFragment {
     private String getToolTipFromElement(WebElement element) {
         new Actions(browser).moveToElement(element).moveByOffset(1, 1).perform();
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
+    }
+
+    public void hasNotSAC(){
+        openPermissionsDialog().checkShareAll().submit();
+    }
+
+    public void hasSAC(){
+        openPermissionsDialog().unCheckShareAll().submit();
+    }
+
+    public void addUserGroup(PermissionsDialog permissionsDialog, AddGranteesDialog addGranteesDialog , String userRoles){
+        selectCandidatesAndShare(addGranteesDialog, userRoles);
+        permissionsDialog.submit();
+
+    }
+
+    private void selectCandidatesAndShare(AddGranteesDialog addGranteesDialog, String... candidates) {
+        selectCandidates(addGranteesDialog, candidates);
+        addGranteesDialog.share();
+        waitForElementNotPresent(className("grantee-candidates-dialog"));
+    }
+
+    private void selectCandidates(AddGranteesDialog addGranteesDialog, String... candidates) {
+        for (String candidate : candidates) {
+            addGranteesDialog.searchAndSelectItem(candidate);
+        }
+    }
+
+    public void takeToMyDashboard(){
+        waitForElementVisible(By.cssSelector("#strictAccessControl > a"), browser).click();
+    }
+
+    public String getDashboardNoPermissionAccessText(){
+        return waitForElementVisible(By.cssSelector("#strictAccessControl > p.noPermissionAccess"), browser).getText();
     }
 }

@@ -229,6 +229,17 @@ public class BrowserUtils {
         }
     }
 
+    public static void moveToCenterOfElement(WebDriver driver, WebElement target) {
+        Actions driverActions = new Actions(driver);
+        if (isChrome()) {
+            driverActions.moveToElement(target, 1, target.getSize().height / 2).perform();
+        } else if (isFirefox()){
+            driverActions.moveToElement(target, 1, target.getSize().height).perform();
+        } else {
+            throw new UnsupportedOperationException("Unsupported another browsers than chrome and firefox");
+        }
+    }
+
     public static boolean isChrome() {
         String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
             .getBrowserName().toLowerCase();

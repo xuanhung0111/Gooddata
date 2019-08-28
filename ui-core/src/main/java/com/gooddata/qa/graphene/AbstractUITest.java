@@ -26,11 +26,14 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.utils.PdfUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -663,5 +666,35 @@ public class AbstractUITest extends AbstractGreyPageTest {
         String hasIdPart = browser.getCurrentUrl().split(testParams.getProjectId() + "/")[1];
         openUrl("analyze/embedded/#/" + testParams.getProjectId() + "/" + hasIdPart + "?" + type + "=[" + name + "]");
         return AnalysisPage.getInstance(browser);
+    }
+
+    public String getUser(UserRoles userRoles){
+        switch (userRoles){
+            case EDITOR:
+                return testParams.getEditorUser();
+            case VIEWER:
+                return testParams.getViewerUser();
+            case EDITOR_AND_USER_ADMIN:
+                return testParams.getEditorAdminUser();
+            case EDITOR_AND_INVITATIONS:
+                return testParams.getEditorInvitationsUser();
+            case VIEWER_DISABLED_EXPORT:
+                return testParams.getViewerDisabledExport();
+            default:
+                throw new IllegalArgumentException("Unknown user role " + userRoles);
+        }
+    }
+
+    public String createTestDashboard(String name) throws JSONException, IOException {
+        DashboardRestRequest dashboardRestRequest = new DashboardRestRequest(
+                new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId());
+        JSONObject dashboardObj = dashboardRestRequest.prepareDataDashboardJson(name);
+
+        String dashboardURI = dashboardRestRequest.createDashboard(dashboardObj);
+
+        //refresh page to update the dashboards has just been created
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardURI);
+        waitForDashboardPageLoaded(browser);
+        return dashboardURI;
     }
 }

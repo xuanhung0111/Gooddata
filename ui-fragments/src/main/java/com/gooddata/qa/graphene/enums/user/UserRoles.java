@@ -8,6 +8,7 @@ public enum UserRoles {
     EDITOR_AND_USER_ADMIN("10", "EditorAndUserAdmin"),
     EXPLORER("8", "Explorer"),
     VIEWER("4", "Viewer"),
+    VIEWER_DISABLED_EXPORT("12", "ViewerDisabledExport"),
     DASHBOARD_ONLY("3", "DashboardOnly"),
     UNVERIFIED_ADMIN("1");
 

@@ -155,6 +155,17 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         };
     }
 
+    @DataProvider(name = "userRoles")
+    public Object[][] getUserRoles() {
+        return new Object[][]{
+                {UserRoles.EDITOR},
+                {UserRoles.VIEWER},
+                {UserRoles.EDITOR_AND_INVITATIONS},
+                {UserRoles.EDITOR_AND_USER_ADMIN},
+                {UserRoles.VIEWER_DISABLED_EXPORT}
+        };
+    }
+
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "drillToDashboardData")
     public void testDrillToDashboardTab(String dashboard, List<Pair<String, List<String>>> filterValuesToChange,
                                         List<Pair<String, List<String>>> expectedFilterValues,
@@ -319,14 +330,18 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_USER_ADMIN);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_INVITATIONS);
+        createAndAddUserToProject(UserRoles.VIEWER_DISABLED_EXPORT);
     }
 
     /**
      * senario 11
      * https://docs.google.com/document/d/1FtJ-Q2Q-SfbUh5Cp7dD75tVVKdgDEbPeBqdkgj9Rfh8
      */
-    @Test(dependsOnGroups = {"createProject"})
-    public void testDrillToStrictAccessDashboardTab() throws JSONException, IOException {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "userRoles")
+    public void testDrillToStrictAccessDashboardTab(UserRoles userRoles) throws JSONException, IOException {
         Dashboard dashboard = initDashboardHavingNoFilterInSourceTab();
         String dashboardUri = dashboardRequest.createDashboard(dashboard.getMdObject());
         Dashboard sacDashboard = initDashboardHavingOneTab();
@@ -347,8 +362,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             tableReport.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TAB_ANOTHER_DASHBOARD), DASHBOARD_DRILLING_GROUP);
 
             dashboardsPage.saveDashboard();
-
-            logoutAndLoginAs(false, UserRoles.EDITOR);
+            log.info("Logout And Login With UserRoles : " + userRoles);
+            logoutAndLoginAs(false, userRoles);
 
             initDashboardsPage().selectDashboard(dashboard.getName());
             tableReport.waitForLoaded().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);

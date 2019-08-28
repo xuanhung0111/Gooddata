@@ -3,10 +3,9 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
@@ -16,8 +15,13 @@ import org.openqa.selenium.SearchContext;
 
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class EmbeddedDashboard extends DashboardsPage {
+
+    @FindBy(css = ".dashboardTitleEditBox span")
+    private WebElement dashBoardTitle;
 
     public static final By LOCATOR = By.id("root");
 
@@ -84,5 +88,16 @@ public class EmbeddedDashboard extends DashboardsPage {
         waitForElementVisible(scheduleButton).click();
         waitForElementVisible(scheduleDialog.getRoot());
         return scheduleDialog;
+    }
+
+    @Override
+    public String getDashboardName() {
+        return waitForElementPresent(dashBoardTitle).getText();
+    }
+
+    public EmbeddedDashboard openEmbedDashboard(String embeddedUri) {
+        browser.get(embeddedUri);
+        waitForReportLoaded(browser);
+        return this;
     }
 }
