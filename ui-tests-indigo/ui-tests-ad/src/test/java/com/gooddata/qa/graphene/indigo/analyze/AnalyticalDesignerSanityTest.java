@@ -64,8 +64,6 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createSnapshotBOPMetric();
     }

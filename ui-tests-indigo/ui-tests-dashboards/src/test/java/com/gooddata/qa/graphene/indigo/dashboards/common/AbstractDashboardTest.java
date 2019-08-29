@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
@@ -23,10 +22,8 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -57,16 +54,6 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
     protected void initProperties() {
         super.initProperties(); // use GoodSales by default
         validateAfterClass = false;
-    }
-
-    @Override
-    public void createProject() throws Throwable {
-        super.createProject();
-
-        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
-            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {

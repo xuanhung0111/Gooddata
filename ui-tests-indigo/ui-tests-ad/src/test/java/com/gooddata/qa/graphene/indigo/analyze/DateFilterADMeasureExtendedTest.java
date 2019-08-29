@@ -77,8 +77,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

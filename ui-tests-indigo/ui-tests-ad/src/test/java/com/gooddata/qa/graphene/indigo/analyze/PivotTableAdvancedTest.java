@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.PivotAggregationPopup;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -18,7 +17,6 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -64,7 +62,6 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private final String METRIC_LONG = "metricLong";
 
     private IndigoRestRequest indigoRestRequest;
-    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -77,10 +74,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         Metrics metrics = getMetricCreator();
         metrics.createAmountMetric();
         metrics.createAvgAmountMetric();
-        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
 
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 

@@ -30,8 +30,6 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(
             new RestClient(getProfile(ADMIN)), testParams.getProjectId());
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
 
         Metrics metricCreator = getMetricCreator();

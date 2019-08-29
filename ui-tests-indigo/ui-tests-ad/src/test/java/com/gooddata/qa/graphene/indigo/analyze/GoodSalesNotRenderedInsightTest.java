@@ -1,16 +1,13 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -32,14 +29,6 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
                 {ReportType.BAR_CHART},
                 {ReportType.LINE_CHART}
         };
-    }
-
-    @Override
-    protected void customizeProject() throws Throwable {
-        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
-            new RestClient(getProfile(ADMIN)), testParams.getProjectId());
-        // TODO: BB-1448 enablePivot FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")

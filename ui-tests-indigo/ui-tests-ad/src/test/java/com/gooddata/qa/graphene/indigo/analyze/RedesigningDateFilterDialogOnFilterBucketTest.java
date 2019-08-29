@@ -1,13 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -53,9 +50,6 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createTimelineBOPMetric();
-        // TODO: BB-1448 enablePivot FF should be removed
-        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

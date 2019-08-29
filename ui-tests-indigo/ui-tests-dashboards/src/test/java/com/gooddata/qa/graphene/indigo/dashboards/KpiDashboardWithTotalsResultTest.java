@@ -13,7 +13,6 @@ import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
@@ -162,7 +161,6 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
         try {
             ProjectRestRequest projectRestRequest = new ProjectRestRequest(
                 new RestClient(getProfile(ADMIN)), testParams.getProjectId());
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
 
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             AnalysisPage analysisPage = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).waitForReportComputing();

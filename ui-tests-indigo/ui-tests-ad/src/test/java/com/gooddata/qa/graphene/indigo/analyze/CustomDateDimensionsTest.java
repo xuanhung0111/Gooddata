@@ -63,7 +63,6 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
                 new RestClient(getProfile(ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

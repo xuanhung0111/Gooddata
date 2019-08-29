@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -36,7 +35,6 @@ public class MainEditor extends AbstractFragment {
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT_EMPTY = ".s-blank-canvas-message";
     private static final String WARNING_UNSUPPORTED_MESSAGE_CLASS_NAME = "s-unsupported-bucket-items-warning";
-    private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
     private static final By BY_PIVOT_TABLE_REPORT = By.className("s-pivot-table");
     private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
@@ -52,11 +50,6 @@ public class MainEditor extends AbstractFragment {
 
     public boolean isNoData() {
         return isElementPresent(BY_REPORT_NO_DATA, browser);
-    }
-
-    public TableReport getTableReport() {
-        return Graphene.createPageFragment(TableReport.class,
-                waitForElementVisible(BY_TABLE_REPORT, browser));
     }
 
     public PivotTableReport getPivotTableReport() {
