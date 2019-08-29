@@ -344,16 +344,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public ExtendedDateFilterPanel openExtendedDateFilterPanel() {
-        if (!isElementPresent(className("is-active"), dateFilter.getRoot())) {
+        if (!isElementPresent(className("is-active"), waitForFragmentVisible(dateFilter).getRoot())) {
             dateFilter.getRoot().click();
         }
         return ExtendedDateFilterPanel.getInstance(browser);
     }
 
     public IndigoDashboardsPage selectDateFilterByName(String dateFilterName) {
-        waitForWidgetsLoading();
-
-        waitForFragmentVisible(dateFilter).selectByName(dateFilterName);
+        openExtendedDateFilterPanel().selectPeriod(dateFilterName).apply();
 
         return waitForWidgetsLoading();
     }

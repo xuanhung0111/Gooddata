@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -60,16 +61,19 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void makeNoChangeOnUnrelatedDateInsight() throws ParseException, JSONException, IOException {
         String insightUri = createUnrelatedDateInsight();
-        addWidgetToWorkingDashboard(indigoRestRequest.createVisualizationWidget(insightUri, UNRELATED_DATE_INSIGHT));
+        indigoRestRequest.createVisualizationWidget(insightUri, UNRELATED_DATE_INSIGHT);
+        indigoDashboardsPage
+            .addInsightToCreateANewRow(UNRELATED_DATE_INSIGHT, TEST_INSIGHT, Widget.FluidLayoutPosition.BOTTOM)
+            .saveEditModeWithWidgets();
 
         try {
             List<String> expectedValues = initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                    .selectLastWidget(Insight.class).getChartReport().getDataLabels();
+                    .selectWidgetByHeadline(Insight.class, UNRELATED_DATE_INSIGHT).getChartReport().getDataLabels();
 
             indigoDashboardsPage.selectDateFilterByName(LAST_7_DAYS).waitForWidgetsLoading();
 
-            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
-                    expectedValues);
+            assertEquals(indigoDashboardsPage.getWidgetByHeadline(Insight.class, UNRELATED_DATE_INSIGHT).getChartReport()
+                    .getDataLabels(), expectedValues);
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteObjectsUsingCascade(insightUri);
@@ -104,8 +108,9 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.selectDateFilterByName(ALL_TIME).waitForWidgetsLoading();
             takeScreenshot(browser, "Override-Date-Filter-If-Insight-Uses-Same-Date-Dataset", getClass());
-            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
-                    singletonList("154,271"), "Common date filter does not override insight's filter");
+            assertEquals(indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_USING_DATE_FILTER)
+                    .getChartReport().getDataLabels(), singletonList("154,271"),
+                "Common date filter does not override insight's filter");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
@@ -123,8 +128,9 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.selectDateFilterByName(ALL_TIME).waitForWidgetsLoading();
             takeScreenshot(browser, "Combine-Filters-If-Insight-Uses-Different-Date-Dataset", getClass());
-            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
-                    singletonList("23,673"), "Combination of common & insight date filer is not correct");
+            assertEquals(indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_USING_DATE_FILTER)
+                    .getChartReport().getDataLabels(), singletonList("23,673"),
+                "Combination of common & insight date filer is not correct");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
@@ -152,7 +158,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(initIndigoDashboardsPageWithWidgets().switchToEditMode().getDateFilterSelection(),
                     LAST_7_DAYS, "Common date filter is changed");
 
-            indigoDashboardsPage.selectLastWidget(Insight.class);
+            indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_USING_DATE_FILTER);
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_ACTIVITY,
                     "Date dataset is changed");
         } finally {
@@ -211,12 +217,12 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
                     "Date dimension is not changed");
 
             assertEquals(
-                    initIndigoDashboardsPageWithWidgets().switchToEditMode().getLastWidget(Insight.class)
-                            .getChartReport().getDataLabels(),
-                    singletonList("31,766"),
+                    initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                        .getWidgetByHeadline(Insight.class, INSIGHT_USING_DATE_FILTER).getChartReport()
+                        .getDataLabels(), singletonList("31,766"),
                     "Changing date dimension on AD makes no impact to the insight on dashboard");
 
-            indigoDashboardsPage.selectLastWidget(Insight.class);
+            indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_USING_DATE_FILTER);
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
                     "Date dataset on dashboard is affected by changing date filter on AD");
 

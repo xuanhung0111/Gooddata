@@ -74,7 +74,7 @@ public class KpiCompareToPreviousPeriodTest extends AbstractDashboardTest {
 
         initIndigoDashboardsPage()
                 .addDashboard()
-                .addInsight("Insight Test").waitForWidgetsLoading();
+                .addInsight("Insight Test");
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getFirstWidget(Insight.class);
         PivotTableReport tableReport = insight.getPivotTableReport();
