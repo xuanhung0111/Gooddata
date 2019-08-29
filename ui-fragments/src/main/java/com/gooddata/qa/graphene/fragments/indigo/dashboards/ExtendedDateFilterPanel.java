@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -68,6 +69,15 @@ public class ExtendedDateFilterPanel extends AbstractFragment {
         return this;
     }
 
+    public ExtendedDateFilterPanel selectPeriod(String period) {
+        waitForCollectionIsNotEmpty(filters).stream()
+            .filter(filter -> filter.getText().equals(period))
+            .findFirst()
+            .get()
+            .click();
+        return this;
+    }
+
     public ExtendedDateFilterPanel selectStaticPeriod(String from, String to) {
         selectPeriod(DateRange.STATIC_PERIOD);
         fillInDateRange(waitForElementVisible(fromDate), from);
@@ -96,6 +106,10 @@ public class ExtendedDateFilterPanel extends AbstractFragment {
 
     public List<String> getDateRangeOptions() {
         return waitForCollectionIsNotEmpty(listItem).stream().map(WebElement::getText).collect(toList());
+    }
+
+    public boolean isInfoMessageDisplayed() {
+        return isElementPresent(className("gd-extended-date-filter-edit-mode-message"), getRoot());
     }
 
     public enum DateGranularity {
