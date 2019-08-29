@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
@@ -50,10 +49,8 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
                 return;
             case STAGING:
                 publicDashboardUri = "https://staging.intgdc.com/dashboard.html#project=" +
-                    "/gdc/projects/t0uyev2dbuvbdwfdyovzuuosduhyg6dw&dashboard=/gdc/md/t0uyev2dbuvbdwfdyovzuuosduhyg6dw/obj/21284" +
-                    "&tab=a0b4ce17cec4&publicAccessCode=2E2jmianWW27Q1gk";
-                tabs = asList("Executive Overview", "Marketing Contribution", "Sales Forecast", "Create Insights");
-                selectedTab = "Executive Overview";
+                    "/gdc/projects/x7mm4ixhrb9v9wfv1m0gkm27zspgcxid&dashboard=/gdc/md/x7mm4ixhrb9v9wfv1m0gkm27zspgcxid/obj/916" +
+                    "&tab=adzD7xEmdhTx&publicAccessCode=ZkAM4yitTJUGihBfx1e_OsUWC3tV-AAAAAbTLNHbq_fjTGpEN1d2OAZsj9Yw";
                 return;
             default:
                 System.out.println("Test just runs on staging, staging2 and staging3");
