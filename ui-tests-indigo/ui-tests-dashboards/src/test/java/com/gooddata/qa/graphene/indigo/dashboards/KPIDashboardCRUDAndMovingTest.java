@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
@@ -41,6 +42,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.hamcrest.Matchers.containsString;
 
 public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
 
@@ -94,21 +96,6 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
 
         createInsightHasOnlyMetric(thirdInsight, ReportType.TABLE,
             asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP));
-    }
-
-    @Test(dependsOnMethods = "prepareInsights")
-    public void addOneWidgetToEmptyDashboard() {
-        initIndigoDashboardsPage().addDashboard().dragInsightToDashboard(INSIGHT_HAS_SOME_METRICS);
-        assertTrue(indigoDashboardsPage.getMinHeightLayoutPlaceHolder().contains("min-height: 450px"));
-        assertTrue(indigoDashboardsPage.getAttributeClassFluidLayout().contains("s-fluid-layout-column-width-12"));
-        assertEquals(indigoDashboardsPage.getDashboardBodyText(), "Drop insight");
-        new Actions(browser).release().perform();
-
-        initIndigoDashboardsPage().addDashboard().dragAddKpiToDashboard();
-        assertTrue(indigoDashboardsPage.getMinHeightLayoutPlaceHolder().contains("min-height: 300px"));
-        assertTrue(indigoDashboardsPage.getAttributeClassFluidLayout().contains("s-fluid-layout-column-width-2"));
-        assertEquals(indigoDashboardsPage.getDashboardBodyText(), "Drop insight");
-        new Actions(browser).release().perform();
     }
 
     @Test(dependsOnMethods = "prepareInsights")
@@ -218,6 +205,11 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
         initIndigoDashboardsPage().addDashboard();
         IntStream.range(0, 3).forEach(e -> indigoDashboardsPage.addKpiToBeginningOfRow(kpi));
 
+        indigoDashboardsPage.dragInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.TOP);
+        assertThat(indigoDashboardsPage.getDashboardBodyText(), containsString("Drop to create a new section"));
+        new Actions(browser).release().perform();
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_METRICS).clickDeleteButton();
+
         indigoDashboardsPage.addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.TOP)
             .changeDashboardTitle(DASHBOARD_ON_TOP_WITH_NO_SCROLLBAR).saveEditModeWithWidgets();
 
@@ -236,6 +228,11 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
         initIndigoDashboardsPage().addDashboard();
         IntStream.range(0, 3).forEach(e -> indigoDashboardsPage.addKpiToBeginningOfRow(kpi));
 
+        indigoDashboardsPage.dragInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.TOP);
+        assertThat(indigoDashboardsPage.getDashboardBodyText(), containsString("Drop to create a new section"));
+        new Actions(browser).release().perform();
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_METRICS).clickDeleteButton();
+
         indigoDashboardsPage.addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
             .changeDashboardTitle(DASHBOARD_ON_BOTTOM_WITH_NO_SCROLLBAR).saveEditModeWithWidgets();
 
@@ -249,59 +246,76 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
             singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
     }
 
-    @Test(dependsOnMethods = "prepareInsights")
-    public void addWidgetNewRow_BetweenExistingRows_WithNoScrollBar() throws IOException {
-        initIndigoDashboardsPage().addDashboard();
-        IntStream.range(0, 3).forEach(e -> indigoDashboardsPage.addKpiToBeginningOfRow(kpi));
+     @Test(dependsOnMethods = "prepareInsights")
+     public void addWidgetNewRow_BetweenExistingRows_WithNoScrollBar() throws IOException {
+         initIndigoDashboardsPage().addDashboard();
+         IntStream.range(0, 3).forEach(e -> indigoDashboardsPage.addKpiToBeginningOfRow(kpi));
 
-        indigoDashboardsPage.addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
-            .addInsightToCreateANewRow(firstInsight, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
-            .changeDashboardTitle(DASHBOARD_BETWEEN_WITH_NO_SCROLLBAR).saveEditModeWithWidgets();
+         indigoDashboardsPage.dragInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM);
+         assertThat(indigoDashboardsPage.getDashboardBodyText(), containsString("Drop to create a new section"));
+         new Actions(browser).release().perform();
+         indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_METRICS).clickDeleteButton();
 
-        assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
-            asList(METRIC_AMOUNT, METRIC_AMOUNT, METRIC_AMOUNT), singletonList(firstInsight),
-            singletonList(INSIGHT_HAS_SOME_METRICS)));
+         indigoDashboardsPage.addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
+             .addInsightToCreateANewRow(firstInsight, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
+             .changeDashboardTitle(DASHBOARD_BETWEEN_WITH_NO_SCROLLBAR).saveEditModeWithWidgets();
 
-        String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_BETWEEN_WITH_NO_SCROLLBAR);
+         assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
+             asList(METRIC_AMOUNT, METRIC_AMOUNT, METRIC_AMOUNT), singletonList(firstInsight),
+             singletonList(INSIGHT_HAS_SOME_METRICS)));
 
-        assertEquals(getListWidthAndUriMetadata(indigoDashboardUri), asList(
-            asList(Pair.of(METRIC_AMOUNT, "2"), Pair.of(METRIC_AMOUNT, "2"), Pair.of(METRIC_AMOUNT, "2")),
-            singletonList(Pair.of(firstInsight, "12")),
-            singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
-    }
+         String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_BETWEEN_WITH_NO_SCROLLBAR);
+
+         assertEquals(getListWidthAndUriMetadata(indigoDashboardUri), asList(
+             asList(Pair.of(METRIC_AMOUNT, "2"), Pair.of(METRIC_AMOUNT, "2"), Pair.of(METRIC_AMOUNT, "2")),
+             singletonList(Pair.of(firstInsight, "12")),
+             singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
+     }
 
     @Test(dependsOnMethods = "prepareInsights")
     public void addWidgetIntoSameRowAtFirstPosition() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addKpiToBeginningOfRow(kpi)
-            .addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
-            .addInsightToCreateSameRow(firstInsight, METRIC_AMOUNT, Widget.DropZone.PREV)
-            .changeDashboardTitle(DASHBOARD_TEST_FIRST_POSITION).saveEditModeWithWidgets();
+         initIndigoDashboardsPage().addDashboard().addKpiToBeginningOfRow(kpi)
+             .dragInsightToCreateSameRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.DropZone.PREV);
+         assertThat(indigoDashboardsPage.getDashboardBodyText(), containsString("Drop here"));
+         new Actions(browser).release().perform();
+         indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_METRICS).clickDeleteButton();
 
-        assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
+         indigoDashboardsPage
+             .addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
+             .addInsightToCreateSameRow(firstInsight, METRIC_AMOUNT, Widget.DropZone.PREV)
+             .changeDashboardTitle(DASHBOARD_TEST_FIRST_POSITION).saveEditModeWithWidgets();
+
+         assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
             asList(firstInsight, METRIC_AMOUNT), singletonList(INSIGHT_HAS_SOME_METRICS)));
 
-        String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_TEST_FIRST_POSITION);
+         String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_TEST_FIRST_POSITION);
 
-        assertEquals(getListWidthAndUriMetadata(indigoDashboardUri),
-            asList(asList(Pair.of(firstInsight, "12"), Pair.of(METRIC_AMOUNT, "2")),
-                singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
+         assertEquals(getListWidthAndUriMetadata(indigoDashboardUri),
+             asList(asList(Pair.of(firstInsight, "12"), Pair.of(METRIC_AMOUNT, "2")),
+                 singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
     }
 
     @Test(dependsOnMethods = "prepareInsights")
     public void addWidgetIntoSameRowAtLastPosition() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addKpiToBeginningOfRow(kpi)
-            .addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
-            .addInsightToCreateSameRow(firstInsight, METRIC_AMOUNT, Widget.DropZone.NEXT)
-            .changeDashboardTitle(DASHBOARD_TEST_LAST_POSITION).saveEditModeWithWidgets();
+     initIndigoDashboardsPage().addDashboard().addKpiToBeginningOfRow(kpi)
+         .dragInsightToCreateSameRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.DropZone.NEXT);
+     assertThat(indigoDashboardsPage.getDashboardBodyText(), containsString("Drop to the existing section"));
+     new Actions(browser).release().perform();
+     indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_METRICS).clickDeleteButton();
 
-        assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
-            asList(METRIC_AMOUNT, firstInsight), singletonList(INSIGHT_HAS_SOME_METRICS)));
+     indigoDashboardsPage
+         .addInsightToCreateANewRow(INSIGHT_HAS_SOME_METRICS, METRIC_AMOUNT, Widget.FluidLayoutPosition.BOTTOM)
+         .addInsightToCreateSameRow(firstInsight, METRIC_AMOUNT, Widget.DropZone.NEXT)
+         .changeDashboardTitle(DASHBOARD_TEST_LAST_POSITION).saveEditModeWithWidgets();
 
-        String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_TEST_LAST_POSITION);
+     assertEquals(indigoDashboardsPage.getHeaderWidgetFluidLayout(), asList(
+         asList(METRIC_AMOUNT, firstInsight), singletonList(INSIGHT_HAS_SOME_METRICS)));
 
-        assertEquals(getListWidthAndUriMetadata(indigoDashboardUri),
-            asList(asList(Pair.of(METRIC_AMOUNT, "2"), Pair.of(firstInsight, "12")),
-                singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
+     String indigoDashboardUri = indigoRestRequest.getAnalyticalDashboardUri(DASHBOARD_TEST_LAST_POSITION);
+
+     assertEquals(getListWidthAndUriMetadata(indigoDashboardUri),
+         asList(asList(Pair.of(METRIC_AMOUNT, "2"), Pair.of(firstInsight, "12")),
+             singletonList(Pair.of(INSIGHT_HAS_SOME_METRICS, "12"))));
     }
 
     @Test(dependsOnMethods = "prepareInsights")
