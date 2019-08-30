@@ -100,6 +100,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
+    private String dashboardTitle = "Dashboard Scheduled Email";
 
     private DashboardRestRequest dashboardRequest;
     private UserManagementRestRequest userManagementRestRequest;
@@ -126,6 +127,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         messages.put(filteredVariableReportTitle += identification, emptyMessage);
         messages.put(numericVariableReportTitle += identification, emptyMessage);
         messages.put(mufReportTitle += identification, emptyMessage);
+        dashboardTitle = dashboardTitle + identification;
     }
 
     @Override
@@ -149,7 +151,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         logout();
         signInAtGreyPages(imapUser, imapPassword);
     }
-
     /**
      * Automate testscase for Jira ticket CL-12102
      * testcase is "disable a user which is the only one used in schedule email, then try to save the schedule email
@@ -204,6 +205,40 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         } finally {
             waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboard);
             userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
+        }
+    }
+
+    @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
+    public void verifyAuthorEmailWhenDeletedUserOnGlobalScheduledEmails() throws ParseException, JSONException, MessagingException, IOException {
+        String userA = createDynamicUserFrom(testParams.getUser());
+        String userB = createDynamicUserFrom(imapUser);
+        try {
+            addUserToProject(userA, UserRoles.ADMIN);
+            addUserToProject(userB, UserRoles.EDITOR);
+
+            logout();
+            signInAtGreyPages(userA, testParams.getPassword());
+
+            EmailSchedulePage emailSchedulePage = initEmailSchedulesPage();
+            emailSchedulePage.scheduleNewDashboardEmail(asList(userB), dashboardTitle,
+                    "Global Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
+            assertEquals(emailSchedulePage.openSchedule(dashboardTitle).getEmailToListItem(), asList(userB));
+
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userA);
+
+            logout();
+            signInAtGreyPages(userB, testParams.getPassword());
+            assertEquals(initEmailSchedulesPage().openSchedule(dashboardTitle).getEmailToListItem(), asList(userB));
+
+            checkMailBoxDashboardExport(imapUser, imapPassword);
+
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboardTitle);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userB);
+            logout();
+            signInAtGreyPages(imapUser, imapPassword);
         }
     }
 
@@ -619,6 +654,25 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         public MessageContent setBody(String body) {
             this.body = body;
             return this;
+        }
+    }
+
+    private void checkMailBoxDashboardExport(String userName, String password) throws MessagingException, IOException {
+        ScheduleEmailRestRequest scheduleEmailRestRequest = initScheduleEmailRestRequest();
+        try (ImapClient imapClient = new ImapClient(imapHost, userName, password)) {
+            System.out.println("ACCELERATE scheduled mails processing");
+            scheduleEmailRestRequest.accelerate();
+            List<Message> dashboardMessages = waitForMessages(imapClient, GDEmails.NOREPLY, dashboardTitle, 1);
+            System.out.println("Saving dashboard message ...");
+            ImapUtils.saveMessageAttachments(dashboardMessages.get(0), attachmentsDirectory);
+            // DASHBOARD EXPORT
+            List<Part> dashboardAttachmentParts = ImapUtils.getAttachmentParts(dashboardMessages.get(0));
+            assertEquals(dashboardAttachmentParts.size(), 1, "Dashboard message has correct number of attachments.");
+            assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
+                    "Dashboard attachment has PDF content type.");
+        } finally {
+            System.out.println("DECELERATE scheduled mails processing");
+            scheduleEmailRestRequest.decelerate();
         }
     }
 }
