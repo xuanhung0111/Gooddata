@@ -1,7 +1,7 @@
 package com.gooddata.qa.utils.snowflake;
 
 public class SnowflakeTableUtils {
-
+    // Dataset names in GD workspace
     public static final String PK_CUSKEY = "custkey";
     public static final String PK_CUSKEY_LABEL = "custkeylabel";
     public static final String PK_CUSKEY_LINK = "custkeylink";
@@ -26,6 +26,7 @@ public class SnowflakeTableUtils {
     public static final String DATASET_CUSTOMERS_TIMESTAMP_DELETED = "customers8";
     public static final String OPTIONAL_PREFIX = "PRE_";
     public static final String DELETED_PREFIX = "DELETED_";
+    // ADS Table names
     public static final String TABLE_CUSTOMERS = OPTIONAL_PREFIX + "CUSTOMERS";
     public static final String TABLE_CUSTOMERS_MUlTILABELS_NORMAL = OPTIONAL_PREFIX + "CUSTOMERSMULTINORMAL";
     public static final String TABLE_CUSTOMERS_MUlTILABELS_HASDEFAULT = OPTIONAL_PREFIX + "CUSTOMERSMULTIDEFAULT";
@@ -41,6 +42,7 @@ public class SnowflakeTableUtils {
     public static final String DELETED_TABLE_CUSTOMERS_TIMESTAMP_CLIENTID = OPTIONAL_PREFIX + DELETED_PREFIX + "CUSTOMERS6";
     public static final String DELETED_TABLE_CUSTOMERS_DELETED_CLIENTID = OPTIONAL_PREFIX + DELETED_PREFIX + "CUSTOMERS7";
     public static final String DELETED_TABLE_CUSTOMERS_TIMESTAMP_DELETED = OPTIONAL_PREFIX + DELETED_PREFIX + "CUSTOMERS8";
+    // Column names in ADS Tables
     public static final String PKCOLUMN_CUSKEY = "CP__CUSTKEY";
     public static final String GRAINCOLUMN_CUSKEY = "A__CUSTKEYGRAIN";
     public static final String GRAINCOLUMN_SECOND_CUSKEY = "A__CUSTKEYGRAIN2";
@@ -51,10 +53,38 @@ public class SnowflakeTableUtils {
     public static final String COLUMN_X_TIMESTAMP = "X__TIMESTAMP";
     public static final String COLUMN_X_DELETED = "X__DELETED";
     public static final String COLUMN_X_CLIENT_ID = "X__CLIENT_ID";
+    // Datatypes of ADS Column
     public static final String VARCHAR_TYPE = "varchar";
     public static final String NUMERIC_TYPE = "NUMERIC(12,2)";
     public static final String TIMESTAMP_TYPE = "TIMESTAMP";
     public static final String BOOLEAN_TYPE = "BOOLEAN";
     public static final String PRIMARY_KEY = "PRIMARY KEY";
     public static final int LIMIT_RECORDS = 100;
+    // Dataset names in GD workspace for Custom discriminator testing
+    public static final String DATASET_MAPPING_PROJECT_ID_NO_CLIENT_ID_COLUMN = "customersmappingprojectid";
+    public static final String DATASET_MAPPING_CLIENT_ID_NO_CLIENT_ID_COLUMN = "customersmappingclientid";
+    public static final String DATASET_MAPPING_BOTH_NO_CLIENT_ID_COLUMN = "customersmappingboth";
+    public static final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN = "customersmappingprojectid2";
+    public static final String DATASET_MAPPING_CLIENT_ID_HAS_CLIENT_ID_COLUMN = "customersmappingclientid2";
+    public static final String DATASET_MAPPING_BOTH_HAS_CLIENT_ID_COLUMN = "customersmappingboth2";
+    // ADS Table names for Custom discriminator testing
+    public static final String TABLE_MAPPING_PROJECT_ID_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGPROJECTID";
+    public static final String TABLE_MAPPING_CLIENT_ID_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGCLIENTID";
+    public static final String TABLE_MAPPING_BOTH_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGBOTH";
+    public static final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGPROJECTID2";
+    public static final String TABLE_MAPPING_CLIENT_ID_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGCLIENTID2";
+    public static final String TABLE_MAPPING_BOTH_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + "CUSTOMERSMAPPINGBOTH2";
+    public static final String TABLE_DELETE_MAPPING_PROJECT_ID_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGPROJECTID";
+    public static final String TABLE_DELETE_MAPPING_CLIENT_ID_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGCLIENTID";
+    public static final String TABLE_DELETE_MAPPING_BOTH_NO_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGBOTH";
+    public static final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGPROJECTID2";
+    public static final String TABLE_DELETE_MAPPING_CLIENT_ID_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGCLIENTID2";
+    public static final String TABLE_DELETE_MAPPING_BOTH_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
+            + "CUSTOMERSMAPPINGBOTH2";
+
 }

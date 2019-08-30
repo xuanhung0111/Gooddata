@@ -1,6 +1,8 @@
 package com.gooddata.qa.utils.snowflake;
 
 import static org.apache.commons.lang.Validate.notNull;
+
+import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
@@ -38,7 +40,18 @@ public class ProcessUtils {
         return restClient.getProcessService().executeProcess(
                 new ProcessExecution(dataloadProcess, executable, params.getParameters(), params.getSecureParameters())).get();
     }
-    
+
+    public String executeError(final Parameters params) {
+        try {
+            notNull(params, "Parameter cannot be null");
+            return restClient.getProcessService().executeProcess(
+                    new ProcessExecution(dataloadProcess, executable, params.getParameters(), params.getSecureParameters()))
+                    .get().getUri();
+        } catch (GoodDataException e) {
+            return e.getCause().getMessage();
+        }
+    }
+
     public JSONObject setModeDefaultDataset(String dataset) {
         Pair<String, String> datasetPair = Pair.of("dataset", "dataset." + dataset);
         Pair<String, String> uploadMode = Pair.of("uploadMode", "DEFAULT");

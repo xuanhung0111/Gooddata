@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.snowflake.SegmentDeleteTableForceLoadTest;
 import com.gooddata.qa.graphene.snowflake.SegmentDeleteTableLoadTest;
 import com.gooddata.qa.graphene.snowflake.SegmentForceLoadTest;
 import com.gooddata.qa.graphene.snowflake.SegmentLoadTest;
+import com.gooddata.qa.graphene.snowflake.CustomCurrentLoadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -27,7 +28,8 @@ public class UITestsRegistry {
                 SegmentDeleteColumnForceLoadTest.class,
                 SegmentDeleteColumnLoadTest.class,
                 SegmentDeleteTableForceLoadTest.class,
-                SegmentDeleteTableLoadTest.class
+                SegmentDeleteTableLoadTest.class,
+                CustomCurrentLoadTest.class
         });
 
         TestsRegistry.getInstance()
