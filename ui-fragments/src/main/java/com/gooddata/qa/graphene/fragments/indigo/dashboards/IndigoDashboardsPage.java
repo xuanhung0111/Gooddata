@@ -25,6 +25,7 @@ import static org.openqa.selenium.By.id;
 import static java.util.Collections.EMPTY_LIST;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
@@ -45,6 +46,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
@@ -85,7 +87,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = ATTRIBUTE_FITERS_PANEL_CLASS_NAME)
     private AttributeFiltersPanel attributeFiltersPanel;
 
-    @FindBy(className = "dash-title")
+    @FindBy(className = DASHBOARD_TITLE_CLASS_NAME)
     private WebElement dashboardTitle;
 
     @FindBy(className = "gd-button-text")
@@ -124,6 +126,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
     private static final String FLUID_LAYOUT_ROWS_CSS = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
     private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-all";
+    private static final String FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME = "gd-fluidlayout-width-resizer";
+    private static final String HOTSPOT_WIDTH_RESIZER_CLASS_NAME = "dash-width-resizer-hotspot";
+    private static final String RESIZE_BULLET_CSS = ".s-resize-bullet-%s";
+    private static final String DASHBOARD_TITLE_CLASS_NAME = "dash-title";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
@@ -181,6 +187,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public boolean isAddDashboardVisible() {
         return isElementVisible(By.className("navigation-add-dashboard"), browser);
+    }
+
+    public boolean isWidthResizerColorVisible() {
+        return waitForElementVisible(By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME), browser)
+            .getCssValue("background-color").equals("rgba(20, 178, 226, 0.15)");
+    }
+
+    public int getSizeWidthResizer() {
+        return getRoot().findElements(By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME)).size();
     }
 
     public SplashScreen getSplashScreen() {
@@ -605,7 +620,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this.addInsight(insight, DropZone.NEXT);
     }
 
-    private IndigoDashboardsPage addInsight(final String insight, DropZone dropZoneType) {
+    public IndigoDashboardsPage addInsight(final String insight, DropZone dropZoneType) {
         dragAndDropWithCustomBackend(browser,
                 convertCSSClassTojQuerySelector(
                         getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
@@ -687,6 +702,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
             .collect(toList());
     }
 
+    public WebElement getWidgetFluidLayout(String columnTitle) {
+        return getWidgetFluidLayout(columnTitle, 0);
+    }
+
     public WebElement getWidgetFluidLayout(String columnTitle, int cellIndex) {
         List<WebElement> fluidLayoutRows = getRoot().findElements(By.cssSelector(FLUID_LAYOUT_ROWS_CSS));
 
@@ -712,6 +731,50 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public String getAttributeClassFluidLayout() {
         return getElementFluidLayoutPlaceHolder().findElement(
             By.xpath("//ancestor::div[contains(@class,'s-fluid-layout-column')]")).getAttribute("class");
+    }
+
+    public void hoverOnResizerWidget() {
+        getActions().moveToElement(waitForElementVisible(By.className(HOTSPOT_WIDTH_RESIZER_CLASS_NAME), getRoot()))
+            .moveByOffset(1, 1).perform();
+    }
+
+    public IndigoDashboardsPage resizeWidthOfWidget(ResizeBullet resizeBullet) {
+        String resizeBulletCss = String.format(RESIZE_BULLET_CSS, resizeBullet.getNumber());
+        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
+            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        return this;
+    }
+
+    public IndigoDashboardsPage resizeMinimumWidget() {
+        String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 1);
+
+        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
+            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        return this;
+    }
+
+    public IndigoDashboardsPage dragToResizeMinimumWidget() {
+        String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 1);
+
+        tryToDragWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
+            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        return this;
+    }
+
+    public IndigoDashboardsPage resizeMaximumWidget() {
+        String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 12);
+
+        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
+            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        return this;
+    }
+
+    public IndigoDashboardsPage dragToResizeMaximumWidget() {
+        String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 12);
+
+        tryToDragWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
+            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        return this;
     }
 
     private MobileKpiDashboardSelection getMobileKpiDashboardSelection() {

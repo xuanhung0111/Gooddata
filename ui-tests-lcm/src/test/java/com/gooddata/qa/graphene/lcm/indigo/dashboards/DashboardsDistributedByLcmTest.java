@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket.Type;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -26,6 +27,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableRepor
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.utils.XlsxUtils;
@@ -219,7 +221,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertThat("Admin should be able to edit dashboard", indigoDashboardsPage.isEditButtonVisible());
         indigoDashboardsPage.switchToEditMode();
         indigoDashboardsPage.getInsightSelectionPanel().switchFilter(FilterType.ALL);
-        indigoDashboardsPage.addInsight(SECOND_TEST_INSIGHT).waitForWidgetsLoading();
+        indigoDashboardsPage.addInsightToCreateANewRow(SECOND_TEST_INSIGHT, FIRST_TEST_INSIGHT,
+            Widget.FluidLayoutPosition.BOTTOM).waitForWidgetsLoading();
         assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getHeadline(), SECOND_TEST_INSIGHT);
     }
 
@@ -441,6 +444,17 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         assertEquals(chartReport.getTrackersCount(),4);
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList("Activity Type", "Email"), asList("# of Activities", "33,920")));
+    }
+
+
+    @Test (dependsOnMethods = "testSyncLockedFlag")
+    public void testResizeInsightOnDashBoard(){
+        initIndigoDashboardsPage().addDashboard().addInsight(COMBO_CHART_INSIGHT).selectWidgetByHeadline(Insight.class,
+            COMBO_CHART_INSIGHT);
+        indigoDashboardsPage.resizeWidthOfWidget(ResizeBullet.TEN).saveEditModeWithWidgets();
+        assertTrue(indigoDashboardsPage.getWidgetFluidLayout(COMBO_CHART_INSIGHT)
+                .getAttribute("class").contains("s-fluid-layout-column-width-" + ResizeBullet.TEN.getNumber()),
+            "The width widget should be resized");
     }
 
     @AfterClass(alwaysRun = true)
