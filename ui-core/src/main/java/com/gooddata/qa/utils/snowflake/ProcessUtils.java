@@ -1,7 +1,6 @@
 package com.gooddata.qa.utils.snowflake;
 
 import static org.apache.commons.lang.Validate.notNull;
-
 import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
@@ -49,6 +48,17 @@ public class ProcessUtils {
                     .get().getUri();
         } catch (GoodDataException e) {
             return e.getCause().getMessage();
+        }
+    }
+
+    public String executeWarning(final Parameters params) {
+        try {
+            notNull(params, "Parameter cannot be null");
+            return restClient.getProcessService().executeProcess(
+                    new ProcessExecution(dataloadProcess, executable, params.getParameters(), params.getSecureParameters()))
+                    .get().getLogUri();
+        } catch (GoodDataException e) {
+            return e.getMessage();
         }
     }
 
