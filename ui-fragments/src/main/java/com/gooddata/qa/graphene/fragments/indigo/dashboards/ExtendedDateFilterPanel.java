@@ -46,7 +46,7 @@ public class ExtendedDateFilterPanel extends AbstractFragment {
     @FindBy(className = "s-apply")
     private WebElement applyButton;
 
-    @FindBy(css = ".gd-extended-date-filter-body-scrollable button")
+    @FindBy(css = ".gd-extended-date-filter-body button")
     private List<WebElement> filters;
 
     @FindBy(className = "gd-filter-list-item-selected")

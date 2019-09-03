@@ -39,11 +39,14 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAddingInsightsToDashboard() throws JSONException, IOException {
-        indigoRestRequest.createAnalyticalDashboard(asList(
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(
                 createBlankInsightWrapUsingRest(FIRST_INSIGHT),
                 createBlankInsightWrapUsingRest(SECOND_INSIGHT),
                 createBlankInsightWrapUsingRest(THIRD_INSIGHT)
         ));
+        indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 2);
+        indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 1, 2);
+        indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 2, 2);
 
         initIndigoDashboardsPageWithWidgets();
         checkInsightOrder(FIRST_INSIGHT, SECOND_INSIGHT, THIRD_INSIGHT, "Adding-Insight-To-Dashboard");

@@ -51,8 +51,7 @@ public class KpiPopTest extends AbstractDashboardTest {
         // When project is created by REST API (and not using SplashScreen)
         // "All time" is the initial filter --> switch to "This month"
         indigoDashboardsPage
-                .getDateFilter()
-                .selectByName(DATE_FILTER_THIS_MONTH);
+                .openExtendedDateFilterPanel().selectPeriod(DateRange.THIS_MONTH).apply();
 
         takeScreenshot(browser, "checkKpiPopInMobile-thisMonth", getClass());
 
