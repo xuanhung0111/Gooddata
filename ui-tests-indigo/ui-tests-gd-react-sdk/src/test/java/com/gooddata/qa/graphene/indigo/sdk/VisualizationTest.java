@@ -69,9 +69,9 @@ public class VisualizationTest extends AbstractReactSdkTest {
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
         assertEquals(sdkAnalysisPage.getHeadline().getPrimaryItem(), "154,271");
@@ -96,9 +96,9 @@ public class VisualizationTest extends AbstractReactSdkTest {
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
         assertEquals(sdkAnalysisPage.getHeadline().getPrimaryItem(), "154,271");
