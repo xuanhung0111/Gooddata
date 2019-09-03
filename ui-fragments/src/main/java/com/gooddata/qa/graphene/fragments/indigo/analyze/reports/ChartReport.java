@@ -215,6 +215,21 @@ public class ChartReport extends AbstractFragment {
         displayTooltipOnTrackerByIndex(groupIndex, index);
         return getTooltipText();
     }
+    /*These methods will remove when SDK update version********START*************/
+
+    public List<List<String>> getTooltipTextOnTrackerByIndexForSDK(int groupIndex, int index) {
+        displayTooltipOnTrackerByIndex(groupIndex, index);
+        return getTooltipTextForSDK();
+    }
+
+    private List<List<String>> getTooltipTextForSDK() {
+        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector("tr"))).stream()
+                .map(row -> asList(row.findElement(cssSelector(".title")).getText(),
+                        row.findElement(cssSelector(".value")).getText()))
+                .collect(Collectors.toList());
+    }
+
+    /*These methods will remove when SDK update version********END**************/
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
