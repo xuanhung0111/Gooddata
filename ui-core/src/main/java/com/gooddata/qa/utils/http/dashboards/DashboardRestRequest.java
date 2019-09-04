@@ -330,7 +330,7 @@ public class DashboardRestRequest extends CommonRestRequest {
      * @param dashboardID
      */
     public void setDrillReportTargetAsPopup(final String dashboardID) throws IOException {
-        setDrillReportTarget(dashboardID, TARGET_POPUP, null);
+        setDrillReportTarget(dashboardID, TARGET_POPUP, null, null, null);
     }
 
     /**
@@ -339,8 +339,8 @@ public class DashboardRestRequest extends CommonRestRequest {
      * @param dashboardID
      * @param exportFormat
      */
-    public void setDrillReportTargetAsExport(String dashboardID, String exportFormat) throws IOException {
-        setDrillReportTarget(dashboardID, TARGET_EXPORT, exportFormat);
+    public void setDrillReportTargetAsExport(String dashboardID, String exportFormat, String mergeHeaders, String includeFilterContext) throws IOException {
+        setDrillReportTarget(dashboardID, TARGET_EXPORT, exportFormat, mergeHeaders, includeFilterContext);
     }
 
     /**
@@ -436,9 +436,22 @@ public class DashboardRestRequest extends CommonRestRequest {
         executeRequest(initPutRequest(uri, json.toString()), HttpStatus.OK);
     }
 
-    private void setDrillReportTarget(final String dashboardID, final String target, final String exportFormat)
+    private void setDrillReportTarget(final String dashboardID, final String target, final String exportFormat,
+    final String mergeHeaders, final String includeFilterContext)
             throws IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectId, dashboardID);
+        final JSONObject exportJson = new JSONObject();
+        exportJson.put("format", exportFormat);
+        if(mergeHeaders != null || includeFilterContext != null){
+            exportJson.put("options", new JSONObject() {{
+                    if(mergeHeaders != null) {
+                        put("mergeHeaders", mergeHeaders);
+                    }
+                    if (includeFilterContext != null) {
+                        put("includeFilterContext", includeFilterContext);
+                    }
+                }});
+        }
         final JSONObject json = getJsonObject(initGetRequest(dashboardEditModeURI));
 
         final JSONObject drills = json.getJSONObject("projectDashboard")
@@ -455,9 +468,7 @@ public class DashboardRestRequest extends CommonRestRequest {
         if (TARGET_POPUP.equals(target)) {
             drills.remove("export");
         } else if (TARGET_EXPORT.equals(target)) {
-            drills.put("export", new JSONObject() {{
-                put("format", exportFormat);
-            }});
+            drills.put("export", exportJson );
         }
 
         executeRequest(initPostRequest(dashboardEditModeURI, json.toString()), HttpStatus.OK);

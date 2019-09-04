@@ -69,6 +69,8 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     private static final String REPORT_NO_DATA_MESSAGE = "No data match the filtering criteria";
     private static final String RAW_FORMAT = "raw";
     private static final String DRILL_DOWN_VALUE = "2,647";
+    private static final String NO = "no";
+    private static final String YES = "yes";
 
     private DashboardRestRequest dashboardRequest;
 
@@ -135,17 +137,20 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     @DataProvider(name = "exportFormatDataProvider")
     public Object[][] exportFormatDataProvider() {
         return new Object[][] {
-            {ExportFormat.CSV},
-            {ExportFormat.EXCEL_XLSX}
+            {ExportFormat.CSV, NO, NO},
+            {ExportFormat.EXCEL_XLSX, NO, NO},
+            {ExportFormat.EXCEL_XLSX, YES, NO},
+            {ExportFormat.EXCEL_XLSX, NO, YES},
+            {ExportFormat.EXCEL_XLSX, YES, YES}
         };
     }
 
     @Test(dependsOnMethods = { "testCreatingLargeReport" }, dataProvider = "exportFormatDataProvider")
-    public void testRedBarVisibleForExportLargeReport(ExportFormat format) throws JSONException, IOException {
+    public void testRedBarVisibleForExportLargeReport(ExportFormat format, String mergeHeaders, String includeFilterContext) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Large-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, TOO_LARGE_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(format.getName(), mergeHeaders, includeFilterContext);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRebBarVisible();
         } finally {
@@ -154,11 +159,11 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = { "testCreatingIncomputableReport" }, dataProvider = "exportFormatDataProvider")
-    public void testRedBarVisibleForExportIncomputableReport(ExportFormat format) throws JSONException, IOException {
+    public void testRedBarVisibleForExportIncomputableReport(ExportFormat format, String mergeHeaders, String includeFilterContext) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Incomputable-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, INCOMPUTABLE_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(format.getName(), mergeHeaders, includeFilterContext);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRebBarVisible();
         } finally {
@@ -167,11 +172,11 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = { "testCreatingEmptyReport" }, dataProvider = "exportFormatDataProvider")
-    public void testRedBarNotVisibleForExportEmptyReport(ExportFormat format) throws JSONException, IOException {
+    public void testRedBarNotVisibleForExportEmptyReport(ExportFormat format, String mergeHeaders, String includeFilterContext) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Empty-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, EMPTY_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(format.getName(), mergeHeaders, includeFilterContext);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRedBar(browser);
         } finally {
@@ -188,7 +193,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createSimpleReport(drillDownReport, METRIC_NUMBER_OF_WON_OPPS, ATTR_REGION);
         createDashboardForExportTest(dashboard, report, METRIC_NUMBER_OF_ACTIVITIES, drillDownReport);
         try {
-            setDrillReportTargetAsExport(RAW_FORMAT);
+            setDrillReportTargetAsExport(RAW_FORMAT, "yes", "yes");
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "Email.csv");
             waitForExporting(exportFile);
@@ -207,7 +212,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createSimpleReport(report, METRIC_PRODUCTIVE_REPS, ATTR_PRODUCT);
         createDashboardForExportTest(dashboard, report, METRIC_PRODUCTIVE_REPS, TOO_LARGE_REPORT);
         try {
-            setDrillReportTargetAsExport(RAW_FORMAT);
+            setDrillReportTargetAsExport(RAW_FORMAT, "yes", "yes");
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "CompuSci.csv");
             waitForExporting(exportFile);
@@ -237,7 +242,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
                 .addReportToDashboard(report);
         dashboardsPage.getContent()
                 .getLatestReport(TableReport.class)
-        //wait for report loading finish before adding drilling. Otherwise, the select item popup panel on 
+        //wait for report loading finish before adding drilling. Otherwise, the select item popup panel on
         //drilling setting is disappeared when report finishes loading (might be due to lost focus)
                 .waitForLoaded()
                 .addDrilling(Pair.of(singletonList(drillDownValue), drillDownReport), "Reports");
@@ -254,9 +259,9 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    private void setDrillReportTargetAsExport(final String format) throws JSONException, IOException {
+    private void setDrillReportTargetAsExport(final String format, String mergeHeaders, String includeFilterContext) throws JSONException, IOException {
         final String workingDashboard = dashboardsPage.getDashboardName();
-        dashboardRequest.setDrillReportTargetAsExport(UrlParserUtils.getObjId(browser.getCurrentUrl()), format);
+        dashboardRequest.setDrillReportTargetAsExport(UrlParserUtils.getObjId(browser.getCurrentUrl()), format, mergeHeaders, includeFilterContext);
         //refresh to make sure drill settings are applied
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
