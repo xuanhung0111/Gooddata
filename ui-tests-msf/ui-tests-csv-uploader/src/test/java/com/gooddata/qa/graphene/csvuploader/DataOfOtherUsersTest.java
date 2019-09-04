@@ -16,11 +16,13 @@ import java.util.List;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
@@ -31,6 +33,15 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
     private String newAdminUser;
 
+    @Override
+    public void createProject() throws Throwable {
+        super.createProject();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1550 enableCatalogGrouping FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CATALOG_GROUPING, false);
+    }
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {

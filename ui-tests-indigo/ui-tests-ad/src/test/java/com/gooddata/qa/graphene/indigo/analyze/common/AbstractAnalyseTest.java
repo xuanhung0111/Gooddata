@@ -2,7 +2,11 @@ package com.gooddata.qa.graphene.indigo.analyze.common;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -22,6 +26,16 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
     @Override
     public void initProperties() {
         super.initProperties(); // GS fixture is used by default
+    }
+
+    @Override
+    public void createProject() throws Throwable {
+        super.createProject();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1550 enableCatalogGrouping FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CATALOG_GROUPING, false);
     }
 
     protected void checkingOpenAsReport(String screenShot) {
