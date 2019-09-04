@@ -24,6 +24,8 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,6 +36,7 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 
@@ -54,6 +57,16 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
     protected void initProperties() {
         super.initProperties(); // use GoodSales by default
         validateAfterClass = false;
+    }
+
+    @Override
+    public void createProject() throws Throwable {
+        super.createProject();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        // TODO: BB-1550 enableCatalogGrouping FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CATALOG_GROUPING, false);
     }
 
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
