@@ -11,7 +11,9 @@ import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
@@ -31,6 +33,7 @@ import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
@@ -48,11 +51,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.MIDDLE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
@@ -62,6 +67,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
 
@@ -409,6 +416,69 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
                     exportedDashboardName));
+        }
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void cannotExportBlankEmbeddedDashboard() {
+        dashboardTitle = generateDashboardName();
+        embeddedUri = initDashboardsPage().addNewDashboard(dashboardTitle).openEmbedDashboardDialog().getPreviewURI();
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
+        embeddedDashboard.openEditExportEmbedMenu();
+        assertFalse(embeddedDashboard.isSettingExportToPdfButtonVisible(),
+            "Dashboard setting export to pdf should be disabled");
+        assertFalse(embeddedDashboard.isSettingExportToXLSXButtonVisible(),
+            "Dashboard setting export to XLSX should be disabled");
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void exportBlankDashboard() {
+        initDashboardsPage().addNewDashboard("Empty Dashboard");
+
+        assertTrue(dashboardsPage.isPrintButtonDisabled(),
+            "Dashboard setting Print button should be disabled");
+        dashboardsPage.openEditExportEmbedMenu();
+        assertFalse(dashboardsPage.isSettingExportToPdfButtonVisible(),
+            "Dashboard setting export to pdf should be disabled");
+        assertFalse(dashboardsPage.isSettingExportToXLSXButtonVisible(),
+            "Dashboard setting export to XLSX should be disabled");
+
+        dashboardsPage.getDashboardsNames().stream().forEach(name -> tryDeleteDashboard(name));
+
+        assertTrue(dashboardsPage.isPrintButtonDisabled(),
+            "Dashboard setting Print button should be disabled");
+
+        dashboardsPage.openEditExportEmbedMenu();
+        assertFalse(dashboardsPage.isSettingExportToPdfButtonVisible(),
+            "Dashboard setting export to pdf should be disabled");
+        assertFalse(dashboardsPage.isSettingExportToXLSXButtonVisible(),
+            "Dashboard setting export to XLSX should be disabled");
+
+        initDashboardsPage().addNewDashboard("Dashboard has objects exclude report");
+        dashboardsPage.editDashboard().addAttributeFilterToDashboard(
+            DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT).saveDashboard();
+
+        dashboardsPage.openEditExportEmbedMenu();
+        assertFalse(dashboardsPage.isSettingExportToXLSXButtonVisible(),
+            "Dashboard setting export to XLSX should be disabled");
+
+        dashboardsPage.closeEditExportEmbedMenu();
+        dashboardsPage.exportDashboardTabToPDF();
+        List<String> contents = asList(getContentFrom(FIRST_TAB).split("\n"));
+        Screenshots.takeScreenshot(browser, "Dashboard_has_objects_exclude_report", getClass());
+        today = DateRange.getCurrentDate();
+        assertEquals(contents, asList("DEPARTMENT" , "All", FIRST_TAB + " " + today, "Page 1/1"));
+        takeScreenshot(browser, "Export_Blank_Dashboard", getClass());
+    }
+
+    private void tryDeleteDashboard(String name) {
+        try {
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(name);
+            dashboardsPage.deleteDashboard();
+        } catch (AssertionError e) {
+            // sometime we get RED BAR: Dashboard no longer exists
+            // in this case, we also want to delete this dashboard so ignore this issue
         }
     }
 
