@@ -231,6 +231,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             signInAtGreyPages(userB, testParams.getPassword());
             assertEquals(initEmailSchedulesPage().openSchedule(dashboardTitle).getEmailToListItem(), asList(userB));
 
+            initEmailSchedulesPage();
+            String dashboardScheduleUri = EmailSchedulePage.getInstance(browser).getScheduleMailUriByName(dashboardTitle);
+            updateRecurrencyString(dashboardScheduleUri);
+
             checkMailBoxDashboardExport(imapUser, imapPassword);
 
         } finally {
