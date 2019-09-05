@@ -103,9 +103,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
-        /*PivotTableReport sdkTableReport = sdkAnalysisPage.getPivotTableReport();
+        PivotTableReport sdkTableReport = sdkAnalysisPage.getPivotTableReport();
         assertEquals(sdkTableReport.getHeaders(), singletonList(METRIC_AMOUNT));
-        assertEquals(sdkTableReport.getBodyContent(), singletonList(singletonList("$116,625,456.54")));*/
+        assertEquals(sdkTableReport.getBodyContent(), singletonList(singletonList("$116,625,456.54")));
     }
 
     @Test(dependsOnMethods = "login")
@@ -116,8 +116,8 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         initSDKAnalysisPage(); //refresh SDK page to apply change
         initAnalysePage().openInsight(treemap).addStack(ATTR_IS_CLOSED).changeReportType(ReportType.TABLE).saveInsight();
-        /*assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
-                asList(ATTR_IS_CLOSED, "TRUE", ATTR_DEPARTMENT, METRIC_NUMBER_OF_ACTIVITIES));*/
+        assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
+                asList(ATTR_IS_CLOSED, "TRUE", ATTR_DEPARTMENT, METRIC_NUMBER_OF_ACTIVITIES));
 
         initAnalysePage().openInsight(treemap).removeColumn(ATTR_IS_CLOSED).changeReportType(ReportType.TREE_MAP).saveInsight();
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
