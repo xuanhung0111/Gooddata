@@ -2,18 +2,22 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 
 public class MetricFilterByDatePicker extends AbstractPicker {
@@ -104,6 +108,7 @@ public class MetricFilterByDatePicker extends AbstractPicker {
     }
 
     public MetricFilterByDatePicker backToOtherPeriods() {
+        makeSureNoPopupDateFilterVisible();
         waitForElementVisible(iconBackToOtherPeriods).click();
         return this;
     }
@@ -177,5 +182,13 @@ public class MetricFilterByDatePicker extends AbstractPicker {
         waitForFragmentNotVisible(this);
 
         return this;
+    }
+
+    private void makeSureNoPopupDateFilterVisible() {
+        // Click to icon From Date input to make sure no popup is displayed
+        ElementUtils.moveToElementActions(waitForElementPresent(fromDateCalendarIcon), 1, 1).click().perform();
+
+        Function<WebDriver, Boolean> isDismissed = context -> !isElementVisible(ElementUtils.BY_BUBBLE_CONTENT, context);
+        Graphene.waitGui().until(isDismissed);
     }
 }
