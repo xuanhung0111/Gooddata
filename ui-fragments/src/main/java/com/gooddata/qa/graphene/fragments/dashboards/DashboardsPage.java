@@ -68,6 +68,7 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_PERMISSION_DIALOG_LOCATOR = By.className("s-permissionSettingsDialog");
     private static final By BY_HIDDEN_TAB_BAR = By.cssSelector(".yui3-dashboardtabs-content.gdc-hidden");
     private static final By BY_SETTING_EXPORT_TO_PDF = By.cssSelector(".s-export_to_pdf");
+    private static final By BY_SETTING_EXPORT_TO_XLSX = By.cssSelector(".s-export_to_xlsx___");
     private static final By BY_SETTING_EMBED = By.cssSelector(".s-embed");
     private static final By BY_SETTING_SAVES_AS = By.cssSelector(".s-save_as___");
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
@@ -301,6 +302,11 @@ public class DashboardsPage extends AbstractFragment {
     public boolean isSettingExportToPdfButtonVisible() {
         return !waitForElementPresent(SimpleMenu.getInstance(browser).getRoot().findElement(BY_SETTING_EXPORT_TO_PDF))
                 .getAttribute("class").contains("disabledItem");
+    }
+
+    public boolean isSettingExportToXLSXButtonVisible() {
+        return !waitForElementPresent(SimpleMenu.getInstance(browser).getRoot().findElement(BY_SETTING_EXPORT_TO_XLSX))
+            .getAttribute("class").contains("disabledItem");
     }
 
     public boolean isSettingEmbedButtonVisible() {
