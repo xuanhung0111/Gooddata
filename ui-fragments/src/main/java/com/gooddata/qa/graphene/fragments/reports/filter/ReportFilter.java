@@ -116,7 +116,7 @@ public class ReportFilter extends AbstractFragment {
     @SuppressWarnings("unchecked")
     private <T extends AbstractFilterFragment> T openFilterFragment(WebElement link,
             FilterFragment returnFragment) {
-
+        waitForFilterContentLoading();
         waitForElementVisible(link).click();
         return (T) Graphene.createPageFragment(returnFragment.getFragmentClass(),
                 waitForElementVisible(returnFragment.getLocator(), browser));
