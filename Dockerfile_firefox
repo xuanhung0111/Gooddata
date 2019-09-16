@@ -8,7 +8,7 @@ LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:7b4dcf6"
 LABEL git_commit=$GIT_COMMIT
 
 ARG BROWSER_VERSION=69.0
-ARG DRIVER_VERSION=0.20.1
+ARG DRIVER_VERSION=0.25.0
 
 #=========
 # Firefox

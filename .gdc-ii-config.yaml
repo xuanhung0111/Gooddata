@@ -13,7 +13,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_firefox'
       customTags:
-        - '69.0-0.20.1'
+        - '69.0-0.25.0'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
