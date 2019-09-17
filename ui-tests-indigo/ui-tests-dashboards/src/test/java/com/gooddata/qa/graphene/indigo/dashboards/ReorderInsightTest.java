@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,9 +12,15 @@ import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -55,7 +64,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToFirstPosition() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
-        indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 2),
+        dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 2),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 0), DropZone.PREV);
         checkInsightOrder(THIRD_INSIGHT, FIRST_INSIGHT, SECOND_INSIGHT, "Test-Moving-Insight-To-First-Position");
     }
@@ -108,5 +117,29 @@ public class ReorderInsightTest extends AbstractDashboardTest {
         assertEquals(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0).getHeadline(), firstWidget);
         assertEquals(indigoDashboardsPage.getWidgetByIndex(Insight.class, 1).getHeadline(), secondWidget);
         assertEquals(indigoDashboardsPage.getWidgetByIndex(Insight.class, 2).getHeadline(), thirdWidget);
+    }
+
+    private void dragWidget(final Widget source, final Widget target, DropZone dropZone) {
+        final String sourceSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class"));
+        final String targetSelector = convertCSSClassTojQuerySelector(target.getRoot().getAttribute("class"));
+        final String dropZoneSelector = targetSelector + " " + dropZone.getCss();
+
+        dragAndDropWithCustomBackend(browser, sourceSelector, targetSelector, dropZoneSelector);
+    }
+
+    private static void dragAndDropWithCustomBackend(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+
+        driverActions.clickAndHold(source).perform();
+
+        try {
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+            ElementUtils.moveToElementActions(target, - target.getSize().height / 2 + 1, 1).perform();
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
     }
 }

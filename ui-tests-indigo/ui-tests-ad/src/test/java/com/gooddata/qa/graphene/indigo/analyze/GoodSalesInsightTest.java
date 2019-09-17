@@ -144,7 +144,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void deleteNotCurrentlyOpenedInsight() throws JSONException {
-        final String insight = "Delete-Currently-Opened-Insight";
+        final String insight = "InsightTest";
         initAnalysePage().openInsight(INSIGHT_TEST).saveInsightAs(insight);
         assertTrue(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " does not exist");

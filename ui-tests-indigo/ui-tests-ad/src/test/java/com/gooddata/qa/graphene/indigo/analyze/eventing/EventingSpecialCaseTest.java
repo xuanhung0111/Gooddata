@@ -86,11 +86,11 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.waitForReportComputing();
         embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
 
-        setDrillableItems(regionUri, opportunityUri);
+        setDrillableItems(regionUri, activityUri);
 
         cleanUpLogger();
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_OPPORTUNITIES, "East Coast");
+        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
         chartReport.clickOnElement(position);
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
@@ -104,8 +104,8 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
 
         String uri = intersection.getJSONObject(0).getJSONObject("header").getString("uri");
         String title = intersection.getJSONObject(0).getString("title");
-        assertEquals(uri, opportunityUri);
-        assertEquals(title, METRIC_NUMBER_OF_OPPORTUNITIES);
+        assertEquals(uri, activityUri);
+        assertEquals(title, METRIC_NUMBER_OF_ACTIVITIES);
 
         uri = intersection.getJSONObject(2).getJSONObject("header").getString("uri");
         title = intersection.getJSONObject(2).getString("title");

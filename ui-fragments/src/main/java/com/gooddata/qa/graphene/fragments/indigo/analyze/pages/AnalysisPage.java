@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_BUBBLE_CONTENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -362,6 +363,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage changeReportType(ReportType type) {
+        makeSureNoPopupVisible(BY_BUBBLE_CONTENT);
         waitForFragmentVisible(reportTypePicker).setReportType(type);
         return this;
     }
@@ -608,6 +610,13 @@ public class AnalysisPage extends AbstractFragment {
     private AnalysisPage addDate(WebElement typeAttribute) {
         WebElement source = getCataloguePanel().getDate();
         return drag(source, typeAttribute);
+    }
+
+    private void makeSureNoPopupVisible(By popupElement) {
+        ElementUtils.moveToElementActions(getRoot(), 1, 1).perform();
+        ElementUtils.moveToElementActions(getFilterBuckets().getFiltersLabel(), 1, 1).click().perform();
+        Function<WebDriver, Boolean> isDismissed = context -> !isElementVisible(popupElement, context);
+        Graphene.waitGui().until(isDismissed);
     }
 
     public AnalysisPage resetColorPicker() {

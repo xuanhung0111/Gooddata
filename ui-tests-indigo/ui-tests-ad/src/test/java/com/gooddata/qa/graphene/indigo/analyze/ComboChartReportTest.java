@@ -328,7 +328,6 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
             assertThat(metricsBucket.getItemNames(), hasItems(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
             assertThat(attributesBucket.getItemNames(), hasItem(DATE));
 
-            ElementUtils.moveToElementActions(analysisPage.getPageHeader().getResetButton(), 1, 1).perform();
             analysisPage.changeReportType(ReportType.COMBO_CHART);
             MetricsBucket metricsSecondaryBucket = analysisPage.getMetricsSecondaryBucket();
             assertThat(metricsBucket.getItemNames(), hasItem(METRIC_AMOUNT));

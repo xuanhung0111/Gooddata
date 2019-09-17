@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.insight;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -172,7 +173,8 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
         public void delete() {
             // hover on type icon to avoid tooltip which is only displayed with long name
-            getActions().moveToElement(vizTypeIcon).perform();
+            ElementUtils.moveToElementActions(getRoot(), 1, 1).perform();
+            ElementUtils.moveToElementActions(vizTypeIcon, 1, 1).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
             waitForIndigoMessageDisappear(browser);
