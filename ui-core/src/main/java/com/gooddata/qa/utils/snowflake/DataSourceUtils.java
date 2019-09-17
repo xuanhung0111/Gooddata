@@ -30,14 +30,25 @@ public class DataSourceUtils {
         this.commonRestRequest = new CommonRestRequest(restClient, testParams.getProjectId());
     }
 
-    public ConnectionInfo createDefaultConnectionInfo(String database) {
+    public ConnectionInfo createSnowflakeConnectionInfo(String database, DatabaseType dbType) {
         return new ConnectionInfo()
                 .setWarehouse(WAREHOUSE_NAME)
+                .setDbType(dbType)
                 .setDatabase(database)
                 .setSchema(SCHEMA_NAME)
                 .setUserName(testParams.getSnowflakeUserName())
                 .setPassword(testParams.getSnowflakePassword())
                 .setUrl(testParams.getSnowflakeJdbcUrl());
+    }
+
+    public ConnectionInfo createRedshiftConnectionInfo(String database, DatabaseType dbType) {
+        return new ConnectionInfo()
+                .setDbType(dbType)
+                .setDatabase(database)
+                .setSchema(SCHEMA_NAME)
+                .setUserName(testParams.getRedshiftUserName())
+                .setPassword(testParams.getRedshiftPassword())
+                .setUrl(testParams.getRedshiftJdbcUrl());
     }
 
     public String createDataSource(ConnectionInfo connectionInfo, String datasourceName, String... optionalPrefix) throws IOException {
@@ -49,8 +60,8 @@ public class DataSourceUtils {
         return createDataSource(connectionInfo, datasourceTitle, OPTIONAL_PREFIX);
     }
 
-    public String createDefaultDataSource(String datasourceTitle, String databaseTitle) throws IOException {
-        return createDataSource(datasourceTitle, createDefaultConnectionInfo(databaseTitle));
+    public String createDefaultDataSource(String datasourceTitle, String databaseTitle, DatabaseType dbType) throws IOException {
+        return createDataSource(datasourceTitle, createSnowflakeConnectionInfo(databaseTitle, dbType));
     }
 
     public DataSourceRestRequest getDataSourceRestRequest() {

@@ -66,6 +66,7 @@ import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.snowflake.DatabaseColumn;
+import com.gooddata.qa.utils.snowflake.DatabaseType;
 import com.gooddata.qa.utils.snowflake.ProcessUtils;
 import com.gooddata.qa.utils.snowflake.SnowflakeUtils;
 
@@ -107,7 +108,7 @@ public class SegmentForceLoadTest extends AbstractADDProcessTest {
     @Test(dependsOnGroups = { "createProject" }, groups = { "precondition" })
     public void initData() throws SQLException, IOException {
         createLCM();
-        ConnectionInfo connectionInfo = dataSourceUtils.createDefaultConnectionInfo(DATABASE_NAME);
+        ConnectionInfo connectionInfo = dataSourceUtils.createSnowflakeConnectionInfo(DATABASE_NAME, DatabaseType.SNOWFLAKE);
         snowflakeUtils = new SnowflakeUtils(connectionInfo);
         snowflakeUtils.createDatabase(DATABASE_NAME);
         dataSourceId = dataSourceUtils.createDataSource(DATA_SOURCE_NAME, connectionInfo);
