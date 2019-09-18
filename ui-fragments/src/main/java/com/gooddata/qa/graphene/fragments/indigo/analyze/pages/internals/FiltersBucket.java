@@ -30,6 +30,9 @@ public class FiltersBucket extends AbstractBucket {
     @FindBy(css = ".adi-bucket-item .gd-button")
     private List<WebElement> filters;
 
+    @FindBy(tagName = "h2")
+    private WebElement filtersLabel;
+
     private static final String LOADING = "...";
     private static final By BY_FILTER_TEXT = By.cssSelector(".gd-button-text");
 
@@ -38,6 +41,10 @@ public class FiltersBucket extends AbstractBucket {
             DateFilterPickerPanel.class,
             waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)
         );
+    }
+
+    public WebElement getFiltersLabel() {
+        return waitForElementVisible(filtersLabel);
     }
 
     public int getFiltersCount() {
