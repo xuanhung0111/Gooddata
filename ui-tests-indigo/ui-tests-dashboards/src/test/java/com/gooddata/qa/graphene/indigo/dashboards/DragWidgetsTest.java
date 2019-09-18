@@ -2,15 +2,19 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 
-import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -103,7 +108,23 @@ public class DragWidgetsTest extends AbstractDashboardTest {
         String drop = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
                 format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
-        BrowserUtils.dragAndDropWithCustomBackend(browser, from, to, drop);
+        dragAndDropWithCustomBackend(browser, from, to, drop);
+    }
+
+    private static void dragAndDropWithCustomBackend(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+
+        driverActions.clickAndHold(source).perform();
+
+        try {
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+            ElementUtils.moveToElementActions(target, target.getSize().height / 2 + 1, 1).perform();
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
     }
 
     private int getSourceKpiIndexAfterDragDropTo(int index, String dropzone) {
