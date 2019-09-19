@@ -41,11 +41,11 @@ public class DataSourceUtils {
                 .setUrl(testParams.getSnowflakeJdbcUrl());
     }
 
-    public ConnectionInfo createRedshiftConnectionInfo(String database, DatabaseType dbType) {
+    public ConnectionInfo createRedshiftConnectionInfo(String database, DatabaseType dbType, String schema) {
         return new ConnectionInfo()
                 .setDbType(dbType)
                 .setDatabase(database)
-                .setSchema(SCHEMA_NAME)
+                .setSchema(schema)
                 .setUserName(testParams.getRedshiftUserName())
                 .setPassword(testParams.getRedshiftPassword())
                 .setUrl(testParams.getRedshiftJdbcUrl());
