@@ -3,8 +3,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_chrome'
       customTags:
-        - '67.0.3396.79-2.39'
-        - 'latest'
+        - '67.0.3396.79-2.39-2.3.8'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
@@ -13,8 +12,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_firefox'
       customTags:
-        - '69.0-0.25.0'
-        - 'latest'
+        - '69.0-0.25.0-2.3.8'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
