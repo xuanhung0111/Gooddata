@@ -20,6 +20,10 @@ import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.utils.datasource.DataDistributionProcess;
 import com.gooddata.qa.utils.snowflake.DataSourceRestRequest;
 import com.gooddata.qa.utils.snowflake.DataSourceUtils;
+import com.gooddata.qa.utils.snowflake.DatabaseType;
+
+import net.snowflake.client.jdbc.DBMetadataResultSetMetadata;
+
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -62,9 +66,9 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String prefix = generateHashString();
         String specialDataSourceTitle = "♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ ♟" + prefix;
         String dataSourceTitle = generateDataSourceTitle();
-        new DataSourceUtils(testParams.getEditorUser()).createDefaultDataSource(dataSourceTitle, DATA_BASE);
+        new DataSourceUtils(testParams.getEditorUser()).createDefaultDataSource(dataSourceTitle, DATA_BASE, DatabaseType.SNOWFLAKE);
         String specialDataSourceID =
-                new DataSourceUtils(testParams.getUser()).createDefaultDataSource(specialDataSourceTitle, ANOTHER_DATA_BASE);
+                new DataSourceUtils(testParams.getUser()).createDefaultDataSource(specialDataSourceTitle, ANOTHER_DATA_BASE, DatabaseType.SNOWFLAKE);
         try {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
             DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
@@ -84,7 +88,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
     public void checkUIForDeployDialogWithDomainUser() throws IOException {
         String prefix = generateHashString();
         String specialDataSourceTitle = "<h1 style=\"color:red\">This is dataSource</h1>" + prefix;
-        String dataSourceID = domainDataSourceUtils.createDefaultDataSource(specialDataSourceTitle, DATA_BASE);
+        String dataSourceID = domainDataSourceUtils.createDefaultDataSource(specialDataSourceTitle, DATA_BASE, DatabaseType.SNOWFLAKE);
         logout();
         signInAtUI(testParams.getDomainUser(), testParams.getPassword());
         try {
@@ -127,8 +131,8 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String firstDataSource = generateDataSourceTitle();
         String secondDataSource = generateDataSourceTitle();
         String processName = "This process has special character @#$%^&*";
-        String firstDataSourceID = domainDataSourceUtils.createDefaultDataSource(firstDataSource, DATA_BASE);
-        String secondDataSourceID = domainDataSourceUtils.createDefaultDataSource(secondDataSource, DATA_BASE);
+        String firstDataSourceID = domainDataSourceUtils.createDefaultDataSource(firstDataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
+        String secondDataSourceID = domainDataSourceUtils.createDefaultDataSource(secondDataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         logout();
         signInAtUI(testParams.getDomainUser(), testParams.getPassword());
         try {
@@ -162,8 +166,8 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String firstDataSource = generateDataSourceTitle();
         String secondDataSource = generateDataSourceTitle();
         String processName = "<h1 style=\"color:red\">This is process</h1>";
-        String firstDataSourceID = dataSourceUtils.createDefaultDataSource(firstDataSource, DATA_BASE);
-        String secondDataSourceID = dataSourceUtils.createDefaultDataSource(secondDataSource, DATA_BASE);
+        String firstDataSourceID = dataSourceUtils.createDefaultDataSource(firstDataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
+        String secondDataSourceID = dataSourceUtils.createDefaultDataSource(secondDataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         try {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
             DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
@@ -189,7 +193,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String dataSource = generateDataSourceTitle();
         String processName = generateProcessName();
         String otherProcessName = generateProcessName();
-        String dataSourceID = dataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE);
+        String dataSourceID = dataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         DataloadProcess dataloadProcess =
                 getProcessService().createProcess(getProject(), new DataDistributionProcess(processName, dataSourceID, "1"));
         try {
@@ -212,7 +216,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String dataSource = generateDataSourceTitle();
         String processName = generateProcessName();
         String otherProcessName = generateProcessName();
-        String dataSourceID = domainDataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE);
+        String dataSourceID = domainDataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         DataloadProcess dataloadProcess = domainRestClient.getProcessService().createProcess(
                 domainRestClient.getProjectService().getProjectById(testParams.getProjectId()),
                 new DataDistributionProcess(processName, dataSourceID,
@@ -239,7 +243,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
     public void deleteProcess() throws IOException {
         String dataSource = generateDataSourceTitle();
         String processName = generateProcessName();
-        String dataSourceID = dataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE);
+        String dataSourceID = dataSourceUtils.createDefaultDataSource(dataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         DataloadProcess dataloadProcess =
                 getProcessService().createProcess(getProject(), new DataDistributionProcess(processName, dataSourceID, "1"));
         try {

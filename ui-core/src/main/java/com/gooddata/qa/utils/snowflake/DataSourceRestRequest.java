@@ -3,13 +3,16 @@ package com.gooddata.qa.utils.snowflake;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-
+import com.gooddata.qa.utils.snowflake.DatabaseType;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DataSourceRestRequest extends CommonRestRequest {
@@ -45,7 +48,7 @@ public class DataSourceRestRequest extends CommonRestRequest {
      */
 
     public HttpRequestBase setupDataSourceRequest(ConnectionInfo connectionInfo, String dataSourceName,
-                                                  String... optionalPrefix) {
+            String... optionalPrefix) {
         // get prefix if exist.
         String prefix = null;
         if (optionalPrefix.length > 0) {
@@ -59,8 +62,9 @@ public class DataSourceRestRequest extends CommonRestRequest {
                 put("name", dataSourceName);
                 put("prefix", finalPrefix);
                 put("connectionInfo", new JSONObject() {{
-                    put("snowflake", new JSONObject() {{
-                        put("warehouse", connectionInfo.getWarehouse());
+                    put(connectionInfo.getDbType() == DatabaseType.SNOWFLAKE ? DatabaseType.SNOWFLAKE.toString() 
+                        : DatabaseType.REDSHIFT.toString() , new JSONObject() {{
+                        if (connectionInfo.getDbType() == DatabaseType.SNOWFLAKE) put("warehouse", connectionInfo.getWarehouse());
                         put("schema", connectionInfo.getSchema());
                         put("database", connectionInfo.getDatabase());
                         put("url", connectionInfo.getUrl());

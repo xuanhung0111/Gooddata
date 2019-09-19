@@ -8,6 +8,16 @@ public class ConnectionInfo {
     String userName;
     String password;
     String url;
+    DatabaseType dbType;
+
+    public DatabaseType getDbType() {
+        return dbType;
+    }
+
+    public ConnectionInfo setDbType(DatabaseType dbType) {
+        this.dbType = dbType;
+        return this;
+    }
 
     public String getWarehouse() {
         return warehouse;

@@ -26,6 +26,9 @@ public class TestParameters {
     private String snowflakePassword;
     private String snowflakeUserName;
     private String snowflakeJdbcUrl;
+    private String redshiftPassword;
+    private String redshiftUserName;
+    private String redshiftJdbcUrl;
     private String editorUser;
     private String editorInvitationsUser;
     private String editorAdminUser;
@@ -83,6 +86,9 @@ public class TestParameters {
         snowflakePassword = loadProperty("snowflakePassword");
         snowflakeUserName = loadProperty("snowflakeUserName");
         snowflakeJdbcUrl = loadProperty("snowflakeJdbcUrl");
+        redshiftPassword = loadProperty("redshiftPassword");
+        redshiftUserName = loadProperty("redshiftUserName");
+        redshiftJdbcUrl = loadProperty("redshiftJdbcUrl");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
@@ -182,6 +188,18 @@ public class TestParameters {
         this.snowflakePassword = snowflakePassword;
     }
 
+    public String getRedshiftPassword() {
+        return redshiftPassword;
+    }
+
+    public String getRedshiftUserName() {
+        return redshiftUserName;
+    }
+
+    public String getRedshiftJdbcUrl() {
+        return redshiftJdbcUrl;
+    }
+    
     public String getPassword() {
         return password;
     }
