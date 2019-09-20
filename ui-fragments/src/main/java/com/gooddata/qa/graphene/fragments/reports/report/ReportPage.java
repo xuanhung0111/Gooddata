@@ -192,8 +192,19 @@ public class ReportPage extends AbstractFragment {
 
     public ReportFilter openFilterPanel() {
         selectFilterButton();
+        waitForFilterContentLoading();
         return Graphene.createPageFragment(ReportFilter.class,
                 waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
+    }
+
+    public void waitForFilterContentLoading() {
+        WebElement loadingElement = waitForElementPresent(cssSelector(".c-filterContainer .loadingWheel"), browser);
+        try {
+            waitForElementVisible(loadingElement, 1);
+            waitForElementNotVisible(loadingElement);
+        } catch (TimeoutException e) {
+            log.info("Filters already loaded so WebDriver unable to catch the loading indicator");
+        }
     }
 
     public ReportPage hideFilterPanel() {
