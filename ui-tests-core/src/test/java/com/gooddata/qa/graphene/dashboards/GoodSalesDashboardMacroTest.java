@@ -168,7 +168,7 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
         EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget.getRoot());
         Screenshots.takeScreenshot(browser, "Create_Variable_Value_Macro", getClass());
-        assertEquals(embeddedWidget.getContentBodyAsText(), "Open");
+        assertEquals(embeddedWidget.waitForImageLoading().getContentBodyAsText(), "Open");
     }
 
     @Test(dependsOnGroups = "createProject")
