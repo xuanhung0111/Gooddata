@@ -23,6 +23,7 @@ import static org.testng.Assert.assertEquals;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.Headline;
+import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.sdk.common.AbstractReactSdkTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
@@ -76,19 +77,20 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("typeFormat", Formatter.DEFAULT.toString()));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURE_AND_FORMAT);
-        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271.00");
+        Headline headline = initSDKAnalysisPage().getHeadline();
+        assertEquals(headline.getPrimaryItem(), "154,271.00");
 
           //RAIL-941 not apply format
 //        createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
 //                Pair.of("typeFormat", "#.##0.00"));
 //        replaceContentAppJSFrom("HeadlineWithMeasureAndFormat.js");
 //        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
-
-        createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURE);
         dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         try {
-            assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271.00");
+            createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES));
+            replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURE);
+            headline = initSDKAnalysisPage().getHeadline();
+            assertEquals(headline.getPrimaryItem(), "154,271.00");
         } finally {
             dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), "#,##0");
         }
@@ -143,14 +145,16 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
                 Pair.of("elementAttributeUri", getAttributeElementUri(ATTR_DEPARTMENT, DIRECT_SALES)),
                 Pair.of("attributeUri", getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri()));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_FILTER);
-        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "101,054");
+        Headline headline = initSDKAnalysisPage().getHeadline();
+        assertEquals(headline.getPrimaryItem(), "101,054");
 
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("dateAttributeName", DATE_DIMENSION_ACTIVITY),
                 Pair.of("from", "2010-01-01"),
                 Pair.of("to", "2011-01-01"));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER);
-        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "46,868");
+        headline = initSDKAnalysisPage().getHeadline();
+        assertEquals(headline.getPrimaryItem(), "46,868");
 
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("dateAttributeName", DATE_DIMENSION_ACTIVITY),
@@ -159,14 +163,16 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
                 Pair.of("from", "2010-01-01"),
                 Pair.of("to", "2011-01-01"));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_FILTERS);
-        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "30,934");
+        headline = initSDKAnalysisPage().getHeadline();
+        assertEquals(headline.getPrimaryItem(), "30,934");
     }
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithAttribute() throws IOException {
         createCatalogJSON(Pair.of("firstAttributeTitle", ATTR_DEPARTMENT));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_ATTRIBUTE);
-        assertEquals(initSDKAnalysisPage().getWarning(), WARNING_CAN_NOT_DISPLAY);
+        SDKAnalysisPage sdkAnalysisPage = initSDKAnalysisPage();
+        assertEquals(sdkAnalysisPage.getWarning(), WARNING_CAN_NOT_DISPLAY);
     }
 
     @Test(dependsOnMethods = "login")
@@ -179,6 +185,7 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("isPercent", "false"));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_PERCENT_MEASURE);
-        assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
+        Headline headline = initSDKAnalysisPage().getHeadline();
+        assertEquals(headline.getPrimaryItem(), "154,271");
     }
 }
