@@ -62,7 +62,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu,.gd-header-account,.hamburger-icon");
     protected static By BY_LOGOUT_LINK = By.className("s-logout");
-    protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
