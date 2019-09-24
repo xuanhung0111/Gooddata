@@ -59,7 +59,7 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("secondaryMeasureTitle", METRIC_AVG_AMOUNT));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURES);
-        initSDKAnalysisPage();
+        headline = initSDKAnalysisPage().getHeadline();
         assertEquals(headline.getPrimaryItem(), "154,271");
         assertEquals(headline.getSecondItem(), asList("$20,286.22", "Avg. Amount"));
     }
