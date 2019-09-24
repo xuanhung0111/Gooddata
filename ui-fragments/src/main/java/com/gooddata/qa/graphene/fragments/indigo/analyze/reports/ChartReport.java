@@ -62,8 +62,9 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = HEATMAP_LEGEND)
     private List<WebElement> heatmapLegend;
 
+    // will be removed when SDK 7.2.0 release
     @FindBy(css = "div.highcharts-tooltip")
-    private WebElement tooltip;
+    private WebElement oldTooltip;
 
     @FindBy(css = ".highcharts-data-labels tspan")
     private List<WebElement> dataLabels;
@@ -87,6 +88,7 @@ public class ChartReport extends AbstractFragment {
     private static final By BY_SECONDARY_Y_AXIS_TITLE = cssSelector(".highcharts-yaxis.s-highcharts-secondary-yaxis");
     private static final By BY_PRIMARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-primary-yaxis");
     private static final By BY_SECONDARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-secondary-yaxis");
+    private static final By BY_HIGHCHARTS_TOOLTIP = cssSelector(".highcharts-tooltip-container div.highcharts-tooltip");
 
     public static ChartReport getInstance(SearchContext context) {
         return Graphene.createPageFragment(ChartReport.class,
@@ -218,12 +220,19 @@ public class ChartReport extends AbstractFragment {
     /*These methods will remove when SDK update version********START*************/
 
     public List<List<String>> getTooltipTextOnTrackerByIndexForSDK(int groupIndex, int index) {
-        displayTooltipOnTrackerByIndex(groupIndex, index);
+        displayTooltipOnTrackerByIndexForSDK(groupIndex, index);
         return getTooltipTextForSDK();
     }
 
+    private void displayTooltipOnTrackerByIndexForSDK(int groupIndex, int index) {
+        WebElement tracker = getTracker(groupIndex, index);
+        checkIndex(index);
+        getActions().moveToElement(tracker).moveByOffset(1, 1).click().perform();
+        waitForElementVisible(oldTooltip);
+    }
+
     private List<List<String>> getTooltipTextForSDK() {
-        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector("tr"))).stream()
+        return waitForCollectionIsNotEmpty(oldTooltip.findElements(cssSelector("tr"))).stream()
                 .map(row -> asList(row.findElement(cssSelector(".title")).getText(),
                         row.findElement(cssSelector(".value")).getText()))
                 .collect(Collectors.toList());
@@ -233,6 +242,7 @@ public class ChartReport extends AbstractFragment {
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
+        WebElement tooltip = browser.findElement(BY_HIGHCHARTS_TOOLTIP);
         return isShortenedTitleDesignByCss(waitForElementVisible(tooltip.findElement(cssSelector(TOOLTIP_TITLE))), width);
     }
 
@@ -384,10 +394,11 @@ public class ChartReport extends AbstractFragment {
         WebElement tracker = getTracker(groupIndex, index);
         checkIndex(index);
         getActions().moveToElement(tracker).moveByOffset(1, 1).click().perform();
-        waitForElementVisible(tooltip);
+        waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
     }
 
     private List<List<String>> getTooltipText() {
+        WebElement tooltip = browser.findElement(BY_HIGHCHARTS_TOOLTIP);
         return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector(TOOLTIP_ITEM))).stream()
                 .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
                         item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
