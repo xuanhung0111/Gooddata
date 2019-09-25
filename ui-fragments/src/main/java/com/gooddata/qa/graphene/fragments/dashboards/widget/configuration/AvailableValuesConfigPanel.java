@@ -67,7 +67,12 @@ public class AvailableValuesConfigPanel extends AbstractFragment {
         return this;
     }
 
+    public void waitForAvailableMetricsRowVisible(){
+        waitForElementVisible(getRoot().findElement(By.className("availabelMetricsRow")));
+    }
+
     public List<String> getSelectedMetrics() {
+        waitForAvailableMetricsRowVisible();
         return getElementTexts(selectedMetrics);
     }
 

@@ -292,10 +292,9 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
             widgetConfigPanel = initDashboardsPage().selectDashboard(dashboard).editDashboard()
                     .getDashboardEditFilter().openWidgetConfigPanel(filterName);
             Screenshots.takeScreenshot(browser, "verify-hidden-metrics-from-ohter-user", getClass());
-            assertEquals(widgetConfigPanel.getTab(Tab.AVAILABLE_VALUES, AvailableValuesConfigPanel.class)
-                    .getSelectedMetrics(), singletonList(PRIVATE_METRIC));
-            assertEquals(widgetConfigPanel.getTab(Tab.AVAILABLE_VALUES, AvailableValuesConfigPanel.class)
-                    .getTooltipFromIHiddenMetric(PRIVATE_METRIC), "Hidden metric.");
+            AvailableValuesConfigPanel availableValuesConfigPanel = widgetConfigPanel.getTab(Tab.AVAILABLE_VALUES, AvailableValuesConfigPanel.class);
+            assertEquals(availableValuesConfigPanel.getSelectedMetrics(), singletonList(PRIVATE_METRIC));
+            assertEquals(availableValuesConfigPanel.getTooltipFromIHiddenMetric(PRIVATE_METRIC), "Hidden metric.");
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
