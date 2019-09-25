@@ -6,6 +6,7 @@ import static com.gooddata.qa.browser.BrowserUtils.moveToBottomOfElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
@@ -711,7 +712,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
         List<List<WebElement>> elements = fluidLayoutRows.stream()
             .filter(ElementUtils::isElementVisible)
-            .map(tableRow -> tableRow.findElements(By.className("s-fluid-layout-column")))
+            .map(tableRow -> tableRow.findElements(By.xpath(
+                "//div[contains(concat(' ', @class, ' '), 's-dash-item')]" +
+                    "/ancestor::div[contains(concat(' ', @class, ' '), 's-fluid-layout-column')]")))
             .map(cells -> cells.stream().collect(toList()))
             .collect(toList());
 
@@ -894,11 +897,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
         try {
             WebElement target = waitForElementVisible(saveButton);
             driverActions.moveToElement(target).perform();
-
-            WebElement drop = waitForElementPresent(webElementWidget.findElement(By.cssSelector(position.getCss())));
+            WebElement drop = waitForElementPresent(webElementWidget.findElement(By.xpath(position.getXpath())));
 
             scrollElementIntoView(drop, browser);
-            driverActions.moveToElement(drop).perform();
+            if (position.equals(DropZone.PREV)) {
+                ElementUtils.moveToElementActions(drop, 5,drop.getSize().width / 2).perform();
+            } else {
+                ElementUtils.moveToElementActions(
+                    drop,  drop.getSize().height / 2, drop.getSize().width / 2).perform();
+            }
         } finally {
             if (isDrop) driverActions.release().perform();
         }

@@ -130,18 +130,24 @@ public class Widget extends AbstractFragment {
     }
 
     public static enum DropZone {
-        PREV(".dropzone.prev"),
-        NEXT(".dropzone.next"),
-        LAST(".s-last-drop-position");
+        PREV(".dropzone.prev", "//div[@class='dropzone prev']"),
+        NEXT(".dropzone.next", "//div[@class='dropzone next']"),
+        LAST(".s-last-drop-position", "//div[@class='s-last-drop-position']");
 
         private String css;
+        private String xpath;
 
-        private DropZone(final String css) {
+        private DropZone(final String css, final String xpath) {
             this.css = css;
+            this.xpath = xpath;
         }
 
         public String getCss() {
             return this.css;
+        }
+
+        public String getXpath() {
+            return this.xpath;
         }
     }
 
