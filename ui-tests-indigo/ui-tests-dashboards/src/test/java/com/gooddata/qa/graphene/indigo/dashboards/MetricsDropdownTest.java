@@ -8,6 +8,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.Test;
@@ -109,8 +110,10 @@ public class MetricsDropdownTest extends AbstractDashboardTest {
         MetricSelect ms = indigoDashboardsPage
                 .getConfigurationPanel()
                 .getMetricSelect();
-
         assertTrue(ms.getSearchText().isEmpty(), "Search box should be empty");
+        Screenshots.takeScreenshot(browser, "checkDropdownSearchEmpty", MetricsDropdownTest.class);
+        ms.ensureDropdownOpen();
         assertTrue(ms.getValues().size() > 10, "Missing some selected metrics");
+        Screenshots.takeScreenshot(browser, "checkDropdownValues", MetricsDropdownTest.class);
     }
 }
