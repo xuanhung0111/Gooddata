@@ -25,7 +25,7 @@ import static org.openqa.selenium.By.className;
 /**
  * search() method needs to sleep tight for 1 sec in order to work.
  */
-public class CataloguePanel extends AbstractFragment {
+public class CatalogPanel extends AbstractFragment {
 
     @FindBy(css = ".s-catalogue-search input")
     private WebElement searchInput;
@@ -74,7 +74,7 @@ public class CataloguePanel extends AbstractFragment {
         return Integer.parseInt(unrelatedItemsHiddenMessage.split(" ")[0]);
     }
 
-    public CataloguePanel filterCatalog(CatalogFilterType type) {
+    public CatalogPanel filterCatalog(CatalogFilterType type) {
         WebElement filter;
         switch(type) {
             case ALL:
@@ -163,14 +163,14 @@ public class CataloguePanel extends AbstractFragment {
      * @param item
      * @return true if found something from search input, otherwise return false
      */
-    public CataloguePanel search(String item) {
+    public CatalogPanel search(String item) {
         clearInputText();
         searchInput.sendKeys(item);
         waitForItemLoaded();
         return this;
     }
 
-    public CataloguePanel clearInputText() {
+    public CatalogPanel clearInputText() {
         if (!searchInput.getAttribute("value").isEmpty()) {
             waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot()).click();
             waitForItemLoaded();
@@ -197,7 +197,7 @@ public class CataloguePanel extends AbstractFragment {
         return true;
     }
 
-    public CataloguePanel changeDataset(String dataset) {
+    public CatalogPanel changeDataset(String dataset) {
         waitForElementVisible(datasetPicker).click();
         Graphene.createPageFragment(DatasourceDropDown.class,
                 waitForElementVisible(BY_DATASOURCE_DROPDOWN, browser)).select(dataset);
@@ -219,7 +219,7 @@ public class CataloguePanel extends AbstractFragment {
         return waitForElementVisible(className("data-source-picker"), browser).getText().equals(dataset);
     }
 
-    public CataloguePanel waitForItemLoaded() {
+    public CatalogPanel waitForItemLoaded() {
         Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
                 browser);
         waitForElementVisible(catalogLoaded);

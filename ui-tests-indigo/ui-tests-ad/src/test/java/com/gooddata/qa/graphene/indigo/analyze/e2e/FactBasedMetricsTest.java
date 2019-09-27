@@ -122,7 +122,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
-        assertEquals(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
+        assertEquals(initAnalysePage().drag(analysisPage.getCatalogPanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()
@@ -132,7 +132,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
-        assertEquals(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
+        assertEquals(initAnalysePage().drag(analysisPage.getCatalogPanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()

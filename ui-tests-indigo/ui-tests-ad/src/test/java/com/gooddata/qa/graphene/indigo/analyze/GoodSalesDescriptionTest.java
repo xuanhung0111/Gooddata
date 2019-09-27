@@ -85,7 +85,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
 
         createMetric(name, completedMaql, "#,##0");
 
-        String metricDescription = initAnalysePage().getCataloguePanel().getMetricDescription(name);
+        String metricDescription = initAnalysePage().getCatalogPanel().getMetricDescription(name);
 
         takeScreenshot(browser, "Metric with identifier " + name, getClass());
         assertThat(metricDescription, containsString(identifier));
@@ -97,7 +97,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
                 .append("Represents all your dates in project. Can group by Day, Week, Month, Quarter & Year.\n")
                 .append("Field Type\n")
                 .append("Date\n");
-        assertEquals(initAnalysePage().getCataloguePanel().getDateDescription(), expected.toString());
+        assertEquals(initAnalysePage().getCatalogPanel().getDateDescription(), expected.toString());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -108,7 +108,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(initAnalysePage().getCataloguePanel().getAttributeDescription(ATTR_DEPARTMENT), expected.toString());
+        assertEquals(initAnalysePage().getCatalogPanel().getAttributeDescription(ATTR_DEPARTMENT), expected.toString());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -118,7 +118,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
                 .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("SELECT COUNT(Activity)\n");
-        assertEquals(initAnalysePage().getCataloguePanel().getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES), expected.toString());
+        assertEquals(initAnalysePage().getCatalogPanel().getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -146,6 +146,6 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
                 .append("Measure\n")
                 .append("Dataset\n")
                 .append("Activity\n");
-        assertEquals(initAnalysePage().getCataloguePanel().getFactDescription(ACTIVITY_DATE), expected.toString());
+        assertEquals(initAnalysePage().getCatalogPanel().getFactDescription(ACTIVITY_DATE), expected.toString());
     }
 }

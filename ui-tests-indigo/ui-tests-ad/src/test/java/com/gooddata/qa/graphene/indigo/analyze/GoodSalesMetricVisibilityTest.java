@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -58,8 +58,8 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
             logoutAndLoginAs(false, UserRoles.EDITOR);
 
-            CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search(RATIO_METRIC);
-            assertFalse(cataloguePanel.getFieldNamesInViewPort().contains(RATIO_METRIC), "Private metric shouldn't display");
+            CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel().search(RATIO_METRIC);
+            assertFalse(catalogPanel.getFieldNamesInViewPort().contains(RATIO_METRIC), "Private metric shouldn't display");
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
         }

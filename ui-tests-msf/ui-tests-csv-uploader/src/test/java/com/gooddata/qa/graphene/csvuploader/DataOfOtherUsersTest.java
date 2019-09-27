@@ -22,7 +22,6 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
@@ -223,7 +222,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     .deleteUserByEmail(testParams.getUserDomain(), removedAdminUser);
             AnalysisPage analysePage = initAnalysePage();
             checkRedBar(browser);
-            analysePage.getCataloguePanel().changeDataset(datasetName);
+            analysePage.getCatalogPanel().changeDataset(datasetName);
             checkRedBar(browser);
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);

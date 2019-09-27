@@ -24,21 +24,21 @@ public class CatalogueDescriptionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_display_metric_info_bubble_when_hovering_the_info_icon() {
-        assertTrue(initAnalysePage().getCataloguePanel()
+        assertTrue(initAnalysePage().getCatalogPanel()
                 .getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES)
                 .contains("SELECT COUNT(Activity)"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_display_attribute_info_bubble_when_hovering_the_info_icon() {
-        assertTrue(initAnalysePage().getCataloguePanel()
+        assertTrue(initAnalysePage().getCatalogPanel()
                 .getAttributeDescription(ATTR_ACTIVITY_TYPE)
                 .contains("Email"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_display_dataset_of_fact() {
-        assertTrue(initAnalysePage().getCataloguePanel()
+        assertTrue(initAnalysePage().getCatalogPanel()
                 .getFactDescription(FACT_AMOUNT)
                 .contains("OpportunitySnapshot"));
     }

@@ -84,10 +84,10 @@ public class PieChartReportTest extends AbstractAnalyseTest {
         assertEquals(parseFilterText(analysisPage.getFilterBuckets()
                 .getFilterText(ATTR_DEPARTMENT)), asList(ATTR_DEPARTMENT, "All"));
 
-        WebElement metric = analysisPage.getCataloguePanel().searchAndGet(METRIC_AVG_AMOUNT, FieldType.METRIC);
+        WebElement metric = analysisPage.getCatalogPanel().searchAndGet(METRIC_AVG_AMOUNT, FieldType.METRIC);
         analysisPage.tryToDrag(metric, analysisPage.getMetricsBucket().get(METRIC_AMOUNT));
 
-        WebElement attribute = analysisPage.getCataloguePanel().searchAndGet(ATTR_FORECAST_CATEGORY, FieldType.ATTRIBUTE);
+        WebElement attribute = analysisPage.getCatalogPanel().searchAndGet(ATTR_FORECAST_CATEGORY, FieldType.ATTRIBUTE);
         analysisPage.tryToDrag(attribute, analysisPage.getAttributesBucket().get(ATTR_DEPARTMENT));
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AVG_AMOUNT));
@@ -109,7 +109,7 @@ public class PieChartReportTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getLegends(), asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
         assertEquals(analysisPage.getAttributesBucket().getWarningMessage(), ReportType.PIE_CHART.getViewbyByMessage());
 
-        WebElement attribute = analysisPage.getCataloguePanel().searchAndGet(ATTR_FORECAST_CATEGORY, FieldType.ATTRIBUTE);
+        WebElement attribute = analysisPage.getCatalogPanel().searchAndGet(ATTR_FORECAST_CATEGORY, FieldType.ATTRIBUTE);
         analysisPage.tryToDrag(attribute, analysisPage.getAttributesBucket().getRoot());
         assertTrue(analysisPage.getAttributesBucket().getItemNames().isEmpty(), "Attribute Bucket should be empty");
     }

@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class AvailableItemsTest extends AbstractAdE2ETest {
@@ -32,7 +32,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_attributes_when_metric_is_added() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
         analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
@@ -44,7 +44,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_categories() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
@@ -56,7 +56,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_stacks() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
@@ -68,7 +68,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_facts() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
@@ -80,9 +80,9 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_all_items_on_reset() {
-        CataloguePanel panel = initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
+        CatalogPanel panel = initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .getCataloguePanel()
+            .getCatalogPanel()
             .clearInputText()
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
 
@@ -102,7 +102,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_metric_after_undo() {
-        CataloguePanel panel = initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
+        CatalogPanel panel = initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getCatalogPanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPage.resetToBlankState();
@@ -114,7 +114,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_attribute_after_undo() {
-        CataloguePanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
+        CatalogPanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCatalogPanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
         analysisPage.resetToBlankState();
@@ -126,7 +126,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
-        CataloguePanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCatalogPanel();
         assertEquals(panel.search(ATTR_ACTIVITY_TYPE).getUnrelatedItemsHiddenCount(), 1);
     }
 }

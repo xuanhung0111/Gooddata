@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import java.lang.reflect.Method;
@@ -68,7 +68,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
-        initAnalysePage().getCataloguePanel().changeDataset(PRODUCTION_DATASET);
+        initAnalysePage().getCatalogPanel().changeDataset(PRODUCTION_DATASET);
 
         ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
                 .addDate()
@@ -88,7 +88,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnPayrollData() {
-        initAnalysePage().getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        initAnalysePage().getCatalogPanel().changeDataset(PAYROLL_DATASET);
 
         ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
@@ -108,27 +108,27 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchDataAfterSelectDataset() {
-        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
+        final CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel();
 
-        cataloguePanel.changeDataset(PRODUCTION_DATASET).search(AMOUNT);
+        catalogPanel.changeDataset(PRODUCTION_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in production data", getClass());
-        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains(AMOUNT), "Amount shouldn't be in view port");
+        assertFalse(catalogPanel.getFieldNamesInViewPort().contains(AMOUNT), "Amount shouldn't be in view port");
 
-        cataloguePanel.search("County");
-        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains("County"), "County shouldn't be in view port");
+        catalogPanel.search("County");
+        assertFalse(catalogPanel.getFieldNamesInViewPort().contains("County"), "County shouldn't be in view port");
 
-        cataloguePanel.search("Id");
-        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem("Id"));
+        catalogPanel.search("Id");
+        assertThat(catalogPanel.getFieldNamesInViewPort(), hasItem("Id"));
 
-        cataloguePanel.changeDataset(PAYROLL_DATASET).search(AMOUNT);
+        catalogPanel.changeDataset(PAYROLL_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
-        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem(AMOUNT));
+        assertThat(catalogPanel.getFieldNamesInViewPort(), hasItem(AMOUNT));
 
-        cataloguePanel.search("County");
-        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem("County"));
+        catalogPanel.search("County");
+        assertThat(catalogPanel.getFieldNamesInViewPort(), hasItem("County"));
 
-        cataloguePanel.search("Id");
-        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains("Id"), "ID shouldn't be in view port");
+        catalogPanel.search("Id");
+        assertFalse(catalogPanel.getFieldNamesInViewPort().contains("Id"), "ID shouldn't be in view port");
     }
 
     @Test(dependsOnGroups = {"createProject"},
@@ -136,7 +136,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     public void addMetricFilterAfterSwitchingDataset() {
         initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
 
-        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        analysisPage.getCatalogPanel().changeDataset(PAYROLL_DATASET);
         analysisPage.removeAttribute(MARKET)
                 .addMetric(AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
@@ -159,7 +159,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
-                .getCataloguePanel()
+                .getCatalogPanel()
                 .changeDataset(GEO_CHART_DATASET);
 
         //ensure working dataset is geo_chart before adding percent to chart

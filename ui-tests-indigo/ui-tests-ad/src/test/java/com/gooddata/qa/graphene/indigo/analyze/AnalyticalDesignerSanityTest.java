@@ -90,7 +90,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dragMetricToColumnChartShortcutPanel() {
-        WebElement metric = initAnalysePage().getCataloguePanel()
+        WebElement metric = initAnalysePage().getCatalogPanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
@@ -185,7 +185,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
-        WebElement metric = initAnalysePage().getCataloguePanel()
+        WebElement metric = initAnalysePage().getCatalogPanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->

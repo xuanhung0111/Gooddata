@@ -60,7 +60,7 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         super.initProperties();
         projectTitle += "HeatMap Advanced Test";
     }
-    
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
@@ -389,12 +389,12 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
         initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getDialogTagName().addTagNameToMetric("metrictag");
         initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
         openAnalyzeEmbeddedPage("excludeObjectsWithTags", "metrictag");
-        analysisPage.getCataloguePanel().search(METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(analysisPage.getCataloguePanel().isEmpty(), "Catalogue panel should be empty");
-        assertEquals(analysisPage.getCataloguePanel().getEmptyMessage(), "No data matching\n\"" + METRIC_NUMBER_OF_ACTIVITIES + "\"");
+        analysisPage.getCatalogPanel().search(METRIC_NUMBER_OF_ACTIVITIES);
+        assertTrue(analysisPage.getCatalogPanel().isEmpty(), "Catalogue panel should be empty");
+        assertEquals(analysisPage.getCatalogPanel().getEmptyMessage(), "No data matching\n\"" + METRIC_NUMBER_OF_ACTIVITIES + "\"");
         openAnalyzeEmbeddedPage("includeObjectsWithTags", "metrictag");
-        analysisPage.getCataloguePanel().search(METRIC_NUMBER_OF_ACTIVITIES);
-        assertEquals(analysisPage.getCataloguePanel().getFieldNamesInViewPort(), asList(METRIC_NUMBER_OF_ACTIVITIES));
+        analysisPage.getCatalogPanel().search(METRIC_NUMBER_OF_ACTIVITIES);
+        assertEquals(analysisPage.getCatalogPanel().getFieldNamesInViewPort(), asList(METRIC_NUMBER_OF_ACTIVITIES));
     }
 
     private String createInsightHasMetricAndTwoAttributesOnRowAndColumn(String title, String metric, String attribute, String stack) {

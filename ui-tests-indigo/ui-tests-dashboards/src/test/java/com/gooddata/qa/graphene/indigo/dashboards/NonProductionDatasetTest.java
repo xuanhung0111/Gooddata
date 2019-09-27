@@ -148,7 +148,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         String insight = "Insight-without-date-filter";
 
         AnalysisPage page = initAnalysePage();
-        page.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        page.getCatalogPanel().changeDataset(PAYROLL_DATASET);
         page.addMetric("Amount", FieldType.FACT).waitForReportComputing().saveInsight(insight);
 
         try {
@@ -170,7 +170,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         takeScreenshot(browser, "uploaded-" + DATASET_CONTAINING_11_DATES + "-dataset", getClass());
 
         AnalysisPage page = initAnalysePage();
-        page.getCataloguePanel().changeDataset(DATASET_CONTAINING_11_DATES);
+        page.getCatalogPanel().changeDataset(DATASET_CONTAINING_11_DATES);
         page.addMetric("Number", FieldType.FACT).waitForReportComputing().saveInsight(insight);
 
         try {
