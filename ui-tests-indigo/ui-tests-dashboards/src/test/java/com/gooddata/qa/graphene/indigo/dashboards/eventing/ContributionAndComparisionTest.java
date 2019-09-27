@@ -187,8 +187,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         AnalysisPage analysisPage = initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011")
-                .getRoot().click();
+                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
