@@ -12,13 +12,14 @@ import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.graphene.enums.TimeZone;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -104,6 +105,12 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".repeatBase .selection")
     private Select repeatBaseSelection;
 
+    @FindBy(css = ".s-time .selection")
+    private Select timeSelection;
+
+    @FindBy(css = ".timezone .selection")
+    private Select timeZoneSelection;
+
     @FindBy(css = ".dashboards .picker .selected label")
     private List<WebElement> attachedDashboards;
 
@@ -167,6 +174,12 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public EmailSchedulePage changeTime(RepeatTime time) {
         waitForElementVisible(repeatBaseSelection).selectByVisibleText(time.toString());
+        return this;
+    }
+
+    public EmailSchedulePage changeTimeZone(Pair<TimeZone, TimeZone.Time> timeZoneConfiguration) {
+        waitForElementVisible(timeZoneSelection).selectByVisibleText(timeZoneConfiguration.getKey().toString());
+        waitForElementVisible(timeSelection).selectByVisibleText(timeZoneConfiguration.getValue().toString());
         return this;
     }
 
@@ -292,6 +305,12 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody,
                                        List<String> reportNames, ExportFormat format, RepeatTime repeatTime) {
+        scheduleNewReportEmail(emailsTo, emailSubject, emailBody, reportNames, format, repeatTime, null);
+    }
+
+    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody,
+                                       List<String> reportNames, ExportFormat format, RepeatTime repeatTime,
+                                       Pair<TimeZone, TimeZone.Time> timeZone) {
         openNewSchedule()
             .changeEmailTo(emailsTo)
             .changeSubject(emailSubject)
@@ -304,6 +323,9 @@ public class EmailSchedulePage extends AbstractFragment {
         selectReportFormat(format);
         if (repeatTime != null) {
             changeTime(repeatTime);
+        }
+        if (timeZone != null) {
+            changeTimeZone(timeZone);
         }
         // TODO - schedule (will be sent in the nearest time slot now)
         saveSchedule();
