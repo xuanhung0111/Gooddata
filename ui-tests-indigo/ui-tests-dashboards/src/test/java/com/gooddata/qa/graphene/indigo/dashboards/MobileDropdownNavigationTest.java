@@ -117,7 +117,7 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
             indigoDashboardsPage.selectKpiDashboard(DASHBOARD_LONG_NAME);
 
             takeScreenshot(browser, "shortened-dashboard-name-test-with-" + role, getClass());
-            assertTrue(indigoDashboardsPage.isShortenTitleDesignByCss(557), "Title should be shortened");
+            assertTrue(indigoDashboardsPage.isShortenTitleDesignByCss(515), "Title should be shortened");
             assertEquals(indigoDashboardsPage.getKpiTitles(), asList(METRIC_LOST));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
