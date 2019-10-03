@@ -23,6 +23,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
@@ -703,6 +704,27 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
 
         assertThat(chartReport.getTotalsStackedColumn(), hasItems("85,226.00", "85,588.00", "83,560.00",
                 "83,980.00","-800,000.00", "-319,200.00", "-800,000.00", "-319,200.00"));
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkSortingBarChartWhenStackingByTotalValue() {
+        String insight = "Insight" + generateHashString();
+        createMetric("Sum of Amount", format("SELECT SUM([%s])", getFactByTitle("Amount").getUri()), "#,##0.00");
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(insight, ReportType.BAR_CHART)
+                .setMeasureBucket(
+                    asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT)),
+                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle("Sum of Amount"))))
+                .setCategoryBucket(singletonList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_PRODUCT),
+                        CategoryBucket.Type.ATTRIBUTE))));
+
+        ChartReport chartReport = initAnalysePage().openInsight(insight).waitForReportComputing().getChartReport();
+        analysisPage.getStacksBucket().checkOption(OptionalStacking.MEASURES);
+        analysisPage.waitForReportComputing();
+
+        assertEquals(chartReport.getXaxisLabels(), asList("Explorer", "Educationly", "CompuSci", "WonderKid",
+            "PhoenixSoft", "Grammar Plus"));
     }
 
     private void createInsightHasAMeasureAndAnAttributeAndAStack(
