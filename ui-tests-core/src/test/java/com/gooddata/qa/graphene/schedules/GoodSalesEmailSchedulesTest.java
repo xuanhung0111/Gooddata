@@ -9,6 +9,9 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.TimeZone;
+import com.gooddata.qa.graphene.enums.TimeZone.Time;
+import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -95,7 +98,9 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), reportTitle,
-                "Scheduled email test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE), ExportFormat.ALL);
+            "Scheduled email test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE),
+            ExportFormat.ALL, null, Pair.of(TimeZone.GMT_01_00_Paris, Time.AM_12_00));
+
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }
