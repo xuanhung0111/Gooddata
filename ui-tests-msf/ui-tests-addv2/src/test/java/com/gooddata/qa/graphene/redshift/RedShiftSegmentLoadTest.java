@@ -2,26 +2,26 @@ package com.gooddata.qa.graphene.redshift;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static com.gooddata.qa.utils.DateTimeUtils.parseToTimeStampFormat;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static com.gooddata.qa.utils.snowflake.DatasetUtils.datasetDelete;
-import static com.gooddata.qa.utils.snowflake.DatasetUtils.datasetUseAmount;
 import static com.gooddata.qa.utils.snowflake.DatasetUtils.datasetUpdateColumn;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATE_DATASET_BIRTHDAY;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_NAME;
+import static com.gooddata.qa.utils.snowflake.DatasetUtils.datasetUseAmount;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_ADDRESS;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_CITY;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATE_BIRTHDAY;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AGE;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AMOUNT;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_NAME;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_ADDRESS;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_AGE;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_CITY;
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_ADDRESS;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_X_CLIENT_ID;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_X_DELETED;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATE_BIRTHDAY;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATE_DATASET_BIRTHDAY;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AGE;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.LIMIT_RECORDS;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.NUMERIC_TYPE;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.PKCOLUMN_CUSKEY;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.PK_CUSKEY;
@@ -35,6 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,33 +68,42 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.S3Utils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import com.gooddata.qa.utils.schedule.ScheduleUtils;
 import com.gooddata.qa.utils.snowflake.ConnectionInfo;
-import com.gooddata.qa.utils.snowflake.DataMappingUtils;
 import com.gooddata.qa.utils.snowflake.DataSourceRestRequest;
 import com.gooddata.qa.utils.snowflake.DataSourceUtils;
 import com.gooddata.qa.utils.snowflake.DatabaseType;
 import com.gooddata.qa.utils.snowflake.ProcessUtils;
 import com.gooddata.qa.utils.snowflake.RedshiftUtils;
 
-public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
-    private Project projectTest;
+public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
     private String dataSourceId;
+    private String serviceProjectId;
+    private String clientProjectId1;
+    private String clientProjectId2;
+    private Project serviceProject;
+    private Project project1;
+    private Project project2;
+    private final String CLIENT_ID_1 = "att_client_" + generateHashString();
+    private final String CLIENT_ID_2 = "att_client_" + generateHashString();
+    private final String CLIENT_PROJECT_TITLE_1 = "ATT_LCM Client project " + generateHashString();
+    private final String CLIENT_PROJECT_TITLE_2 = "ATT_LCM Client project " + generateHashString();
+    private final String SEGMENT_ID = "att_segment_" + generateHashString();
     private IndigoRestRequest indigoRestRequest;
-    private String projectMappingPID;
     private final String DATA_SOURCE_NAME = "Auto_datasource" + generateHashString();
     private final String DASHBOARD_NAME = "Dashboard Test";
     private final String INSIGHT_NAME = "Insight Test";
     private final String DATABASE_NAME = "dev";
     private final String SCHEMA_NAME = "auto_schema_" + generateHashString();
     private final String PROCESS_NAME = "AutoProcess Test" + generateHashString();
-    private final String CLIENT_ID = "att_client_" + generateHashString();
     private final String OTHER_CLIENT_ID = "att_other_client_" + generateHashString();
     private final String DEFAULT_S3_BUCKET_URI = "s3://msf-dev-grest/";
     private DataloadProcess dataloadProcess;
@@ -106,7 +116,6 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     private String timeLoadFrom;
     private String timeLoadTo;
     private String timeOverRange;
-    private DataMappingUtils dataMappingProjectIdUtils;
     private RedshiftUtils redshiftUtils;
     private DataSourceUtils dataSource;
     private ProcessUtils domainProcessUtils;
@@ -129,9 +138,8 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
 
     @Test(dependsOnGroups = { "createProject" }, groups = { "precondition" })
     public void initData() throws IOException, SQLException {
-        setUpProject();
+        createLCM();
         setUpDatasource();
-        setUpDataMapping();
         setUpModel();
         setUpKPIs();
         setUpDatabase();
@@ -140,22 +148,22 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     /**
-     * Create schedules for the process to run full load and distribute data to
-     * projects based on client_id.
+     * In the Service project, run full load Snowflake ADD to distribute data to client projects for the first time.
      */
     @DataProvider
     public Object[][] dataFirstFullLoad() throws IOException {
         return new Object[][] { { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
-                datasetUseAmount().rows(asList("CUS1", "User", "2019-09-30", "10", time, "0", CLIENT_ID))
-                        .rows(asList("CUS2", "User2", "2019-09-30", "10", time, "false", CLIENT_ID))
-                        .rows(asList("CUS3", "User3", "2019-09-30", "10", time, "FALSE", CLIENT_ID))
+                datasetUseAmount().rows(asList("CUS1", "User", "2019-09-30", "10", time, "0", CLIENT_ID_1))
+                        .rows(asList("CUS2", "User2", "2019-09-30", "10", time, "false", CLIENT_ID_1))
+                        .rows(asList("CUS3", "User3", "2019-09-30", "10", time, "FALSE", CLIENT_ID_1))
                         .rows(asList("CUS4", "User4", "2019-09-30", "10", time, "FALSE", OTHER_CLIENT_ID)),
-                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PKCOLUMN_CUSKEY, PK_CUSKEY, projectTest, projectMappingPID } };
+                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PKCOLUMN_CUSKEY, PK_CUSKEY, project1, clientProjectId1,
+                CLIENT_ID_1 } };
     }
 
     @Test(dependsOnMethods = { "initData" }, dataProvider = "dataFirstFullLoad")
     public void checkFirstFullLoad(String table, CsvFile csvfile, String dataset, String column, String attribute,
-            Project project, String projectId) throws SQLException, IOException {
+            Project project, String projectId, String clientId) throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
         File file = new File(csvfile.getFilePath());
@@ -176,7 +184,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), projectId);
         List<String> custkeyValues = new ArrayList<String>();
         List<Pair<String, String>> conditions = new ArrayList<>();
-        String conditionString = String.format("= '%s'", CLIENT_ID);
+        String conditionString = String.format("= '%s'", clientId);
         String conditionString2 = "= 0";
         conditions.add(Pair.of(COLUMN_X_CLIENT_ID, conditionString));
         conditions.add(Pair.of(COLUMN_X_DELETED, conditionString2));
@@ -184,13 +192,13 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         custkeyValues = redshiftUtils.getRecordsByCondition(table, column, conditions, null, LIMIT_RECORDS);
 
         assertThat(executionLog, containsString(
-                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]", projectId, CLIENT_ID, dataset)));
+                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]", projectId, clientId, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
 
         // Check results UI
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        initIndigoDashboardsPageSpecificProject(projectId).selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                 "$30.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
@@ -198,25 +206,25 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     /**
-     * Customer have more data which is updated on Redshift manual scheduled run the
-     * ADD process to incremental load data from Redshift.
+     * Customer has more data so schedule/manual run incremental load
+     * and distribute data to client projects.
      */
     @DataProvider
     public Object[][] dataSecondIncrementalLoad() throws IOException {
         return new Object[][] { { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
-                datasetUseAmount().rows(asList("CUS5", "User5", "2019-09-30", "15", timeSecond, "0", CLIENT_ID))
-                        .rows(asList("CUS6", "User6", "2019-09-30", "15", timeSecond, "false", CLIENT_ID))
-                        .rows(asList("CUS1", "User1", "2019-09-30", "10", timeSecond, "true", CLIENT_ID))
+                datasetUseAmount().rows(asList("CUS5", "User5", "2019-09-30", "15", timeSecond, "0", CLIENT_ID_1))
+                        .rows(asList("CUS6", "User6", "2019-09-30", "15", timeSecond, "false", CLIENT_ID_1))
+                        .rows(asList("CUS1", "User1", "2019-09-30", "10", timeSecond, "true", CLIENT_ID_1))
                         .rows(asList("CUS3", "User3", "2019-09-30", "10", timeSecond, "false", OTHER_CLIENT_ID)),
-                datasetDelete().rows(asList("CUS2", timeSecond, CLIENT_ID)).rows(asList("CUS3", timeSecond, OTHER_CLIENT_ID)),
-                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, projectTest, projectMappingPID,
+                datasetDelete().rows(asList("CUS2", timeSecond, CLIENT_ID_1)).rows(asList("CUS3", timeSecond, OTHER_CLIENT_ID)),
+                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, project1, clientProjectId1, CLIENT_ID_1,
                 asList("CUS3", "CUS5", "CUS6") } };
     }
 
     @Test(dependsOnMethods = { "checkFirstFullLoad" }, dataProvider = "dataSecondIncrementalLoad")
     public void checkSecondIncrementalLoad(String table, String deleteTable, CsvFile csvfile, CsvFile csvFileDelete,
-            String dataset, String attribute, Project project, String projectId, List<String> expectedResult)
+            String dataset, String attribute, Project project, String projectId, String clientId, List<String> expectedResult)
             throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         csvFileDelete.saveToDisc(testParams.getCsvFolder());
@@ -249,7 +257,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         assertThat(executionLog,
                 containsString(
                         String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, incremental, loadDataFrom=%s}]",
-                                projectId, CLIENT_ID, dataset, lastSuccessful)));
+                                projectId, clientId, dataset, lastSuccessful)));
         assertThat(executionLog,
                 containsString(String.format("dataset.%s, delete_table, rows=%s", dataset, csvFileDelete.getDataRowCount() - 1)));
         assertThat(executionLog,
@@ -258,7 +266,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(expectedResult.toArray()));
         // Check result UI
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        initIndigoDashboardsPageSpecificProject(projectId).selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                 "$40.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
@@ -266,39 +274,39 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     /**
-     * The business change after time, customer has more data with LDM and data
-     * structure which changed also.
+     * The business change after time, customer has more data with LDM and data structure which changed also.
      */
     @Test(dependsOnMethods = { "checkSecondIncrementalLoad" })
     public void changeBusiness() {
         updateModel();
         updateDatabase();
+        updateLCM();
     }
 
     /**
-     * Customer still need old data so they will continue incremental load with new
-     * LDM and data structure.
+     * In Service project, run incremental load, private KPI and AD on client project are kept.
      */
     @DataProvider
     public Object[][] dataThirdIncrementalLoad() throws IOException {
         return new Object[][] { { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 datasetUpdateColumn()
-                        .rows(asList("CUS7", "User7", "2019-09-30", "10", timeThird, "0", CLIENT_ID, "address7", "city7", "10"))
-                        .rows(asList("CUS8", "User8", "2019-09-30", "10", timeThird, "false", CLIENT_ID, "address8", "city8",
+                        .rows(asList("CUS7", "User7", "2019-09-30", "10", timeThird, "0", CLIENT_ID_1, "address7", "city7", "10"))
+                        .rows(asList("CUS8", "User8", "2019-09-30", "10", timeThird, "false", CLIENT_ID_1, "address8", "city8",
                                 "10"))
-                        .rows(asList("CUS3", "User3", "2019-09-30", "10", timeThird, "true", CLIENT_ID, "address3", "city3",
+                        .rows(asList("CUS3", "User3", "2019-09-30", "10", timeThird, "true", CLIENT_ID_1, "address3", "city3",
                                 "10"))
                         .rows(asList("CUS6", "User6", "2019-09-30", "15", timeThird, "false", OTHER_CLIENT_ID, "address6",
                                 "city6", "10")),
-                datasetDelete().rows(asList("CUS5", timeThird, CLIENT_ID)).rows(asList("CUS6", timeThird, OTHER_CLIENT_ID)),
-                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, projectTest, projectMappingPID,
+                datasetDelete().rows(asList("CUS5", timeThird, CLIENT_ID_1)).rows(asList("CUS6", timeThird, OTHER_CLIENT_ID)),
+                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, project1, clientProjectId1, CLIENT_ID_1,
                 asList("CUS6", "CUS7", "CUS8") } };
     }
 
     @Test(dependsOnMethods = { "checkSecondIncrementalLoad" }, dataProvider = "dataThirdIncrementalLoad")
     public void checkThirdLoadWithNewLDM(String table, String deleteTable, CsvFile csvfile, CsvFile csvFileDelete, String dataset,
-            String attribute, Project project, String projectId, List<String> expectedResult) throws SQLException, IOException {
+            String attribute, Project project, String projectId, String clientId, List<String> expectedResult)
+            throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         csvFileDelete.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
@@ -329,7 +337,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), projectId);
         assertThat(executionLog, containsString(String.format(
                 "Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, incremental, loadDataFrom=%s, deleteDataFrom=%s}]",
-                projectId, CLIENT_ID, dataset, lastSecondSuccessful, lastSecondSuccessful)));
+                projectId, clientId, dataset, lastSecondSuccessful, lastSecondSuccessful)));
         assertThat(executionLog,
                 containsString(String.format("dataset.%s, delete_table, rows=%s", dataset, csvFileDelete.getDataRowCount() - 1)));
         assertThat(executionLog,
@@ -338,7 +346,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(expectedResult.toArray()));
         // Check result UI
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        initIndigoDashboardsPageSpecificProject(projectId).selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                 "$35.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
@@ -351,23 +359,24 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     /**
-     * Customer need to force full load but keep all KPI and AD design.
+     * Customer want to clean everything with new LDM -> they will need to force full load but keep all KPI and AD design.
      */
     @DataProvider
     public Object[][] dataFourthForceFullLoad() throws IOException {
         return new Object[][] { { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 datasetUpdateColumn()
-                        .rows(asList("CUS1", "User", "2019-09-30", "10", time, "0", CLIENT_ID, "address1", "city1", "10"))
-                        .rows(asList("CUS2", "User2", "2019-09-30", "10", time, "false", CLIENT_ID, "address2", "city2", "10"))
-                        .rows(asList("CUS3", "User3", "2019-09-30", "10", time, "FALSE", CLIENT_ID, "address3", "city3", "10"))
+                        .rows(asList("CUS1", "User", "2019-09-30", "10", time, "0", CLIENT_ID_1, "address1", "city1", "10"))
+                        .rows(asList("CUS2", "User2", "2019-09-30", "10", time, "false", CLIENT_ID_1, "address2", "city2", "10"))
+                        .rows(asList("CUS3", "User3", "2019-09-30", "10", time, "FALSE", CLIENT_ID_1, "address3", "city3", "10"))
                         .rows(asList("CUS4", "User4", "2019-09-30", "10", time, "FALSE", OTHER_CLIENT_ID, "address4", "city4",
                                 "10")),
-                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PKCOLUMN_CUSKEY, PK_CUSKEY, projectTest, projectMappingPID } };
+                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PKCOLUMN_CUSKEY, PK_CUSKEY, project1, clientProjectId1,
+                CLIENT_ID_1 } };
     }
 
     @Test(dependsOnMethods = { "cleanUpDataWithNewLDM" }, dataProvider = "dataFourthForceFullLoad")
     public void checkFourthForceFullLoad(String table, CsvFile csvfile, String dataset, String column, String attribute,
-            Project project, String projectId) throws SQLException, IOException {
+            Project project, String projectId, String clientId) throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
         File file = new File(csvfile.getFilePath());
@@ -388,19 +397,19 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), projectId);
         List<String> custkeyValues = new ArrayList<String>();
         List<Pair<String, String>> conditions = new ArrayList<>();
-        String conditionString = String.format("= '%s'", CLIENT_ID);
+        String conditionString = String.format("= '%s'", clientId);
         String conditionString2 = "= 0";
         conditions.add(Pair.of(COLUMN_X_CLIENT_ID, conditionString));
         conditions.add(Pair.of(COLUMN_X_DELETED, conditionString2));
         custkeyValues = redshiftUtils.getRecordsByCondition(table, column, conditions, null, LIMIT_RECORDS);
         assertThat(executionLog, containsString(
-                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]", projectId, CLIENT_ID, dataset)));
+                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]", projectId, clientId, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
 
         // Check results UI
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        initIndigoDashboardsPageSpecificProject(projectId).selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                 "$30.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
@@ -408,33 +417,34 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     /**
-     * Customer did a promotional eventsthey would like to make reports in the time
-     * which event happened Run force incremental load for defined period.
+     * Customer had promotional events in some specific agents. So they run force incremental load
+     * for defined period with GDC_TARGET_PROJECTS
      */
     @DataProvider
     public Object[][] dataFifthLoadForceIncremental() throws IOException {
-        return new Object[][] { { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
-                TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
-                datasetUpdateColumn()
-                        .rows(asList("CUS5", "User5", "2019-09-30", "15", timeLoadFrom, "0", CLIENT_ID, "address5", "city5",
-                                "10"))
-                        .rows(asList("CUS6", "User6", "2019-09-30", "15", timeLoadTo, "false", CLIENT_ID, "address6", "city6",
-                                "10"))
-                        .rows(asList("CUS1", "User1", "2019-09-30", "10", timeLoadFrom, "true", CLIENT_ID, "address1", "city1",
-                                "10"))
-                        .rows(asList("CUS3", "User3", "2019-09-30", "10", timeOverRange, "true", CLIENT_ID, "address3", "city3",
-                                "10"))
-                        .rows(asList("CUS3", "User3", "2019-09-30", "10", timeLoadFrom, "false", OTHER_CLIENT_ID, "address3",
-                                "city3", "10")),
-                datasetDelete().rows(asList("CUS2", timeLoadFrom, CLIENT_ID)).rows(asList("CUS3", timeLoadFrom, OTHER_CLIENT_ID)),
-                DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, projectTest, projectMappingPID,
-                asList("CUS2", "CUS3", "CUS5", "CUS6") } };
+        return new Object[][] {
+                { TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
+                        datasetUpdateColumn()
+                                .rows(asList("CUS5", "User5", "2019-09-30", "15", timeLoadFrom, "0", CLIENT_ID_1, "address5",
+                                        "city5", "10"))
+                                .rows(asList("CUS6", "User6", "2019-09-30", "15", timeLoadTo, "false", CLIENT_ID_1, "address6",
+                                        "city6", "10"))
+                                .rows(asList("CUS1", "User1", "2019-09-30", "10", timeLoadFrom, "true", CLIENT_ID_1, "address1",
+                                        "city1", "10"))
+                                .rows(asList("CUS3", "User3", "2019-09-30", "10", timeOverRange, "true", CLIENT_ID_1, "address3",
+                                        "city3", "10"))
+                                .rows(asList("CUS5", "User5", "2019-09-30", "15", timeLoadFrom, "false", CLIENT_ID_2, "address5",
+                                        "city5", "10")),
+                        datasetDelete().rows(asList("CUS2", timeLoadFrom, CLIENT_ID_1))
+                                .rows(asList("CUS3", timeLoadFrom, OTHER_CLIENT_ID)),
+                        DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, PK_CUSKEY, project1, clientProjectId1, project2,
+                        clientProjectId2, CLIENT_ID_1, asList("CUS2", "CUS3", "CUS5", "CUS6") } };
     }
 
     @Test(dependsOnMethods = { "checkFourthForceFullLoad" }, dataProvider = "dataFifthLoadForceIncremental")
     public void checkFifthLoadWithClientId(String table, String deleteTable, CsvFile csvfile, CsvFile csvFileDelete,
-            String dataset, String attribute, Project project, String projectId, List<String> expectedResult)
-            throws SQLException, IOException {
+            String dataset, String attribute, Project project, String projectId, Project projectNotLoad, String projectIdNotLoad,
+            String clientId, List<String> expectedResult) throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         csvFileDelete.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
@@ -461,24 +471,34 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "INCREMENTAL")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_DATE_FROM", timeLoadFrom)
-                .addParameter("GDC_DATALOAD_SINGLE_RUN_DATE_TO", timeLoadTo);
+                .addParameter("GDC_DATALOAD_SINGLE_RUN_DATE_TO", timeLoadTo)
+                .addParameter("GDC_TARGET_PROJECTS", clientProjectId1);
         ProcessExecutionDetail detail = domainProcessUtils.execute(parameters);
         // Check result greypage
         String executionLog = domainProcessUtils.getExecutionLog(detail.getLogUri(), projectId);
         assertThat(executionLog, containsString(String.format(
                 "Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, incremental, loadDataFrom=%s, deleteDataFrom=%s}]",
-                projectId, CLIENT_ID, dataset, lastSuccessful, lastThirdSuccessful)));
+                projectId, clientId, dataset, lastSuccessful, lastThirdSuccessful)));
         assertThat(executionLog,
                 containsString(String.format("dataset.%s, upsert, rows=%s", dataset, csvfile.getDataRowCount() - 3)));
         Attribute attributeCustkey = getMdService().getObj(project, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
+        Attribute attributeCustkeyNotLoad = getMdService().getObj(projectNotLoad, Attribute.class,
+                identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(expectedResult.toArray()));
+        assertTrue(getAttributeValues(attributeCustkeyNotLoad).isEmpty());
         // Check result UI
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        initIndigoDashboardsPageSpecificProject(projectId).selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                 "$50.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
                 .getChartReport().getDataLabels(), singletonList("$50.00"), "Unconnected filter make impact to insight");
+
+        initIndigoDashboardsPageSpecificProject(projectIdNotLoad).selectDateFilterByName("All time");
+        assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(), "–",
+                "Unconnected filter make impact to kpi");
+        assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME).isEmptyValue(),
+                "The empty state of insight is not correct");
     }
 
     @AfterClass(alwaysRun = true)
@@ -488,18 +508,12 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
             return;
         }
         domainRestClient.getProcessService().removeProcess(dataloadProcess);
-        dataMappingProjectIdUtils.deleteProjectIdDataMapping(projectMappingPID);
+        lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         redshiftUtils.dropTables(TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN);
         redshiftUtils.dropSchemaIfExists();
         redshiftUtils.closeRedshiftConnection();
-    }
-
-    private void setUpProject() throws IOException {
-        projectMappingPID = testParams.getProjectId();
-        projectTest = getAdminRestClient().getProjectService().getProjectById(projectMappingPID);
-        log.info("Project 1 :" + projectMappingPID);
     }
 
     private void setUpDatasource() throws SQLException, IOException {
@@ -511,16 +525,12 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         dataSourceId = dataSource.createDataSource(DATA_SOURCE_NAME, connectionInfo);
     }
 
-    private void setupMaql(String maql, Project project) {
-        getAdminRestClient().getModelService().updateProjectModel(project, maql).get();
-    }
-
     private void setUpModel() {
         // setUp Model projects
         Dataset datasetMappingProjectId = new Dataset(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN).withPrimaryKey(PK_CUSKEY)
                 .withAttributes(ATTR_NAME).withFacts(FACT_AMOUNT).withDates(DATE_BIRTHDAY);
         // create MAQL
-        setupMaql(new LdmModel().withDataset(datasetMappingProjectId).buildMaqlUsingPrimaryKey(), projectTest);
+        setupMaql(new LdmModel().withDataset(datasetMappingProjectId).buildMaqlUsingPrimaryKey());
 
     }
 
@@ -541,26 +551,22 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         redshiftUtils.executeSql(sql_delete);
     }
 
-    private void setUpDataMapping() {
-        List<Pair<String, String>> listProjectIdMapping = new ArrayList<>();
-        listProjectIdMapping.add(Pair.of(projectMappingPID, CLIENT_ID));
-
-        dataMappingProjectIdUtils = new DataMappingUtils(testParams.getDomainUser(), listProjectIdMapping, asList(), dataSourceId,
-                testParams.getProjectId());
-        dataMappingProjectIdUtils.createDataMapping();
-
-    }
-
     private void setUpProcess() {
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectTest, PROCESS_NAME,
-                dataSourceId, "1");
+        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
+                dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
         domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        updateLCM();
     }
 
     private void updateModel() {
         Dataset datasetMappingProjectId = new Dataset(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN)
                 .withAttributes(ATTR_ADDRESS, ATTR_CITY).withFacts(FACT_AGE);
-        setupMaql(new LdmModel().withDataset(datasetMappingProjectId).buildMaqlUpdateModel(), projectTest);
+        setupMaql(new LdmModel().withDataset(datasetMappingProjectId).buildMaqlUpdateModel());
+    }
+
+    private void updateLCM() {
+        lcmBrickFlowBuilder.deleteMasterProject();
+        lcmBrickFlowBuilder.runLcmFlow();
     }
 
     private void updateDatabase() {
@@ -586,11 +592,34 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     protected Metrics getMetricCreator() {
-        return new Metrics(domainRestClient, projectMappingPID);
+        return new Metrics(domainRestClient, testParams.getProjectId());
     }
 
     private String createInsightHasOnlyMetric(String insightTitle, ReportType reportType, List<String> metricsTitle) {
         return indigoRestRequest.createInsight(new InsightMDConfiguration(insightTitle, reportType).setMeasureBucket(metricsTitle
                 .stream().map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))).collect(toList())));
+    }
+
+    private void createLCM() throws ParseException, IOException {
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
+        serviceProjectId = lcmBrickFlowBuilder.getLCMServiceProject().getServiceProjectId();
+        serviceProject = domainRestClient.getProjectService().getProjectById(serviceProjectId);
+
+        String devProjectId = testParams.getProjectId();
+        log.info("dev project : " + devProjectId);
+
+        clientProjectId1 = createNewEmptyProject(domainRestClient, CLIENT_PROJECT_TITLE_1);
+        project1 = domainRestClient.getProjectService().getProjectById(clientProjectId1);
+        log.info("client 1 : " + clientProjectId1);
+
+        clientProjectId2 = createNewEmptyProject(domainRestClient, CLIENT_PROJECT_TITLE_2);
+        project2 = domainRestClient.getProjectService().getProjectById(clientProjectId2);
+        log.info("client 2 : " + clientProjectId2);
+
+        lcmBrickFlowBuilder.setDevelopProject(devProjectId).setSegmentId(SEGMENT_ID).setClient(CLIENT_ID_1, clientProjectId1)
+                .setClient(CLIENT_ID_2, clientProjectId2).buildLcmProjectParameters();
+        lcmBrickFlowBuilder.runLcmFlow();
+        addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId1);
+        addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId2);
     }
 }
