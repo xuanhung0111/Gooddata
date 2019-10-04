@@ -15,6 +15,7 @@ public class Dataset {
     private String primarykey ;
     private List<String> attributes;
     private List<String> facts;
+    private List<String> dates;
     private List<Pair<String, String>> labelOfAttributes;
     private List<Pair<String, String>> defaultLabelOfAttributes;
     private List<String> grains;
@@ -24,6 +25,7 @@ public class Dataset {
         this.grains = new ArrayList<>();
         this.primarykey = null;
         this.attributes = new ArrayList<>();
+        this.dates = new ArrayList<>();
         this.labelOfAttributes = new ArrayList<>();
         this.defaultLabelOfAttributes = new ArrayList<>();
         this.facts = new ArrayList<>();
@@ -31,6 +33,11 @@ public class Dataset {
 
     public Dataset withAttributes(String... attributes) {
         this.attributes.addAll(asList(attributes));
+        return this;
+    }
+
+    public Dataset withDates(String... dates) {
+        this.dates.addAll(asList(dates));
         return this;
     }
 
@@ -76,16 +83,27 @@ public class Dataset {
                 .replace("${dataset}", getName());
     }
 
+    public String buildMaqlUpdateModel() {
+        return new StringBuilder()
+                .append(buildAttributes())
+                .append(buildFacts())
+                .append("SYNCHRONIZE {dataset.${dataset}} PRESERVE DATA;")
+                .toString()
+                .replace("${dataset}", getName());
+    }
+
     public String buildMaqlUsingPrimaryKey() {
         return new StringBuilder()
                 .append("CREATE FOLDER {dim.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE ATTRIBUTE;")
                 .append("CREATE FOLDER {ffld.${dataset}} VISUAL(TITLE \"${dataset}\") TYPE FACT;")
                 .append("CREATE DATASET {dataset.${dataset}} VISUAL(TITLE \"${dataset}\");")
+                .append(includeDates())
                 .append(buildAttributes())
                 .append(buildFacts())
                 .append(primarykey == null ? "" : buildPrimaryKey())
                 .append(labelOfAttributes.isEmpty() ? "" : buildLabels())
                 .append(defaultLabelOfAttributes.isEmpty() ? "" : buildDefaultLabels())
+                .append(buildDates())
                 .append("SYNCHRONIZE {dataset.${dataset}};")
                 .toString()
                 .replace("${dataset}", getName());
@@ -171,6 +189,29 @@ public class Dataset {
 
     private String buildFacts() {
         return facts.stream().map(this::buildFact).collect(joining());
+    }
+
+    private String includeDate(String date) {
+        return new StringBuilder()
+                .append("INCLUDE TEMPLATE \"urn:gooddata:date\" MODIFY (IDENTIFIER \"${date}\", TITLE \"${date}\");")
+                .toString()
+                .replace("${date}", date);
+    }
+
+    private String includeDates() {
+        return dates.stream().map(this::includeDate).collect(joining());
+    }
+
+    private String buildDate(String date) {
+        return new StringBuilder()
+                .append("ALTER ATTRIBUTE {${date}.date} ADD KEYS {f_${dataset}.dt_${date}_id};")
+                .toString()
+                .replace("${dataset}", getName())
+                .replace("${date}", date);
+    }
+
+    private String buildDates() {
+        return dates.stream().map(this::buildDate).collect(joining());
     }
 
     private String buildGrains() {

@@ -1,6 +1,10 @@
 package com.gooddata.qa.utils.snowflake;
 
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_NAME;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATE_BIRTHDAY;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_ADDRESS;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_CITY;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AGE;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_FIRST_GRAIN;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.ATTR_SECOND_GRAIN;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.COLUMN_X_CLIENT_ID;
@@ -21,6 +25,7 @@ import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATASET_CUSTOM
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATASET_CUSTOMERS_TIMESTAMP_CLIENTID;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.DATASET_CUSTOMERS_TIMESTAMP_DELETED;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AGE;
+import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.PK_CUSKEY;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.PK_CUSKEY_LABEL;
 import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.PK_CUSKEY_LINK;
@@ -32,6 +37,19 @@ public class DatasetUtils {
         return new CsvFile(DATASET_CUSTOMERS).columns(new CsvFile.Column(PK_CUSKEY), new CsvFile.Column(ATTR_NAME),
                 new CsvFile.Column(FACT_AGE), new CsvFile.Column(COLUMN_X_TIMESTAMP), new CsvFile.Column(COLUMN_X_DELETED),
                 new CsvFile.Column(COLUMN_X_CLIENT_ID));
+    }
+
+    public static CsvFile datasetUseAmount() {
+        return new CsvFile(DATASET_CUSTOMERS).columns(new CsvFile.Column(PK_CUSKEY), new CsvFile.Column(ATTR_NAME),
+                new CsvFile.Column(DATE_BIRTHDAY), new CsvFile.Column(FACT_AMOUNT), new CsvFile.Column(COLUMN_X_TIMESTAMP),
+                new CsvFile.Column(COLUMN_X_DELETED), new CsvFile.Column(COLUMN_X_CLIENT_ID));
+    }
+
+    public static CsvFile datasetUpdateColumn() {
+        return new CsvFile(DATASET_CUSTOMERS).columns(new CsvFile.Column(PK_CUSKEY), new CsvFile.Column(ATTR_NAME),
+                new CsvFile.Column(DATE_BIRTHDAY), new CsvFile.Column(FACT_AMOUNT), new CsvFile.Column(COLUMN_X_TIMESTAMP),
+                new CsvFile.Column(COLUMN_X_DELETED), new CsvFile.Column(COLUMN_X_CLIENT_ID), new CsvFile.Column(ATTR_ADDRESS),
+                new CsvFile.Column(ATTR_CITY), new CsvFile.Column(FACT_AGE));
     }
 
     public static CsvFile datasetDelete() {

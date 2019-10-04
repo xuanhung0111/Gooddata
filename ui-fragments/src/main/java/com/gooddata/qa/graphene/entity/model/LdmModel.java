@@ -55,4 +55,10 @@ public class LdmModel {
         logger.info("MAQL update Model Fact Table Grain: " + maql);
         return maql;
     }
+
+    public String buildMaqlUpdateModel() {
+        String maql = datasets.stream().map(Dataset::buildMaqlUpdateModel).collect(joining());
+        logger.info("MAQL update Model add more attribute, fact: " + maql);
+        return maql;
+    }
 }
