@@ -675,6 +675,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return AnalysisPage.getInstance(browser);
     }
 
+    public AnalysisPage openAnalyzePage(String type, String name) {
+        initAnalysePage();
+        String hasIdPart = browser.getCurrentUrl().split(testParams.getProjectId() + "/")[1];
+        openUrl("analyze/#/" + testParams.getProjectId() + "/" + hasIdPart + "?" + type + "=[" + name + "]");
+        return AnalysisPage.getInstance(browser);
+    }
+
     public String getUser(UserRoles userRoles){
         switch (userRoles){
             case EDITOR:

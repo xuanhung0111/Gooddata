@@ -66,6 +66,15 @@ public class DataPage extends AbstractFragment {
         return getRoot().findElements(FOLDERS_XPATH_LOCATOR);
     }
 
+    public String getUriFolder(String nameFolder) {
+        return getRoot().findElements(FOLDERS_XPATH_LOCATOR)
+            .stream().filter(e -> e.getText().equals(nameFolder))
+            .findFirst()
+            .get()
+            .findElement(By.xpath(".."))
+            .getAttribute("gdc:link");
+    }
+
     public void openPage(ObjectTypes objectType) {
         waitForElementVisible(cssSelector("div#objectTypesList"), getRoot())
             .findElement(xpath(objectType.getMenuItemXpath()))

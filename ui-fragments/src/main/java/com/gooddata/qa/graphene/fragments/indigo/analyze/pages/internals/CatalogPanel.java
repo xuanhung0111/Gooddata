@@ -51,6 +51,12 @@ public class CatalogPanel extends AbstractFragment {
     @FindBy(className = "s-dataset-picker-toggle")
     private WebElement datasetPicker;
 
+    @FindBy(className = "s-catalog-group-label")
+    private List<WebElement> catalogGroupLabels;
+
+    @FindBy(className = "s-no-objects-found")
+    private WebElement noObjectsFound;
+
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
     private static final By BY_NO_ITEMS = By.className("adi-no-items");
     private static final By BY_UNRELATED_ITEMS_HIDDEN = By.cssSelector("footer > div");
@@ -133,6 +139,10 @@ public class CatalogPanel extends AbstractFragment {
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getMetricDescription();
     }
 
+    public String getMetricDescriptionAndGroupCatalog(String metric) {
+        return getMetricDescription(metric).concat(getDescriptionPanel().getGroupCatalog());
+    }
+
     public String getFactDescription(String fact) {
         WebElement field = searchAndGet(fact, FieldType.FACT);
 
@@ -147,6 +157,27 @@ public class CatalogPanel extends AbstractFragment {
     public List<String> getFieldNamesInViewPort() {
         waitForItemLoaded();
         return getElementTexts(items);
+    }
+
+    public List<String> getTextCatalogGroupLabels() {
+        waitForItemLoaded();
+        return getElementTexts(catalogGroupLabels);
+    }
+
+    public String getNoObjectsFound() {
+        return waitForElementVisible(noObjectsFound).getText();
+    }
+
+    public CatalogPanel expandCatalogGroupLabels(String nameGroup) {
+        if (!isGroupLabelExpanded(nameGroup)) {
+            getCatalogGroupLabels(nameGroup).click();
+        }
+        return this;
+    }
+
+    public Boolean isGroupLabelExpanded(String nameGroup) {
+        WebElement groupWebElement = getCatalogGroupLabels(nameGroup);
+        return groupWebElement.getAttribute("class").contains("s-is-expanded");
     }
 
     public boolean isEmpty() {
@@ -227,6 +258,11 @@ public class CatalogPanel extends AbstractFragment {
         return this;
     }
 
+    private DescriptionPanel getDescriptionPanel() {
+        return Graphene.createPageFragment(DescriptionPanel.class,
+            waitForElementVisible(DescriptionPanel.LOCATOR, browser));
+    }
+
     public class DatasourceDropDown extends AbstractFragment {
 
         @FindBy(className = "gd-list-item")
@@ -239,5 +275,12 @@ public class CatalogPanel extends AbstractFragment {
                 .orElseThrow(() -> new NoSuchElementException("Cannot find dataset: " + dataset))
                 .click();
         }
+    }
+
+    private WebElement getCatalogGroupLabels(String nameGroup) {
+        waitForItemLoaded();
+        return catalogGroupLabels.stream()
+            .filter(e -> e.getText().equals(nameGroup))
+            .findFirst().get();
     }
 }
