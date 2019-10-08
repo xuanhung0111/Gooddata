@@ -25,19 +25,25 @@ import static org.openqa.selenium.By.className;
 /**
  * search() method needs to sleep tight for 1 sec in order to work.
  */
-public class CataloguePanel extends AbstractFragment {
+public class CatalogPanel extends AbstractFragment {
 
     @FindBy(css = ".s-catalogue-search input")
     private WebElement searchInput;
 
-    @FindBy(className = "adi-catalogue-item")
+    @FindBy(className = "s-date")
+    private WebElement dateItem;
+
+    @FindBy(className = "s-catalog-item")
     private List<WebElement> items;
+
+    @FindBy(className = "s-catalogue-loaded")
+    private WebElement catalogLoaded;
 
     @FindBy(className = "s-filter-all")
     private WebElement filterAll;
 
-    @FindBy(className = "s-filter-metrics")
-    private WebElement filterMetrics;
+    @FindBy(className = "s-filter-measures")
+    private WebElement filterMeasures;
 
     @FindBy(className = "s-filter-attributes")
     private WebElement filterAttributes;
@@ -68,14 +74,14 @@ public class CataloguePanel extends AbstractFragment {
         return Integer.parseInt(unrelatedItemsHiddenMessage.split(" ")[0]);
     }
 
-    public CataloguePanel filterCatalog(CatalogFilterType type) {
+    public CatalogPanel filterCatalog(CatalogFilterType type) {
         WebElement filter;
         switch(type) {
             case ALL:
                 filter = filterAll;
                 break;
             case MEASURES:
-                filter = filterMetrics;
+                filter = filterMeasures;
                 break;
             case ATTRIBUTES:
                 filter = filterAttributes;
@@ -91,6 +97,7 @@ public class CataloguePanel extends AbstractFragment {
 
     public WebElement getDate() {
         clearInputText();
+        waitForElementVisible(dateItem);
         return waitForCollectionIsNotEmpty(items).stream()
             .filter(date -> "Date".equals(date.getText()))
             .filter(date -> date.getAttribute("class").contains(FieldType.DATE.toString()))
@@ -156,14 +163,14 @@ public class CataloguePanel extends AbstractFragment {
      * @param item
      * @return true if found something from search input, otherwise return false
      */
-    public CataloguePanel search(String item) {
+    public CatalogPanel search(String item) {
         clearInputText();
         searchInput.sendKeys(item);
         waitForItemLoaded();
         return this;
     }
 
-    public CataloguePanel clearInputText() {
+    public CatalogPanel clearInputText() {
         if (!searchInput.getAttribute("value").isEmpty()) {
             waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot()).click();
             waitForItemLoaded();
@@ -190,7 +197,7 @@ public class CataloguePanel extends AbstractFragment {
         return true;
     }
 
-    public CataloguePanel changeDataset(String dataset) {
+    public CatalogPanel changeDataset(String dataset) {
         waitForElementVisible(datasetPicker).click();
         Graphene.createPageFragment(DatasourceDropDown.class,
                 waitForElementVisible(BY_DATASOURCE_DROPDOWN, browser)).select(dataset);
@@ -212,9 +219,10 @@ public class CataloguePanel extends AbstractFragment {
         return waitForElementVisible(className("data-source-picker"), browser).getText().equals(dataset);
     }
 
-    public CataloguePanel waitForItemLoaded() {
+    public CatalogPanel waitForItemLoaded() {
         Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
                 browser);
+        waitForElementVisible(catalogLoaded);
         Graphene.waitGui().until(itemsLoaded);
         return this;
     }

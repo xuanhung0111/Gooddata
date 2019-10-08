@@ -34,8 +34,6 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(
             new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        // TODO: BB-1550 enableCatalogGrouping FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CATALOG_GROUPING, false);
     }
 
     protected void checkingOpenAsReport(String screenShot) {

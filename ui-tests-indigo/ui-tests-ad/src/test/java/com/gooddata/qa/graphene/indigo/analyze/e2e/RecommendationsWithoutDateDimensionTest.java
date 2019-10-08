@@ -34,7 +34,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void trending_recommendation_should_not_be_visible() {
-        assertFalse(initAnalysePage().getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
+        assertFalse(initAnalysePage().getCatalogPanel().getFieldNamesInViewPort().contains(DATE));
         analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
             .waitForReportComputing();
 //        enable with CL-9443

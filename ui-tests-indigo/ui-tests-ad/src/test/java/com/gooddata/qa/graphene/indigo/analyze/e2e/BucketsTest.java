@@ -86,11 +86,11 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_attributes() {
-        WebElement metric = initAnalysePage().getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+        WebElement metric = initAnalysePage().getCatalogPanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
         analysisPage.tryToDrag(metric, analysisPage.getStacksBucket().getInvitation());
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
-        WebElement date = analysisPage.getCataloguePanel().getDate();
+        WebElement date = analysisPage.getCatalogPanel().getDate();
         analysisPage.tryToDrag(date, analysisPage.getStacksBucket().getInvitation());
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 

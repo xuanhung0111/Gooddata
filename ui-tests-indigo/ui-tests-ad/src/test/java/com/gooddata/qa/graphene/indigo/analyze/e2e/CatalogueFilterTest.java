@@ -18,7 +18,6 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
     private String attributes = ".type-attribute";
     private String facts = ".type-fact";
     private String dates = ".type-date";
-    private String header = ".adi-catalogue-header";
 
     @Override
     public void initProperties() {
@@ -33,21 +32,21 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_all_items_for_all_data_filter() {
-        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
-        expectVisible(dates, attributes, metrics, facts, header);
+        initAnalysePage().getCatalogPanel().filterCatalog(CatalogFilterType.ALL);
+        expectVisible(dates, attributes, metrics, facts);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_only_metrics_and_facts_for_metrics_filter() {
-        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.MEASURES);
-        expectVisible(metrics, facts, header);
+        initAnalysePage().getCatalogPanel().filterCatalog(CatalogFilterType.MEASURES);
+        expectVisible(metrics, facts);
         expectHidden(dates, attributes);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_only_date_and_attributes_for_attributes_filter() {
-        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
-        expectVisible(dates, attributes, header);
+        initAnalysePage().getCatalogPanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
+        expectVisible(dates, attributes);
         expectHidden(metrics, facts);
     }
 

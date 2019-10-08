@@ -59,7 +59,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        WebElement attribute = analysisPage.getCataloguePanel()
+        WebElement attribute = analysisPage.getCatalogPanel()
                 .searchAndGet(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
         assertTrue(analysisPage.tryToDrag(attribute, analysisPage.getStacksBucket().getInvitation())
             .removeFilter(ATTR_ACTIVITY_TYPE)

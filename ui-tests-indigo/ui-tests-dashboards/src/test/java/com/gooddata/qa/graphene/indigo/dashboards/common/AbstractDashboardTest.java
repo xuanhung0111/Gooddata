@@ -65,8 +65,6 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
 
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(
             new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        // TODO: BB-1550 enableCatalogGrouping FF should be removed
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CATALOG_GROUPING, false);
     }
 
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
