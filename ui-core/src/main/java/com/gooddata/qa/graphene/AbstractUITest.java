@@ -467,7 +467,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public IndigoDashboardsPage initIndigoDashboardsPage() {
-        openUrl(getIndigoDashboardsPageUri());
+        return initIndigoDashboardsPageSpecificProject(testParams.getProjectId());
+    }
+
+    public String getIndigoDashboardsPageUriSpecificProject(String projectId) {
+        return PAGE_INDIGO_DASHBOARDS + "#/project/" + projectId;
+    }
+
+    public IndigoDashboardsPage initIndigoDashboardsPageSpecificProject(String projectId) {
+        openUrl(getIndigoDashboardsPageUriSpecificProject(projectId));
         waitForOpeningIndigoDashboard();
         return IndigoDashboardsPage.getInstance(browser);
     }
