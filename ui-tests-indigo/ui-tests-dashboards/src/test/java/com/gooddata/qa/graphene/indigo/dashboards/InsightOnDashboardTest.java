@@ -220,7 +220,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
             initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedAfterRenameTitle = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .addInsight(RENAMED_TEST_INSIGHT)
+                .addInsightNext(RENAMED_TEST_INSIGHT)
                 .getLastWidget(Insight.class)
                 .getHeadline();
 
