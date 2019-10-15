@@ -418,7 +418,8 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_PRODUCT),
                 "Default sorting should be kept with ASC");
 
-        analysisPage.addAttributeTopRowsBucket(ATTR_PRODUCT, ATTR_IS_CLOSED);
+        analysisPage.addAttribute(ATTR_IS_CLOSED).reorderAttribute(ATTR_PRODUCT, ATTR_IS_CLOSED)
+            .reorderAttribute(ATTR_DEPARTMENT, ATTR_IS_CLOSED).waitForReportComputing();
         takeScreenshot(browser, "Validate-GoodSales-project", getClass());
         assertTrue(analysisPage.getPivotTableReport().isRowHeaderSortedUp(ATTR_IS_CLOSED),
                 "Default sorting should be kept with ASC");

@@ -39,7 +39,7 @@ public class VisualizationsTest extends AbstractDashboardTest {
     public void addVisualizationToLastPosition() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .addInsight(VISUALIZATION_TITLE);
+                .addInsightNext(VISUALIZATION_TITLE);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
@@ -66,7 +66,7 @@ public class VisualizationsTest extends AbstractDashboardTest {
     public void checkaddVisualizationFromList() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .addInsight(VISUALIZATION_TITLE);
+                .addInsightNext(VISUALIZATION_TITLE);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 

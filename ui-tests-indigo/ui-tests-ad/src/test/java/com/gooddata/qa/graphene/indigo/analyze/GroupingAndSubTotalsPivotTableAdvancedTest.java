@@ -194,7 +194,8 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
         assertEquals(pivotTableReport.getGrandTotalsContent(), asList(asList("Sum", EMPTY, "$48,932,639.59",
             "$2,245,586.38", "$67,692,816.95", "$2,888,811.27")));
 
-        analysisPage.addAttributeTopRowsBucket(ATTR_REGION, ATTR_DEPARTMENT).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_DEPARTMENT).reorderAttribute(ATTR_REGION, ATTR_DEPARTMENT)
+            .reorderAttribute(ATTR_FORECAST_CATEGORY, ATTR_DEPARTMENT).waitForReportComputing();
 
         assertFalse(pivotTableReport.hasSubTotals(), "Subtotals should be not showed");
         assertEquals(pivotTableReport.getGrandTotalsContent(),
