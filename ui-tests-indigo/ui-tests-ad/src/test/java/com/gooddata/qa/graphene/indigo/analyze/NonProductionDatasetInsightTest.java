@@ -11,7 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
@@ -38,7 +38,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             description = "Graphene test for bug ONE-1464 Get error when opening viz belong to non-production dataset")
     public void openInsightContainingNonProductionDataset() {
         final String insight = "Open-Insight-Containing-Non-Production-Dataset-Test";
-        final CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        final CatalogPanel panel = initAnalysePage().getCatalogPanel();
         panel.changeDataset(PAYROLL_DATASET);
         analysisPage.addMetric("Amount", FieldType.FACT)
                 .addAttribute("Education")
@@ -60,7 +60,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             description = "CL-9954 Unable to add filter for measure in existing viz that belongs to non-production")
     public void makeSureCanAddFilterForMeasure() {
         final String insight = "Cover bug CL-9954";
-        final CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        final CatalogPanel panel = initAnalysePage().getCatalogPanel();
         panel.changeDataset(PAYROLL_DATASET);
 
         assertTrue(analysisPage.addMetric("Amount", FieldType.FACT)

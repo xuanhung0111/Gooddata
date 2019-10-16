@@ -34,6 +34,14 @@ public class Metrics extends CommonRestRequest{
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
+    //This function used by Redshift Test
+    public Metric createSumAmountMetric() {
+        return createMetricIfNotExist(METRIC_AMOUNT,
+                format("SELECT SUM([%s])",
+                        getFactByTitle("amount").getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
     public Metric createAmountBOPMetric() {
         return createMetricIfNotExist(METRIC_AMOUNT_BOP,
                 format("SELECT SUM([%s]) where [%s]= [%s]",

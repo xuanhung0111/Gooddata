@@ -7,12 +7,11 @@ import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
-import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -61,7 +60,7 @@ public class AnalysisPage extends AbstractFragment {
     private AnalysisPageHeader pageHeader;
 
     @FindBy(className = "s-catalogue")
-    private CataloguePanel cataloguePanel;
+    private CatalogPanel catalogPanel;
 
     @FindBy(className = "adi-editor-main")
     private MainEditor mainEditor;
@@ -137,7 +136,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage addMetricToRecommendedStepsPanelOnCanvas(String metricTitle, FieldType type) {
-        WebElement source = getCataloguePanel().searchAndGet(metricTitle, type);
+        WebElement source = getCatalogPanel().searchAndGet(metricTitle, type);
         Supplier<WebElement> recommendation = () ->
                 waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
         return drag(source, recommendation);
@@ -197,7 +196,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage addMetric(String data, FieldType type) {
-        WebElement source = getCataloguePanel().searchAndGet(data, type);
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
         WebElement target = getMetricsBucket().getInvitation();
         return drag(source, target);
     }
@@ -207,7 +206,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage addMetricToSecondaryBucket(String data, FieldType type) {
-        WebElement source = getCataloguePanel().searchAndGet(data, type);
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
         WebElement target = getMetricsSecondaryBucket().getInvitation();
         return drag(source, target);
     }
@@ -233,25 +232,25 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage addStack(String attribute) {
-        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getStacksBucket().getInvitation();
         return drag(source, target);
     }
 
     public AnalysisPage addFilter(String attribute) {
-        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getFilterBuckets().getInvitation();
         return drag(source, target);
     }
 
     public AnalysisPage addDateFilter() {
-        WebElement source = getCataloguePanel().getDate();
+        WebElement source = getCatalogPanel().getDate();
         WebElement target = getFilterBuckets().getInvitation();
         return drag(source, target);
     }
 
     public AnalysisPage addMetricAfter(String metric, String newMetric) {
-        WebElement source = getCataloguePanel().searchAndGet(newMetric, FieldType.METRIC);
+        WebElement source = getCatalogPanel().searchAndGet(newMetric, FieldType.METRIC);
         WebElement target = getMetricsBucket().get(metric);
 
         try {
@@ -270,7 +269,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
-        WebElement source = getCataloguePanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().get(oldAttr);
         return drag(source, target);
     }
@@ -300,19 +299,19 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage replaceAttributeWithDate(String oldAttr) {
-        WebElement source = getCataloguePanel().getDate();
+        WebElement source = getCatalogPanel().getDate();
         WebElement target = getAttributesBucket().get(oldAttr);
         return drag(source, target);
     }
 
     public AnalysisPage replaceAttribute(String attr) {
-        WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(attr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getFirst();
         return drag(source, target);
     }
 
     public AnalysisPage replaceStack(String attr) {
-        WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(attr, FieldType.ATTRIBUTE);
         WebElement target = getStacksBucket().get();
         return drag(source, target);
     }
@@ -427,8 +426,8 @@ public class AnalysisPage extends AbstractFragment {
         return getMainEditor().getChartReport();
     }
 
-    public CataloguePanel getCataloguePanel() {
-        return waitForFragmentVisible(cataloguePanel).waitForItemLoaded();
+    public CatalogPanel getCatalogPanel() {
+        return waitForFragmentVisible(catalogPanel).waitForItemLoaded();
     }
 
     public MetricsBucket getMetricsBucket() {
@@ -563,7 +562,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     private AnalysisPage addAttribute(WebElement typeAttribute, String attribute) {
-        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement source = getCatalogPanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         //To avoid move target out of bounds of viewport, should scroll element into view
         Point location = typeAttribute.getLocation();
         Dimension dimension = typeAttribute.getSize();
@@ -574,7 +573,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     private AnalysisPage addDate(WebElement typeAttribute) {
-        WebElement source = getCataloguePanel().getDate();
+        WebElement source = getCatalogPanel().getDate();
         return drag(source, typeAttribute);
     }
 

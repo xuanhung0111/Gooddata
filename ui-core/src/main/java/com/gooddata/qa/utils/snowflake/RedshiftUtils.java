@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class RedshiftUtils {
      * @param s3SecretKey
      */
     public void loadDataFromS3ToDatabase(String tableName, String s3Path, String s3AccessKey, String s3SecretKey) throws SQLException {
-        executeSingleSql(String.format(
+        executeSql(String.format(
                 "copy %s from '%s' credentials 'aws_access_key_id=%s;aws_secret_access_key=%s' delimiter ',' ignoreheader 1 region 'us-east-1';",
                 tableName, s3Path, s3AccessKey, s3SecretKey));
         logger.info("Loaded CSV data from S3 " + s3Path + "to table " + tableName);
@@ -72,7 +73,7 @@ public class RedshiftUtils {
         String columnsOfTable = setupColumnsOfTable(listOfColumns);
 
         // create table
-        executeSingleSql("CREATE TABLE " + tableName + "(" + columnsOfTable + ")");
+        executeSql("CREATE TABLE " + tableName + "(" + columnsOfTable + ")");
         logger.info("Created table with name: " + tableName);
         return this;
     }
@@ -97,7 +98,7 @@ public class RedshiftUtils {
      */
     public void dropTables(String... tableNames) throws SQLException {
         for (String willDeleteTableName : tableNames) {
-            executeSingleSql("DROP TABLE IF EXISTS " + willDeleteTableName + " CASCADE;");
+            executeSql("DROP TABLE IF EXISTS " + willDeleteTableName + " CASCADE;");
             logger.info("Dropped table with name: " + willDeleteTableName);
         }
     }
@@ -110,7 +111,6 @@ public class RedshiftUtils {
     public void executeSql(String sqlStr) throws SQLException {
         // create statements
         Statement statement = connection.createStatement();
-
         // execute SQL commands
         logger.info("Executing the SQL statements");
         logger.info(sqlStr);
@@ -122,45 +122,28 @@ public class RedshiftUtils {
     }
 
     /**
-     * Execute SQL statement on the redshift via given connection info for specific warehouse.
-     *
-     * @param sqlStr SQL command or a script (multiple colon-separated commands) to execute.
-     */
-    public void executeSingleSql(String sqlStr) throws SQLException {
-        executeCommandsForSpecificWarehouse();
-        executeSql(sqlStr);
-    }
-
-    /**
      * Execute SQL statement then return SQL result.
      *
      * @param sqlStr SQL command or a script (multiple colon-separated commands) to execute.
      * @return SQL result
      */
-    public ResultSet getSqlResult(String sqlStr) throws SQLException {
+    public ArrayList<String> getArrayResult(String sqlStr, String column) throws SQLException {
         // create statements
-        Statement statement = connection.createStatement();
+        Statement statementArray = connection.createStatement();
+        ArrayList<String> resultArray = new ArrayList<String>();
         try {
             // execute SQL commands
             logger.info("Executing the SQL statements");
-            ResultSet result = statement.executeQuery(sqlStr);
+            ResultSet result = statementArray.executeQuery(sqlStr);
             logger.info("Done executing the SQL statements");
-            return result;
+            while (result.next()) {
+                resultArray.add(result.getString(column));
+            }
+            return resultArray;
         } finally {
             // close statement
-            statement.close();
+            statementArray.close();
         }
-    }
-
-    /**
-     * Execute SQL statement then return SQL result.
-     *
-     * @param sqlStr SQL command or a script (multiple colon-separated commands) to execute.
-     * @return SQL result
-     */
-    public ResultSet getSingleSqlResult(String sqlStr) throws SQLException {
-        executeCommandsForSpecificWarehouse();
-        return getSqlResult(sqlStr);
     }
 
     /**
@@ -189,7 +172,7 @@ public class RedshiftUtils {
 
     public void updateColumn(String tableName, String column, String value, boolean isSchemaCreation) {
         try {
-            executeSingleSql("UPDATE " + tableName + " SET " + column + "= " + value);
+            executeSql("UPDATE " + tableName + " SET " + column + "= " + value);
         } catch (SQLException e) {
             logger.error("Update column" + column + "with value" + value + "failed");
             throw new RuntimeException(e);
@@ -198,7 +181,7 @@ public class RedshiftUtils {
 
     public void dropColumn(String tableName, String column) {
         try {
-            executeSingleSql("ALTER TABLE " + tableName + " DROP COLUMN " + column);
+            executeSql("ALTER TABLE " + tableName + " DROP COLUMN " + column);
         } catch (SQLException e) {
             logger.error("Drop column" + column + "failed");
             throw new RuntimeException(e);
@@ -207,17 +190,26 @@ public class RedshiftUtils {
 
     public void addColumn(String tableName, String column, String datatype) {
         try {
-            executeSingleSql("ALTER TABLE " + tableName + " ADD COLUMN " + column + " " + datatype);
+            executeSql("ALTER TABLE " + tableName + " ADD COLUMN " + column + " " + datatype);
         } catch (SQLException e) {
             logger.error("Add column" + column + "with datatype " + datatype + "failed");
             throw new RuntimeException(e);
         }
     }
 
-    public ResultSet getRecords(String tableName, String column, int limit) {
+    public void truncateTable(String tableName) {
+        try {
+            executeSql("TRUNCATE TABLE " + tableName);
+        } catch (SQLException e) {
+            logger.error("Truncate table failed !!!");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ArrayList<String> getRecords(String tableName, String column, int limit) {
         try {
             String sqlStr = "SELECT " + column + " FROM " + tableName + " LIMIT " + limit;
-            return getSingleSqlResult(sqlStr);
+            return getArrayResult(sqlStr, column);
         } catch (SQLException e) {
             logger.error("get Records error" + e.getMessage());
             throw new RuntimeException(e);
@@ -233,7 +225,7 @@ public class RedshiftUtils {
      * @param limit         : limit records returns
      * @return ResultSet apply querry
      */
-    public ResultSet getRecordsByCondition(String tableName, String column, List<Pair<String, String>> andConditions,
+    public ArrayList<String> getRecordsByCondition(String tableName, String column, List<Pair<String, String>> andConditions,
                                            List<Pair<String, String>> orConditions, int limit) {
 
         String andConditionString = andConditions != null
@@ -253,7 +245,7 @@ public class RedshiftUtils {
                     .replace("${tableName}", tableName)
                     .replace("${column}", column);
             logger.info("SQL Record in range:" + sqlStr);
-            return getSingleSqlResult(sqlStr);
+            return getArrayResult(sqlStr, column);
         } catch (SQLException e) {
             logger.error("get Records By Condition error" + e.getMessage());
             throw new RuntimeException(e);
@@ -280,7 +272,7 @@ public class RedshiftUtils {
         }
     }
 
-    private void executeCommandsForSpecificWarehouse(){
+    public void executeCommandsForSpecificWarehouse(){
         try {
             executeSql(String.format("set search_path = \"%s\";", redshiftConnectionInfo.getSchema()));
 

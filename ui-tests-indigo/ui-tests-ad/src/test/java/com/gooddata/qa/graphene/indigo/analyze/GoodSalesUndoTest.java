@@ -25,7 +25,7 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
@@ -197,11 +197,11 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
         ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
-        cataloguePanel.search(ATTR_DEPARTMENT);
-        assertEquals(cataloguePanel.getFieldNamesInViewPort(), singletonList(ATTR_DEPARTMENT));
+        final CatalogPanel catalogPanel = analysisPage.getCatalogPanel();
+        catalogPanel.search(ATTR_DEPARTMENT);
+        assertEquals(catalogPanel.getFieldNamesInViewPort(), singletonList(ATTR_DEPARTMENT));
         checkUndoRedoForReport(baseState, true);
-        assertEquals(cataloguePanel.getFieldNamesInViewPort(), singletonList(ATTR_DEPARTMENT));
+        assertEquals(catalogPanel.getFieldNamesInViewPort(), singletonList(ATTR_DEPARTMENT));
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).exportReport();
         checkUndoRedoForReport(baseState, true);

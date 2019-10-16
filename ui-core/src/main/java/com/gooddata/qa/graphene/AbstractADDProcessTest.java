@@ -3,13 +3,10 @@ package com.gooddata.qa.graphene;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static java.lang.String.format;
 
-import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
-import org.testng.annotations.AfterClass;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -17,7 +14,6 @@ import java.time.LocalTime;
 public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
 
     protected RestClient domainRestClient;
-    protected CommonRestRequest commonRestRequest;
     protected LcmBrickFlowBuilder lcmBrickFlowBuilder;
     protected boolean useK8sExecutor = false;
 
@@ -55,4 +51,5 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
                 projectId);
         userManagementRestRequest.addUserToProject(email, userRole);
     }
+
 }

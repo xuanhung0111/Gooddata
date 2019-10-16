@@ -26,7 +26,7 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(className = "s-dataset-name")
     private WebElement dataset;
 
-    public static final By LOCATOR = By.className("adi-catalogue-item-details");
+    public static final By LOCATOR = By.className("adi-catalog-item-details");
     private static final By CATALOG_BUBBLE_LOADED = By.className("s-catalogue-bubble-loaded");
 
     private static final String NEW_LINE = "\n";

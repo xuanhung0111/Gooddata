@@ -14,7 +14,7 @@ import static org.testng.Assert.assertTrue;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class CatalogueSearchTest extends AbstractAdE2ETest {
@@ -37,14 +37,14 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
-        CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search("xyz");
-        assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
-        assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"xyz\"");
+        CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel().search("xyz");
+        assertTrue(catalogPanel.isEmpty(), "Catalogue panel should be empty");
+        assertEquals(catalogPanel.getEmptyMessage(), "No data matching\n\"xyz\"");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_only_matched_items() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         panel.search("Opps.");
         assertThat(panel.getFieldNamesInViewPort() ,
@@ -56,7 +56,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_case_insensitive() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         panel.search("opps.");
         assertThat(panel.getFieldNamesInViewPort(),
@@ -65,7 +65,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_cancel_search() {
-        CataloguePanel panel = initAnalysePage().getCataloguePanel();
+        CatalogPanel panel = initAnalysePage().getCatalogPanel();
 
         panel.search(METRIC_NUMBER_OF_LOST_OPPS);
         assertThat(panel.getFieldNamesInViewPort(), not(hasItem(ATTR_ACTIVITY_TYPE)));

@@ -136,7 +136,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
         assertEquals(chartReport.getLegends().size(), 20);
         assertEquals(chartReport.getChartType(), ReportType.COLUMN_CHART.getLabel());
 
-        analysisPage.tryToDrag(analysisPage.getCataloguePanel().searchAndGet(METRIC_TIMELINE_BOP, FieldType.METRIC),
+        analysisPage.tryToDrag(analysisPage.getCatalogPanel().searchAndGet(METRIC_TIMELINE_BOP, FieldType.METRIC),
                 analysisPage.getMetricsBucket().getRoot());
         assertEquals(metricsBucket.getItemNames().size(), 20, "Can not add over 20 metrics");
     }

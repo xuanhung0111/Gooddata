@@ -31,7 +31,7 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 
 public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
@@ -51,12 +51,12 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testFilteringFieldsInCatalog() {
-        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
+        final CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel();
 
-        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
+        catalogPanel.filterCatalog(CatalogFilterType.MEASURES)
             .search("am");
 
-        assertTrue(cataloguePanel.getFieldsInViewPort()
+        assertTrue(catalogPanel.getFieldsInViewPort()
             .stream()
             .allMatch(input -> {
                 final String cssClass = input.getAttribute("class");
@@ -64,11 +64,11 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
                         cssClass.contains(FieldType.FACT.toString());
             }), "Catalogue panel should contain metric and fact");
 
-        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
+        catalogPanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
             .search("am");
 
         assertTrue(
-            cataloguePanel.getFieldsInViewPort()
+            catalogPanel.getFieldsInViewPort()
                 .stream()
                 .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString())),
             "Catalogue panel should contain metric and fact");
@@ -76,11 +76,11 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testCreateReportWithFieldsInCatalogFilter() {
-        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
+        final CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel();
 
-        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
+        catalogPanel.filterCatalog(CatalogFilterType.MEASURES);
         analysisPage.addMetric(METRIC_AMOUNT);
-        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
+        catalogPanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
         analysisPage.addAttribute(ATTR_STAGE_NAME)
             .waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1,
@@ -97,8 +97,8 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
         try {
             initAnalysePage();
-            analysisPage.getCataloguePanel().search("aaaa");
-            assertEquals(analysisPage.getCataloguePanel().getFieldNamesInViewPort(),
+            analysisPage.getCatalogPanel().search("aaaa");
+            assertEquals(analysisPage.getCatalogPanel().getFieldNamesInViewPort(),
                     asList("aaaaA1", "AAAAb2"));
         } finally {
             deleteMetric("aaaaA1");
@@ -128,21 +128,21 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(renameSuccess);
         try {
             initAnalysePage();
-            final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+            final CatalogPanel catalogPanel = analysisPage.getCatalogPanel();
 
-            cataloguePanel.search("<button> test XSS </button>");
-            assertTrue(cataloguePanel.isEmpty(), "Catalogue Panel should be empty");
-            cataloguePanel.search("<script> alert('test'); </script>");
-            assertTrue(cataloguePanel.isEmpty(), "Catalogue Panel should be empty");
-            cataloguePanel.search("<button>");
-            assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
+            catalogPanel.search("<button> test XSS </button>");
+            assertTrue(catalogPanel.isEmpty(), "Catalogue Panel should be empty");
+            catalogPanel.search("<script> alert('test'); </script>");
+            assertTrue(catalogPanel.isEmpty(), "Catalogue Panel should be empty");
+            catalogPanel.search("<button>");
+            assertEquals(catalogPanel.getFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
 
             StringBuilder expected = new StringBuilder(xssMetric).append("\n")
                     .append("Field Type\n")
                     .append("Calculated Measure\n")
                     .append("Defined As\n")
                     .append("select Won/Quota\n");
-            assertEquals(cataloguePanel.getMetricDescription(xssMetric), expected.toString());
+            assertEquals(catalogPanel.getMetricDescription(xssMetric), expected.toString());
 
             expected = new StringBuilder(xssAttribute).append("\n")
                     .append("Field Type\n")
@@ -150,7 +150,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
                     .append("Values\n")
                     .append("false\n")
                     .append("true\n");
-            assertEquals(cataloguePanel.getAttributeDescription(xssAttribute), expected.toString());
+            assertEquals(catalogPanel.getAttributeDescription(xssAttribute), expected.toString());
 
             analysisPage.addMetric(xssMetric).addAttribute(xssAttribute)
                 .waitForReportComputing();
@@ -173,43 +173,43 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testHiddenUnrelatedObjects() {
-        final CataloguePanel cataloguePanel = initAnalysePage()
+        final CatalogPanel catalogPanel = initAnalysePage()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
-                .getCataloguePanel()
+                .getCatalogPanel()
                 .clearInputText();
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(21));
+        assertThat(catalogPanel.getUnrelatedItemsHiddenCount(), equalTo(21));
 
-        assertThat(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
+        assertThat(catalogPanel.filterCatalog(CatalogFilterType.MEASURES)
             .getUnrelatedItemsHiddenCount(), equalTo(12));
-        assertThat(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
+        assertThat(catalogPanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getUnrelatedItemsHiddenCount(), equalTo(9));
 
-        cataloguePanel.filterCatalog(CatalogFilterType.ALL).search("Amo");
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
+        catalogPanel.filterCatalog(CatalogFilterType.ALL).search("Amo");
+        assertThat(catalogPanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
-        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES).search("Amo");
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
+        catalogPanel.filterCatalog(CatalogFilterType.MEASURES).search("Amo");
+        assertThat(catalogPanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
-        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES).search("Amo");
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(0));
+        catalogPanel.filterCatalog(CatalogFilterType.ATTRIBUTES).search("Amo");
+        assertThat(catalogPanel.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchNonExistent() {
-        CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
+        CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel();
 
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            cataloguePanel.filterCatalog(type).search("abcxyz");
-            assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
-            assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"abcxyz\"");
+            catalogPanel.filterCatalog(type).search("abcxyz");
+            assertTrue(catalogPanel.isEmpty(), "Catalogue panel should be empty");
+            assertEquals(catalogPanel.getEmptyMessage(), "No data matching\n\"abcxyz\"");
         });
 
-        cataloguePanel.filterCatalog(CatalogFilterType.ALL);
+        catalogPanel.filterCatalog(CatalogFilterType.ALL);
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            cataloguePanel.filterCatalog(type).search("Am");
-            assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
+            catalogPanel.filterCatalog(type).search("Am");
+            assertTrue(catalogPanel.isEmpty(), "Catalogue panel should be empty");
 
             assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
                     .getText().matches("^\\d unrelated data item[s]? hidden$"), "Be wrong format text");

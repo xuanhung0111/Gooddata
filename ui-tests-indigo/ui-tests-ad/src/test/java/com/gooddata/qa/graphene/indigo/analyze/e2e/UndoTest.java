@@ -66,7 +66,7 @@ public class UndoTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
         // D&D the first metric to the metric overtime recommendation
-        initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        initAnalysePage().drag(analysisPage.getCatalogPanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing()
                 .getFilterBuckets()
