@@ -9,6 +9,36 @@ public class ConnectionInfo {
     String password;
     String url;
     DatabaseType dbType;
+    String clientEmail;
+    String privateKey;
+    String project;
+
+    public String getClientEmail() {
+        return clientEmail;
+    }
+
+    public ConnectionInfo setClientEmail(String clientEmail) {
+        this.clientEmail = clientEmail;
+        return this;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public ConnectionInfo setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+        return this;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public ConnectionInfo setProject(String project) {
+        this.project = project;
+        return this;
+    }
 
     public DatabaseType getDbType() {
         return dbType;

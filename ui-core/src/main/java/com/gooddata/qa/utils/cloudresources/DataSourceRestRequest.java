@@ -53,6 +53,9 @@ public class DataSourceRestRequest extends CommonRestRequest {
         if (optionalPrefix.length > 0) {
             prefix = optionalPrefix[0];
         }
+        if (connectionInfo.getDbType() == DatabaseType.BIGQUERY) {
+            return setupBigQueryDataSourceRequest(connectionInfo, dataSourceName, prefix);
+        }
 
         // Setup Json body of Data Source
         String finalPrefix = prefix;
@@ -79,6 +82,35 @@ public class DataSourceRestRequest extends CommonRestRequest {
         }};
 
         return RestRequest.initPostRequest(DATA_SOURCE_REST_URI, dataSourceJson.toString());
+    }
+
+    private HttpRequestBase setupBigQueryDataSourceRequest(ConnectionInfo connectionInfo, String dataSourceName, String finalPrefix) {
+        // Setup Json body of Data Source
+        JSONObject dataSourceJson = new JSONObject() {{
+            put("dataSource", new JSONObject() {{
+                put("name", dataSourceName);
+                put("prefix", finalPrefix);
+                put("connectionInfo", new JSONObject() {{
+                    put(getDbType(connectionInfo), new JSONObject() {{
+                        put("schema", connectionInfo.getSchema());
+                        put("project", connectionInfo.getProject());
+                        put("authentication", new JSONObject() {{
+                            if (connectionInfo.getDbType() == DatabaseType.BIGQUERY) {
+                                put("serviceAccount", new JSONObject() {{
+                                    put("clientEmail", connectionInfo.getClientEmail());
+                                    put("privateKey", connectionInfo.getPrivateKey());
+                                }});
+                            }
+                        }});
+                    }});
+                }});
+            }});
+        }};
+        return RestRequest.initPostRequest(DATA_SOURCE_REST_URI, dataSourceJson.toString());
+    }
+
+    private String getDbType(ConnectionInfo connectionInfo) {
+        return connectionInfo.getDbType().toString();
     }
 
     /**

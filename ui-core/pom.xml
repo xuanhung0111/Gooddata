@@ -30,6 +30,54 @@
             <artifactId>redshift-jdbc42</artifactId>
             <version>1.2.10.1009</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-bigquery -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-bigquery</artifactId>
+            <version>1.96.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+            <version>1.96.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-core -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-core</artifactId>
+            <version>1.91.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client -->
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client</artifactId>
+            <version>1.30.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.30.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.0</version>
+        </dependency>
+         <!--https://mvnrepository.com/artifact/com.google.auth/google-auth-library-credentials-->
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-credentials</artifactId>
+            <version>0.18.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.api/gax -->
+        <dependency>
+            <groupId>com.google.api</groupId>
+            <artifactId>gax</artifactId>
+            <version>1.49.0</version>
+        </dependency>
     </dependencies>
 
     <profiles>
