@@ -268,19 +268,6 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage addAttributeTopRowsBucket(String topAttribute, String newAttribute) {
-        WebElement source = getCatalogPanel().searchAndGet(newAttribute, FieldType.ATTRIBUTE);
-        WebElement target = getAttributesBucket().get(topAttribute);
-
-        try {
-            startDrag(source);
-            moveToTopDropLineOfElement(target);
-        } finally {
-            getActions().release().perform();
-        }
-        return this;
-    }
-
     public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
         WebElement source = getCatalogPanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().get(oldAttr);
@@ -569,22 +556,6 @@ public class AnalysisPage extends AbstractFragment {
             }
 
             return isElementPresent(By.className("adi-drop-line-bottom"), getRoot());
-        };
-
-        Graphene.waitGui().until(droppable);
-    }
-
-    private void moveToTopDropLineOfElement(WebElement target) {
-        String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
-                .getBrowserName().toLowerCase();
-        Function<WebDriver, Boolean> droppable = browser -> {
-            if ("chrome".equals(browserName)) {
-                getActions().moveToElement(target).perform();
-            } else {
-                getActions().moveToElement(target, 0, - target.getSize().height / 2).perform();
-            }
-
-            return isElementPresent(By.className("adi-drop-line-top"), getRoot());
         };
 
         Graphene.waitGui().until(droppable);
