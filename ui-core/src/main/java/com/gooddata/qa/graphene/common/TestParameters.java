@@ -29,8 +29,6 @@ public class TestParameters {
     private String redshiftPassword;
     private String redshiftUserName;
     private String redshiftJdbcUrl;
-    private String bigqueryProject;
-    private String bigquerySchema;
     private String bigqueryClientEmail;
     private String bigqueryPrivateKey;
     private String editorUser;
@@ -93,8 +91,6 @@ public class TestParameters {
         redshiftPassword = loadProperty("redshiftPassword");
         redshiftUserName = loadProperty("redshiftUserName");
         redshiftJdbcUrl = loadProperty("redshiftJdbcUrl");
-        bigqueryProject = loadProperty("bigqueryProject");
-        bigquerySchema = loadProperty("bigquerySchema");
         bigqueryClientEmail = loadProperty("bigqueryClientEmail");
         bigqueryPrivateKey = loadProperty("bigqueryPrivateKey");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
@@ -207,14 +203,6 @@ public class TestParameters {
     public String getRedshiftJdbcUrl() {
         return redshiftJdbcUrl;
     }
-
-    public String getBigqueryProject() { return bigqueryProject; }
-
-    public void setBigqueryProject(String bigqueryProject) { this.bigqueryProject = bigqueryProject; }
-
-    public String getBigquerySchema() { return bigquerySchema; }
-
-    public void setBigquerySchema(String bigquerySchema) { this.bigquerySchema = bigquerySchema; }
 
     public String getBigqueryClientEmail() { return bigqueryClientEmail; }
 
