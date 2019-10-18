@@ -90,6 +90,9 @@ public final class LCMServiceProject {
             log.info("--->Created ads instance has uri:" + ads.getUri());
             createLCMProcesses(testParameters);
         } catch (Exception e) {
+            if(projectId != null ) {
+                deleteProject(projectId);
+            }
             throw new RuntimeException("Cannot init lcm project", e);
         }
     }
