@@ -19,10 +19,13 @@ import java.util.stream.Stream;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.cssSelector;
 
 public final class ElementUtils {
 
     public static final By BY_BUBBLE_CONTENT = By.cssSelector(".bubble:not(.s-gd-configuration-bubble) .bubble-content .content");
+    public static final By BY_PROGRESS_MESSAGE_BAR = cssSelector(".gd-message.progress.gd-message-overlay");
+    public static final By BY_SUCCESS_MESSAGE_BAR = cssSelector(".gd-message.success.gd-message-overlay");
 
     private ElementUtils() {
     }

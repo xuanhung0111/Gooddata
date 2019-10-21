@@ -49,6 +49,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.KpiApplyColorPaletteTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ReportPageApplyColorPaletteTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardCRUDAndMovingTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ExportKPIDashboardsToPDF;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -135,6 +136,7 @@ public class UITestsRegistry {
             ExportDataToXLSXAndCSVDashboardsAdvancedTest.class,
             KPIDashboardCRUDAndMovingTest.class,
             ResizeWidgetsAndRowsTest.class,
+            ExportKPIDashboardsToPDF.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
