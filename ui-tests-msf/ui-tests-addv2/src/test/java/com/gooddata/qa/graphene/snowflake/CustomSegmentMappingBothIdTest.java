@@ -379,7 +379,6 @@ public class CustomSegmentMappingBothIdTest extends AbstractADDProcessTest {
     }
 
     private void createLCM() throws ParseException, IOException {
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         serviceProjectId = lcmBrickFlowBuilder.getLCMServiceProject().getServiceProjectId();
         serviceProject = domainRestClient.getProjectService().getProjectById(serviceProjectId);
         devProjectId = testParams.getProjectId();
