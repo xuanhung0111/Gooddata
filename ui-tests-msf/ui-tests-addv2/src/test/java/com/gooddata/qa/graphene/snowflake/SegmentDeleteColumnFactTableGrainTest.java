@@ -80,7 +80,6 @@ public class SegmentDeleteColumnFactTableGrainTest extends AbstractADDProcessTes
     private final String DATA_SOURCE_NAME = "Auto_datasource" + generateHashString();
     private final String DATABASE_NAME = "ATT_DATABASE" + generateHashString();
     private final String PROCESS_NAME = "AutoProcess Test" + generateHashString();
-    private LcmBrickFlowBuilder lcmBrickFlowBuilder;
 
     private DataloadProcess dataloadProcess;
     private LocalDateTime lastSuccessful;
