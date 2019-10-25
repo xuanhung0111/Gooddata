@@ -37,3 +37,23 @@ microservices:
     buildOnChangeOf:
       paths:
       - 'Dockerfile_firefox_uisdk'
+  graphene-chrome-rubysdk:
+    docker:
+      dockerfile: './Dockerfile_chrome_rubysdk'
+      customTags:
+        - '2.1.3'
+        - 'latest'
+      cacheFromTag: 'latest'
+    buildOnChangeOf:
+      paths:
+      - 'Dockerfile_chrome_rubysdk'
+  graphene-firefox-rubysdk:
+    docker:
+      dockerfile: './Dockerfile_firefox_rubysdk'
+      customTags:
+        - '2.1.3'
+        - 'latest'
+      cacheFromTag: 'latest'
+    buildOnChangeOf:
+      paths:
+      - 'Dockerfile_firefox_rubysdk'
