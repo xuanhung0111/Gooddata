@@ -1,4 +1,4 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
 import net.snowflake.client.jdbc.SnowflakeConnectionV1;
 import org.apache.commons.lang3.tuple.Pair;

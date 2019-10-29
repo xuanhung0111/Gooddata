@@ -1,4 +1,4 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
 import java.io.IOException;
 import java.util.List;

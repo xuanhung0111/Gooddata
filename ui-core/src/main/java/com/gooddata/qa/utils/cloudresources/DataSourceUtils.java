@@ -1,6 +1,6 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
-import static com.gooddata.qa.utils.snowflake.SnowflakeTableUtils.OPTIONAL_PREFIX;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.OPTIONAL_PREFIX;
 
 import java.io.IOException;
 import java.util.function.Supplier;

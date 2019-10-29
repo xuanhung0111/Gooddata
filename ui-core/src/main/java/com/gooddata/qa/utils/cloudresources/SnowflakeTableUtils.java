@@ -1,4 +1,4 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
 public class SnowflakeTableUtils {
     // Dataset names in GD workspace

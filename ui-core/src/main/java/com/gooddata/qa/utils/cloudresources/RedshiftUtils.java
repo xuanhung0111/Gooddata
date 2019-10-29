@@ -1,4 +1,4 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
