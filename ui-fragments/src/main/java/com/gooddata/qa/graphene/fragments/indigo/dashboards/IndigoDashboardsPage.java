@@ -52,6 +52,9 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
 
+    @FindBy(css = ROW_CONTAINER)
+    private List<Row> rows;
+
     @FindBy(className = "mobile-navigation-button")
     private WebElement mobileNavigationButton;
 
@@ -131,6 +134,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String HOTSPOT_WIDTH_RESIZER_CLASS_NAME = "dash-width-resizer-hotspot";
     private static final String RESIZE_BULLET_CSS = ".s-resize-bullet-%s";
     private static final String DASHBOARD_TITLE_CLASS_NAME = "dash-title";
+    private static final String ROW_CONTAINER = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
@@ -701,6 +705,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
             .map(cells -> cells.stream().map(WebElement::getText)
                 .collect(toList()))
             .collect(toList());
+    }
+
+    public List<Row> getRows() {
+        return  rows;
     }
 
     public WebElement getWidgetFluidLayout(String columnTitle) {
