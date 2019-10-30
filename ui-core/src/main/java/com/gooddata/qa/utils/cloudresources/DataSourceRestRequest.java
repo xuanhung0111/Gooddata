@@ -1,5 +1,6 @@
-package com.gooddata.qa.utils.snowflake;
+package com.gooddata.qa.utils.cloudresources;
 
+import com.gooddata.qa.utils.cloudresources.DatabaseType;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -8,7 +9,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import com.gooddata.qa.utils.snowflake.DatabaseType;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

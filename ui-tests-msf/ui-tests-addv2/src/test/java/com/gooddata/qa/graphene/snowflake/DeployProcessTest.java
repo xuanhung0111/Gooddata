@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.snowflake;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.VIEWER;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static com.gooddata.qa.utils.cloudresources.DataSourceRestRequest.DATA_SOURCE_REST_URI;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.snowflake.DataSourceRestRequest.DATA_SOURCE_REST_URI;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -17,10 +17,10 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeploySDDProcessDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeploySDDProcessDialog.Scope;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
+import com.gooddata.qa.utils.cloudresources.DataSourceRestRequest;
+import com.gooddata.qa.utils.cloudresources.DataSourceUtils;
+import com.gooddata.qa.utils.cloudresources.DatabaseType;
 import com.gooddata.qa.utils.datasource.DataDistributionProcess;
-import com.gooddata.qa.utils.snowflake.DataSourceRestRequest;
-import com.gooddata.qa.utils.snowflake.DataSourceUtils;
-import com.gooddata.qa.utils.snowflake.DatabaseType;
 
 import net.snowflake.client.jdbc.DBMetadataResultSetMetadata;
 
