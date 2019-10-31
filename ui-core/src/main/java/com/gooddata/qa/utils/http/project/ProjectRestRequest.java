@@ -29,6 +29,7 @@ import static java.lang.String.format;
  */
 public final class ProjectRestRequest extends CommonRestRequest {
 
+    public static final String AD_CATALOG_GROUPING = "ADCatalogGrouping";
     private static final Logger log = Logger.getLogger(ProjectRestRequest.class.getName());
     private static final String PROJECT_LINK = "/gdc/projects/%s";
     private static final String PROJECT_CONFIGURATION_LINK = "/gdc/projects/%s/config";

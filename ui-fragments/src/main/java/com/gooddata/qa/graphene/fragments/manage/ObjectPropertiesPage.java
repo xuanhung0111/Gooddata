@@ -59,6 +59,9 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(css = ".item.comment")
     private Collection<WebElement> commentItems;
 
+    @FindBy(className = "s-btn-move_to_folder")
+    private WebElement moveToFolderButton;
+
     public ObjectPropertiesPage changeName(String name) {
         if (!IpeEditor.isPresent(browser)) {
             waitForElementVisible(nameField).click();
@@ -152,12 +155,13 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
 
     public ObjectPropertiesPage changeFolder(String targetFolder) {
         waitForElementVisible(changeFolderButton).click();
-        IpeEditor.getInstance(browser).setText(targetFolder);
+        setTextFolder(targetFolder);
+        return this;
+    }
 
-        Function<WebDriver, Boolean> folderChanged = browser ->
-                targetFolder.equals(browser.findElement(By.cssSelector(".folderText a")).getText());
-        Graphene.waitGui().until(folderChanged);
-
+    public ObjectPropertiesPage moveToFolder(String targetFolder) {
+        waitForElementVisible(moveToFolderButton).click();
+        setTextFolder(targetFolder);
         return this;
     }
 
@@ -186,5 +190,13 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
             // Variable detail already loaded so WebDriver unable to catch the loading indicator
         }
         return this;
+    }
+
+    private void setTextFolder(String targetFolder) {
+        IpeEditor.getInstance(browser).setText(targetFolder);
+
+        Function<WebDriver, Boolean> folderChanged = browser ->
+            targetFolder.equals(browser.findElement(By.cssSelector(".folderText a")).getText());
+        Graphene.waitGui().until(folderChanged);
     }
 }

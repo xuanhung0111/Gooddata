@@ -23,6 +23,9 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(css = ".adi-item-type + span p")
     private WebElement value;
 
+    @FindBy(className = "adi-catalog-tooltip-group-list")
+    private WebElement groupCatalog;
+
     @FindBy(className = "s-dataset-name")
     private WebElement dataset;
 
@@ -43,6 +46,10 @@ public class DescriptionPanel extends AbstractFragment {
                 .append(waitForElementVisible(value).getText())
                 .append(NEW_LINE)
                 .toString();
+    }
+
+    public String getGroupCatalog() {
+        return waitForElementVisible(groupCatalog).getText();
     }
 
     public String getMetricDescription() {

@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.http.dashboards;
 
 import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -208,6 +209,31 @@ public class DashboardRestRequest extends CommonRestRequest {
         final JSONObject json = getJsonObject(metricUri);
         json.getJSONObject("metric").getJSONObject("meta").put("locked", BooleanUtils.toInteger(isLocked));
         executeRequest(RestRequest.initPutRequest(metricUri, json.toString()), HttpStatus.OK);
+    }
+
+    /**
+     * Lock/unlock metric
+     * note: if there are dashboards or reports contain this metric
+     * metric cannot unlock
+     */
+    public void setTagToObject(String objectTitle, String tags, FieldType fieldType) throws JSONException, IOException {
+        String objectUri;
+        if (fieldType.equals(FieldType.METRIC)) {
+            objectUri = getMetricByTitle(objectTitle).getUri();
+            JSONObject json = getJsonObject(objectUri);
+            json.getJSONObject("metric").getJSONObject("meta").put("tags", tags);
+            executeRequest(RestRequest.initPutRequest(objectUri, json.toString()), HttpStatus.OK);
+        } else if (fieldType.equals(FieldType.ATTRIBUTE)) {
+            objectUri = getAttributeByTitle(objectTitle).getUri();
+            JSONObject json = getJsonObject(objectUri);
+            json.getJSONObject("attribute").getJSONObject("meta").put("tags", tags);
+            executeRequest(RestRequest.initPutRequest(objectUri, json.toString()), HttpStatus.OK);
+        } else if (fieldType.equals(FieldType.FACT)) {
+            objectUri = getFactByTitle(objectTitle).getUri();
+            JSONObject json = getJsonObject(objectUri);
+            json.getJSONObject("fact").getJSONObject("meta").put("tags", tags);
+            executeRequest(RestRequest.initPutRequest(objectUri, json.toString()), HttpStatus.OK);
+        }
     }
 
     /**

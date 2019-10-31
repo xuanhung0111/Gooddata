@@ -643,6 +643,14 @@ public class IndigoRestRequest extends CommonRestRequest {
         executeRequest(RestRequest.initPostRequest(uri + "?mode=edit", dashboard.toString()), HttpStatus.OK);
     }
 
+    public void addTagNameForFolder(String uri, String tagName) throws IOException{
+        JSONObject jsonObject = getJsonObject(uri);
+        JSONObject metaObject = jsonObject.getJSONObject("folder").getJSONObject("meta");
+        metaObject.put("tags", tagName);
+
+        executeRequest(RestRequest.initPutRequest(uri,jsonObject.toString()), HttpStatus.OK);
+    }
+
     private int getDashboardWidgetCount(final String dashboardUri) throws JSONException, IOException {
         return getJsonObject(dashboardUri).getJSONObject("analyticalDashboard")
                 .getJSONObject("content").getJSONArray("widgets").length();
