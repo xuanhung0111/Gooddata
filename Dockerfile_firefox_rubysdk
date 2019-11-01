@@ -12,4 +12,5 @@ ARG RUBY_SDK_VERSION=2.1.3
 #==================
 # GoodData Ruby SDK
 #==================
-RUN gem install gooddata -v $RUBY_SDK_VERSION
+RUN chmod o=x /root
+RUN gem install gooddata -v $RUBY_SDK_VERSION --bindir /usr/local/bin
