@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.dashboards.CommonDateFilteringTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DashboardHeadersTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterConfigurationTest;
@@ -64,6 +65,7 @@ public class UITestsRegistry {
             VisualizationDrillableWidgetTest.class,
             EventingWidgetDrillToDashboardTest.class,
             KpiApplyColorPaletteTest.class,
+            DashboardHeadersTest.class,
             "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-SplashScreen.xml"

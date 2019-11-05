@@ -75,6 +75,7 @@ import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingFiltersUnderMetr
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingSpecialCaseTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.VisualizationMeasureAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.OptionalStackingTest;
+import com.gooddata.qa.graphene.indigo.analyze.OrganisingMeasureAndAttributeCatalogue;
 import com.gooddata.qa.graphene.indigo.analyze.OptionalStackingAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVTest;
 import com.gooddata.qa.graphene.indigo.analyze.ExportVisualizedDataToXLSXAndCSVAdvancedTest;
@@ -187,6 +188,7 @@ public class UITestsRegistry {
             ComboChartReportTest.class,
             GroupingAndSubTotalsPivotTableTest.class,
             GroupingAndSubTotalsPivotTableAdvancedTest.class,
+            OrganisingMeasureAndAttributeCatalogue.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
