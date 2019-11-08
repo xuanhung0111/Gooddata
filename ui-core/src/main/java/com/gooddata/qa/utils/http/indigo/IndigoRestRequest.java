@@ -16,6 +16,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -649,6 +650,36 @@ public class IndigoRestRequest extends CommonRestRequest {
         metaObject.put("tags", tagName);
 
         executeRequest(RestRequest.initPutRequest(uri,jsonObject.toString()), HttpStatus.OK);
+    }
+
+    /**
+     * Get uris element filter are excepted
+     *
+     * @param attribute
+     * @param filtersNotApplicable
+     * @return list uris element filter not applicable
+     */
+
+    public List<String> getUrisFilterNotApplicable(String attribute, List<String> filtersNotApplicable) throws IOException{
+        JSONArray jsonArray = getJsonObject(
+            getAttributeByTitle(attribute).getDefaultDisplayForm().getUri() + "/elements")
+            .getJSONObject("attributeElements").getJSONArray("elements");
+
+        List<String> urisFilterNotApplicable = new ArrayList<>();
+        for (int i = 0; i < filtersNotApplicable.size(); i ++) {
+            urisFilterNotApplicable.add(getUriFilterNotApplicable(jsonArray, filtersNotApplicable.get(i)));
+        }
+
+        return urisFilterNotApplicable;
+    }
+
+    private String getUriFilterNotApplicable(JSONArray jsonArray, String elementNotApplicable) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            if (elementNotApplicable.equals(jsonArray.getJSONObject(i).get("title").toString())) {
+                return jsonArray.getJSONObject(i).get("uri").toString();
+            }
+        }
+        return StringUtils.EMPTY;
     }
 
     private int getDashboardWidgetCount(final String dashboardUri) throws JSONException, IOException {
