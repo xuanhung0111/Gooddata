@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
@@ -22,6 +23,9 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
 import java.io.IOException;
@@ -30,6 +34,7 @@ import java.util.Collections;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_HISTORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
@@ -47,6 +52,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -73,6 +79,8 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
     private final String VALUE_BY_TAG_NAMING_CONVENTION = "ByTagNamingConvention";
     private final String VALUE_BY_FOLDERS = "ByFolders";
     private DashboardRestRequest dashboardRequest;
+    private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
+    private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
 
     @Override
     public void initProperties() {
@@ -113,6 +121,14 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
         cataloguePanel.expandCatalogGroupLabels(expectedTagMetric).expandCatalogGroupLabels(expectedTagFact);
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList("Date", METRIC_AMOUNT, METRIC_AMOUNT));
+
+        embedAdToWrapperPage(getEmbeddedAdUrl());
+        CatalogPanel catalogueEmbeddedPanel = getEmbeddedAnalysisPage().getCatalogPanel();
+        assertEquals(catalogueEmbeddedPanel.getTextCatalogGroupLabels(), asList(
+                expectedTagFact, expectedTagMetric, TAG_NAME_UNGROUPED));
+
+        catalogueEmbeddedPanel.expandCatalogGroupLabels(expectedTagMetric).expandCatalogGroupLabels(expectedTagFact);
+            assertEquals(catalogueEmbeddedPanel.getFieldNamesInViewPort(), asList("Date", METRIC_AMOUNT, METRIC_AMOUNT));
     }
 
     @Test(dependsOnMethods = {"checkGroupNameIsConvertedCorrectly"})
@@ -181,12 +197,24 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         assertEquals(cataloguePanel.getTextCatalogGroupLabels(), asList(
             expectedTagFact, "First Group", expectedTagMetric, "Second Group"));
 
+        embedAdToWrapperPage(getEmbeddedAdUrl());
+        CatalogPanel catalogueEmbeddedPanel = getEmbeddedAnalysisPage().getCatalogPanel();
+        catalogueEmbeddedPanel.search("s");
+
+        assertEquals(catalogueEmbeddedPanel.getTextCatalogGroupLabels(), asList(
+                expectedTagFact, "First Group", expectedTagMetric, "Second Group"));
+
         initMetricPage().openMetricDetailPage(METRIC_BEST_CASE).getDialogTagName()
             .addTagNameToMetric("adgroup_second_group");
         initAnalysePage().getCatalogPanel().search(METRIC_BEST_CASE);
 
         assertThat(cataloguePanel.getMetricDescriptionAndGroupCatalog(METRIC_BEST_CASE),
             containsString("First Group\nSecond Group"));
+
+        embedAdToWrapperPage(getEmbeddedAdUrl());
+        getEmbeddedAnalysisPage().getCatalogPanel().search(METRIC_BEST_CASE);
+        assertEquals(catalogueEmbeddedPanel.getMetricDescriptionAndGroupCatalog(METRIC_BEST_CASE),
+                containsString("First Group\\nSecond Group"));
     }
 
     @Test(dependsOnMethods = {"searchItemByGroupTagNaming"})
@@ -267,6 +295,13 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
         openAnalyzePage("includeObjectsWithTags", tagNameForFolder);
         assertEquals(cataloguePanel.getNoObjectsFound(), "No objects found.");
+
+        openAnalyzeEmbeddedPage("excludeObjectsWithTags", tagNameForFolder);
+        CatalogPanel catalogueEmbeddedPanel = getEmbeddedAnalysisPage().getCatalogPanel();
+        Assert.notEmpty(catalogueEmbeddedPanel.expandCatalogGroupLabels("Opp. Snapshot").getFieldNamesInViewPort());
+
+        openAnalyzeEmbeddedPage("includeObjectsWithTags", tagNameForFolder);
+        assertEquals(catalogueEmbeddedPanel.getNoObjectsFound(), "No objects found.");
     }
 
     @Test(dependsOnMethods = {"checkAllObjectsAreGroupedByFolderCorrectly"})
@@ -340,6 +375,19 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         assertEquals(cataloguePanel.getTextCatalogGroupLabels(), Collections.EMPTY_LIST);
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(
             METRIC_AMOUNT, METRIC_AMOUNT, METRIC_AMOUNT_BOP, METRIC_AVG_AMOUNT));
+
+        embedAdToWrapperPage(getEmbeddedAdUrl());
+        CatalogPanel catalogueEmbeddedPanel = getEmbeddedAnalysisPage().getCatalogPanel();
+        catalogueEmbeddedPanel.search("f");
+
+        assertThat(catalogueEmbeddedPanel.getTextCatalogGroupLabels(), hasItems("FirstFolder", "SecondFolder", "ThirdFolder"));
+        assertEquals(catalogueEmbeddedPanel.getFieldNamesInViewPort(), asList(ATTR_FORECAST_CATEGORY));
+
+        catalogueEmbeddedPanel.clearInputText();
+        catalogueEmbeddedPanel.search(METRIC_AMOUNT);
+        assertEquals(catalogueEmbeddedPanel.getTextCatalogGroupLabels(), Collections.EMPTY_LIST);
+        assertEquals(catalogueEmbeddedPanel.getFieldNamesInViewPort(), asList(
+            METRIC_AMOUNT, METRIC_AMOUNT, METRIC_AMOUNT_BOP, METRIC_AVG_AMOUNT));
     }
 
     @Test(dependsOnMethods = {"searchItemByFolders"})
@@ -388,6 +436,24 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         takeScreenshot(browser, "Include-Objects-With-Tags", getClass());
         cataloguePanel.expandCatalogGroupLabels("SecondFolder").expandCatalogGroupLabels("ThirdFolder");
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(METRIC_AMOUNT_BOP, METRIC_AVG_AMOUNT));
+    }
+
+    private String getEmbeddedAdUrl() {
+        return getRootUrl() + format(EMBEDDED_URI, testParams.getProjectId());
+    }
+
+    private EmbeddedAnalysisPage getEmbeddedAnalysisPage() {
+        return EmbeddedAnalysisPage.getInstance(browser);
+    }
+
+    private void embedAdToWrapperPage(final String url) {
+        browser.get(IFRAME_WRAPPER_URL);
+        final WebElement urlTextBox = waitForElementVisible(By.id("url"), browser);
+        urlTextBox.sendKeys(url);
+        // clicking on go button is not stable
+        urlTextBox.submit();
+
+        browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
     }
 
     private FactDetailPage initObject(String factName) {

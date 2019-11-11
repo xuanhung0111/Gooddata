@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcm
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcmTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessOnK8sTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessTest;
+import com.gooddata.qa.graphene.lcm.indigo.dashboards.OrganisingCatalogueUsingClientIdTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.RenderingInsightUsingClientIdTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.RenderingAnalyticalDashboardUsingClientIdTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
@@ -22,7 +23,8 @@ public class UITestsRegistry {
                 MsfProcessTest.class,
                 MsfProcessOnK8sTest.class,
                 RenderingInsightUsingClientIdTest.class,
-                RenderingAnalyticalDashboardUsingClientIdTest.class
+                RenderingAnalyticalDashboardUsingClientIdTest.class,
+                OrganisingCatalogueUsingClientIdTest.class
         });
 
         TestsRegistry.getInstance()
