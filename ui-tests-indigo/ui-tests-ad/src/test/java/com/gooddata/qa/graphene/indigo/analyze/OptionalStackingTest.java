@@ -171,7 +171,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
                         asList(METRIC_AMOUNT, "$46,843,842.45")));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Include"), asList(ATTR_DEPARTMENT, "Inside Sales"),
-                        asList(METRIC_AMOUNT, "$33,562,482.51")));
+                        asList(METRIC_AMOUNT, "$20,848,974.50")));
         assertEquals(chartReport.getXaxisLabels(),
                 asList("Direct Sales", "Include", "Inside Sales",  "Direct Sales", "Exclude", "Inside Sales"));
         assertNotEquals(chartReport.getXLocationColumn(0, 0), chartReport.getXLocationColumn(0, 1));
