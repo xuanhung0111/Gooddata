@@ -5,15 +5,18 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static java.util.stream.Collectors.toList;
+
+import static org.openqa.selenium.By.tagName;
 
 import java.util.List;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
@@ -46,6 +49,9 @@ public class DataPage extends AbstractFragment {
 
     @FindBy(className = "deselect")
     private WebElement deselectAllTagsButton;
+
+    @FindBy(className = "s-dataPage-listRow")
+    private List<WebElement> dataPageRows;
 
     private static final String XPATH_TAG_BY_LIST = "//ul/li[${index}]/a[text()='${tagName}']";
     private static final String XPATH_TAG_BY_CLOUD =
@@ -125,5 +131,14 @@ public class DataPage extends AbstractFragment {
 
     public void deselectAllTags() {
         waitForElementVisible(deselectAllTagsButton).click();
+    }
+
+    public List<String> getDataPageRowsByTitle(String title) {
+        return waitForCollectionIsNotEmpty(dataPageRows).stream()
+            .filter(input -> title.equals(input.findElement(By.cssSelector("td:first-of-type")).getText()))
+            .map(input -> input.findElements(cssSelector("td:not(.date)")))
+            .map(es -> es.stream().map(WebElement::getText).collect(toList()))
+            .flatMap(List::stream)
+            .collect(toList());
     }
 }

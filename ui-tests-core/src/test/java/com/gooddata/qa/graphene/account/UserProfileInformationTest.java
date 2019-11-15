@@ -9,7 +9,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -17,10 +20,15 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest.UserStatus;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -199,6 +207,48 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         } finally {
             userRestRequest.updateUserStatusInProject(testParams.getEditorUser(), UserStatus.ENABLED);
             deleteProject(getProfile(DOMAIN), sameProject);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void hideUserInfoWhenDeletingAccount() throws IOException{
+        try{
+            String userEditor = createAndAddUserToProject(UserRoles.EDITOR);
+
+            logout();
+            signInAtGreyPages(userEditor, testParams.getPassword());
+
+            String metricName = "Hide User Amount";
+            MetricPage metricPage = initMetricPage()
+                .createAggregationMetric(MetricTypes.AVG, new CustomMetricUI()
+                    .withName(metricName)
+                    .withFacts(FACT_AMOUNT));
+
+            metricPage.setVisibility(true, metricName);
+            assertThat(metricPage.getDataPageRowsByTitle(metricName), hasItem("FirstName LastName"));
+
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            assertEquals(initMetricPage().openMetricOwnerProfilePage(metricName)
+                .getUserInfo().getEmail(), userEditor);
+
+            logout();
+            signInAtUI(userEditor, testParams.getPassword());
+            PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
+
+            if (personalInfoDialog.getEmail().equals(userEditor) &&
+                !personalInfoDialog.getEmail().equals(testParams.getDomainUser())) {
+
+                log.info("Deleted User Editor " + userEditor);
+                initAccountPage().deleteAccount();
+            }
+
+            LoginFragment loginPage = LoginFragment.getInstance(browser);
+            loginPage.login(testParams.getDomainUser(), testParams.getPassword(), false);
+
+            assertEquals(initMetricPage().getDataPageRowsByTitle(metricName),
+                asList(metricName, StringUtils.EMPTY));
+        }finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 }
