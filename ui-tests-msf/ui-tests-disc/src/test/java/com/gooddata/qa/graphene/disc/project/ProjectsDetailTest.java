@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.disc.project;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -58,12 +60,23 @@ public class ProjectsDetailTest extends AbstractProcessTest {
 
         try {
             initDiscProjectDetailPage();
-            assertEquals(projectDetailPage.getTitle(), projectTitle);
+            assertProjectTitle();
             assertEquals(projectDetailPage.getProjectIdMetadata(), testParams.getProjectId());
             assertTrue(projectDetailPage.hasProcess(process.getName()));
 
         } finally {
             getProcessService().removeProcess(process);
+        }
+    }
+
+    private void assertProjectTitle() {
+        String actualProjectTitle;
+        try {
+            actualProjectTitle = projectDetailPage.getTitle();
+            assertEquals(actualProjectTitle, projectTitle);
+        } catch (org.openqa.selenium.NoSuchElementException enableLdmViewException) {
+            actualProjectTitle = waitForElementVisible(By.className("ait-header-project-title-btn"), browser).getText();
+            assertEquals(actualProjectTitle, projectTitle.substring(0, 20) + "…");
         }
     }
 
