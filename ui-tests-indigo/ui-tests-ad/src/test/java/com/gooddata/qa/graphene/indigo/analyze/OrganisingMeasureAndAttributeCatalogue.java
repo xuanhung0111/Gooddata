@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Collections;
 
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.AD_CATALOG_GROUPING;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
@@ -43,7 +44,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_BOP;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.project.ProjectRestRequest.AD_CATALOG_GROUPING;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -109,7 +109,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkGroupNameIsConvertedCorrectly() throws IOException{
-        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_TAG_NAMING_CONVENTION);
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_TAG_NAMING_CONVENTION);
 
         initMetricPage().openMetricDetailPage(METRIC_AMOUNT).getDialogTagName().addTagNameToMetric(TAG_NAME_METRIC);
         initObject(METRIC_AMOUNT).addTag(TAG_NAME_FACT);
@@ -273,7 +273,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
     @Test(dependsOnMethods = {"combineFilterByTagsByTagName"})
     public void checkAllObjectsAreGroupedByFolderCorrectly() throws IOException {
-        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_FOLDERS);
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_FOLDERS);
 
         CatalogPanel cataloguePanel = initAnalysePage().getCatalogPanel();
         assertThat(cataloguePanel.getTextCatalogGroupLabels(), hasItems(

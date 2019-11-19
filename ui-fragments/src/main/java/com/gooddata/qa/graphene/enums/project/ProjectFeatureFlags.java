@@ -31,11 +31,15 @@ public enum ProjectFeatureFlags {
     ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS("enableKPIDashboardExtendedDateFilters"),
     ENABLE_KPI_DASHBOARD_WEEK_FILTERS("enableKPIDashboardWeekFilters"),
     ENABLE_LAYOUTS_DASHBOARD("enableLayouts"),
-    ENABLE_KPI_DASHBOARD_EXPORT_PDF("enableKPIDashboardExportPDF");
+    ENABLE_KPI_DASHBOARD_EXPORT_PDF("enableKPIDashboardExportPDF"),
+    AD_CATALOG_GROUPING("ADCatalogGrouping"),
+    DISABLE_ZEBRA_EFFECT("disableZebraEffect"),
+    TABLE_HEADER_FONT_SIZE("tableHeaderFontSize"),
+    TABLE_BODY_FONT_SIZE("tableBodyFontSize");
 
     private final String featureFlag;
 
-    private ProjectFeatureFlags(String featureFlag) {
+    ProjectFeatureFlags(String featureFlag) {
         this.featureFlag = featureFlag;
     }
 

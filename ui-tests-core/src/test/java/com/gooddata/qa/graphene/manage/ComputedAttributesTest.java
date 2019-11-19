@@ -135,7 +135,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         getMetricCreator().createNumberOfWonOppsMetric();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
+        DEFAULT_XAE_VERSION = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,
@@ -550,7 +550,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
     public void renderReportContainComputedAttributeWithoutMetric(int xaeVersion) throws IOException {
-        XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+        XAE_VERSION = xaeVersion;
+        projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
         String factAmountUri = getFactByTitle(FACT_AMOUNT).getUri();
         Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
         String stageNameValues = getMdService()
@@ -589,7 +590,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             }
         } finally {
             getMdService().removeObjByUri(attributeUri);
-            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(DEFAULT_XAE_VERSION));
         }
     }
 

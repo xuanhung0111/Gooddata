@@ -71,7 +71,8 @@ public class ResetPasswordTest extends AbstractUITest {
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
+        historyPasswordLimit = Integer.parseInt(
+            projectRestRequest.getValueOfDomainFeatureFlag("security.password.history.limit"));
     }
 
     @Test

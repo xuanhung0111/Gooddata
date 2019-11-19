@@ -14,7 +14,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
-import static com.gooddata.qa.utils.http.project.ProjectRestRequest.AD_CATALOG_GROUPING;
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.AD_CATALOG_GROUPING;
 import static com.gooddata.qa.utils.lcm.LcmRestUtils.ATT_LCM_DATA_PRODUCT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -127,7 +127,7 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkGroupName() throws IOException{
-        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_TAG_NAMING_CONVENTION);
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_TAG_NAMING_CONVENTION);
         testParams.setProjectId(devProjectId);
 
         initMetricPage().openMetricDetailPage(METRIC_AMOUNT).getDialogTagName().addTagNameToMetric(TAG_NAME_METRIC);
@@ -142,7 +142,7 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
 
         testParams.setProjectId(clientProjectId);
         addUserToProject(testParams.getUser(), UserRoles.ADMIN);
-        projectClientRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_TAG_NAMING_CONVENTION);
+        projectClientRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_TAG_NAMING_CONVENTION);
 
         CatalogPanel cataloguePanel = initAnalysePage().getCatalogPanel();
         assertEquals(cataloguePanel.getTextCatalogGroupLabels(),
@@ -165,8 +165,8 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"checkGroupName"})
     public void checkAllObjectsAreGroupedByFolder() throws IOException {
-        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_FOLDERS);
-        projectClientRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING, VALUE_BY_FOLDERS);
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_FOLDERS);
+        projectClientRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_FOLDERS);
 
         testParams.setProjectId(devProjectId);
         CatalogPanel cataloguePanel = initAnalysePage().getCatalogPanel();

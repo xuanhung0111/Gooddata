@@ -49,7 +49,7 @@ public class DynamicImageTest extends AbstractProjectTest {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.DYNAMIC_IMAGES + "/image_url.csv"));
         takeScreenshot(browser, "uploaded-image-file", getClass());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
+        DEFAULT_XAE_VERSION = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @DataProvider(name = "getXaeVersions")
@@ -63,7 +63,8 @@ public class DynamicImageTest extends AbstractProjectTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
     public void testImageFromPubliclyAccessibleImages(int xaeVersion) throws IOException {
         try {
-            XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+            XAE_VERSION = xaeVersion;
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
             initAttributePage().initAttribute(IMAGE)
                     .setDrillToAttribute(NAME)
                     .selectLabelType(IMAGE);
@@ -101,7 +102,7 @@ public class DynamicImageTest extends AbstractProjectTest {
             takeScreenshot(browser, "images-having-top-position", getClass());
             checkAllImagesInReport();
         } finally {
-            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(DEFAULT_XAE_VERSION));
         }
     }
 

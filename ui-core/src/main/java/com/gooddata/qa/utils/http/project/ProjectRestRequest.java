@@ -11,6 +11,7 @@ import com.gooddata.qa.utils.http.RestRequest;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
 import com.jayway.awaitility.pollinterval.IterativePollInterval;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,10 +30,10 @@ import static java.lang.String.format;
  */
 public final class ProjectRestRequest extends CommonRestRequest {
 
-    public static final String AD_CATALOG_GROUPING = "ADCatalogGrouping";
     private static final Logger log = Logger.getLogger(ProjectRestRequest.class.getName());
     private static final String PROJECT_LINK = "/gdc/projects/%s";
     private static final String PROJECT_CONFIGURATION_LINK = "/gdc/projects/%s/config";
+    private static final String DOMAIN_CONFIGURATION_LINK = "/gdc/domains/default/config";
 
     public ProjectRestRequest(final RestClient restClient, final String projectId) {
         super(restClient, projectId);
@@ -118,38 +119,33 @@ public final class ProjectRestRequest extends CommonRestRequest {
         executeRequest(initPutRequest(url, settingItem.toString()), HttpStatus.NO_CONTENT);
     }
 
-    public int setXaeVersionProject(int xaeVersion) throws IOException {
-        updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
-        return xaeVersion;
-    }
-
-    public int getXaeVersionProject() throws IOException {
-        int xaeVersionProject = 3;
-        JSONArray items = this.getJsonObject(format(PROJECT_CONFIGURATION_LINK, projectId))
-                .getJSONObject("settings").getJSONArray("items");
+    public String getValueOfDomainFeatureFlag(String key) throws IOException {
+        String value = StringUtils.EMPTY;
+        JSONArray items = this.getJsonObject(DOMAIN_CONFIGURATION_LINK).getJSONObject("settings")
+            .getJSONArray("items");
 
         for (int i = 0; i < items.length(); i++) {
             JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
-            if ("xae_version".equals(jsonObject.getString("key"))) {
-                xaeVersionProject = Integer.valueOf(jsonObject.getString("value"));
+            if (key.equals(jsonObject.getString("key"))) {
+                value = String.valueOf(jsonObject.getString("value"));
             }
         }
-        log.info("Current XAE version of Project is: " + xaeVersionProject);
-        return xaeVersionProject;
+        log.info("Current "+ key +"'s value of Domain is: " + value);
+        return value;
     }
 
-    public int getValuePasswordHistoryLimit() throws IOException {
-        int valueLimited = 1;
-        JSONArray items = this.getJsonObject("/gdc/domains/default/config")
+    public String getValueOfProjectFeatureFlag(String key) throws IOException {
+        String value = StringUtils.EMPTY;
+        JSONArray items = this.getJsonObject(format(PROJECT_CONFIGURATION_LINK, projectId))
             .getJSONObject("settings").getJSONArray("items");
 
         for (int i = 0; i < items.length(); i++) {
             JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
-            if ("security.password.history.limit".equals(jsonObject.getString("key"))) {
-                valueLimited = Integer.valueOf(jsonObject.getString("value"));
+            if (key.equals(jsonObject.getString("key"))) {
+                value = String.valueOf(jsonObject.getString("value"));
             }
         }
-        log.info("Value password history limit of Domain is: " + valueLimited);
-        return valueLimited;
+        log.info("Current "+ key +"'s value of Project is: " + value);
+        return value;
     }
 }

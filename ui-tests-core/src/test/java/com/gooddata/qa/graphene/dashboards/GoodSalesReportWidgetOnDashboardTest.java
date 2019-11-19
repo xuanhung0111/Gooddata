@@ -1,28 +1,50 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.TABLE_BODY_FONT_SIZE;
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.TABLE_HEADER_FONT_SIZE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TOP_5_OF_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TOP_5_OF_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import com.gooddata.md.Fact;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
+import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
@@ -45,6 +67,10 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
 
     private static final String REPORT = "Test report";
     private static final String VARIABLE_NAME = "variable";
+    private static final String TABLE_REPORT = "Table Report";
+    private String sourceProjectId;
+    private String targetProjectId;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -52,11 +78,23 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         projectTitle = "GoodSales-dashboard-report-widget";
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void createAnotherProject() {
+        sourceProjectId = testParams.getProjectId();
+        targetProjectId = createNewEmptyProject("TARGET_PROJECT_TITLE" + generateHashString());
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
         getMetricCreator().createNumberOfActivitiesMetric();
         getReportCreator().createTop5OpenByCashReport();
+        projectRestRequest = new ProjectRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -285,9 +323,174 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         }
     }
 
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
+    @Test(dependsOnGroups = {"createProject"})
+    public void prepareTableReport() {
+        createReport(new UiReportDefinition().withName(TABLE_REPORT).withWhats(METRIC_AMOUNT).withHows(ATTR_ACCOUNT)
+            .withType(ReportTypes.TABLE), TABLE_REPORT);
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void disableAlternateColorOfRows() {
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+
+            initDashboardsPage().addReportToDashboard(TABLE_REPORT);
+
+            TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
+            assertEquals(getRowElementsFrom(report).get(0).getCssValue("background-color"),
+                getRowElementsFrom(report).get(1).getCssValue("background-color"));
+        } finally {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void setNegativeFontSizeForTableHeaderAndBody() throws IOException {
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "0");
+            assertEquals(projectRestRequest.getValueOfProjectFeatureFlag(TABLE_HEADER_FONT_SIZE.getFlagName()), "0");
+
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "0");
+            assertEquals(projectRestRequest.getValueOfProjectFeatureFlag(TABLE_BODY_FONT_SIZE.getFlagName()), "0");
+            try {
+                projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "-5");
+            } catch (InvalidStatusCodeException e) {
+                assertEquals(e.getStatusCode(), 400);
+            }
+            try {
+                projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "-5");
+            } catch (InvalidStatusCodeException e) {
+                assertEquals(e.getStatusCode(), 400);
+            }
+            try {
+                projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "string");
+            } catch (InvalidStatusCodeException e) {
+                assertEquals(e.getStatusCode(), 400);
+            }
+
+        } finally {
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void setMore20FontSizeForTableHeaderAndBody() throws IOException {
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "50");
+            initDashboardsPage().addReportToDashboard(TABLE_REPORT);
+            TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
+            assertThat(getRowElementsFrom(report).get(0).getAttribute("style"),
+                containsString("font-size: 50px"));
+
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "50");
+            initDashboardsPage().addReportToDashboard(TABLE_REPORT);
+
+            report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
+
+            assertThat(report.getCellElements(CellType.METRIC_VALUE).get(0).getAttribute("style"),
+                containsString("font-size: 50px"));
+            assertThat(report.getCellElements(CellType.ATTRIBUTE_VALUE).get(0).getAttribute("style"),
+                containsString("font-size: 50px"));
+
+        } finally {
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void setFontSizeCombineApplyingMetricFormatting() throws IOException{
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "18");
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "18");
+
+            String metricName = "Metric Background Color Format";
+            String tableReportName = "Table Background Color";
+            createMetric(metricName, format(
+                "SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT))),
+                MetricFormatterDialog.Formatter.BACKGROUND_COLOR_FORMAT.toString());
+            createReport(new UiReportDefinition().withName(tableReportName).withWhats(metricName)
+                .withHows(ATTR_DEPARTMENT).withType(ReportTypes.TABLE), TABLE_REPORT);
+
+            initDashboardsPage().addReportToDashboard(tableReportName);
+            TableReport report = dashboardsPage.getContent().getReport(tableReportName, TableReport.class);
+            assertThat(report.getCellElements(CellType.METRIC_VALUE).get(0).getAttribute("style"),
+                containsString("font-size: 18px; background: rgb(175, 248, 239)"));
+
+            assertThat(report.getCellElements(CellType.ATTRIBUTE_VALUE).get(0).getAttribute("style"),
+                containsString("font-size: 18px"));
+        } finally {
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void keepFontSizeAfterDoingActions() throws IOException{
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "18");
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "18");
+
+            initDashboardsPage().addReportToDashboard(TABLE_REPORT);
+            TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
+            report.addDrilling(Pair.of(Arrays.asList(METRIC_AMOUNT), ATTR_STAGE_NAME));
+            report.drillOnFirstValue(CellType.METRIC_VALUE);
+
+            DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
+                waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+
+            assertThat(drillDialog.getReport(TableReport.class).getCellElements(CellType.METRIC_VALUE)
+                    .get(0).getAttribute("style"), containsString("font-size: 18px"));
+
+            drillDialog.closeDialog();
+            report.waitForLoaded();
+
+            report.sortBy(METRIC_AMOUNT, CellType.METRIC_HEADER, Sort.DESC).waitForLoaded();
+            assertThat(report.getCellElements(CellType.METRIC_VALUE)
+                .get(0).getAttribute("style"), containsString("font-size: 18px"));
+        } finally {
+            projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareTableReport"})
+    public void testExportAndImportProjectWithInsight() throws IOException{
+        try {
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "50");
+            final int statusPollingCheckIterations = 60; // (60*5s)
+            String exportToken = exportProject(
+                true, true, true, statusPollingCheckIterations);
+            testParams.setProjectId(targetProjectId);
+            try {
+                importProject(exportToken, statusPollingCheckIterations);
+                initDashboardsPage().addReportToDashboard(TABLE_REPORT);
+
+                TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
+                assertThat(getRowElementsFrom(report).get(0).getAttribute("style"),
+                    containsString("font-size: 50px"));
+            } finally {
+                testParams.setProjectId(sourceProjectId);
+            }
+        }finally {
+            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
+        }
+    }
+
+    private List<WebElement> getRowElementsFrom(TableReport report) {
+        sleepTightInSeconds(1);
+        return report.getRoot().findElements(By.cssSelector(".gridTile div.element.cell.rows"));
     }
 
     private void refreshDashboardsPage() {

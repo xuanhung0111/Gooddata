@@ -78,7 +78,8 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test
     public void prepareDataForTest() throws ParseException, JSONException, IOException {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
+        historyPasswordLimit = Integer.parseInt(projectRestRequest.getValueOfDomainFeatureFlag(
+            "security.password.history.limit"));
 
         accountSettingUser = createDynamicUserFrom(testParams.getUser());
         testParams.setProjectId(createNewEmptyProject(accountSettingUser, "Account-setting-test"));
@@ -298,7 +299,8 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     private String prepareDataForTestHistoryPassword() throws ParseException, JSONException, IOException {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        historyPasswordLimit = projectRestRequest.getValuePasswordHistoryLimit();
+        historyPasswordLimit = Integer.parseInt(projectRestRequest.getValueOfDomainFeatureFlag(
+            "security.password.history.limit"));
 
         String accountSettingUser = createDynamicUserFrom(testParams.getUser());
         testParams.setProjectId(createNewEmptyProject(accountSettingUser, "History-Password-Test"));

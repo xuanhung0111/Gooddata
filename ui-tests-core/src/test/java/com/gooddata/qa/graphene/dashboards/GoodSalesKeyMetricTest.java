@@ -75,7 +75,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]",
                 getMetricCreator().createAmountMetric().getUri(), variableUri), "#,##0");
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
+        DEFAULT_XAE_VERSION = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @DataProvider(name = "getXaeVersions")
@@ -89,7 +89,8 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "createProject", dataProvider = "getXaeVersions")
     public void editHeadlineWidget(int xaeVersion) throws IOException {
         try {
-            XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+            XAE_VERSION = xaeVersion;
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
             initDashboardsPage()
                     .addNewDashboard(DASHBOARD_NAME)
                     .selectDashboard(DASHBOARD_NAME);
@@ -174,7 +175,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
                 assertEquals(getKeyMetricValue(), "No data");
             }
         } finally {
-            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(DEFAULT_XAE_VERSION));
         }
     }
 
