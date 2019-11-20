@@ -229,7 +229,7 @@ public class GoodSalesEmailScheduleReportTest extends AbstractGoodSalesEmailSche
         assertEquals(getNumberOfPartsFrom(messages.get(0)), 2);
     }
 
-    @Test(dependsOnMethods = "signInImapUser")
+    @Test(dependsOnMethods = "signInImapUser", enabled = false)
     public void sendScheduleReportWithLargeSize() throws IOException, MessagingException {
         String emailSubject = "Large-Report" + identification;
         String reportTitle = "Large Report";
