@@ -22,7 +22,7 @@ public class Dataset extends AbstractFragment {
     public static final By BY_DELETE_BUTTON = By.className("s-dataset-delete-button");
 
     private static final By BY_DETAIL_BUTTON = By.className("s-dataset-detail-button");
-    private static final By BY_ANALYZE_LINK = By.cssSelector(".icon-analyze.button-link");
+    private static final By BY_ANALYZE_LINK = By.cssSelector(".icon-analyze.gd-button-link");
 
     @FindBy(className = "s-dataset-status")
     private WebElement status;

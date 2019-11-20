@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DatasetDetailPage extends AbstractFragment {
 
-    private static final String ANALYZE_BUTTON_LOCATOR = ".icon-analyze.button-link";
+    private static final String ANALYZE_BUTTON_LOCATOR = ".icon-analyze.gd-button-link";
     private static final String DELETE_BUTTON_LOCATOR = "button.s-delete";
     private static final String UPDATE_BUTTON_LOCATOR = "s-dataset-update-ds-from-file-button";
 
