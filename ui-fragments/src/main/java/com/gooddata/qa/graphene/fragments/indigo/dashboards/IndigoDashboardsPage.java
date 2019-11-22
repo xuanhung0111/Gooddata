@@ -6,7 +6,8 @@ import static com.gooddata.qa.browser.BrowserUtils.moveToBottomOfElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_PROGRESS_MESSAGE_BAR;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_SUCCESS_MESSAGE_BAR;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
@@ -47,7 +48,6 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
@@ -69,6 +69,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = EDIT_BUTTON_CLASS_NAME)
     private WebElement editButton;
+
+    @FindBy(className = HEADER_OPTIONS_BUTTON_CLASS_NAME)
+    private WebElement headerOptionsButton;
 
     @FindBy(className = "s-cancel_button")
     private WebElement cancelButton;
@@ -124,6 +127,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String DATE_FILTER_SELECTOR = "dash-filters-date";
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
+    private static final String HEADER_OPTIONS_BUTTON_CLASS_NAME = "s-header-options-button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
@@ -353,6 +357,35 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public boolean isEditButtonVisible() {
         By buttonVisible = By.className(EDIT_BUTTON_CLASS_NAME);
         return isElementPresent(buttonVisible, browser);
+    }
+
+    public boolean isHeaderOptionsButtonVisible() {
+        return isElementVisible(By.className(HEADER_OPTIONS_BUTTON_CLASS_NAME), browser);
+    }
+
+    public IndigoDashboardsPage exportDashboardToPDF() {
+        //wait for exporting dashboard tab in maximum 10 minutes
+        int exportingTextDisplayedTimeoutInSeconds = 600;
+
+        clickHeaderOptionsButton();
+        waitForElementVisible(className("s-pdf-export-item"), browser).click();
+
+        waitForElementVisible(BY_PROGRESS_MESSAGE_BAR, browser);
+        waitForElementNotPresent(BY_PROGRESS_MESSAGE_BAR, exportingTextDisplayedTimeoutInSeconds);
+
+        waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, browser);
+        waitForElementNotPresent(BY_SUCCESS_MESSAGE_BAR, exportingTextDisplayedTimeoutInSeconds);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage clickHeaderOptionsButton() {
+        waitForElementVisible(headerOptionsButton).click();
+        return this;
+    }
+
+    public Boolean isPDFExportItemVisible() {
+        return isElementVisible(className("s-pdf-export-item"), browser);
     }
 
     public boolean hasDateFilter() {

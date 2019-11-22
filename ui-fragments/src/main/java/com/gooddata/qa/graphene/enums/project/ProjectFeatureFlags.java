@@ -30,7 +30,8 @@ public enum ProjectFeatureFlags {
     CASCADING_FILTERS_BOOSTING_ENABLE("cascadingFiltersBoostingEnabled"),
     ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS("enableKPIDashboardExtendedDateFilters"),
     ENABLE_KPI_DASHBOARD_WEEK_FILTERS("enableKPIDashboardWeekFilters"),
-    ENABLE_LAYOUTS_DASHBOARD("enableLayouts");
+    ENABLE_LAYOUTS_DASHBOARD("enableLayouts"),
+    ENABLE_KPI_DASHBOARD_EXPORT_PDF("enableKPIDashboardExportPDF");
 
     private final String featureFlag;
 
