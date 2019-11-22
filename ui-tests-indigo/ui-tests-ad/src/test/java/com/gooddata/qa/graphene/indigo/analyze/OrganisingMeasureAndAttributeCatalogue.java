@@ -213,8 +213,8 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
         embedAdToWrapperPage(getEmbeddedAdUrl());
         getEmbeddedAnalysisPage().getCatalogPanel().search(METRIC_BEST_CASE);
-        assertEquals(catalogueEmbeddedPanel.getMetricDescriptionAndGroupCatalog(METRIC_BEST_CASE),
-                containsString("First Group\\nSecond Group"));
+        assertThat(catalogueEmbeddedPanel.getMetricDescriptionAndGroupCatalog(METRIC_BEST_CASE),
+                containsString("First Group\nSecond Group"));
     }
 
     @Test(dependsOnMethods = {"searchItemByGroupTagNaming"})
@@ -296,10 +296,12 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         openAnalyzePage("includeObjectsWithTags", tagNameForFolder);
         assertEquals(cataloguePanel.getNoObjectsFound(), "No objects found.");
 
+        initAnalysePage();
         openAnalyzeEmbeddedPage("excludeObjectsWithTags", tagNameForFolder);
         CatalogPanel catalogueEmbeddedPanel = getEmbeddedAnalysisPage().getCatalogPanel();
         Assert.notEmpty(catalogueEmbeddedPanel.expandCatalogGroupLabels("Opp. Snapshot").getFieldNamesInViewPort());
 
+        initAnalysePage();
         openAnalyzeEmbeddedPage("includeObjectsWithTags", tagNameForFolder);
         assertEquals(catalogueEmbeddedPanel.getNoObjectsFound(), "No objects found.");
     }
