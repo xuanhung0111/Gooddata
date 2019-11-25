@@ -13,6 +13,7 @@ import java.io.IOException;
 import static com.gooddata.qa.utils.http.RestRequest.initGetRequest;
 import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;
 import static java.lang.String.format;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Copyright (C) 2007-2018, GoodData(R) Corporation. All rights reserved.
@@ -51,6 +52,15 @@ public class EtlProcessRestRequest extends CommonRestRequest {
                 format(COMPONENT_PROCESS_CREATE_URI, projectId), jsonStr), HttpStatus.CREATED);
     }
 
+    public void deployInvalidEtlProcess(String processName, DeployProcessForm.ProcessType processType,
+                                        DeployProcessForm.ProcessType invalidProcessType, String s3ConfigurationPath, String s3AccessKey, String s3SecretKey) {
+        String version = getEtlProcessTypeVersion(processType);
+        assertNotNull(version, "Does not support process type= " + processType);
+        String jsonStr = buildEtlProcessJson(
+                processName, invalidProcessType, version, s3ConfigurationPath, s3AccessKey, s3SecretKey);
+        executeRequest(initPostRequest(
+                format(COMPONENT_PROCESS_CREATE_URI, projectId), jsonStr), HttpStatus.NOT_FOUND);
+    }
     /**
      * Create schedule for ETL process in specified project.
      *

@@ -70,6 +70,11 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
                 defaultS3AccessKey, defaultS3SecretKey);
     }
 
+    protected void deployInvalidEtlProcessWithDefaultConfig(String processName, DeployProcessForm.ProcessType processType, DeployProcessForm.ProcessType invalidProcessType) {
+        etlProcessRequest.deployInvalidEtlProcess(processName, processType, invalidProcessType, DEFAULT_S3_CONFIGURATION_PATH,
+                defaultS3AccessKey, defaultS3SecretKey);
+    }
+
     protected DataloadProcess getProcessByName(String processName) {
         Optional<DataloadProcess> process =  getProcessService().listProcesses(getProject()).stream()
                 .filter(dataloadProcess -> processName.equals(dataloadProcess.getName()))
