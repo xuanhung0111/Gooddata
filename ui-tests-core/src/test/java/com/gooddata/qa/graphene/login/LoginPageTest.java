@@ -1,9 +1,12 @@
 package com.gooddata.qa.graphene.login;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.utils.CheckUtils;
 import org.json.JSONException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
@@ -60,5 +63,37 @@ public class LoginPageTest extends AbstractUITest {
         } finally {
             logout();
         }
+    }
+
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
+    public void loginWithXSSShouldNotWork(String lastUrl) throws JSONException {
+        try {
+            signIn(true, UserRoles.ADMIN);
+            openUrl(ACCOUNT_PAGE + lastUrl);
+            assertFalse(CheckUtils.isAlertDisplayed(),
+                "Javascript from the input parameters should be not executed");
+        } finally {
+            logout();
+        }
+    }
+
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
+    public void openLoginPageWithXSSShouldNotWork(String lastUrl) throws JSONException {
+        openUrl(ACCOUNT_PAGE + lastUrl);
+        assertFalse(CheckUtils.isAlertDisplayed(),
+            "Javascript from the input parameters should be not executed");
+    }
+
+    @DataProvider
+    public Object[][] getLastUrlXSS() {
+        return new Object[][]{
+            {"?lastUrl=javascript:alert(document.location)"},
+            {"?lastUrl=vbscript:alert(document.location)"},
+            {"?lastUrl=data:alert(document.location)"},
+            {"?lastUrl=vbscript:alert<script>alert(document.cookie)</script>"},
+            {"?lastUrl=data:text/html,<script>alert(document.domain)</script>"},
+            {"?lastUrl=javascript:attackers_script_here"},
+            {"?lastUrl=javascript:alert(1)"},
+        };
     }
 }
