@@ -120,32 +120,26 @@ public final class ProjectRestRequest extends CommonRestRequest {
     }
 
     public String getValueOfDomainFeatureFlag(String key) throws IOException {
-        String value = StringUtils.EMPTY;
         JSONArray items = this.getJsonObject(DOMAIN_CONFIGURATION_LINK).getJSONObject("settings")
             .getJSONArray("items");
 
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
-            if (key.equals(jsonObject.getString("key"))) {
-                value = String.valueOf(jsonObject.getString("value"));
-            }
-        }
-        log.info("Current "+ key +"'s value of Domain is: " + value);
-        return value;
+        return getValueByKey(items, key);
     }
 
     public String getValueOfProjectFeatureFlag(String key) throws IOException {
-        String value = StringUtils.EMPTY;
         JSONArray items = this.getJsonObject(format(PROJECT_CONFIGURATION_LINK, projectId))
             .getJSONObject("settings").getJSONArray("items");
 
+        return getValueByKey(items, key);
+    }
+
+    private String getValueByKey(JSONArray items, String key) {
         for (int i = 0; i < items.length(); i++) {
             JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
             if (key.equals(jsonObject.getString("key"))) {
-                value = String.valueOf(jsonObject.getString("value"));
+                return String.valueOf(jsonObject.getString("value"));
             }
         }
-        log.info("Current "+ key +"'s value of Project is: " + value);
-        return value;
+        return StringUtils.EMPTY;
     }
 }

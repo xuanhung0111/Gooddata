@@ -39,8 +39,8 @@ public class DynamicImageTest extends AbstractProjectTest {
             "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage3.png";
     private static final int XAE_VERSION_1 = 1;
     private static final int XAE_VERSION_3 = 3;
-    private int DEFAULT_XAE_VERSION;
-    private int XAE_VERSION;
+    private int defaultXaeVersion;
+    private int xaeVersion;
 
     ProjectRestRequest projectRestRequest;
 
@@ -49,7 +49,7 @@ public class DynamicImageTest extends AbstractProjectTest {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.DYNAMIC_IMAGES + "/image_url.csv"));
         takeScreenshot(browser, "uploaded-image-file", getClass());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
+        defaultXaeVersion = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @DataProvider(name = "getXaeVersions")
@@ -63,7 +63,7 @@ public class DynamicImageTest extends AbstractProjectTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
     public void testImageFromPubliclyAccessibleImages(int xaeVersion) throws IOException {
         try {
-            XAE_VERSION = xaeVersion;
+            this.xaeVersion = xaeVersion;
             projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
             initAttributePage().initAttribute(IMAGE)
                     .setDrillToAttribute(NAME)
@@ -84,9 +84,9 @@ public class DynamicImageTest extends AbstractProjectTest {
             reportPage.waitForReportExecutionProgress();
             takeScreenshot(browser, "drill-on-an-image", getClass());
 
-            if (XAE_VERSION == 1) {
+            if (this.xaeVersion == 1) {
                 assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 1", "Image 2", "Image 3"));
-            } else if (XAE_VERSION == 3) {
+            } else if (this.xaeVersion == 3) {
                 assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 2"));
             }
 
@@ -102,7 +102,7 @@ public class DynamicImageTest extends AbstractProjectTest {
             takeScreenshot(browser, "images-having-top-position", getClass());
             checkAllImagesInReport();
         } finally {
-            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(DEFAULT_XAE_VERSION));
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(defaultXaeVersion));
         }
     }
 

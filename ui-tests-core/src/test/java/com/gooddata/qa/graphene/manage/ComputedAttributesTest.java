@@ -113,8 +113,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .withBucket(new AttributeBucket(3, "Best"));
 
     private DashboardRestRequest dashboardRequest;
-    private int DEFAULT_XAE_VERSION;
-    private int XAE_VERSION;
+    private int defaultXaeVersion;
+    private int xaeVersion;
 
     ProjectRestRequest projectRestRequest;
 
@@ -135,7 +135,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         getMetricCreator().createNumberOfWonOppsMetric();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
+        defaultXaeVersion = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,
@@ -550,7 +550,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "getXaeVersions")
     public void renderReportContainComputedAttributeWithoutMetric(int xaeVersion) throws IOException {
-        XAE_VERSION = xaeVersion;
+        this.xaeVersion = xaeVersion;
         projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
         String factAmountUri = getFactByTitle(FACT_AMOUNT).getUri();
         Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
@@ -581,16 +581,16 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     .withHows(computedAttribute, ATTR_DEPARTMENT),
                     "Report-renders-well-with-computed-attribute-without-metric");
 
-            if (XAE_VERSION == 1) {
+            if (this.xaeVersion == 1) {
                 assertEquals(reportPage.getTableReport().getAttributeValues(),
                         asList("Large", "Direct Sales", "Inside Sales"));
-            } else if (XAE_VERSION == 3) {
+            } else if (this.xaeVersion == 3) {
                 assertEquals(reportPage.getTableReport().getAttributeValues(),
                         asList("(empty value)", "Direct Sales", "Inside Sales", "Large", "Direct Sales", "Inside Sales"));
             }
         } finally {
             getMdService().removeObjByUri(attributeUri);
-            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(DEFAULT_XAE_VERSION));
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(defaultXaeVersion));
         }
     }
 

@@ -14,7 +14,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -33,7 +32,6 @@ import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -345,9 +343,8 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
     }
 
     @Test(dependsOnMethods = {"prepareTableReport"})
-    public void setNegativeFontSizeForTableHeaderAndBody() throws IOException {
+    public void testInputInvalidHeaderAndBodyFontSize() throws IOException {
         try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "0");
             assertEquals(projectRestRequest.getValueOfProjectFeatureFlag(TABLE_HEADER_FONT_SIZE.getFlagName()), "0");
 
@@ -372,14 +369,12 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         } finally {
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
         }
     }
 
     @Test(dependsOnMethods = {"prepareTableReport"})
-    public void setMore20FontSizeForTableHeaderAndBody() throws IOException {
+    public void testInputValidHeaderAndBodyFontSize() throws IOException {
         try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "50");
             initDashboardsPage().addReportToDashboard(TABLE_REPORT);
             TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);
@@ -399,14 +394,12 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         } finally {
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
         }
     }
 
     @Test(dependsOnMethods = {"prepareTableReport"})
     public void setFontSizeCombineApplyingMetricFormatting() throws IOException{
         try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "18");
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "18");
 
@@ -428,14 +421,12 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         } finally {
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
         }
     }
 
     @Test(dependsOnMethods = {"prepareTableReport"})
     public void keepFontSizeAfterDoingActions() throws IOException{
         try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "18");
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "18");
 
@@ -459,14 +450,12 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         } finally {
             projectRestRequest.updateProjectConfiguration(TABLE_HEADER_FONT_SIZE.getFlagName(), "12");
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
         }
     }
 
     @Test(dependsOnMethods = {"prepareTableReport"})
     public void testExportAndImportProjectWithInsight() throws IOException{
         try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, true);
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "50");
             final int statusPollingCheckIterations = 60; // (60*5s)
             String exportToken = exportProject(
@@ -483,7 +472,6 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
                 testParams.setProjectId(sourceProjectId);
             }
         }finally {
-            projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "12");
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DISABLE_ZEBRA_EFFECT, false);
         }
     }
