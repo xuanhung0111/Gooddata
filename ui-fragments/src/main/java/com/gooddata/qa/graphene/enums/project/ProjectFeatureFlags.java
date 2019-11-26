@@ -35,7 +35,8 @@ public enum ProjectFeatureFlags {
     AD_CATALOG_GROUPING("ADCatalogGrouping"),
     DISABLE_ZEBRA_EFFECT("disableZebraEffect"),
     TABLE_HEADER_FONT_SIZE("tableHeaderFontSize"),
-    TABLE_BODY_FONT_SIZE("tableBodyFontSize");
+    TABLE_BODY_FONT_SIZE("tableBodyFontSize"),
+    ENABLE_NEW_AD_FILTER_BAR("enableNewADFilterBar");
 
     private final String featureFlag;
 
