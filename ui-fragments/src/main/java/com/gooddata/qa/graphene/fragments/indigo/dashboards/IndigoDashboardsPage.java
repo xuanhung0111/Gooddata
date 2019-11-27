@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
+import com.gooddata.qa.graphene.utils.CalculateUtils;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
@@ -985,5 +986,26 @@ public class IndigoDashboardsPage extends AbstractFragment {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
                 .findElements(By.cssSelector(".gd-base-visualization .highcharts-series rect")));
         return list.get(index).getAttribute("fill");
+    }
+
+    public String getNavigationDashboardWidth(){
+        return getRoot().findElement(By.className("dash-nav")).getCssValue("width");
+    }
+
+    public String getDashboardContentWidth(){
+        return getRoot().findElement(By.className("dashboard")).getCssValue("width");
+    }
+
+    public String getDistanceFromLeftToAlertDialogContent(){
+        return browser.findElement(By.className("kpi-alert-dialog-overlay")).getCssValue("left");
+    }
+
+    public boolean isAlertDialogContentCenter(String navigatorWidth, String dashboardContentWidth, String dialogContentWidth, String distanceFromLeftToDialogContent){
+        return CalculateUtils.addWidth(CalculateUtils.convertToInteger(removePX(navigatorWidth)),CalculateUtils.halfOfWidth(removePX(dashboardContentWidth)))
+                .compareTo(CalculateUtils.addWidth(CalculateUtils.halfOfWidth(removePX(dialogContentWidth)), CalculateUtils.convertToInteger(removePX(distanceFromLeftToDialogContent))))== 0 ? true : false;
+    }
+
+    private String removePX(String value){
+        return value.replace("px","");
     }
 }
