@@ -198,4 +198,16 @@ public class Kpi extends Widget {
             return text;
         }
     }
+
+    public boolean isBreakLineBottom(){
+        return getRoot().findElements(By.className("kpi-pop-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("wrap");
+    }
+
+    public boolean isNonBreakLineBottom(){
+        return getRoot().findElements(By.className("kpi-pop-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("nowrap");
+    }
+
+    public String getWidth(){
+        return getRoot().findElements(By.className("dash-item-content")).stream().findFirst().get().getCssValue("width");
+    }
 }
