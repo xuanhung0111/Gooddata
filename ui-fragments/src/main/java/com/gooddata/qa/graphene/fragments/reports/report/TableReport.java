@@ -243,7 +243,7 @@ public class TableReport extends AbstractDashboardReport {
                 .orElseThrow(() -> new NoSuchElementException("Not found cell type: " + type + " with value: " + value));
     }
 
-    private List<WebElement> getCellElements(CellType type) {
+    public List<WebElement> getCellElements(CellType type) {
         waitForLoaded();
         return getRoot().findElements(type.getLocator());
     }

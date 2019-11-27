@@ -53,8 +53,8 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     private static final By HEADLINE_WIDGET_LOCATOR = className("yui3-c-headlinedashboardwidget");
     private static final int XAE_VERSION_1 = 1;
     private static final int XAE_VERSION_3 = 3;
-    private int DEFAULT_XAE_VERSION;
-    private int XAE_VERSION;
+    private int defaultXaeVersion;
+    private int xaeVersion;
 
     ProjectRestRequest projectRestRequest;
 
@@ -75,7 +75,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]",
                 getMetricCreator().createAmountMetric().getUri(), variableUri), "#,##0");
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        DEFAULT_XAE_VERSION = projectRestRequest.getXaeVersionProject();
+        defaultXaeVersion = Integer.parseInt(projectRestRequest.getValueOfProjectFeatureFlag("xae_version"));
     }
 
     @DataProvider(name = "getXaeVersions")
@@ -89,7 +89,8 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "createProject", dataProvider = "getXaeVersions")
     public void editHeadlineWidget(int xaeVersion) throws IOException {
         try {
-            XAE_VERSION = projectRestRequest.setXaeVersionProject(xaeVersion);
+            this.xaeVersion = xaeVersion;
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(xaeVersion));
             initDashboardsPage()
                     .addNewDashboard(DASHBOARD_NAME)
                     .selectDashboard(DASHBOARD_NAME);
@@ -159,22 +160,22 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
             widgetConfigPanel.saveConfiguration();
             dashboardsPage.getDashboardEditBar().saveDashboard();
             waitForKeyMetricUpdateValue();
-            if (XAE_VERSION == 1) {
+            if (this.xaeVersion == 1) {
                 assertEquals(getKeyMetricValue(), "7.00USD");
-            } else if (XAE_VERSION == 3){
+            } else if (this.xaeVersion == 3){
                 assertEquals(getKeyMetricValue(), "No data");
             }
 
             dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
                     .changeAttributeFilterValues("TouchAll");
             waitForKeyMetricUpdateValue();
-            if (XAE_VERSION == 1) {
+            if (this.xaeVersion == 1) {
                 assertEquals(getKeyMetricValue(), "1.00USD");
-            } else if (XAE_VERSION == 3){
+            } else if (this.xaeVersion == 3){
                 assertEquals(getKeyMetricValue(), "No data");
             }
         } finally {
-            projectRestRequest.setXaeVersionProject(DEFAULT_XAE_VERSION);
+            projectRestRequest.updateProjectConfiguration("xae_version", String.valueOf(defaultXaeVersion));
         }
     }
 
