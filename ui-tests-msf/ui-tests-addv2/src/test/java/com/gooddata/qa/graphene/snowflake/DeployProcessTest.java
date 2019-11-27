@@ -75,7 +75,6 @@ public class DeployProcessTest extends AbstractADDProcessTest {
             assertTrue(projectDetailPage.isDeployProcessFormVisible(), "Deploy Process Form should be displayed");
             assertEquals(deployForm.getRedirectedPageFromLearnMore(), SUPPORT_URI);
             DeploySDDProcessDialog deploySDDProcessDialog = deployForm.selectADDProcess();
-            assertTrue(deploySDDProcessDialog.getRedirectedPageFromManageDataSource().contains(DATA_SOURCE_REST_URI));
             deploySDDProcessDialog.selectDataSource("_______________________" + prefix); // get css from specialTitle
             assertEquals(deploySDDProcessDialog.getSelectedDataSourceName(), specialDataSourceTitle);
             assertFalse(dataSourceRestRequest.getAllDataSourceNames().contains(dataSourceTitle), "Editor's Data source shouldn't display");
@@ -97,7 +96,6 @@ public class DeployProcessTest extends AbstractADDProcessTest {
             assertTrue(projectDetailPage.isDeployProcessFormVisible(), "Deploy Process Form should be displayed");
             assertEquals(deployForm.getRedirectedPageFromLearnMore(), SUPPORT_URI);
             DeploySDDProcessDialog deploySDDProcessDialog = deployForm.selectADDProcess();
-            assertTrue(deploySDDProcessDialog.getRedirectedPageFromManageDataSource().contains(DATA_SOURCE_REST_URI));
             deploySDDProcessDialog.selectDataSource("_h1_style__color_red__this_is_datasource__h1_" + prefix);
             assertEquals(deploySDDProcessDialog.getSelectedDataSourceName(), specialDataSourceTitle);
             deploySDDProcessDialog.selectScope(DeploySDDProcessDialog.Scope.SEGMENT).selectSegment(firstSegmentID);
