@@ -17,9 +17,6 @@ import java.util.List;
 
 public class DeploySDDProcessDialog extends AbstractFragment {
 
-    @FindBy(className = "deploy-sdd-process-create-datasource-help")
-    private WebElement manageDataSourceButton;
-
     @FindBy(className = "ait-component-selection-dropdown-button")
     private DataSourceDropdown dataSourceDropDown;
 
@@ -38,15 +35,6 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     public static DeploySDDProcessDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(DeploySDDProcessDialog.class,
                 waitForElementVisible(className("deploy-process-dialog-area"), context));
-    }
-
-    public void manageDataSource() {
-        waitForElementVisible(manageDataSourceButton).click();
-    }
-
-    public String getRedirectedPageFromManageDataSource() {
-        return waitForElementVisible(manageDataSourceButton).findElement(By.className("action-important-link"))
-                .getAttribute("href");
     }
 
     public String getSelectedDataSourceName() {
