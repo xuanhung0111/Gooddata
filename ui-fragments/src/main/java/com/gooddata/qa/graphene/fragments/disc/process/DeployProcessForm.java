@@ -330,7 +330,8 @@ public class DeployProcessForm extends AbstractFragment {
         SALESFORCE_DOWNLOADER("gdc-etl-salesforce-downloader", "Salesforce Downloader"),
         ADS_INTEGRATOR("gdc-etl-ads-integrator", "ADS Integrator"),
         SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor"),
-        AUTOMATED_DATA_DISTRIBUTION("gdc-data-distribution", "Automated Data Distribution");
+        AUTOMATED_DATA_DISTRIBUTION("gdc-data-distribution", "Automated Data Distribution"),
+        INVALID_PROCESS_TYPE("invalid-process-type", "Invalid Process Type");
 
         private String value;
         private String title;

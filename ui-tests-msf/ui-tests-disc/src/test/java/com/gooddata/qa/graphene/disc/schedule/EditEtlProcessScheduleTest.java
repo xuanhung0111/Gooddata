@@ -47,6 +47,12 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
         testEditScheduleParameters(processType);
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkInvalidEtlProcess() {
+        String processName = generateProcessName();
+        deployInvalidEtlProcessWithDefaultConfig(processName, ProcessType.CSV_DOWNLOADER, ProcessType.INVALID_PROCESS_TYPE);
+    }
+
     private void testEditScheduleWithCustomName(ProcessType processType) {
         String processName = generateProcessName();
         createEtlProcessWithDefaultConfig(processName, processType);
