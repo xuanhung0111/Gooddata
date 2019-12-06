@@ -51,6 +51,15 @@ public class DataSourceUtils {
                 .setUrl(testParams.getRedshiftJdbcUrl());
     }
 
+    public ConnectionInfo createBigQueryConnectionInfo(String project, DatabaseType dbType, String schema) {
+        return new ConnectionInfo()
+                .setDbType(dbType)
+                .setSchema(schema)
+                .setProject(project)
+                .setClientEmail(testParams.getBigqueryClientEmail())
+                .setPrivateKey(testParams.getBigqueryPrivateKey());
+    }
+
     public String createDataSource(ConnectionInfo connectionInfo, String datasourceName, String... optionalPrefix) throws IOException {
         return dataSourceRestRequest.createDataSource(
                 commonRestRequest, dataSourceRestRequest.setupDataSourceRequest(connectionInfo, datasourceName, optionalPrefix));
@@ -67,4 +76,5 @@ public class DataSourceUtils {
     public DataSourceRestRequest getDataSourceRestRequest() {
         return dataSourceRestRequest;
     }
+
 }
