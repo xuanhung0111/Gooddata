@@ -412,4 +412,17 @@ public class KpiAlertTest extends AbstractDashboardTest {
             .waitForAlertsLoaded()
             .getLastWidget(Kpi.class);
     }
+
+    @Test(dependsOnMethods = {"updateAlertWhenKpiValueIsEmpty"}, groups = {"desktop"})
+    public void checkUIAlertDialogContentHasManyWidgetsOnKPIsTest() throws JSONException, IOException {
+        String kpiUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()),"Alert Dialog");
+        indigoRestRequest.editWidthOfWidget(kpiUri, 0, 0, 12);
+        initIndigoDashboardsPageWithWidgets();
+        Kpi kpi = indigoDashboardsPage.selectKpiDashboard("Alert Dialog").waitForWidgetsLoading().getLastWidget(Kpi.class);
+        KpiAlertDialog kpiAlertDialog = kpi.openAlertDialog();
+        takeScreenshot(browser, "checkUIAlertDialogContentHasManyWidgetsOnKPIs",KpiAlertTest.class);
+        assertTrue(indigoDashboardsPage.isAlertDialogContentCenter(indigoDashboardsPage.getNavigationDashboardWidth(),
+                indigoDashboardsPage.getDashboardContentWidth(), kpiAlertDialog.getAlertDialogContentWidth(),
+                indigoDashboardsPage.getDistanceFromLeftToAlertDialogContent()));
+    }
 }
