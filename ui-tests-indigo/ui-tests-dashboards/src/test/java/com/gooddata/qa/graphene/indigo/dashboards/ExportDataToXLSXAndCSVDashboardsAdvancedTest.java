@@ -86,6 +86,7 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(
             new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
     }
 

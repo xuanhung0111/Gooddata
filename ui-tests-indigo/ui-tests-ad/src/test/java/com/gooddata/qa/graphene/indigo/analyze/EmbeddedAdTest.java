@@ -19,7 +19,10 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.text.ParseException;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -52,6 +55,12 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createSnapshotBOPMetric();
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        // TODO: BB-1675 enableNewADFilterBar FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
     }
 
     @Test(dependsOnGroups = { "createProject" })

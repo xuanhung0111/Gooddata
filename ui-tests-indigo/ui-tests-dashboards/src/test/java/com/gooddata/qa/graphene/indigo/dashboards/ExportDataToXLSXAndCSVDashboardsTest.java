@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
@@ -41,6 +42,7 @@ import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -69,6 +71,11 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
         getMetricCreator().createAvgAmountMetric();
         getMetricCreator().createAmountBOPMetric();
 
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        // TODO: BB-1675 enableNewADFilterBar FF should be removed
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
