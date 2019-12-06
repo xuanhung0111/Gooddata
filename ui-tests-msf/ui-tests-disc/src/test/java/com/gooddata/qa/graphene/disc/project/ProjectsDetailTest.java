@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc.project;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -27,6 +26,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
@@ -42,8 +42,8 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class ProjectsDetailTest extends AbstractProcessTest {
 
-    private static final String EMPTY_STATE_TITLE = "You don’t have any deployed data loading processes.";
-    private static final String EMPTY_STATE_MESSAGE = "How to deploy a process? Read Deploy a Process with the Data Integration Console article";
+    private static final String GUIDE_DEPLOY_MESSAGE = "To load data into your workspace, start with Deploy\n" +
+            "process. And follow this tutorial with next steps.";
     private static final String NO_SCHEDULE = "No schedules";
 
     @Override
@@ -91,16 +91,15 @@ public class ProjectsDetailTest extends AbstractProcessTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void goToDashboardsInProjectDetailPage() {
-        initDiscProjectDetailPage().goToDashboards();
-        waitForDashboardPageLoaded(browser);
+    public AnalysisPage goToAnalyzeInProjectDetailPage() {
+        initDiscProjectDetailPage().goToAnalyze();
+        return AnalysisPage.getInstance(browser);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkProjectEmptyState() {
         initDiscProjectDetailPage();
-        assertEquals(projectDetailPage.getEmptyStateTitle(), EMPTY_STATE_TITLE);
-        assertEquals(projectDetailPage.getEmptyStateMessage(), EMPTY_STATE_MESSAGE);
+        assertEquals(projectDetailPage.getGuideDeployMessage(), GUIDE_DEPLOY_MESSAGE);
     }
 
     @Test(dependsOnGroups = {"createProject"})

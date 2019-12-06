@@ -40,13 +40,13 @@ public class ProjectDetailPage extends AbstractFragment {
     private WebElement projectIdMetadata;
 
     @FindBy(className = "action-link-with-icon")
-    private WebElement goToDashboardsLink;
+    private WebElement goToAnalyzeLink;
 
     @FindBy(css = ".empty-state .title")
     private WebElement emptyStateTitle;
 
-    @FindBy(css = ".empty-state .message")
-    private WebElement emptyStateMessage;
+    @FindBy(css = ".guide-deploy")
+    private WebElement guideDeployMessage;
 
     @FindBy(className = "process-detail")
     private Collection<WebElement> processes;
@@ -59,16 +59,16 @@ public class ProjectDetailPage extends AbstractFragment {
         return waitForElementVisible(projectIdMetadata).getText();
     }
 
-    public void goToDashboards() {
-        waitForElementVisible(goToDashboardsLink).click();
+    public void goToAnalyze() {
+        waitForElementVisible(goToAnalyzeLink).click();
     }
 
     public String getEmptyStateTitle() {
         return waitForElementVisible(emptyStateTitle).getText();
     }
 
-    public String getEmptyStateMessage() {
-        return waitForElementVisible(emptyStateMessage).getText();
+    public String getGuideDeployMessage() {
+        return waitForElementVisible(guideDeployMessage).getText();
     }
 
     public ProcessDetail getProcess(String processName) {
