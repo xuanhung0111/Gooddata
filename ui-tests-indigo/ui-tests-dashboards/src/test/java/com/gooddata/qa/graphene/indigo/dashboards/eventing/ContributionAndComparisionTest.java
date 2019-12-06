@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards.eventing;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -8,6 +10,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableRepor
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -26,6 +31,20 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
 
     private static final String ACTIVITIES_IN_PERCENTATION = "% " + METRIC_NUMBER_OF_ACTIVITIES;
     private static final String ACTIVITIES_YEAR_AGO_IN_PERCENTATION = "% " + METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        Metrics metrics = getMetricCreator();
+        metrics.createNumberOfActivitiesMetric();
+        metrics.createAmountMetric();
+        metrics.createNumberOfOpportunitiesMetric();
+
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+            new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testEventingTableReportWithPercentationAndDateAttribute() throws IOException {
