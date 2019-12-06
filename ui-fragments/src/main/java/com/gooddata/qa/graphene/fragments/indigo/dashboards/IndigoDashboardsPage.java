@@ -290,6 +290,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage waitForSaveButtonEnabled() {
+        waitForElementVisible(enabledSaveButton);
+        return this;
+    }
+
     public IndigoDashboardsPage saveEditModeWithoutWidgets() {
         waitForElementVisible(enabledSaveButton).click();
         ConfirmDialog.getInstance(browser).submitClick();
