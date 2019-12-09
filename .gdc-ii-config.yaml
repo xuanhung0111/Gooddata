@@ -78,8 +78,8 @@ integratedTests:
     -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
     -DuseDynamicUser=true
   artifacts:
-    - **/target/screenshots/**
-    - **/target/media/video/**/**_failed.mp4
+    - '**/target/screenshots/**'
+    - '**/target/media/video/**/**_failed.mp4'
   junitArtifacts:
     - '**/surefire-reports/*.xml'
   microservices:
