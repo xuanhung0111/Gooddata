@@ -9,7 +9,7 @@ TESTING_HOST=$2
 # Create React application
 mkdir /tmp/react
 cd /tmp/react
-create-react-app $REACT_PROJECT_NAME
+yarn create react-app $REACT_PROJECT_NAME
 cd $REACT_PROJECT_NAME
 
 # Configure HTTPS on NodeJs
