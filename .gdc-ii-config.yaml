@@ -67,10 +67,8 @@ integratedTests:
     QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
   image: harbor.intgdc.com/staging/graphene-chrome:latest
   args: |
-    -Duser.home=/tmp \
-    -DscreenResolution=1680x1050 \
-    -Pselenium -am -pl ui-tests-msf/ui-tests-disc \
-    -Dtest.module=ui-tests-msf/ui-tests-disc $SHARED_PARAMS \
+    -pl ui-tests-msf/ui-tests-disc \
+    -Dtest.module=ui-tests-msf/ui-tests-disc \
     -Dtest=DeployProcessByRubyScriptTest \
     -Dhost=staging3.intgdc.com \
     -Duser=qa+test@gooddata.com \
@@ -78,12 +76,7 @@ integratedTests:
     -Duser.domain=default \
     -Dproject.authorizationToken=pgtestingauto01 \
     -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
-    -DuseDynamicUser=true \
-    -Dlanguage=en-US \
-    -Dtest.execution.env=local-chrome \
-    -Dtimeout=90 -Dvideo.recording=true \
-    -DtestIdentification=CI#$BUILD_NUMBER#$JOB_NAME#$BUILD_ID \
-    -DchromeDriverBinaryPath=/bin/chromedriver -DchromeDriverArguments=no-sandbox
+    -DuseDynamicUser=true
   artifacts:
     - **/target/screenshots/**
     - **/target/media/video/**/**_failed.mp4
