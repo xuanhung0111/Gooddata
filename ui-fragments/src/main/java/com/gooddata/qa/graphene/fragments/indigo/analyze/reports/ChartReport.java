@@ -371,6 +371,28 @@ public class ChartReport extends AbstractFragment {
         waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
     }
 
+    public boolean isTooltipContainTwoRowsAndThreeDots(int groupIndex, int index){
+        displayTooltipOnTrackerByIndex(groupIndex, index);
+        return isTooltipContainThreeDots() && isTooltipContainTwoRows();
+    }
+
+    public boolean isTooltipContainThreeDots(int groupIndex, int index){
+        displayTooltipOnTrackerByIndex(groupIndex, index);
+        return  getTooltipInstance().findElement(className("gd-viz-tooltip-title")).getCssValue("text-overflow").contains("ellipsis");
+    }
+
+    private boolean isTooltipContainThreeDots(){
+        return  getTooltipInstance().findElement(className("clamp-two-line")).getCssValue("-webkit-box-orient").contains("vertical");
+    }
+
+    private boolean isTooltipContainTwoRows(){
+        return  getTooltipInstance().findElement(className("clamp-two-line")).getCssValue("-webkit-line-clamp").contains("2");
+    }
+
+    public WebElement getTooltipInstance(){
+        return Tooltip.getInstance(browser).getRoot();
+    }
+
     private List<List<String>> getTooltipText() {
         WebElement tooltip = browser.findElement(BY_HIGHCHARTS_TOOLTIP);
         return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector(TOOLTIP_ITEM))).stream()
@@ -396,5 +418,13 @@ public class ChartReport extends AbstractFragment {
                         ".highcharts-series-%s.highcharts-tracker path," +
                         ".highcharts-series-%s.highcharts-tracker circle", groupIndex, groupIndex, groupIndex))));
         return list.get(index);
+    }
+
+    public static class Tooltip extends AbstractFragment {
+        public static final String MAIN_CLASS = "hc-tooltip";
+        public static Tooltip getInstance(SearchContext context) {
+            return Graphene.createPageFragment(Tooltip.class,
+                    waitForElementVisible(className(MAIN_CLASS), context));
+        }
     }
 }
