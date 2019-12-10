@@ -157,9 +157,10 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
 
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXFormatWithGlobalFilterBar() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_FILTER).saveEditModeWithWidgets()
-            .selectDateFilterByName("All time").waitForWidgetsLoading();
-        indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.XLSX);
+        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_FILTER).waitForWidgetsLoading()
+            .getConfigurationPanel().disableDateFilter();
+        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+            .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.checkOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
@@ -181,8 +182,10 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXFormatWithFilterUnderMetric() throws IOException {
         initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_FILTER_UNDER_METRIC)
-            .saveEditModeWithWidgets().selectDateFilterByName("All time").waitForWidgetsLoading();
-        indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.XLSX);
+            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
+
+        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+            .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.checkOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
@@ -202,8 +205,9 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXBetweenLocalAttributeAndGlobalDateFilter() throws IOException {
         initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_LOCAL_ATTRIBUTE_AND_GLOBAL_DATE)
-            .saveEditModeWithWidgets().selectDateFilterByName("All time").waitForWidgetsLoading();
-        indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.XLSX);
+            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
+        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+            .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.checkOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
@@ -223,8 +227,9 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXBetweenLocalDateMetricAndGlobalAttributeFilter() throws IOException {
         initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_ATTRIBUTE_AND_LOCAL_DATE)
-            .saveEditModeWithWidgets().selectDateFilterByName("All time").waitForWidgetsLoading();
-        indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(OptionalExportMenu.File.XLSX);
+            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
+        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+            .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.checkOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
