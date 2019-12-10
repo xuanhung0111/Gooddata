@@ -754,6 +754,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return getWidgetFluidLayout(columnTitle, 0);
     }
 
+    public String getWidthDashboardSectionKPIs(){
+        return getRoot().getCssValue("width");
+    }
+
     public WebElement getWidgetFluidLayout(String columnTitle, int cellIndex) {
         List<WebElement> fluidLayoutRows = getRoot().findElements(By.cssSelector(FLUID_LAYOUT_ROWS_CSS));
 

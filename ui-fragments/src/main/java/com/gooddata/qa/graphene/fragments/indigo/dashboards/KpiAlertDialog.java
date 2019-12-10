@@ -101,6 +101,10 @@ public class KpiAlertDialog extends AbstractFragment {
         return getRoot().getCssValue("width");
     }
 
+    public String getCalculateWidthKPIAlertDialogContent(String totalWidth, String paddingWidth){
+        return String.valueOf(Integer.parseInt(totalWidth.replace("px","")) - Integer.parseInt(paddingWidth.replace("px",""))).concat("px");
+    }
+
     public String getAlertDialogText() {
         return waitForElementPresent(kpiAlertDialogTextInfo).getText();
     }
