@@ -88,7 +88,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         assertTrue(description.contains("Web Meeting"));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void should_be_possible_to_restore_filter_creation() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
