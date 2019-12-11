@@ -1,9 +1,13 @@
 package com.gooddata.qa.graphene.utils;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -72,5 +76,16 @@ public final class CheckUtils {
         if (desiredMessage.length() != 0 && !greenBarMessage.equals(desiredMessage)) {
             fail("WRONG GREEN BAR MESSAGE - is: " + greenBarMessage + " expected: " + desiredMessage);
         }
+    }
+
+    public static boolean isAlertDisplayed() {
+        boolean foundAlert = false;
+        try {
+            Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(ExpectedConditions.alertIsPresent());
+            foundAlert = true;
+        } catch (TimeoutException e) {
+            // do nothing
+        }
+        return foundAlert;
     }
 }
