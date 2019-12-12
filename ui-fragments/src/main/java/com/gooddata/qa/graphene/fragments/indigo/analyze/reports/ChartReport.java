@@ -62,10 +62,6 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = HEATMAP_LEGEND)
     private List<WebElement> heatmapLegend;
 
-    // will be removed when SDK 7.2.0 release
-    @FindBy(css = "div.highcharts-tooltip")
-    private WebElement oldTooltip;
-
     @FindBy(css = ".highcharts-data-labels tspan")
     private List<WebElement> dataLabels;
 
@@ -217,28 +213,6 @@ public class ChartReport extends AbstractFragment {
         displayTooltipOnTrackerByIndex(groupIndex, index);
         return getTooltipText();
     }
-    /*These methods will remove when SDK update version********START*************/
-
-    public List<List<String>> getTooltipTextOnTrackerByIndexForSDK(int groupIndex, int index) {
-        displayTooltipOnTrackerByIndexForSDK(groupIndex, index);
-        return getTooltipTextForSDK();
-    }
-
-    private void displayTooltipOnTrackerByIndexForSDK(int groupIndex, int index) {
-        WebElement tracker = getTracker(groupIndex, index);
-        checkIndex(index);
-        getActions().moveToElement(tracker).moveByOffset(1, 1).click().perform();
-        waitForElementVisible(oldTooltip);
-    }
-
-    private List<List<String>> getTooltipTextForSDK() {
-        return waitForCollectionIsNotEmpty(oldTooltip.findElements(cssSelector("tr"))).stream()
-                .map(row -> asList(row.findElement(cssSelector(".title")).getText(),
-                        row.findElement(cssSelector(".value")).getText()))
-                .collect(Collectors.toList());
-    }
-
-    /*These methods will remove when SDK update version********END**************/
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
