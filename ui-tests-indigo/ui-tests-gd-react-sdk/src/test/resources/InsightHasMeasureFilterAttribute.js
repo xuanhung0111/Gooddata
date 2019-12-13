@@ -53,7 +53,7 @@ class App extends Component {
 
         return (
             <div style={{ height: 600 }} className="s-column-chart">
-                <title>Column chart</title>
+                <h1>Column chart</h1>
                 <ColumnChart
                     projectId={projectId}
                     measures={[measure]}
