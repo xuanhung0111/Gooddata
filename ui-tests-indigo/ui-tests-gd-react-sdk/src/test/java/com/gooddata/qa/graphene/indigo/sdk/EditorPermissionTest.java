@@ -71,7 +71,7 @@ public class EditorPermissionTest extends AbstractReactSdkTest {
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), singletonList("rgb(20,178,226)"));
         assertEquals(chartReport.getLegends(), singletonList(DIRECT_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
     }
 

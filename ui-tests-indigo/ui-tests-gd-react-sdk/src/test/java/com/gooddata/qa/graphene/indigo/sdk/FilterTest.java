@@ -58,9 +58,9 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 2);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "33,920")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 1),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_ACTIVITY_TYPE, IN_PERSON_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "35,975")));
     }
 
@@ -79,13 +79,13 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 4);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "6,347")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 1),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_ACTIVITY_TYPE, IN_PERSON_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "7,076")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 2),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 2),
                 asList(asList(ATTR_ACTIVITY_TYPE, PHONE_CALL), asList(METRIC_NUMBER_OF_ACTIVITIES, "11,032")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 3),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 3),
                 asList(asList(ATTR_ACTIVITY_TYPE, WEB_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "7,312")));
     }
 
@@ -103,7 +103,7 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 1);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, IN_PERSON_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "35,975")));
     }
 
@@ -123,7 +123,7 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 1);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "6,440")));
     }
 
@@ -143,7 +143,7 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 1);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "6,347")));
     }
 
@@ -164,13 +164,13 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 4);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "6,448")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 1),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_ACTIVITY_TYPE, IN_PERSON_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "7,099")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 2),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 2),
                 asList(asList(ATTR_ACTIVITY_TYPE, PHONE_CALL), asList(METRIC_NUMBER_OF_ACTIVITIES, "11,081")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 3),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 3),
                 asList(asList(ATTR_ACTIVITY_TYPE, WEB_MEETING), asList(METRIC_NUMBER_OF_ACTIVITIES, "7,340")));
     }
 
@@ -193,7 +193,7 @@ public class FilterTest extends AbstractReactSdkTest {
 
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 1);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_ACTIVITY_TYPE, EMAIL), asList(METRIC_NUMBER_OF_ACTIVITIES, "21,175")));
     }
 }
