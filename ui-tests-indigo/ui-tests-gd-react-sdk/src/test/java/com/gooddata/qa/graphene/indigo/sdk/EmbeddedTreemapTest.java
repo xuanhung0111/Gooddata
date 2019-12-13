@@ -70,18 +70,18 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_URI);
         initSDKAnalysisPage();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
     }
 
@@ -99,9 +99,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         ChartReport chartReport = sdkAnalysisPage.getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
         PivotTableReport sdkTableReport = sdkAnalysisPage.getPivotTableReport();
         assertEquals(sdkTableReport.getHeaders(), singletonList(METRIC_AMOUNT));
@@ -123,9 +123,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
     }
 
@@ -151,7 +151,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), singletonList("rgb(20,178,226)"));
         assertEquals(chartReport.getLegends(), singletonList(INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
         createCatalogJSON(Pair.of("visualizationName", treemap),
@@ -161,7 +161,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         initSDKAnalysisPage();
         assertEquals(chartReport.getLegendColors(), singletonList("rgb(20,178,226)"));
         assertEquals(chartReport.getLegends(), singletonList(DIRECT_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
 
         createCatalogJSON(Pair.of("visualizationName", treemap),
@@ -172,9 +172,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         initSDKAnalysisPage();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "33,211")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "17,283")));
     }
 
@@ -240,9 +240,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         assertEquals(chartReport.getLegends(), asList(DIRECT_SALES, INSIDE_SALES));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "65.50%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "34.50%")));
     }
 
@@ -257,9 +257,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMetricFormat(),
                     Formatter.DEFAULT.toString());
             ChartReport chartReport = initSDKAnalysisPage().getChartReport();
-            assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                     asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054.00")));
-            assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                     asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217.00")));
         } finally {
             dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), "#,##0");
@@ -277,9 +277,9 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS);
         ChartReport chartReport = initSDKAnalysisPage().getChartReport();
         assertEquals(chartReport.getLegendColors(), asList("rgb(168,194,86)", "rgb(195,49,73)"));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, DIRECT_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "101,054")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndexForSDK(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_DEPARTMENT, INSIDE_SALES), asList(METRIC_NUMBER_OF_ACTIVITIES, "53,217")));
 
         createCatalogJSON(Pair.of("visualizationName", treemap),
