@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksB
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FilterBarPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -97,6 +98,9 @@ public class AnalysisPage extends AbstractFragment {
 
     @FindBy(css = ".s-visualization-picker button")
     private List<WebElement> visualization;
+
+    @FindBy(className = "s-filter-bar-button")
+    private WebElement filterBarButton;
 
     public static final String MAIN_CLASS = "adi-editor";
 
@@ -532,6 +536,17 @@ public class AnalysisPage extends AbstractFragment {
         Arrays.stream(values).forEach(panel::selectItem);  //To uncheck element
         panel.getApplyButton().click();
         return this;
+    }
+
+    public FilterBarPicker openFilterBarPicker() {
+        if (!waitForElementVisible(filterBarButton).getAttribute("class").contains("is-active")) {
+            filterBarButton.click();
+        }
+        return FilterBarPicker.getInstance(browser);
+    }
+
+    public boolean isFilterBarButtonEnabled() {
+        return !waitForElementVisible(filterBarButton).getAttribute("class").contains("disabled");
     }
 
     public AnalysisPage setFilterIsValues(String filter, String... values) {
