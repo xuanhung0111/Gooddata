@@ -66,7 +66,6 @@ public class UITestsRegistry {
             VisualizationDrillableWidgetTest.class,
             EventingWidgetDrillToDashboardTest.class,
             KpiApplyColorPaletteTest.class,
-            DashboardHeadersTest.class,
             "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-SplashScreen.xml"
@@ -98,6 +97,7 @@ public class UITestsRegistry {
             MetricsDropdownTest.class,
             VisualizationsTest.class,
             ReorderInsightTest.class,
+            DashboardHeadersTest.class,
             NonProductionDatasetTest.class,
             InsightOnDashboardTest.class,
             RoutingTest.class,
