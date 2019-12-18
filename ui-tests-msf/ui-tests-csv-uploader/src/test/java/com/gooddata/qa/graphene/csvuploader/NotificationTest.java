@@ -83,8 +83,10 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     private void checkGeneralNotification(Document message) {
-        String projectUrl = format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
-        assertEquals(message.getElementsMatchingOwnText(projectTitle).attr("href"), projectUrl);
+        String backendProjectUrl = format(PROJECT_PAGE_URL,
+                testParams.getHostProxy().isEmpty() ? testParams.getHost() : testParams.getHostProxy(),
+                testParams.getProjectId());
+        assertEquals(message.getElementsMatchingOwnText(projectTitle).attr("href"), backendProjectUrl);
         assertEquals(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
                 GOODDATA_SUPPORT_URL);
     }
