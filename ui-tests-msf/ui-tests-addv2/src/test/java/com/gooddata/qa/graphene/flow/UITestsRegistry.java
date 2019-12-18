@@ -11,6 +11,8 @@ import com.gooddata.qa.graphene.snowflake.SegmentLoadTest;
 import com.gooddata.qa.graphene.snowflake.CustomCurrentLoadTest;
 import com.gooddata.qa.graphene.redshift.RedShiftCurrentLoadTest;
 import com.gooddata.qa.graphene.redshift.RedShiftSegmentLoadTest;
+import com.gooddata.qa.graphene.bigquery.BigQueryCurrentLoadTest;
+import com.gooddata.qa.graphene.bigquery.BigQuerySegmentLoadTest;
 import com.gooddata.qa.graphene.snowflake.CustomCurrentForceLoadTest;
 import com.gooddata.qa.graphene.snowflake.CustomSegmentMappingBothIdTest;
 import com.gooddata.qa.graphene.snowflake.CustomSegmentMappingClientIdTest;
@@ -42,7 +44,9 @@ public class UITestsRegistry {
                 CustomSegmentMappingClientIdTest.class,
                 CustomSegmentMappingBothIdTest.class,
                 RedShiftCurrentLoadTest.class,
-                RedShiftSegmentLoadTest.class
+                RedShiftSegmentLoadTest.class,
+                BigQueryCurrentLoadTest.class,
+                BigQuerySegmentLoadTest.class
         });
 
         TestsRegistry.getInstance()
