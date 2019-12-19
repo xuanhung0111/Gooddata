@@ -90,7 +90,7 @@ integratedTests:
     command: ./integration-mvn-test
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
-      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-use"
+      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
     image: harbor.intgdc.com/staging/graphene-chrome:latest
     args: |
       -pl ui-tests-msf/ui-tests-datasourceapp \
