@@ -26,6 +26,7 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
 import static java.util.Collections.EMPTY_LIST;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -1016,5 +1017,47 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     private String removePX(String value){
         return value.replace("px","");
+    }
+
+    public boolean isMinimizeSpacingChanged() {
+        if (BrowserUtils.isFirefox()) {
+            return isDashboardSectionChanged() && isDashboardItemContentChangedOnFirefox();
+        } else {
+            return isDashboardSectionChanged() && isDashboardItemContentChanged();
+        }
+    }
+
+    private boolean isDashboardSectionChanged() {
+        return getRoot().findElement(className("dash-section")).getCssValue("padding-left").contains("20px");
+    }
+
+    private boolean isDashboardItemContentChanged() {
+        WebElement element = getDashboardItemContent();
+        return element.getCssValue("padding").contains("8px")
+                && element.getCssValue("border").contains("2px solid rgba(0, 0, 0, 0)");
+    }
+
+    private WebElement getDashboardItemContent() {
+        return getRoot().findElement(className("dash-item-content"));
+    }
+
+    private boolean isDashboardItemContentChangedOnFirefox() {
+        WebElement element = getDashboardItemContent();
+        return element.getCssValue("padding-top").contains("8px") &&
+                element.getCssValue("padding-left").contains("8px") &&
+                element.getCssValue("padding-bottom").contains("8px") &&
+                element.getCssValue("padding-right").contains("8px") &&
+                element.getCssValue("border-top-width").contains("2px") &&
+                element.getCssValue("border-left-width").contains("2px") &&
+                element.getCssValue("border-bottom-width").contains("2px") &&
+                element.getCssValue("border-right-width").contains("2px") &&
+                element.getCssValue("border-top-style").contains("solid") &&
+                element.getCssValue("border-left-style").contains("solid") &&
+                element.getCssValue("border-bottom-style").contains("solid") &&
+                element.getCssValue("border-right-style").contains("solid") &&
+                element.getCssValue("border-top-color").contains("rgba(0, 0, 0, 0)") &&
+                element.getCssValue("border-left-color").contains("rgba(0, 0, 0, 0)") &&
+                element.getCssValue("border-bottom-color").contains("rgba(0, 0, 0, 0)") &&
+                element.getCssValue("border-right-color").contains("rgba(0, 0, 0, 0)");
     }
 }
