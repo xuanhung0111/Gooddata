@@ -88,4 +88,9 @@ public final class CheckUtils {
         }
         return foundAlert;
     }
+
+    public static boolean isLessThan180PX(String value){
+        log.info(" isLessThan180PX : " + CalculateUtils.convertToFloat(value));
+        return CalculateUtils.convertToFloat(value).compareTo(CalculateUtils.convertToFloat("180")) == -1 ? true : false;
+    }
 }
