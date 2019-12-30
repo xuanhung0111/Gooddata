@@ -70,8 +70,8 @@ public class BigQueryCurrentLoadTest extends AbstractADDProcessTest {
     private final String OTHER_CLIENT_ID = "bigquery_other_client_att_" + generateHashString();
     private final String BIGQUERY_PROJECT = "gdc-us-dev";
     private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + generateHashString();
-    private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2",DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
-    private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2",DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
+    private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
+    private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private DataloadProcess dataloadProcess;
     private LocalDateTime lastSuccessful;
     private LocalDateTime lastSecondSuccessful;
@@ -435,9 +435,13 @@ public class BigQueryCurrentLoadTest extends AbstractADDProcessTest {
 
     private void setUpProcess() {
         log.info("Setup Process...............");
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectTest, PROCESS_NAME,
-                dataSourceId, "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectTest, PROCESS_NAME,
+                    dataSourceId, "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
     }
 
     private void prepareTimestamp() {
@@ -459,7 +463,9 @@ public class BigQueryCurrentLoadTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         dataMappingProjectIdUtils.deleteProjectIdDataMapping(projectMappingPID);
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         deleteTable(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE, TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);

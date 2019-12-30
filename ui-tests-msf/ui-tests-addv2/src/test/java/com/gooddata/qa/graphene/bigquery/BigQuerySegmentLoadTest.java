@@ -74,8 +74,8 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
     private final String CLIENT_PROJECT_TITLE_2 = "ATT_LCM Client project " + generateHashString();
     private final String SEGMENT_ID = "att_segment_" + generateHashString();
     private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + generateHashString();
-    private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2",DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
-    private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2",DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
+    private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
+    private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private IndigoRestRequest indigoRestRequest;
     private final String DATA_SOURCE_NAME = "Auto_datasource" + generateHashString();
     private final String DASHBOARD_NAME = "Dashboard Test";
@@ -390,7 +390,9 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         deleteTable(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE, TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
@@ -438,10 +440,14 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
 
     private void setUpProcess() {
         log.info("Setup Process .......................");
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
-                dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
-        updateLCM();
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
+                    dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+            updateLCM();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
     }
 
     private void updateLCM() {
