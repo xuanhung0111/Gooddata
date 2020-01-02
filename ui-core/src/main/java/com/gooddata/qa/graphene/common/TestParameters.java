@@ -43,6 +43,7 @@ public class TestParameters {
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private Environment projectEnvironment = Environment.TESTING;
     private int retentionDays;
+    private int databaseRetentionDays;
     private String testIdentification;
     private String downloadFolder;
     private String csvFolder;
@@ -98,6 +99,7 @@ public class TestParameters {
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
         retentionDays = Integer.parseInt(loadProperty("project.retentionDayNumber"));
+        databaseRetentionDays = Integer.parseInt(loadProperty("databaseRetentionDayNumber"));
         downloadFolder = loadProperty("browserDownloadFolder");
         csvFolder = loadProperty("csvFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));
@@ -284,6 +286,10 @@ public class TestParameters {
 
     public int getRetentionDays() {
         return retentionDays;
+    }
+
+    public int getDatabaseRetentionDays() {
+        return databaseRetentionDays;
     }
 
     public DeleteMode getDeleteMode() {

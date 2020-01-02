@@ -2,6 +2,7 @@ package com.gooddata.qa.utils.cloudresources;
 
 import net.snowflake.client.jdbc.SnowflakeConnectionV1;
 import org.apache.commons.lang3.tuple.Pair;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -50,6 +52,22 @@ public class SnowflakeUtils {
     public void dropDatabaseIfExists(String databaseName) throws SQLException {
         executeSql("DROP DATABASE IF EXISTS " + databaseName);
         logger.info("Dropped the database with name is: " + databaseName);
+    }
+
+    /**
+     * Get old databases which name start with ATT_DATABASE and created by Graphene.
+     */
+    public ArrayList<DatabaseInfo> getOldSnowflakeDatabase() throws SQLException {
+        ArrayList<DatabaseInfo> resultArray = new ArrayList<DatabaseInfo>();
+        ResultSet resultSet = getSqlResult("SHOW TERSE DATABASES STARTS WITH 'ATT_DATABASE'");
+        while (resultSet.next()) {
+            DatabaseInfo dbinfo = new DatabaseInfo();
+            dbinfo.setName(resultSet.getString("name"));
+            DateTime date = new DateTime(resultSet.getTimestamp("created_on").getTime());
+            dbinfo.setCreated_on(date);
+            resultArray.add(dbinfo);
+        }
+        return resultArray;
     }
 
     /**
@@ -302,6 +320,32 @@ public class SnowflakeUtils {
             connection.close();
         } catch (SQLException e) {
             // Ignore because not sense.
+        }
+    }
+
+    public class DatabaseInfo {
+        String name;
+        DateTime created_on;
+
+        public DatabaseInfo() {
+            this.name = name;
+            this.created_on = created_on;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public DateTime getCreated_on() {
+            return created_on;
+        }
+
+        public void setCreated_on(DateTime created_on) {
+            this.created_on = created_on;
         }
     }
 }
