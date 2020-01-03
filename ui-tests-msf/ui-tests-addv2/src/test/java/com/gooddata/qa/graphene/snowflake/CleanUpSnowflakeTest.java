@@ -29,13 +29,13 @@ public class CleanUpSnowflakeTest extends AbstractTest {
 
         // get all Snowflake database created by Graphene
         ArrayList<SnowflakeUtils.DatabaseInfo> allSnowflakeDB = snowflakeUtils.getOldSnowflakeDatabase();
-        if (allSnowflakeDB.size() == 0) {
-            log.info("There is no database need to drop");
-            return;
-        }
 
         // Filter old databases
         ArrayList<SnowflakeUtils.DatabaseInfo> filteredResult = filterOldDatabases(allSnowflakeDB);
+        if (allSnowflakeDB.size() == 0 || filteredResult.size() == 0) {
+            log.info("There is no database need to drop");
+            return;
+        }
 
         // Drop old databases
         dropManyDatabases(filteredResult);
@@ -43,7 +43,7 @@ public class CleanUpSnowflakeTest extends AbstractTest {
 
         // Assert dropped databases to make this test pass or fail.
         ArrayList<String> allDatabaseName = this.convertToProjectIdCollection(snowflakeUtils.getOldSnowflakeDatabase());
-        log.info("Old database names: " + allDatabaseName.toString());
+        log.info("All database names: " + allDatabaseName.toString());
 
         ArrayList<String> droppedDatabaseName = this.convertToProjectIdCollection(filteredResult);
         log.info("Dropped database is older than " + databaseRetentionDays + ": " + droppedDatabaseName.toString());
