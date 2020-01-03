@@ -42,6 +42,7 @@ public class EmailSchedulePage extends AbstractFragment {
     private static final By BY_SCHEDULE_EMAIL_TITLES = By.cssSelector(".s-dataPage-listRow .title span");
 
     private static final String SCHEDULE_SELECTOR = "tbody td.title.s-title-%s";
+    private static final String KPI_SCHEDULE_SELECTOR = "tbody td[class*='title s-title-%s']";
     private static final String SCHEDULE_ANCHOR_SELECTOR = SCHEDULE_SELECTOR + " a";
     private static final String CONTROL_SELECTOR = SCHEDULE_SELECTOR + " ~ .scheduleControls";
     private static final String DELETE_SELECTOR = CONTROL_SELECTOR + " .s-btn-delete";
@@ -59,6 +60,9 @@ public class EmailSchedulePage extends AbstractFragment {
 
     @FindBy(css = ".privateSchedulesTable")
     private WebElement privateSchedulesTable;
+
+    @FindBy(css = ".privateKPISchedulesTable")
+    private WebElement privateKPISchedulesTable;
 
     @FindBy(css = ".emailScheduleForm")
     private WebElement scheduleDetail;
@@ -211,12 +215,20 @@ public class EmailSchedulePage extends AbstractFragment {
         return waitForElementVisible(privateSchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
     }
 
+    public List<WebElement> getKPIPrivateScheduleTitles() {
+        return waitForElementPresent(privateKPISchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
+    }
+
     public int getNumberOfGlobalSchedules() {
         return getGlobalScheduleTitles().size();
     }
 
     public int getNumberOfPrivateSchedules() {
         return getPrivateScheduleTitles().size();
+    }
+
+    public int getNumberKPIOfPrivateSchedules() {
+        return getKPIPrivateScheduleTitles().size();
     }
 
     public boolean isGlobalSchedulePresent(String title) {
@@ -366,6 +378,15 @@ public class EmailSchedulePage extends AbstractFragment {
         waitForElementVisible(By.cssSelector(format(DELETE_SELECTOR, simplifyText(scheduleName))), browser)
             .click();
         Graphene.waitGui().until(browser -> getNumberOfGlobalSchedules() == numberOfSchedule - 1);
+        return this;
+    }
+
+    public EmailSchedulePage deleteKPISchedule(final String scheduleName) {
+        final String KPI_DELETE_SELECTOR = KPI_SCHEDULE_SELECTOR + " ~ .scheduleControls" + " .s-btn-delete";
+        final int numberOfSchedule = getNumberKPIOfPrivateSchedules();
+        waitForElementVisible(By.cssSelector(format(KPI_DELETE_SELECTOR, simplifyText(scheduleName))), browser)
+            .click();
+        Graphene.waitGui().until(browser -> getNumberKPIOfPrivateSchedules() == numberOfSchedule - 1);
         return this;
     }
 
