@@ -19,6 +19,7 @@
         <module>ui-tests-lcmconsole</module>
         <module>ui-tests-lcm</module>
         <module>ui-tests-trial</module>
+        <module>ui-tests-freemium-growth</module>
     </modules>
 
     <properties>

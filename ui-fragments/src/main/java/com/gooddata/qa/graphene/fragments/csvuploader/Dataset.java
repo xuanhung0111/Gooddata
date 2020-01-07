@@ -1,12 +1,6 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -14,7 +8,12 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class Dataset extends AbstractFragment {
 
@@ -51,6 +50,10 @@ public class Dataset extends AbstractFragment {
 
     public String getAnalyzeLink() {
         return waitForElementVisible(getRoot()).findElement(BY_ANALYZE_LINK).getAttribute("href");
+    }
+
+    public void openAnalyzePage() {
+        waitForElementVisible(getRoot()).findElement(BY_ANALYZE_LINK).click();
     }
 
     public DatasetDetailPage openDetailPage() {
