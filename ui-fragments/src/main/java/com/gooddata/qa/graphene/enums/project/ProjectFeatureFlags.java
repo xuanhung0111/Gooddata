@@ -36,7 +36,8 @@ public enum ProjectFeatureFlags {
     DISABLE_ZEBRA_EFFECT("disableZebraEffect"),
     TABLE_HEADER_FONT_SIZE("tableHeaderFontSize"),
     TABLE_BODY_FONT_SIZE("tableBodyFontSize"),
-    ENABLE_NEW_AD_FILTER_BAR("enableNewADFilterBar");
+    ENABLE_NEW_AD_FILTER_BAR("enableNewADFilterBar"),
+    ENABLE_MEASURE_VALUE_FILTERS("enableMeasureValueFilters");
 
     private final String featureFlag;
 

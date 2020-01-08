@@ -56,7 +56,7 @@ public abstract class AbstractBucket extends AbstractFragment {
     private WebElement getItemBucket(final String item) {
         return waitForCollectionIsNotEmpty(items)
                 .stream()
-                .filter(e -> item.equals(e.getText()))
+                .filter(e -> item.equals(e.findElement(className("s-bucket-item-header")).getText()))
                 .findFirst()
                 .get();
     }

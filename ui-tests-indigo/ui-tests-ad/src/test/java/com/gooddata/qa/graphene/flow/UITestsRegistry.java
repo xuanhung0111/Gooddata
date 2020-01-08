@@ -83,6 +83,7 @@ import com.gooddata.qa.graphene.indigo.analyze.PieChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.ComboChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
+import com.gooddata.qa.graphene.indigo.analyze.ADFilterBarFlowTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -116,6 +117,7 @@ public class UITestsRegistry {
             DateFilterADMeasureTest.class,
             ApplyColorPaletteOnAnalyzePageTest.class,
             ColorPalettePickerBasicInsightAndKPITest.class,
+            ADFilterBarFlowTest.class
         });
 
         suites.put("all", new Object[] {
