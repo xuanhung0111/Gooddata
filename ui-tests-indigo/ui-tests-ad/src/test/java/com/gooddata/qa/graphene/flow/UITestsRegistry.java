@@ -83,6 +83,7 @@ import com.gooddata.qa.graphene.indigo.analyze.PieChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.ComboChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
+import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -162,6 +163,7 @@ public class UITestsRegistry {
             EventingFiltersUnderMetric.class,
             EventingSpecialCaseTest.class,
             DateFilterADMeasureExtendedTest.class,
+            DateFilterADMeasureCombineDateTest.class,
             InsightCompareToPreviousPeriodTest.class,
             RenamingMeasuresAndAttributesTest.class,
             InsightCompareToSamePreviousPeriodYearTest.class,

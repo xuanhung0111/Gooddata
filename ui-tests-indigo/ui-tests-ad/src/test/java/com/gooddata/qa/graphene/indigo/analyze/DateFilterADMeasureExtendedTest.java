@@ -50,7 +50,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_ONLY_ATTRIBUTES = "Insight has only attributes";
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
     //Will be changed evert year
-    private static final String TWO_YEARS_AGO = "two years ago";
+    private static final String THREE_YEARS_AGO = "three years ago";
     private static final String DATE_FILTER_ALL_TIME = "All time";
     private static final String DATE_FILTER_THIS_MONTH = "This month";
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
@@ -300,7 +300,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
         metricFilterByDatePicker.backToOtherPeriods();
-        metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, TWO_YEARS_AGO);
+        metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, THREE_YEARS_AGO);
         assertEquals(getListDataChartReportRender(), singletonList("$3,644.00"),
                 "Chart does not render correctly");
 
@@ -473,14 +473,14 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void prepareInsightsApplyDateFilter() {
         initAnalysePage().addMetric(METRIC_AMOUNT).waitForReportComputing().getMetricsBucket()
-            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
+            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterByDate(THREE_YEARS_AGO);
         analysisPage.saveInsight(INSIGHT_HAS_MEASURE_APPLY_DATE_FILTER);
 
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).getMetricsBucket()
             .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-            .addFilterByDate(TWO_YEARS_AGO);
+            .addFilterByDate(THREE_YEARS_AGO);
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AVG_AMOUNT)
-            .expandConfiguration().addFilterByDate(TWO_YEARS_AGO);
+            .expandConfiguration().addFilterByDate(THREE_YEARS_AGO);
         analysisPage.saveInsight(INSIGHT_HAS_MEASURES_APPLY_DATE_FILTER);
     }
 
