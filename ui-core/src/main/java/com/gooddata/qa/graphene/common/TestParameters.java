@@ -29,8 +29,6 @@ public class TestParameters {
     private String redshiftPassword;
     private String redshiftUserName;
     private String redshiftJdbcUrl;
-    private String bigqueryProject;
-    private String bigquerySchema;
     private String bigqueryClientEmail;
     private String bigqueryPrivateKey;
     private String editorUser;
@@ -45,6 +43,7 @@ public class TestParameters {
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private Environment projectEnvironment = Environment.TESTING;
     private int retentionDays;
+    private int databaseRetentionDays;
     private String testIdentification;
     private String downloadFolder;
     private String csvFolder;
@@ -93,8 +92,6 @@ public class TestParameters {
         redshiftPassword = loadProperty("redshiftPassword");
         redshiftUserName = loadProperty("redshiftUserName");
         redshiftJdbcUrl = loadProperty("redshiftJdbcUrl");
-        bigqueryProject = loadProperty("bigqueryProject");
-        bigquerySchema = loadProperty("bigquerySchema");
         bigqueryClientEmail = loadProperty("bigqueryClientEmail");
         bigqueryPrivateKey = loadProperty("bigqueryPrivateKey");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
@@ -102,6 +99,7 @@ public class TestParameters {
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
         retentionDays = Integer.parseInt(loadProperty("project.retentionDayNumber"));
+        databaseRetentionDays = Integer.parseInt(loadProperty("databaseRetentionDayNumber"));
         downloadFolder = loadProperty("browserDownloadFolder");
         csvFolder = loadProperty("csvFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));
@@ -208,14 +206,6 @@ public class TestParameters {
         return redshiftJdbcUrl;
     }
 
-    public String getBigqueryProject() { return bigqueryProject; }
-
-    public void setBigqueryProject(String bigqueryProject) { this.bigqueryProject = bigqueryProject; }
-
-    public String getBigquerySchema() { return bigquerySchema; }
-
-    public void setBigquerySchema(String bigquerySchema) { this.bigquerySchema = bigquerySchema; }
-
     public String getBigqueryClientEmail() { return bigqueryClientEmail; }
 
     public void setBigqueryClientEmail(String bigqueryClientEmail) { this.bigqueryClientEmail = bigqueryClientEmail; }
@@ -296,6 +286,10 @@ public class TestParameters {
 
     public int getRetentionDays() {
         return retentionDays;
+    }
+
+    public int getDatabaseRetentionDays() {
+        return databaseRetentionDays;
     }
 
     public DeleteMode getDeleteMode() {
