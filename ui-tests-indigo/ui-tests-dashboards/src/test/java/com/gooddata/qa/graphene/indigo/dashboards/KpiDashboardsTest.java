@@ -5,6 +5,7 @@ import com.gooddata.md.AttributeElement;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -31,6 +32,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -242,7 +244,16 @@ public class KpiDashboardsTest extends AbstractDashboardTest {
         }
     }
 
-    private String removePX(String value){
-        return value.replace("px","");
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void checkMinimizeSpacingTest() {
+        initIndigoDashboardsPage().addDashboard()
+                .addKpi(new KpiConfiguration.Builder().metric(METRIC_AMOUNT).dataSet(DATE_DATASET_CREATED)
+                        .build()).changeDashboardTitle("DASHBOARD NAME").selectDateFilterByName(ALL_TIME).saveEditModeWithWidgets();
+        takeScreenshot(browser, "TEST MINIMIZE SPACING ON KD", getClass());
+        assertTrue(indigoDashboardsPage.isMinimizeSpacingChanged(), "Minimize Spacing should be changed");
+    }
+
+    private String removePX(String value) {
+        return value.replace("px", "");
     }
 }
