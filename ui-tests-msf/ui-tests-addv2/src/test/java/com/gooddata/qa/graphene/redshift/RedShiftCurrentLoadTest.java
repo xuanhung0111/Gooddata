@@ -45,6 +45,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.support.FindBy;
@@ -91,7 +92,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     private final String DASHBOARD_NAME = "Dashboard Test";
     private final String INSIGHT_NAME = "Insight Test";
     private final String DATABASE_NAME = "dev";
-    private final String SCHEMA_NAME = "auto_schema_" + generateHashString();
+    private final String SCHEMA_NAME = "autoschema" + generateHashString() + "__" + getCurrentDate();
     private final String PROCESS_NAME = "AutoProcess Test" + generateHashString();
     private final String CLIENT_ID = "att_client_" + generateHashString();
     private final String OTHER_CLIENT_ID = "att_other_client_" + generateHashString();
@@ -583,6 +584,10 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         timeLoadFrom = parseToTimeStampFormat(lastSuccessful.plusSeconds(20));
         timeLoadTo = parseToTimeStampFormat(lastSuccessful.plusSeconds(25));
         timeOverRange = parseToTimeStampFormat(lastSuccessful.plusSeconds(30));
+    }
+
+    private String getCurrentDate() {
+        return DateTime.now().toString("YYYY_MM_dd_HH_mm_ss");
     }
 
     protected Metrics getMetricCreator() {
