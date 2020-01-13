@@ -124,9 +124,13 @@ public class SegmentDeleteColumnFactTableGrainTest extends AbstractADDProcessTes
         List<DatabaseColumn> listColumn = asList(firstGrainColumn, secondGrainColumn, nameColumn, ageColumn, timestampColumn,
                 deletedColumn, clientIdColumn);
         snowflakeUtils.createTable(TABLE_CUSTOMERS, listColumn);
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
-                dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
+                    dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
         lcmBrickFlowBuilder.deleteMasterProject();
         lcmBrickFlowBuilder.runLcmFlow();
         lastSuccessful = LocalDateTime.now().withNano(0);
@@ -210,7 +214,9 @@ public class SegmentDeleteColumnFactTableGrainTest extends AbstractADDProcessTes
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);

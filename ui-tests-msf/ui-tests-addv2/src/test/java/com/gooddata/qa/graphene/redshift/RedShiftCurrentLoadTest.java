@@ -487,7 +487,9 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         dataMappingProjectIdUtils.deleteProjectIdDataMapping(projectMappingPID);
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         redshiftUtils.dropTables(TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
@@ -552,9 +554,13 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     }
 
     private void setUpProcess() {
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectTest, PROCESS_NAME,
-                dataSourceId, "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectTest, PROCESS_NAME,
+                    dataSourceId, "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
     }
 
     private void updateModel() {

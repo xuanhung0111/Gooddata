@@ -491,9 +491,15 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
-        domainRestClient.getProcessService().removeProcess(dataloadProcessSecond);
-        domainRestClient.getProcessService().removeProcess(dataloadProcessThird);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
+        if (dataloadProcessSecond != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcessSecond);
+        }
+        if (dataloadProcessThird != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcessThird);
+        }
         domainRestClient.getProjectService().removeProject(projectSecond);
         domainRestClient.getProjectService().removeProject(projectThird);
         dataMappingProjectIdUtils.deleteProjectIdDataMapping(projectMappingPID);
@@ -618,15 +624,19 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
     }
 
     private void setUpProcess() {
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectFirst, PROCESS_NAME,
-                dataSourceId, "1");
-        dataloadProcessSecond = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectSecond, PROCESS_NAME,
-                dataSourceSecondId, "1");
-        dataloadProcessThird = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectThird, PROCESS_NAME,
-                dataSourceThirdId, "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
-        domainProcessUtilsSecond = new ProcessUtils(domainRestClient, dataloadProcessSecond);
-        domainProcessUtilsThird = new ProcessUtils(domainRestClient, dataloadProcessThird);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectFirst, PROCESS_NAME,
+                    dataSourceId, "1");
+            dataloadProcessSecond = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectSecond, PROCESS_NAME,
+                    dataSourceSecondId, "1");
+            dataloadProcessThird = new ScheduleUtils(domainRestClient).createDataDistributionProcess(projectThird, PROCESS_NAME,
+                    dataSourceThirdId, "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+            domainProcessUtilsSecond = new ProcessUtils(domainRestClient, dataloadProcessSecond);
+            domainProcessUtilsThird = new ProcessUtils(domainRestClient, dataloadProcessThird);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
     }
 
     private void prepareTimestamp() {
