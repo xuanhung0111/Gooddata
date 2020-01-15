@@ -243,10 +243,10 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
             }
 
             LoginFragment loginPage = LoginFragment.getInstance(browser);
-            loginPage.login(testParams.getDomainUser(), testParams.getPassword(), false);
+            loginPage.login(testParams.getDomainUser(), testParams.getPassword(), true);
 
-            assertEquals(initMetricPage().getDataPageRowsByTitle(metricName),
-                asList(metricName, StringUtils.EMPTY));
+            List<String> metrics = initMetricPage().getDataPageRowsByTitle(metricName);
+            assertEquals(metrics, asList(metricName, StringUtils.EMPTY));
         }finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
