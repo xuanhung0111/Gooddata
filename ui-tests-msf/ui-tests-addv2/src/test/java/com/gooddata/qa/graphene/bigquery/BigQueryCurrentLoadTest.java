@@ -26,6 +26,7 @@ import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.StandardSQLTypeName;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.support.FindBy;
@@ -69,7 +70,7 @@ public class BigQueryCurrentLoadTest extends AbstractADDProcessTest {
     private final String CLIENT_ID = "bigquery_client_att_" + generateHashString();
     private final String OTHER_CLIENT_ID = "bigquery_other_client_att_" + generateHashString();
     private final String BIGQUERY_PROJECT = "gdc-us-dev";
-    private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + generateHashString();
+    private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + "__" + getCurrentDate();
     private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private DataloadProcess dataloadProcess;
@@ -471,5 +472,9 @@ public class BigQueryCurrentLoadTest extends AbstractADDProcessTest {
         deleteTable(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE, TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
         deleteTable(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE, TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
         deleteDataset(DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
+    }
+
+    private String getCurrentDate() {
+        return DateTime.now().toString("YYYY_MM_dd_HH_mm_ss");
     }
 }

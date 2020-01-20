@@ -28,6 +28,7 @@ import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.StandardSQLTypeName;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.support.FindBy;
@@ -73,7 +74,7 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
     private final String CLIENT_PROJECT_TITLE_1 = "ATT_LCM Client project " + generateHashString();
     private final String CLIENT_PROJECT_TITLE_2 = "ATT_LCM Client project " + generateHashString();
     private final String SEGMENT_ID = "att_segment_" + generateHashString();
-    private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + generateHashString();
+    private final String DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN + "__" + getCurrentDate();
     private final String TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private final String TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE = TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN.replace("CUSTOMERSMAPPINGPROJECTID2", DATASET_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN_GENERATE);
     private IndigoRestRequest indigoRestRequest;
@@ -505,5 +506,9 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
         lcmBrickFlowBuilder.runLcmFlow();
         addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId1);
         addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, clientProjectId2);
+    }
+
+    private String getCurrentDate() {
+        return DateTime.now().toString("YYYY_MM_dd_HH_mm_ss");
     }
 }
