@@ -16,6 +16,7 @@
 
     <modules>
         <module>ui-tests-trial-csv-uploader</module>
+        <module>ui-tests-trial-snowflake</module>
     </modules>
 
     <properties>
