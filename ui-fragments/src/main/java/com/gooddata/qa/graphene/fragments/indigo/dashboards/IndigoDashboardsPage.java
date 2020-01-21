@@ -374,7 +374,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         //wait for exporting dashboard tab in maximum 10 minutes
         int exportingTextDisplayedTimeoutInSeconds = 600;
 
-        clickHeaderOptionsButton();
+        openHeaderOptionsButton();
         waitForElementVisible(className("s-pdf-export-item"), browser).click();
 
         waitForElementVisible(BY_PROGRESS_MESSAGE_BAR, browser);
@@ -386,7 +386,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage clickHeaderOptionsButton() {
+    public IndigoDashboardsPage openHeaderOptionsButton() {
         waitForElementVisible(headerOptionsButton).click();
         return this;
     }
