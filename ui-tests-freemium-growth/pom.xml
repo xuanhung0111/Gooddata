@@ -23,7 +23,6 @@
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-freemium-growth-dummy.xml</testng.suite.xml>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
             </properties>
         </profile>

@@ -84,9 +84,12 @@ public abstract class AbstractFreemiumGrowthTest extends AbstractUITest {
         // update user into dynamic user
         String dynamicUser = createDynamicUserFrom(testParams.getUser().replace("@", "+dynamic@"));
         testParams.setUser(dynamicUser);
-        restClient = new RestClient(getProfile(ADMIN));
+    }
 
-        signInAtUI(dynamicUser, testParams.getPassword());
+    @Test(groups = {"prepareTest"}, dependsOnMethods = "createAndUseDynamicUser")
+    public void login() {
+        restClient = new RestClient(getProfile(ADMIN));
+        signInAtUI(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(groups = {"createProject"}, dependsOnGroups = {"prepareTest"})

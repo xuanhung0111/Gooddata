@@ -11,7 +11,7 @@ public class BasicFreemiumTest extends AbstractFreemiumGrowthTest {
         editionName = "FREE";
     }
 
-    @Test(groups = {"createProject"})
+    @Test(groups = {"createProject"}, dependsOnGroups = {"prepareTest"})
     public void creatingNewProjects() {
         for (int i = 0; i< maxProjects; i++) {
             createNewEmptyProject(String.format("ATT_%s_%d", editionName + generateHashString(), i));
