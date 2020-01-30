@@ -43,8 +43,7 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
         expectHidden(dates, attributes);
     }
 
-    // TODO: BB-2028 - Unstable test since the merge of BB-1711
-    @Test(enabled = false, dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shows_only_date_and_attributes_for_attributes_filter() {
         initAnalysePage().getCatalogPanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
         expectVisible(dates, attributes);
