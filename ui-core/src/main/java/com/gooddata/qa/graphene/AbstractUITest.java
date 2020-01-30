@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
@@ -254,6 +256,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
         takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" +
                 reportDefinition.getType().getName(), this.getClass());
         checkRedBar(browser);
+    }
+
+    public void createReport(UiReportDefinition reportDefinition, ReportTypes reportTypes) {
+        initReportCreation();
+        reportPage.createReport(reportDefinition, reportTypes);
+        takeScreenshot(browser, reportDefinition.getName() + "-" + reportDefinition.getName() + "-" +
+                reportDefinition.getType().getName(), this.getClass());
     }
 
     public ReportPage initReportCreation() {

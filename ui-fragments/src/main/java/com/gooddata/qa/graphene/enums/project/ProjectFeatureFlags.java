@@ -37,7 +37,8 @@ public enum ProjectFeatureFlags {
     TABLE_HEADER_FONT_SIZE("tableHeaderFontSize"),
     TABLE_BODY_FONT_SIZE("tableBodyFontSize"),
     ENABLE_NEW_AD_FILTER_BAR("enableNewADFilterBar"),
-    ENABLE_MEASURE_VALUE_FILTERS("enableMeasureValueFilters");
+    ENABLE_MEASURE_VALUE_FILTERS("enableMeasureValueFilters"),
+    ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled");
 
     private final String featureFlag;
 
