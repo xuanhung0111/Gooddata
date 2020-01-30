@@ -62,7 +62,7 @@ integratedTests:
   - kind: 'image'
     env: bash
     path: .
-    command: ./integration-mvn-test
+    command: ./integration-mvn-test.sh
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
     image: harbor.intgdc.com/staging/graphene-chrome:latest
@@ -87,7 +87,7 @@ integratedTests:
   - kind: 'image'
     env: bash
     path: .
-    command: ./integration-mvn-test
+    command: ./integration-mvn-test.sh
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
       QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
