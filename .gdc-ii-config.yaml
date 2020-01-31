@@ -62,14 +62,12 @@ integratedTests:
   - kind: 'image'
     env: bash
     path: .
-    command: ./integration-mvn-test.sh
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
-    image: harbor.intgdc.com/staging/graphene-chrome:latest
-    args: |
-      -pl ui-tests-msf/ui-tests-disc \
-      -Dtest.module=ui-tests-msf/ui-tests-disc \
-      -Dtest=DeployProcessByRubyScriptTest \
+    command: ./integration-mvn-test.sh \
+      -pl ui-tests-msf/ui-tests-modeler \
+      -Dtest.module=ui-tests-msf/ui-tests-modeler \
+      -Dtest=LogicalDataModelPageTest \
       -Dhost=staging3.intgdc.com \
       -Duser=qa+test@gooddata.com \
       -Dpassword=$QA_TEST_PASSWORD \
@@ -77,6 +75,9 @@ integratedTests:
       -Dproject.authorizationToken=pgtestingauto01 \
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
       -DuseDynamicUser=true
+    image: harbor.intgdc.com/staging/graphene-chrome:latest
+    runForClusters:
+    - 'stg3'
     artifacts:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'
