@@ -76,8 +76,8 @@ integratedTests:
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
       -DuseDynamicUser=true
     image: harbor.intgdc.com/staging/graphene-chrome:latest
-    runForClusters:
-    - 'stg3'
+#    runForClusters:
+#    - 'stg3'
     artifacts:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'
