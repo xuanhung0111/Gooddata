@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -40,6 +41,18 @@ public class FilterBarPicker extends AbstractPicker {
 
     public FilterBarPicker checkItem(String nameItem) {
         return toggle(nameItem, true);
+    }
+
+    public FilterBarPicker checkItem(String name, int index) {
+        return checkItem(name + "\nM" + index);
+    }
+
+    public FilterBarPicker uncheckItem(String name, int index) {
+        return uncheckItem(name + "\nM" + index);
+    }
+
+    public boolean isItemChecked(String name, int index) {
+        return isItemCheck(name + "\nM" + index);
     }
 
     public boolean isItemCheck(String nameItem) {

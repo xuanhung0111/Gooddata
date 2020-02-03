@@ -178,7 +178,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
         analysisPage.openFilterBarPicker().checkItem(DATE).apply();
         analysisPage.removeDateFilter();
-        assertFalse(analysisPage.openFilterBarPicker().isItemCheck("Date"),
+        assertFalse(analysisPage.openFilterBarPicker().isItemCheck(DATE),
             "Date should be not checked");
         assertFalse(filtersBucket.isDateFilterVisible(), "Date should be removed to filter bar");
     }
@@ -193,7 +193,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     public void dragAndDropDateAndAttributeToFilterBar() {
         initAnalysePage().addDateFilter().addFilter(ATTR_DEPARTMENT);
         FilterBarPicker filterBarPicker = analysisPage.openFilterBarPicker();
-        assertTrue(filterBarPicker.isItemCheck("Date"), "Attribute should be checked");
+        assertTrue(filterBarPicker.isItemCheck(DATE), "Attribute should be checked");
         assertEquals(filterBarPicker.getValuesText(), asList("Date", ATTR_DEPARTMENT));
     }
 

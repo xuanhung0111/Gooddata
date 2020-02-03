@@ -142,8 +142,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
         MetricsBucket metricsBucket = initAnalysePage().openInsight(INSIGHT_APPLIED_ARITHMETIC_MEASURE).getMetricsBucket();
         MetricConfiguration metricConfiguration = metricsBucket.createCalculatedMeasure()
             .getMetricConfiguration("Ratio of …");
-        metricConfiguration.chooseArithmeticMeasureA("M1 (" + METRIC_AMOUNT + ")");
-        metricConfiguration.chooseArithmeticMeasureB("M2 (" + METRIC_AMOUNT_BOP + ")");
+        metricConfiguration.chooseArithmeticMeasureA(METRIC_AMOUNT, 1);
+        metricConfiguration.chooseArithmeticMeasureB(METRIC_AMOUNT_BOP, 2);
         metricConfiguration.chooseOperator(MetricConfiguration.OperatorCalculated.SUM);
         analysisPage.saveInsight().waitForReportComputing();
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
@@ -292,8 +292,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
         MetricsBucket metricsBucket = initAnalysePage().openInsight(INSIGHT_HAS_THREE_ATTRIBUTES_COLUMN_AND_A_ROW).getMetricsBucket();
         MetricConfiguration metricConfiguration = metricsBucket.createCalculatedMeasure()
             .getMetricConfiguration("Ratio of …");
-        metricConfiguration.chooseArithmeticMeasureA("M1 (" + METRIC_AMOUNT + ")");
-        metricConfiguration.chooseArithmeticMeasureB("M2 (" + METRIC_AMOUNT_BOP + ")");
+        metricConfiguration.chooseArithmeticMeasureA(METRIC_AMOUNT, 1);
+        metricConfiguration.chooseArithmeticMeasureB(METRIC_AMOUNT_BOP, 2);
         metricConfiguration.chooseOperator(MetricConfiguration.OperatorCalculated.SUM);
 
         PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();
@@ -470,8 +470,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
 
         MetricConfiguration metricConfiguration = metricsBucket.createCalculatedMeasure()
             .getMetricConfiguration("Ratio of …");
-        metricConfiguration.chooseArithmeticMeasureA("M1 (" + METRIC_AMOUNT + ")");
-        metricConfiguration.chooseArithmeticMeasureB("M2 (" + METRIC_AMOUNT_BOP + ")");
+        metricConfiguration.chooseArithmeticMeasureA(METRIC_AMOUNT, 1);
+        metricConfiguration.chooseArithmeticMeasureB(METRIC_AMOUNT_BOP, 2);
         metricConfiguration.chooseOperator(MetricConfiguration.OperatorCalculated.SUM);
 
         PivotTableReport pivotTableReport = analysisPage.getPivotTableReport();

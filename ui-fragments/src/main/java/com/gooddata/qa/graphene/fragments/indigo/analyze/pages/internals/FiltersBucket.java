@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -112,6 +113,10 @@ public class FiltersBucket extends AbstractBucket {
             .filter(e -> waitForFilterLoaded(e).findElement(By.cssSelector(".adi-filter-title span")).getText().equals(dateOrAttribute))
             .findFirst()
             .get();
+    }
+
+    public WebElement getFilter(String measure, int index) {
+        return getFilter(String.format("%s (M" + "%s" + ")", measure, index));
     }
 
     public WebElement getDateFilter() {
