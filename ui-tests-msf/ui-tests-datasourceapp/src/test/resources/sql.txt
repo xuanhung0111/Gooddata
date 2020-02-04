@@ -1,0 +1,23 @@
+USE DATABASE "ATT_DATASOURCE_TEST";
+USE SCHEMA "PUBLIC";
+
+--------------------------------------------------
+-- PRE_USER --
+--------------------------------------------------
+CREATE OR REPLACE VIEW "PRE_USER" AS SELECT
+ -- WARNING: For the 'ROLE' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
+ -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+  "ROLE"::VARCHAR(128) AS "a__role",
+ -- WARNING: For the 'USERNAME' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
+ -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+  "USERNAME"::VARCHAR(128) AS "a__username",
+ -- WARNING: For the 'ID' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
+ -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+  "ID"::VARCHAR(128) AS "cp__id",
+  "DATE" AS "d__date",
+  "AGE" AS "f__age"
+
+  , "FIXME__x__client_id" AS "x__client_id" /* Remove this line if loading into all client workspaces */
+  , "FIXME__x__deleted" AS "x__deleted"     /* Remove this line if inserting only */
+  , "FIXME__x__timestamp" AS "x__timestamp" /* Remove this line if it's not incremental load */
+FROM "USER";
