@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.cloudresources;
 
+import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.*;
@@ -8,6 +9,11 @@ import com.google.cloud.bigquery.JobStatistics.LoadStatistics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -246,5 +252,61 @@ public class BigQueryUtils {
             throw new RuntimeException();
         }
         return resultArray;
+    }
+
+    public List<Dataset> getOldBigQuerySchemas(int retentionDays) throws ParseException {
+        List<Dataset> listSchema = new ArrayList<>();
+        Page<Dataset> schemas;
+
+        try {
+            schemas = bigQueryClient.listDatasets(BigQuery.DatasetListOption.pageSize(50));
+        } catch (Exception e) {
+            throw new RuntimeException("Embed menu is not visible - " + e.getMessage());
+        }
+
+        for (Dataset dataset : schemas.getValues()) {
+            // filter schemas are created by script test
+            if (dataset.getGeneratedId().contains("customersmappingprojectid")) {
+                log.info("dataset.getGeneratedId() : " + dataset.getGeneratedId());
+                String date = dataset.getGeneratedId().replace("gdc-us-dev:customersmappingprojectid2__", "");
+                // list old schemas
+                log.info("Retention Date : " + getRetentionDate(retentionDays));
+                log.info("Schema Created Date : " + convertStringToDate(date));
+                if (compareTwoDates(convertStringToDate(date), getRetentionDate(retentionDays))) {
+                    listSchema.add(dataset);
+                }
+            }
+        }
+        return listSchema;
+    }
+
+    public void deleteTablesInSelectedSchema(Dataset dataset) {
+        Page<Table> tables = bigQueryClient.listTables(dataset.getDatasetId());
+        for (Table table : tables.getValues()) {
+            String tableName = table.getGeneratedId().replace(dataset.getGeneratedId() + ".", "");
+            log.info("tableName : " + tableName);
+            deleteTable(dataset.getGeneratedId().replace("gdc-us-dev:", ""), tableName);
+        }
+    }
+
+    public void dropSchemaIfExists(String datasetName) {
+        String schemaName = datasetName.replace("gdc-us-dev:", "");
+        log.info("datasetName : " + schemaName);
+        deleteDataset(schemaName);
+    }
+
+    private Date convertStringToDate(String value) throws ParseException {
+        return new SimpleDateFormat("YYYY_MM_dd_HH_mm_ss").parse(value);
+    }
+
+    private Date getRetentionDate(int number) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+        cal.add(Calendar.DATE, -number);
+        return cal.getTime();
+    }
+
+    private boolean compareTwoDates(Date firstDate, Date secondDate) {
+        return firstDate.compareTo(secondDate) > 0;
     }
 }
