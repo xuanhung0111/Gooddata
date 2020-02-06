@@ -235,7 +235,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.apply();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measures and attributes are hidden");
+                "Unsupported measure is hidden");
         assertEquals(metricsBucket.getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
         ElementUtils.moveToElementActions(metricsBucket.getRoot(), 1, 1).perform();
@@ -254,7 +254,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measures and attributes are hidden");
+                "Unsupported measures are hidden");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
         ElementUtils.moveToElementActions(analysisPage.getMetricsBucket().getRoot(), 1, 1).perform();
@@ -273,7 +273,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measures and attributes are hidden");
+                "Unsupported measures are hidden");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
         ElementUtils.moveToElementActions(analysisPage.getMetricsBucket().getRoot(), 1, 1).perform();
@@ -304,7 +304,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measures and attributes are hidden");
+                "Unsupported measure is hidden");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
                         SAME_PERIOD_PREVIOUS_YEAR));
@@ -559,7 +559,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().changeReportType(ReportType.STACKED_AREA_CHART);
         assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measures and attributes are hidden");
+                "Unsupported measures are hidden");
 
         analysisPage.addMetric(METRIC_AVG_AMOUNT);
         assertFalse(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
