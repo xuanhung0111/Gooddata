@@ -172,7 +172,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         try {
             createAndAddUserToProject(UserRoles.VIEWER_DISABLED_EXPORT);
             logoutAndLoginAs(false, UserRoles.VIEWER_DISABLED_EXPORT);
-            assertFalse(initIndigoDashboardsPage().clickHeaderOptionsButton().isPDFExportItemVisible());
+            assertFalse(initIndigoDashboardsPage().openHeaderOptionsButton().isPDFExportItemVisible());
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
@@ -312,8 +312,8 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         try {
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_EXPORT_PDF, false);
-            assertFalse(initIndigoDashboardsPage().isHeaderOptionsButtonVisible(), "Should be not " +
-                "there is three dot button next to “Edit” button");
+            assertFalse(initIndigoDashboardsPage().openHeaderOptionsButton().isPDFExportItemVisible(),
+                "Should be not there is Export PDF button into “Header Option” button");
         } finally {
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_EXPORT_PDF, true);
