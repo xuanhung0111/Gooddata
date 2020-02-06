@@ -30,6 +30,7 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.menu.OptionalHeaderMenu;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
@@ -374,8 +375,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         //wait for exporting dashboard tab in maximum 10 minutes
         int exportingTextDisplayedTimeoutInSeconds = 600;
 
-        openHeaderOptionsButton();
-        waitForElementVisible(className("s-pdf-export-item"), browser).click();
+        openHeaderOptionsButton().exportToPDF();
 
         waitForElementVisible(BY_PROGRESS_MESSAGE_BAR, browser);
         waitForElementNotPresent(BY_PROGRESS_MESSAGE_BAR, exportingTextDisplayedTimeoutInSeconds);
@@ -386,13 +386,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage openHeaderOptionsButton() {
+    public OptionalHeaderMenu openHeaderOptionsButton() {
         waitForElementVisible(headerOptionsButton).click();
-        return this;
+        return OptionalHeaderMenu.getInstance(browser);
     }
-
-    public Boolean isPDFExportItemVisible() {
-        return isElementVisible(className("s-pdf-export-item"), browser);
+    
+    public ScheduleEmailDialog scheduleEmailing() {
+        return openHeaderOptionsButton().scheduleEmailing();
     }
 
     public boolean hasDateFilter() {
