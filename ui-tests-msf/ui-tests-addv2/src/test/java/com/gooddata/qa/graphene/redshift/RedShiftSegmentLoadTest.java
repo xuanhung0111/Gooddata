@@ -508,7 +508,9 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         redshiftUtils.dropTables(TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
@@ -553,9 +555,13 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
     }
 
     private void setUpProcess() {
+        try {
         dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
                 dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
         domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
         updateLCM();
     }
 

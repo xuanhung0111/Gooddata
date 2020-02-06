@@ -297,7 +297,9 @@ public class CustomSegmentMappingBothIdTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         lcmBrickFlowBuilder.destroy();
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_2);
@@ -358,9 +360,13 @@ public class CustomSegmentMappingBothIdTest extends AbstractADDProcessTest {
     }
 
     private void setUpProcess() {
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
-                dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
+                    dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
 
     }
 

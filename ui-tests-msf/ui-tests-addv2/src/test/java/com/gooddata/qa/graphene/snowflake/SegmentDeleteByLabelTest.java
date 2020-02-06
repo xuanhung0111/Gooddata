@@ -173,9 +173,13 @@ public class SegmentDeleteByLabelTest extends AbstractADDProcessTest {
         snowflakeUtils.createTable(TABLE_CUSTOMERS_MUlTILABELS_NORMAL, listColumnMultiHasMainAttribute);
         snowflakeUtils.createTable(TABLE_CUSTOMERS_MUlTILABELS_HASDEFAULT, listColumnMultiNoMainHasDefault);
         snowflakeUtils.createTable(TABLE_CUSTOMERS_MUlTILABELS_NODEFAULT, listColumnMultiNoMainNoDefault);
-        dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
-                dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
-        domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        try {
+            dataloadProcess = new ScheduleUtils(domainRestClient).createDataDistributionProcess(serviceProject, PROCESS_NAME,
+                    dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
+            domainProcessUtils = new ProcessUtils(domainRestClient, dataloadProcess);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create process" + e.getMessage());
+        }
         lcmBrickFlowBuilder.deleteMasterProject();
         lcmBrickFlowBuilder.runLcmFlow();
         // On platform , Default Label will auto-asign to attribute which doesn't have,
@@ -358,7 +362,9 @@ public class SegmentDeleteByLabelTest extends AbstractADDProcessTest {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
-        domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        if (dataloadProcess != null) {
+            domainRestClient.getProcessService().removeProcess(dataloadProcess);
+        }
         lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);
