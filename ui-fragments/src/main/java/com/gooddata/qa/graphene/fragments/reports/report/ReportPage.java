@@ -580,6 +580,16 @@ public class ReportPage extends AbstractFragment {
         finishCreateReport();
     }
 
+    public void createReport(UiReportDefinition reportDefinition, ReportTypes reportTypes) {
+        setReportName(reportDefinition.getName());
+        selectReportVisualisation(reportTypes);
+        openWhatPanel().selectMetrics(reportDefinition.getWhats());
+        openHowPanel().selectAttribtues(reportDefinition.getHows()).done();
+        waitForAnalysisPageLoaded(browser);
+        waitForReportExecutionProgress();
+        finishCreateReport();
+    }
+
     public String getDataReportHelpMessage() {
         return waitForElementVisible(id("emptyDataReportHelp"), browser)
                 .findElement(By.className("alert")).getText();

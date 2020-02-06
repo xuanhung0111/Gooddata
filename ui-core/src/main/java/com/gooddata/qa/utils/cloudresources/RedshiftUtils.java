@@ -217,6 +217,40 @@ public class RedshiftUtils {
     }
 
     /**
+     * @return a list schema created by autotest with ID = 112 in database.
+     */
+    public ArrayList<String> getListCreatedSchema() throws SQLException {
+            String sqlStr = "select s.nspname as table_schema from pg_catalog.pg_namespace s where s.nspowner = \'112\'";
+            return getArrayResult(sqlStr, "table_schema");
+    }
+
+    /**
+     * @param schema selected schema
+     * @return get list tables in selected schema
+     */
+    public ArrayList<String> getListTableFromSchema(String schema) throws SQLException {
+            String sqlStr = "select table_name from information_schema.tables where table_schema = \'" + schema + "\'";
+            return getArrayResult(sqlStr, "table_name");
+    }
+
+    /**
+     * @param schema selected schema
+     * This function delete list tables in selected schema
+     */
+    public void deleteTablesInSelectedSchema(String schema){
+        try {
+            ArrayList<String> listTables = getListTableFromSchema(schema);
+            executeCommandsForSelectedSchema(schema);
+            for (String table : listTables) {
+                dropTables(table);
+            }
+        } catch (SQLException e) {
+            logger.error("delete Tables In selected Schema error: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Get result by Redshift condition .
      *
      * @param tableName     redshift Table name.
@@ -280,5 +314,28 @@ public class RedshiftUtils {
             logger.error("Set search_path failed : " + e.getMessage());
             throw new RuntimeException(e);
         }
-}
+    }
+
+    /**
+     * @param selectedSchema selected schema
+     * this function set search_path to selected schema
+     */
+    private void executeCommandsForSelectedSchema(String selectedSchema){
+        try {
+            executeSql(String.format("set search_path = \"%s\";", selectedSchema));
+
+        } catch (SQLException e) {
+            logger.error("Set search_path failed : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @param schema selected schema
+     * this function drop selected schema
+     */
+    public void dropSchemaIfExists(String schema) throws SQLException {
+        executeSql("DROP SCHEMA IF EXISTS " + schema);
+        logger.info("Dropped the schema with name is: " + schema);
+    }
 }

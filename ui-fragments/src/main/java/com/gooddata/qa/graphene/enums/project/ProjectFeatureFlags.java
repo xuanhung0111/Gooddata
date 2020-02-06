@@ -39,7 +39,8 @@ public enum ProjectFeatureFlags {
     ENABLE_NEW_AD_FILTER_BAR("enableNewADFilterBar"),
     ENABLE_MEASURE_VALUE_FILTERS("enableMeasureValueFilters"),
     ENABLE_KPI_DASHBOARD_SCHEDULE("enableKPIDashboardSchedule"),
-    ENABLE_KPI_DASHBOARD_SCHEDULE_RECIPIENTS("enableKPIDashboardScheduleRecipients");
+    ENABLE_KPI_DASHBOARD_SCHEDULE_RECIPIENTS("enableKPIDashboardScheduleRecipients"),
+    ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled");
 
     private final String featureFlag;
 
