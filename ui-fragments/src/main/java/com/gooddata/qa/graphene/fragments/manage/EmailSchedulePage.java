@@ -1,24 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForEmailSchedulePageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static java.lang.String.format;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.id;
-import static org.testng.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.gooddata.qa.graphene.enums.TimeZone;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -27,9 +12,24 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForEmailSchedulePageLoaded;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static java.lang.String.format;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.id;
+import static org.testng.Assert.assertTrue;
 
 
 public class EmailSchedulePage extends AbstractFragment {
@@ -159,6 +159,10 @@ public class EmailSchedulePage extends AbstractFragment {
         waitForElementVisible(addScheduleButton).click();
         waitForElementVisible(scheduleDetail);
         return this;
+    }
+
+    public boolean isOpenNewScheduleVisible() {
+        return isElementVisible(addScheduleButton);
     }
 
     public List<String> getEmailToListItem() {

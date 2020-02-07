@@ -1,22 +1,24 @@
 package com.gooddata.qa.graphene.fragments.indigo;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.HeaderAccountMenu;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.HeaderAccountMenu;
+import java.util.List;
+import java.util.Optional;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class Header extends AbstractFragment {
 
@@ -25,10 +27,33 @@ public class Header extends AbstractFragment {
 
     public static final By HAMBURGER_LINK = cssSelector(".hamburger-icon");
 
-    private static final By LOCATOR = By.className("gd-header");
+    public static final By LOCATOR = By.className("gd-header");
 
     @FindBy(className = "gd-header-project-wrapper")
     private ReactProjectSwitch projectSwitch;
+
+    public List<WebElement> getMeasureMenuItems() {
+        return measureMenuItems;
+    }
+
+    @FindBy(css = ".gd-header-measure .gd-header-menu-item")
+    private List<WebElement> measureMenuItems;
+
+    public Optional<WebElement> getDashboardMenuItem() {
+        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-dashboards")).findAny();
+    }
+
+    public Optional<WebElement> getReportMenuItem() {
+        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-reports")).findAny();
+    }
+
+    public Optional<WebElement> getActiveMenuItem() {
+        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("active")).findAny();
+    }
+
+    public Optional<WebElement> getManageMenuItem() {
+        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-manage")).findAny();
+    }
 
     public static final Header getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(Header.class, waitForElementVisible(LOCATOR, searchContext));
