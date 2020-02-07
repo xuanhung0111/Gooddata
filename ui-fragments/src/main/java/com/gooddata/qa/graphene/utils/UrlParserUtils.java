@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.utils;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import com.google.common.collect.Iterables;
+import org.openqa.selenium.WebDriver;
 
 import java.util.stream.Stream;
 
-import org.openqa.selenium.WebDriver;
-
-import com.google.common.collect.Iterables;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 public class UrlParserUtils {
     public static void replaceInUrl(WebDriver browser, String target, String replacement) {
@@ -23,6 +22,11 @@ public class UrlParserUtils {
 
         browser.get(replacedUrl);
         System.out.println(format("Changed url from %s to %s", currentUrl, replacedUrl));
+    }
+
+    public static String getProjectId(String url) {
+        String urlSuffix = url.split("projects/")[1];
+        return urlSuffix.split("/")[0];
     }
 
     public static String getObjdUri(String currentUrl) {
