@@ -1,10 +1,5 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.openqa.selenium.By.className;
-
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -13,6 +8,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
 
 public class DatasetsListPage extends AbstractFragment {
 
@@ -47,6 +47,10 @@ public class DatasetsListPage extends AbstractFragment {
 
     public String getDatasetAnalyzeLink(String datasetName) {
         return getMyDatasetsTable().getDataset(datasetName).getAnalyzeLink();
+    }
+
+    public void openAnalyzePage(String datasetName) {
+        getMyDatasetsTable().getDataset(datasetName).openAnalyzePage();
     }
 
     public WebElement waitForHeaderVisible() {
