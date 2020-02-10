@@ -236,14 +236,12 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
         ScheduleEmailDialog scheduleEmailDialog = indigoDashboardsPage.scheduleEmailing();
         assertEquals(scheduleEmailDialog.getRecipientValues().size(), 1);
         scheduleEmailDialog.clickToField();
-        assertThat(scheduleEmailDialog.getRecipientsSuggestion().toString(),
-            containsString("qa+test@gooddata.com"));
+        assertThat(scheduleEmailDialog.getRecipientsSuggestion().toString(), containsString(testParams.getUser()));
 
-        scheduleEmailDialog.addRecipientToField("qa+test@gooddata.com");
+        scheduleEmailDialog.addRecipientToField(testParams.getUser());
         scheduleEmailDialog.removeRecipients();
         scheduleEmailDialog.clickToField();
-        assertThat(scheduleEmailDialog.getRecipientsSuggestion().toString(),
-            containsString("qa+test@gooddata.com"));
+        assertThat(scheduleEmailDialog.getRecipientsSuggestion().toString(), containsString(testParams.getUser()));
 
         scheduleEmailDialog.addRecipientToField("mabdalhammedmabdalhammed.awan@senerza.press");
         assertThat(scheduleEmailDialog.getRecipientValues(), hasItem("mabdalhammedmabdalhammed.awan@senerza.press"));
