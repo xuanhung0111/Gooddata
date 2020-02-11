@@ -45,7 +45,9 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser, "applyWeekGranularityToHidePopComparison-apply-month-granularity", getClass());
 
-        assertTrue(analysisPage.getFilterBuckets().openDateFilterPickerPanel().isCompareTypeEnabled(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR),
+        assertTrue(analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .isCompareTypeEnabled(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR),
                 "same period comparison state is not enabled after removing week granularity");
     }
 
@@ -82,6 +84,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();

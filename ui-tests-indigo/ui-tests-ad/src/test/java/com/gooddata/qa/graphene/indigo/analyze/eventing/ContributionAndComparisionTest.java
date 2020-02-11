@@ -121,7 +121,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.TABLE);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_table_report_pop_date_attribute");
@@ -152,7 +152,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_column_report_pop_date_attribute");
@@ -285,8 +285,8 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_table_combination_pop_contribution");
 
         String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
@@ -315,8 +315,8 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_column_combination_pop_contribution");
 
         String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();

@@ -105,6 +105,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
