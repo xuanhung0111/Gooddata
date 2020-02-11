@@ -501,7 +501,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         assertTrue(attachments.get(emptyDashboardTitle).savedAttachments.get(0).contentType
                 .contains("application/pdf".toUpperCase()),
                 "ERROR: Dashboard attachment does not have PDF content type.");
-        verifyAttachment(attachments.get(emptyDashboardTitle).savedAttachments.get(0), "PDF", 22000);
+        verifyAttachment(attachments.get(emptyDashboardTitle).savedAttachments.get(0), "PDF", 10000);
     }
 
     @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
