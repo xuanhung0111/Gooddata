@@ -64,20 +64,19 @@ integratedTests:
     path: .
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
-    command: ./integration-mvn-test.sh \
-      -pl ui-tests-msf/ui-tests-modeler \
-      -Dtest.module=ui-tests-msf/ui-tests-modeler \
-      -Dtest=LogicalDataModelPageTest \
-      -Dhost=staging3.intgdc.com \
-      -Duser=qa+test@gooddata.com \
-      -Dpassword=$QA_TEST_PASSWORD \
-      -Duser.domain=default \
-      -Dproject.authorizationToken=pgtestingauto01 \
-      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
+    command: >-
+      ./integration-mvn-test.sh
+      -pl ui-tests-msf/ui-tests-modeler
+      -Dtest.module=ui-tests-msf/ui-tests-modeler
+      -Dtest=LogicalDataModelPageTest
+      -Dhost=staging3.intgdc.com
+      -Duser=qa+test@gooddata.com
+      -Dpassword=$QA_TEST_PASSWORD
+      -Duser.domain=default
+      -Dproject.authorizationToken=pgtestingauto01
+      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
     image: harbor.intgdc.com/staging/graphene-chrome:latest
-#    runForClusters:
-#    - 'stg3'
     artifacts:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'
@@ -85,29 +84,29 @@ integratedTests:
       - '**/surefire-reports/*.xml'
     microservices:
       - ldm-modeler
-#  - kind: 'image'
-#    env: bash
-#    path: .
-#    command: ./integration-mvn-test.sh
-#    vault:
-#      QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
-#      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
-#    image: harbor.intgdc.com/staging/graphene-chrome:latest
-#    args: |
-#      -pl ui-tests-msf/ui-tests-datasourceapp \
-#      -Dtest.module=ui-tests-msf/ui-tests-datasourceapp \
-#      -Dtest=*Test \
-#      -Dhost=staging.intgdc.com \
-#      -Duser=qa+test@gooddata.com \
-#      -Dpassword=$QA_TEST_PASSWORD \
-#      -Duser.domain=default \
-#      -Dproject.authorizationToken=$QA_PROJECT_TOKEN \
-#      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful \
-#      -DuseDynamicUser=true
-#    artifacts:
-#      - '**/target/screenshots/**'
-#      - '**/target/media/video/**/**_failed.mp4'
-#    junitArtifacts:
-#      - '**/surefire-reports/*.xml'
-#    microservices:
-#      - datasource-management
+  - kind: 'image'
+    env: bash
+    path: .
+    vault:
+      QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
+      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
+    command: >-
+      ./integration-mvn-test.sh
+      -pl ui-tests-msf/ui-tests-datasourceapp
+      -Dtest.module=ui-tests-msf/ui-tests-datasourceapp
+      -Dtest=*Test
+      -Dhost=staging.intgdc.com
+      -Duser=qa+test@gooddata.com
+      -Dpassword=$QA_TEST_PASSWORD
+      -Duser.domain=default
+      -Dproject.authorizationToken=$QA_PROJECT_TOKEN
+      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
+      -DuseDynamicUser=true
+    image: harbor.intgdc.com/staging/graphene-chrome:latest
+    artifacts:
+      - '**/target/screenshots/**'
+      - '**/target/media/video/**/**_failed.mp4'
+    junitArtifacts:
+      - '**/surefire-reports/*.xml'
+    microservices:
+      - datasource-management
