@@ -95,7 +95,6 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
         commonRestRequest = new CommonRestRequest(getAdminRestClient(), testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest = new ProjectRestRequest(getAdminRestClient(), testParams.getProjectId());
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SCHEDULE, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
     }
