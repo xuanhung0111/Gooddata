@@ -116,7 +116,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();
         analysisPage.saveInsight().waitForReportComputing();
@@ -256,7 +257,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();
@@ -276,7 +278,8 @@ public class GroupingAndSubTotalsPivotTableTest extends AbstractAnalyseTest {
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectByNames("% " + METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();

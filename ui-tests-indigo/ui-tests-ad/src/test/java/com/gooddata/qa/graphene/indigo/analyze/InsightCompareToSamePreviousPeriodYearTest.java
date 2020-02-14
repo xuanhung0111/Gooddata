@@ -57,6 +57,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
     private static final String APPLY_ON_INDIVIDUAL_MODE = "Individual selection";
     private static final String INSIGHT_HAS_A_MEASURE_AND_APPLY_SPPY_FILTER =
             "Insight has 1 measure and applies Same period (SP) previous year filter";
+    private static final String ALL_TIME = DateRange.ALL_TIME.toString();
+
     private ProjectRestRequest projectRestRequest;
 
     @Override
@@ -82,6 +84,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().addFilterWithAllValue(ATTR_ACCOUNT);
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         CompareApplyMeasure compareApplyMeasure = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures();
         assertEquals(getTitles(compareApplyMeasure.getValues()), asList(METRIC_SNAPSHOT_BOP, METRIC_AMOUNT));
         //show tooltip
@@ -96,6 +99,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures();
         assertEquals(getTitles(compareApplyMeasure.getValues()), singletonList(METRIC_SNAPSHOT_BOP));
         assertEquals(dateFilterPickerPanel.getMessageCompareApplyIncompatible(),
@@ -116,6 +120,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         assertEquals(dateFilterPickerPanel.getMessageCompareApplyIncompatible(),
                 "Displaying only supported measures.");
@@ -131,11 +136,13 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
                 .openCompareApplyMeasures().selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
 
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
@@ -160,11 +167,13 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
                 .openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
 
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
@@ -188,6 +197,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .clearAllCheckedValues().isApplyButtonEnabled(), "Apply button should be disabled");
     }
@@ -198,6 +208,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().showPercents();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
@@ -230,7 +241,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .changeReportType(ReportType.HEAD_LINE).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -250,7 +263,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .changeReportType(ReportType.HEAD_LINE).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
@@ -269,7 +284,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .changeReportType(ReportType.HEAD_LINE).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
@@ -287,7 +304,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addDate();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(DERIVED_METRIC_AMOUNT, METRIC_AMOUNT));
@@ -300,13 +319,15 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addDate().addStack(ATTR_DEPARTMENT);
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(analysisPage.waitForReportComputing().getMainEditor().getWarningUnsupportedMessage(),
                 "Unsupported measure is hidden");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
 
         //switch the chart insight to check reference point
@@ -319,7 +340,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
@@ -336,7 +359,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         assertEquals(getTitles(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
@@ -357,8 +382,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures();
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures();
         compareApplyMeasure.selectAllValues().apply();
         dateFilterPickerPanel.apply();
 
@@ -376,8 +402,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues();
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues();
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
         assertEquals(getTitles(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
@@ -396,8 +424,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addMetric(METRIC_AVG_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
@@ -407,7 +437,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_INDIVIDUAL_MODE + " (1)");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
         assertThat(analysisPage.getMetricsBucket().getItemNames(), not(hasItems(DERIVED_METRIC_AMOUNT)));
     }
@@ -417,8 +447,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addMetric(METRIC_AVG_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
@@ -428,7 +460,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_INDIVIDUAL_MODE + " (1)");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
     }
 
@@ -437,8 +469,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addMetric(METRIC_AVG_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues();
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
@@ -449,7 +483,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .openCompareApplyMeasures().getValues()), not(hasItems(METRIC_AMOUNT)));
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_ALL_MODE);
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
         assertThat(analysisPage.getMetricsBucket().getItemNames(), not(hasItems(DERIVED_METRIC_AMOUNT)));
     }
@@ -459,20 +493,21 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addMetric(METRIC_AVG_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues();
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues();
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
 
         analysisPage.waitForReportComputing().removeMetric(METRIC_AMOUNT).removeMetric(METRIC_WON)
-                .removeMetric(METRIC_AVG_AMOUNT);//
-        assertEquals(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
-                .getCompareTypeDropdownButtonText(), "Nothing");
-        assertFalse(dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+                .removeMetric(METRIC_AVG_AMOUNT);
+        assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR)
                 .getCompareApplyMeasure().isDropdownButtonEnabled(), "Apply button should be disabled");
         assertEquals(compareApplyMeasure.getSelection(), APPLY_ON_ALL_MODE);
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME));
+                asList(DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"));
         assertTrue(analysisPage.getMetricsBucket().isEmpty(), "Metrics bucket should be empty");
     }
 
@@ -481,7 +516,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addMetric(METRIC_AVG_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON).apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().removeMetric(DERIVED_METRIC_AMOUNT).waitForReportComputing();
@@ -492,7 +529,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(dateFilterPickerPanel.openCompareApplyMeasures().getSelection(),
                 APPLY_ON_INDIVIDUAL_MODE + " (1)");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
     }
 
@@ -501,17 +538,17 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectByNames(METRIC_AMOUNT, METRIC_WON);
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectByNames(METRIC_AMOUNT, METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().removeMetric(DERIVED_METRIC_AMOUNT).removeMetric(DERIVED_METRIC_WON)
                 .waitForReportComputing();
 
-        assertEquals(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
-                .getCompareTypeDropdownButtonText(), "Nothing");
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME));
+                asList(DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -519,11 +556,14 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
 
-        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).changeCompareType(CompareType.NOTHING).apply();
+        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).changeCompareType(CompareType.NOTHING)
+            .changePeriod(ALL_TIME).apply();
         assertThat(analysisPage.getMetricsBucket().getItemNames(),
                 not(hasItems(DERIVED_METRIC_AMOUNT, DERIVED_METRIC_WON)));
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
@@ -537,7 +577,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().removeDateFilter();
@@ -554,7 +596,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().changeReportType(ReportType.STACKED_AREA_CHART);
@@ -575,7 +619,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel =
                 filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
 
@@ -618,7 +664,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel =
                 filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
@@ -658,7 +706,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addAttribute(ATTR_FORECAST_CATEGORY).addStack(ATTR_DEPARTMENT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
@@ -685,7 +735,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON).apply();
         dateFilterPickerPanel.apply();
 
@@ -711,7 +763,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
@@ -722,7 +776,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(DERIVED_METRIC_AMOUNT));
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
         assertTrue(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
                 .isItemSelected(METRIC_AMOUNT + "M1"), "Checkbox of newly ones should be unchecked");
@@ -734,8 +788,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_WON);
         compareApplyMeasure.apply();
         dateFilterPickerPanel.apply();
@@ -746,7 +802,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(METRIC_WON));
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME),
+                asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
         assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
                 .isItemSelected(METRIC_AMOUNT + "M1"), "Checkbox of newly ones should be unchecked");
@@ -758,7 +814,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetric(METRIC_AVG_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AVG_AMOUNT).apply();
         dateFilterPickerPanel.apply();
 
@@ -768,7 +826,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), singletonList(METRIC_WON));
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
-                asList(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME));
+                asList(DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -777,7 +835,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetricToSecondaryBucket(METRIC_WON);
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -806,7 +866,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetricToSecondaryBucket(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_WON).apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();
@@ -835,7 +897,9 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
                 .addMetricToSecondaryBucket(METRIC_WON).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
@@ -863,8 +927,10 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         initAnalysePage().addMetric(METRIC_AMOUNT).addDateFilter().waitForReportComputing();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(
-                CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues().apply();
+        dateFilterPickerPanel
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .changeCompareType(
+                    CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing().saveInsight(INSIGHT_HAS_A_MEASURE_AND_APPLY_SPPY_FILTER);
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().addDashboard()

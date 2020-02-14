@@ -226,6 +226,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
     public void testShowPercentAndOpenAsReportOnInsight() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter().getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.waitForReportComputing();
         analysisPage.changeReportType(ReportType.PIE_CHART).waitForReportComputing();

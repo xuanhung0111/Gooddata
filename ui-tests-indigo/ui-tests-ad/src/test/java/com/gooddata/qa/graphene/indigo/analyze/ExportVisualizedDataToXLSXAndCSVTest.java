@@ -121,7 +121,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
         metricsBucket.getMetricConfiguration("New-" + METRIC_AMOUNT).expandConfiguration().showPercents();
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
-        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
+        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
 
         filterBucket.configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
@@ -421,7 +421,8 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
             {INSIGHT_HAS_SOME_MEASURE_AND_AN_ATTRIBUTE_STACK_BY, expectedResultsInsightAnAttributeStackBy},
             {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, expectedResultsInsightAnAttributeStackAndViewBy},
             {INSIGHT_HAS_CONFIG_SETTING,
-                asList(asList("Applied filters:", "Department IN (Direct Sales)"),
+                asList(asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                    asList("Department IN (Direct Sales)"),
                     asList(ATTR_DEPARTMENT, "Year (Closed)", "New-Amount - SP year ago", "New-Amount"),
                     asList("Direct Sales", "2010", "0.150187619767568"),
                     asList("2011", "0.150187619767568", "0.498791407018685"),
@@ -445,7 +446,8 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
                     asList("Values", "8.040632496E7", "21310.979316194", "3.621913158E7", "18329.5200303644"))},
             {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, expectedResultsInsightAnAttributeStackAndViewBy},
             {INSIGHT_HAS_CONFIG_SETTING,
-                asList(asList("Applied filters:", "Department IN (Direct Sales)"),
+                asList(asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                    asList("Department IN (Direct Sales)"),
                     asList(ATTR_DEPARTMENT, "Year (Closed)", "New-Amount - SP year ago", "New-Amount"),
                     asList("Direct Sales", "2010", "0.150187619767568"),
                     asList("Direct Sales", "2011", "0.150187619767568", "0.498791407018685"),
