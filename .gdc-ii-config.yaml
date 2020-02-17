@@ -66,6 +66,8 @@ integratedTests:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
+      - '-e'
+      - 'HOME=$HOME'
     command: >-
       ./integration-mvn-test.sh
       -pl ui-tests-msf/ui-tests-modeler
@@ -94,6 +96,8 @@ integratedTests:
       QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
+      - '-e'
+      - 'HOME=$HOME'
     command: >-
       ./integration-mvn-test.sh
       -pl ui-tests-msf/ui-tests-datasourceapp
