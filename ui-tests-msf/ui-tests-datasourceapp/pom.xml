@@ -11,4 +11,13 @@
 
     <artifactId>ui-tests-datasourceapp</artifactId>
 
+    <profiles>
+        <profile>
+            <id>selenium</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
