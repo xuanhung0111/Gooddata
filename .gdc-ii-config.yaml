@@ -85,7 +85,7 @@ integratedTests:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'
     junitArtifacts:
-      - '**/surefire-reports/*.xml'
+      - '**/target/surefire-reports/*.xml'
     microservices:
       - ldm-modeler
   - kind: 'image'
@@ -102,7 +102,7 @@ integratedTests:
       ./integration-mvn-test.sh
       -pl ui-tests-msf/ui-tests-datasourceapp
       -Dtest.module=ui-tests-msf/ui-tests-datasourceapp
-      -Dtest=*Test
+      -Dtest=SnowflakeDataSourceE2ETest
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword=$QA_TEST_PASSWORD
@@ -115,6 +115,6 @@ integratedTests:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'
     junitArtifacts:
-      - '**/surefire-reports/*.xml'
+      - '**/target/surefire-reports/*.xml'
     microservices:
       - datasource-management
