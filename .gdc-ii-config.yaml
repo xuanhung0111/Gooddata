@@ -118,3 +118,36 @@ integratedTests:
       - '**/target/surefire-reports/*.xml'
     microservices:
       - datasource-management
+  - kind: 'image'
+    env: bash
+    path: .
+    vault:
+      QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
+      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
+      BIGQUERY_PRIVATE_KEY: "$VAULT_PREFIX/gooddata-stg-graphene-bigquery-user"
+    args:
+      - '-v $HOME/.m2:$HOME/.m2'
+      - '-e'
+      - 'HOME=$HOME'
+    image: harbor.intgdc.com/staging/graphene-chrome:latest
+    command: >-
+      ./integration-mvn-test.sh
+      -pl ui-tests-core,ui-tests-msf/ui-tests-add,ui-tests-msf/ui-tests-addv2,ui-tests-msf/ui-tests-csv-uploader,ui-tests-msf/ui-tests-disc
+      -Dhost=staging.intgdc.com
+      -Duser=qa+test@gooddata.com
+      -Dpassword=$QA_TEST_PASSWORD
+      -Duser.domain=default
+      -Dproject.authorizationToken=$QA_PROJECT_TOKEN
+      -Ddss.authorizationToken=stgdssnew
+      -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
+      -DbigqueryPrivateKey=$BIGQUERY_PRIVATE_KEY
+      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
+      -DuseDynamicUser=true
+      -Dtestng.suite.xml=testng-metadata-wdp.xml
+    artifacts:
+      - '**/target/screenshots/**'
+      - '**/target/media/video/**/**_failed.mp4'
+    junitArtifacts:
+      - '**/target/surefire-reports/*.xml'
+    microservices:
+      - metadata-wdp

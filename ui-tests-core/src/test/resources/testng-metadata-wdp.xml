@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testng-metadata-wdp">
+    <test name="testng-metadata-wdp" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.project.PartialExportAndImportProjectTest" />
+            <class name="com.gooddata.qa.graphene.project.ExportAndImportProjectTest" />
+            <class name="com.gooddata.qa.graphene.project.ProjectSwitchingTest" />
+            <class name="com.gooddata.qa.graphene.aqe.ValidElementsResourceTest" />
+            <class name="com.gooddata.qa.graphene.manage.ComputedAttributesTest" />
+        </classes>
+    </test>
+</suite>
