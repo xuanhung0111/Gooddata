@@ -124,7 +124,7 @@ integratedTests:
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
       QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
-      BIGQUERY_PRIVATE_KEY: "$VAULT_PREFIX/gooddata-stg-graphene-bigquery-user"
+      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
