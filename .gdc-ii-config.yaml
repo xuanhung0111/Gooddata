@@ -75,7 +75,7 @@ integratedTests:
       -Dtest=LogicalDataModelPageTest
       -Dhost=staging3.intgdc.com
       -Duser=qa+test@gooddata.com
-      -Dpassword=$QA_TEST_PASSWORD
+      -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
       -Dproject.authorizationToken=pgtestingauto01
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
@@ -105,9 +105,9 @@ integratedTests:
       -Dtest=SnowflakeDataSourceE2ETest
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
-      -Dpassword=$QA_TEST_PASSWORD
+      -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
-      -Dproject.authorizationToken=$QA_PROJECT_TOKEN
+      -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
     image: harbor.intgdc.com/staging/graphene-chrome:latest
@@ -135,12 +135,12 @@ integratedTests:
       -pl ui-tests-core,ui-tests-msf/ui-tests-add,ui-tests-msf/ui-tests-addv2,ui-tests-msf/ui-tests-csv-uploader,ui-tests-msf/ui-tests-disc
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
-      -Dpassword=$QA_TEST_PASSWORD
+      -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
-      -Dproject.authorizationToken=$QA_PROJECT_TOKEN
+      -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
       -Ddss.authorizationToken=stgdssnew
       -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
-      -DbigqueryPrivateKey=$BIGQUERY_PRIVATE_KEY
+      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
       -Dtestng.suite.xml=testng-metadata-wdp.xml
