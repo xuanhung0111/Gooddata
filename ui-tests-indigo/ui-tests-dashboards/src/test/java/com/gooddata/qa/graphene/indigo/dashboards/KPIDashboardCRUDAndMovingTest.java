@@ -61,7 +61,6 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
     private final String thirdInsight = "Third Insight";
 
     private IndigoRestRequest indigoRestRequest;
-    private ProjectRestRequest projectRestRequest;
     private KpiConfiguration kpi;
 
     @Override
@@ -73,8 +72,6 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
         getMetricCreator().createBestCaseMetric();
         getMetricCreator().createWinRateMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        projectRestRequest = new ProjectRestRequest(getAdminRestClient(), testParams.getProjectId());
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, true);
     }
 
     @Test(dependsOnGroups = "createProject")
