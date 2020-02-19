@@ -57,8 +57,6 @@ public class ResizeWidgetsAndRowsTest extends AbstractDashboardTest {
         getMetricCreator().createAvgAmountMetric();
         getMetricCreator().createAmountBOPMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        projectRestRequest = new ProjectRestRequest(getAdminRestClient(), testParams.getProjectId());
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, true);
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -163,31 +161,6 @@ public class ResizeWidgetsAndRowsTest extends AbstractDashboardTest {
 
         assertThat(indigoDashboardsPage.getDashboardBodyText(),
             containsString("SORRY, WE CAN'T DISPLAY THIS INSIGHT"));
-    }
-
-    @Test(dependsOnMethods = "prepareInsights")
-    public void deletingAllWidgetsWithoutLayout() {
-        try {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, false);
-
-            String insight = "Insight:" + generateHashString();
-            createInsightHasOnlyMetric(insight, ReportType.COLUMN_CHART,
-                asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP));
-
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).selectDateFilterByName("All time")
-                .saveEditModeWithWidgets();
-
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, true);
-            initIndigoDashboardsPage().switchToEditMode().selectWidgetByHeadline(Insight.class, insight);
-            indigoDashboardsPage.deleteInsightItem().addInsight(insight).resizeWidthOfWidget(ResizeBullet.TEN)
-                .saveEditModeWithWidgets();
-
-            assertTrue(indigoDashboardsPage.getWidgetFluidLayout(insight)
-                    .getAttribute("class").contains("s-fluid-layout-column-width-" + ResizeBullet.TEN.getNumber()),
-                "The width widget should be resized");
-        } finally {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_LAYOUTS_DASHBOARD, true);
-        }
     }
 
     private String createInsightHasOnlyMetric(String insightTitle, ReportType reportType, List<String> metricsTitle) {
