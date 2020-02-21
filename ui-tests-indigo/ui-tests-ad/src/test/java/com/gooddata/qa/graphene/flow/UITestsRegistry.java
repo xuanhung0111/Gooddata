@@ -49,6 +49,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
 import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToPreviousPeriodTest;
 import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToSamePreviousPeriodYearTest;
+import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToSamePreviousPeriodYearSwitchingTest;
 import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
@@ -169,6 +170,7 @@ public class UITestsRegistry {
             InsightCompareToPreviousPeriodTest.class,
             RenamingMeasuresAndAttributesTest.class,
             InsightCompareToSamePreviousPeriodYearTest.class,
+            InsightCompareToSamePreviousPeriodYearSwitchingTest.class,
             RedesigningDateFilterDialogOnFilterBucketTest.class,
             PivotTableTest.class,
             PivotTableAggregationTest.class,
