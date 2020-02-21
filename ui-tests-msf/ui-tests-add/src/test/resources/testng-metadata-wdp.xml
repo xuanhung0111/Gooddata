@@ -1,6 +1,17 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-metadata-wdp">
     <test name="testng-metadata-wdp" enabled="true">
+        <groups>
+            <run>
+                <include name="prompt" />
+                <include name="createProject" />
+                <include name="arquillian" />
+                <include name="initDataload" />
+                <include name="precondition" />
+                <include name="fullLoad" />
+                <include name="metadata-wdp" />
+            </run>
+        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.add.schedule.execution.dialog.DefaultLoadTest" />
         </classes>

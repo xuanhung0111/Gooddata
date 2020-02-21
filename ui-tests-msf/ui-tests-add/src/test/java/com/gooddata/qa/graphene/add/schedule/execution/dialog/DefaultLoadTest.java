@@ -78,7 +78,7 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
                 defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"metadata-wdp"})
     public void checkDefaultLoadSetAsDefault() {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
 
@@ -144,7 +144,7 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
         }
     }
 
-    @Test(dependsOnGroups = {"fullLoad"})
+    @Test(dependsOnGroups = {"fullLoad"}, groups = {"metadata-wdp"})
     public void checkDefaultLoadWorkAsIncrementalLoad() throws ParseException, IOException {
         personLSLTS = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         person.rows("P2", "20", personLSLTS);
