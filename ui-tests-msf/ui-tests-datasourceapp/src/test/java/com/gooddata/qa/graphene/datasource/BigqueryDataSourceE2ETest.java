@@ -10,36 +10,35 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
-public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest {
+public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest {
     private DataSourceManagementPage dataSourceManagementPage;
     private ContentWrapper contentWrapper;
     private DataSourceMenu dsMenu;
-    private String DATASOURCE_URL;
-    private String DATASOURCE_USERNAME;
-    private String DATASOURCE_PASSWORD;
+    private String DATASOURCE_CLIENT_EMAIL;
+    private String DATASOURCE_PRIVATE_KEY;
+    private String privateKeyString;
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
-    private final String SNOWFLAKE = "Snowflake";
+    private final String BIG_QUERY = "Google BigQuery";
     private final String DATASOURCE_NAME = "Auto_datasource" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
     private final String DATASOURCE_INVALID = "Auto_invalid" + generateHashString();
-    private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
-    private final String DATASOURCE_DATABASE = "ATT_DATASOURCE_TEST";
+    private final String DATASOURCE_PROJECT = "gdc-us-dev";
+    private final String DATASOURCE_DATASET = "att_team";
     private final String DATASOURCE_PREFIX = "PRE_";
-    private final String DATASOURCE_SCHEMA = "PUBLIC";
-    private final String INVALID_VALUE = "invalid value" + generateHashString();
+    private final String INVALID_VALUE = "invalidvalue" + generateHashString();
 
     @Override
     public void prepareProject() throws Throwable {
         super.prepareProject();
-        DATASOURCE_URL = testParams.getSnowflakeJdbcUrl();
-        DATASOURCE_USERNAME = testParams.getSnowflakeUserName();
-        DATASOURCE_PASSWORD = testParams.getSnowflakePassword();
+        DATASOURCE_CLIENT_EMAIL = testParams.getBigqueryClientEmail();
+        DATASOURCE_PRIVATE_KEY = testParams.getBigqueryPrivateKey();
+        privateKeyString = DATASOURCE_PRIVATE_KEY.replace("\n", "\\n");
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
-
     }
 
     //In the first time , domain doesn’t have any Datasources, initial screen is showed
@@ -56,11 +55,11 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
             assertEquals(initialContent.getNumberOfCloudResourceButton(), 3);
-            assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
-            initialContent.openSnowflakeEdit();
+            assertEquals(initialContent.getTextOnCloudResourceButton(1), BIG_QUERY);
+            initialContent.openBigQueryEdit();
             dataSourceManagementPage = initDatasourceManagementPage();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
-            dsMenu.selectSnowflakeResource();
+            dsMenu.selectBigQueryResource();
         }
     }
 
@@ -68,43 +67,38 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = "initialStageTest")
     public void checkRequiredDataSourceInformation() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectBigQueryResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 7);
+        assertEquals(configuration.getNumberOfRequiredMessage(), 5);
     }
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, INVALID_VALUE, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"}};
+        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, privateKeyString, DATASOURCE_PROJECT,
+                DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Connection validation failed"},
+                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, INVALID_VALUE, DATASOURCE_PROJECT,
+                        DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Incorrect credentials"},
+                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, privateKeyString, INVALID_VALUE,
+                        DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Project not found"},
+                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, privateKeyString, DATASOURCE_PROJECT,
+                        INVALID_VALUE, DATASOURCE_PREFIX, "Connection failed! Dataset not found"}
+        };
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")
-    public void checkInvalidDataSourceInformation(String name, String url, String warehouse, String username
-            , String password, String database, String prefix, String schema, String validateMessage) {
+    public void checkInvalidDataSourceInformation(String name, String clientEmail, String privateKey, String project,
+                                                  String dataset, String prefix, String validateMessage) {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectBigQueryResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addSnowflakeInfo(url, warehouse, username, password, database, prefix, schema);
+        configuration.addBigqueryInfo(clientEmail, privateKey, project, dataset, prefix);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }
@@ -113,21 +107,20 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = "checkInvalidDataSourceInformation")
     public void checkCreateNewDatasource() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectBigQueryResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(DATASOURCE_NAME);
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        configuration.addBigqueryInfo(DATASOURCE_CLIENT_EMAIL, privateKeyString, DATASOURCE_PROJECT,
+                DATASOURCE_DATASET, DATASOURCE_PREFIX);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail bigqueryDetail = container.getConnectionDetail();
+        checkBigqueryDetail(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(),
+                bigqueryDetail.getTextProject(),  bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
         assertEquals(dsMenu.sortDataSource(), dsMenu.getListDataSources());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
@@ -138,24 +131,22 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail bigqueryDetail = container.getConnectionDetail();
+        checkBigqueryDetail(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(), bigqueryDetail.getTextProject(),
+                bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_NAME_CHANGED);
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        configuration.addBigqueryInfo(DATASOURCE_CLIENT_EMAIL, privateKeyString, DATASOURCE_PROJECT,
+                DATASOURCE_DATASET, DATASOURCE_PREFIX);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        checkSnowflakeDetailUpdate(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        checkBigQueryDetailUpdate(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(),bigqueryDetail.getTextProject(),
+                bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME_CHANGED), "list data sources doesn't have created Datasource");
     }
 
@@ -165,10 +156,10 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        snowflakeDetail.clickGenerateButton();
-        GenerateOutputStageDialog generateDialog = snowflakeDetail.getGenerateDialog();
-        String sql = getResourceAsString("/sql.txt");
+        ConnectionDetail bigqueryDetail = container.getConnectionDetail();
+        bigqueryDetail.clickGenerateButton();
+        GenerateOutputStageDialog generateDialog = bigqueryDetail.getGenerateDialog();
+        String sql = getResourceAsString("/sql_bigquery.txt");
         assertEquals(generateDialog.getMessage(), sql);
         generateDialog.clickCopy();
         DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
@@ -180,14 +171,12 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_INVALID);
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE,
-                INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
+        configuration.addBigqueryInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        snowflakeDetail.clickGenerateButton();
+        bigqueryDetail.clickGenerateButton();
         DatasourceMessageBar ErrormessageBar = DatasourceMessageBar.getInstance(browser);
-        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Failed to obtain JDBC Connection: " +
-                "Connection factory returned null from createConnection");
+        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Invalid BigQuery private key: Invalid PKCS#8 data.");
     }
 
     @Test(dependsOnMethods = "createViewTable")
@@ -215,7 +204,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         }
     }
 
-    private void deleteDatasource(String datasourceName) {
+    public void deleteDatasource(String datasourceName) {
         dsMenu.selectDataSource(datasourceName);
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
@@ -226,25 +215,19 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         assertFalse(dsMenu.isDataSourceExist(datasourceName), "Datasource is still existing");
     }
 
-    private void checkSnowflakeDetail(String name, String url, String username,
-                                      String database, String warehouse, String prefix, String schema) {
-        assertTrue(name.contains(DATASOURCE_NAME));
-        assertEquals(url, DATASOURCE_URL);
-        assertEquals(username, DATASOURCE_USERNAME);
-        assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
+    private void checkBigqueryDetail(String name, String clientEmail, String project, String dataset, String prefix) {
+        assertTrue(name.contains(DATASOURCE_NAME), "Datasource name is not correct");
+        assertEquals(clientEmail, DATASOURCE_CLIENT_EMAIL);
+        assertEquals(project, DATASOURCE_PROJECT);
+        assertEquals(dataset, DATASOURCE_DATASET);
         assertEquals(prefix, DATASOURCE_PREFIX);
-        assertEquals(schema, DATASOURCE_SCHEMA);
     }
 
-    private void checkSnowflakeDetailUpdate(String name, String url, String username,
-                                            String database, String warehouse, String prefix, String schema) {
+    private void checkBigQueryDetailUpdate(String name, String clientemail, String project, String dataset, String prefix) {
         assertTrue(name.contains(DATASOURCE_NAME_CHANGED));
-        assertEquals(url, DATASOURCE_URL);
-        assertEquals(username, DATASOURCE_USERNAME);
-        assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
+        assertEquals(clientemail, DATASOURCE_CLIENT_EMAIL);
+        assertEquals(project, DATASOURCE_PROJECT);
+        assertEquals(dataset, DATASOURCE_DATASET);
         assertEquals(prefix, DATASOURCE_PREFIX);
-        assertEquals(schema, DATASOURCE_SCHEMA);
     }
 }

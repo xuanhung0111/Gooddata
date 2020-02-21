@@ -1,0 +1,32 @@
+-- INFO: You can convert an attribute to:
+-- a connection point by renaming the column from a__<column_name> to cp__<column_name>
+-- a reference by renaming the column from a__<column_name> to r__<table_name>
+
+
+
+--------------------------------------------------
+-- PRE_duc_Employee --
+--------------------------------------------------
+CREATE OR REPLACE VIEW `att_team`.PRE_duc_Employee AS SELECT
+  cp__name AS a__cp_name,
+  d__dob AS d__d_dob
+
+  , FIXME__x__client_id AS x__client_id /* Remove this line if loading into all client workspaces */
+  , FIXME__x__deleted AS x__deleted     /* Remove this line if inserting only */
+  , FIXME__x__timestamp AS x__timestamp /* Remove this line if it's not incremental load */
+FROM `gdc-us-dev`.`att_team`.duc_Employee;
+
+--------------------------------------------------
+-- PRE_user --
+--------------------------------------------------
+CREATE OR REPLACE VIEW `att_team`.PRE_user AS SELECT
+  ID AS a__id,
+  ROLE AS a__role,
+  USERNAME AS a__username,
+  DATE AS d__date,
+  AGE AS f__age
+
+  , FIXME__x__client_id AS x__client_id /* Remove this line if loading into all client workspaces */
+  , FIXME__x__deleted AS x__deleted     /* Remove this line if inserting only */
+  , FIXME__x__timestamp AS x__timestamp /* Remove this line if it's not incremental load */
+FROM `gdc-us-dev`.`att_team`.user;
