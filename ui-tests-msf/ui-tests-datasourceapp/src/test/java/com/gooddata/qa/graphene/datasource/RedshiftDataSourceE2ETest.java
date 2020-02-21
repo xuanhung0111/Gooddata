@@ -10,8 +10,9 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
-public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest {
+public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest {
     private DataSourceManagementPage dataSourceManagementPage;
     private ContentWrapper contentWrapper;
     private DataSourceMenu dsMenu;
@@ -20,26 +21,24 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     private String DATASOURCE_PASSWORD;
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
-    private final String SNOWFLAKE = "Snowflake";
+    private final String AMAZON_REDSHIFT = "Amazon Redshift";
     private final String DATASOURCE_NAME = "Auto_datasource" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
     private final String DATASOURCE_INVALID = "Auto_invalid" + generateHashString();
-    private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
-    private final String DATASOURCE_DATABASE = "ATT_DATASOURCE_TEST";
+    private final String DATASOURCE_DATABASE = "dev";
     private final String DATASOURCE_PREFIX = "PRE_";
-    private final String DATASOURCE_SCHEMA = "PUBLIC";
+    private final String DATASOURCE_SCHEMA = "automation_daily_test";
     private final String INVALID_VALUE = "invalid value" + generateHashString();
 
     @Override
     public void prepareProject() throws Throwable {
         super.prepareProject();
-        DATASOURCE_URL = testParams.getSnowflakeJdbcUrl();
-        DATASOURCE_USERNAME = testParams.getSnowflakeUserName();
-        DATASOURCE_PASSWORD = testParams.getSnowflakePassword();
+        DATASOURCE_URL = testParams.getRedshiftJdbcUrl();
+        DATASOURCE_USERNAME = testParams.getRedshiftUserName();
+        DATASOURCE_PASSWORD = testParams.getRedshiftPassword();
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
-
     }
 
     //In the first time , domain doesn’t have any Datasources, initial screen is showed
@@ -56,11 +55,11 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
             assertEquals(initialContent.getNumberOfCloudResourceButton(), 3);
-            assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
-            initialContent.openSnowflakeEdit();
+            assertEquals(initialContent.getTextOnCloudResourceButton(2), AMAZON_REDSHIFT);
+            initialContent.openRedshiftEdit();
             dataSourceManagementPage = initDatasourceManagementPage();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
-            dsMenu.selectSnowflakeResource();
+            dsMenu.selectRedshiftResource();
         }
     }
 
@@ -68,66 +67,62 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = "initialStageTest")
     public void checkRequiredDataSourceInformation() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectRedshiftResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 7);
+        assertEquals(configuration.getNumberOfRequiredMessage(), 6);
     }
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, INVALID_VALUE, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
+                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE,
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE,
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                         INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"}};
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"}};
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")
-    public void checkInvalidDataSourceInformation(String name, String url, String warehouse, String username
-            , String password, String database, String prefix, String schema, String validateMessage) {
+    public void checkInvalidDataSourceInformation(String name, String url, String username, String password, String database
+            , String prefix, String schema, String validateMessage) {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectRedshiftResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addSnowflakeInfo(url, warehouse, username, password, database, prefix, schema);
+        configuration.addRedshiftBasicInfo(url, username, password, database, prefix, schema);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }
 
     //Customer input correct data and click Save button  for saving datasource
-    @Test(dependsOnMethods = "checkInvalidDataSourceInformation")
+    @Test(dependsOnMethods = "checkRequiredDataSourceInformation")
     public void checkCreateNewDatasource() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectRedshiftResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(DATASOURCE_NAME);
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+        configuration.addRedshiftBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail redshiftDetail = container.getConnectionDetail();
+        checkRedshiftDetail(container.getDatasourceHeading().getName(), redshiftDetail.getTextUrl(), redshiftDetail.getTextUserName(),
+                redshiftDetail.getTextDatabase(), redshiftDetail.getTextPrefix(),
+                redshiftDetail.getTextSchema());
         assertEquals(dsMenu.sortDataSource(), dsMenu.getListDataSources());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
@@ -138,24 +133,23 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail redshiftDetail = container.getConnectionDetail();
+        checkRedshiftDetail(container.getDatasourceHeading().getName(), redshiftDetail.getTextUrl(), redshiftDetail.getTextUserName(),
+                redshiftDetail.getTextDatabase(), redshiftDetail.getTextPrefix(),
+                redshiftDetail.getTextSchema());
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_NAME_CHANGED);
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+        configuration.addRedshiftBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        checkSnowflakeDetailUpdate(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        checkRedshiftDetailUpdate(container.getDatasourceHeading().getName(), redshiftDetail.getTextUrl(), redshiftDetail.getTextUserName(),
+                redshiftDetail.getTextDatabase(), redshiftDetail.getTextPrefix(), redshiftDetail.getTextSchema());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME_CHANGED), "list data sources doesn't have created Datasource");
     }
 
@@ -165,10 +159,10 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        snowflakeDetail.clickGenerateButton();
-        GenerateOutputStageDialog generateDialog = snowflakeDetail.getGenerateDialog();
-        String sql = getResourceAsString("/sql.txt");
+        ConnectionDetail redshiftDetail = container.getConnectionDetail();
+        redshiftDetail.clickGenerateButton();
+        GenerateOutputStageDialog generateDialog = redshiftDetail.getGenerateDialog();
+        String sql = getResourceAsString("/sql_redshift.txt");
         assertEquals(generateDialog.getMessage(), sql);
         generateDialog.clickCopy();
         DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
@@ -180,14 +174,14 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_INVALID);
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE,
-                INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
+        configuration.addRedshiftBasicInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE,
+                INVALID_VALUE, INVALID_VALUE);
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        snowflakeDetail.clickGenerateButton();
+        redshiftDetail.clickGenerateButton();
         DatasourceMessageBar ErrormessageBar = DatasourceMessageBar.getInstance(browser);
-        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Failed to obtain JDBC Connection: " +
-                "Connection factory returned null from createConnection");
+        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Failed to obtain JDBC Connection:" +
+                " Connection factory returned null from createConnection");
     }
 
     @Test(dependsOnMethods = "createViewTable")
@@ -226,24 +220,22 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         assertFalse(dsMenu.isDataSourceExist(datasourceName), "Datasource is still existing");
     }
 
-    private void checkSnowflakeDetail(String name, String url, String username,
-                                      String database, String warehouse, String prefix, String schema) {
+    private void checkRedshiftDetail(String name, String url, String username,
+                                      String database, String prefix, String schema) {
         assertTrue(name.contains(DATASOURCE_NAME));
         assertEquals(url, DATASOURCE_URL);
         assertEquals(username, DATASOURCE_USERNAME);
         assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
         assertEquals(prefix, DATASOURCE_PREFIX);
         assertEquals(schema, DATASOURCE_SCHEMA);
     }
 
-    private void checkSnowflakeDetailUpdate(String name, String url, String username,
-                                            String database, String warehouse, String prefix, String schema) {
+    private void checkRedshiftDetailUpdate(String name, String url, String username,
+                                            String database, String prefix, String schema) {
         assertTrue(name.contains(DATASOURCE_NAME_CHANGED));
         assertEquals(url, DATASOURCE_URL);
         assertEquals(username, DATASOURCE_USERNAME);
         assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
         assertEquals(prefix, DATASOURCE_PREFIX);
         assertEquals(schema, DATASOURCE_SCHEMA);
     }
