@@ -132,7 +132,7 @@ integratedTests:
     image: harbor.intgdc.com/staging/graphene-chrome:latest
     command: >-
       ./integration-mvn-test.sh
-      -pl ui-tests-core,ui-tests-msf/ui-tests-add,ui-tests-msf/ui-tests-addv2,ui-tests-msf/ui-tests-csv-uploader,ui-tests-msf/ui-tests-disc
+      -pl ui-tests-core,ui-tests-msf/ui-tests-add,ui-tests-msf/ui-tests-addv2
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword="$QA_TEST_PASSWORD"
