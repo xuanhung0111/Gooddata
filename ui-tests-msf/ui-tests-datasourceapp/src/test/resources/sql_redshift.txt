@@ -1,0 +1,16 @@
+SET SEARCH_PATH TO "automation_daily_test";
+
+--------------------------------------------------
+-- PRE_user --
+--------------------------------------------------
+CREATE OR REPLACE VIEW "PRE_user" AS SELECT
+  "role" AS "a__role",
+  "username" AS "a__username",
+  "id" AS "cp__id",
+  "date" AS "d__date",
+  "age" AS "f__age"
+
+  , "FIXME__x__client_id" AS "x__client_id" /* Remove this line if loading into all client workspaces */
+  , "FIXME__x__deleted" AS "x__deleted"     /* Remove this line if inserting only */
+  , "FIXME__x__timestamp" AS "x__timestamp" /* Remove this line if it's not incremental load */
+FROM "user";
