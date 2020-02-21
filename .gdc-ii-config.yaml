@@ -124,7 +124,7 @@ integratedTests:
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
       QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
-      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
+      SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
@@ -139,8 +139,9 @@ integratedTests:
       -Duser.domain=default
       -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
       -Ddss.authorizationToken=stgdssnew
-      -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
-      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
+      -DsnowflakeUserName=autoqasnowflake
+      -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
+      -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
       -Dtestng.suite.xml=testng-metadata-wdp.xml

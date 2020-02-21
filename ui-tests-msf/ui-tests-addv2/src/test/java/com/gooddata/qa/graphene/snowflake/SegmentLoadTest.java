@@ -119,7 +119,7 @@ public class SegmentLoadTest extends AbstractADDProcessTest {
         dataSourceRestRequest = new DataSourceRestRequest(domainRestClient, testParams.getProjectId());
     }
 
-    @Test(dependsOnGroups = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" }, groups = {"metadata-wdp"})
     public void initData() throws JSONException, IOException, SQLException {
         createLCM();
         ConnectionInfo connectionInfo = dataSourceUtils.createSnowflakeConnectionInfo(DATABASE_NAME, DatabaseType.SNOWFLAKE);
@@ -202,7 +202,7 @@ public class SegmentLoadTest extends AbstractADDProcessTest {
                         DATASET_CUSTOMERS_DELETED_CLIENTID, PKCOLUMN_CUSKEY, PK_CUSKEY } };
     }
 
-    @Test(dependsOnMethods = { "initData" }, dataProvider = "dataFirstLoadHasClientId")
+    @Test(dependsOnMethods = { "initData" }, dataProvider = "dataFirstLoadHasClientId", groups = {"metadata-wdp"})
     public void checkFirstLoadHasClientId(String table, CsvFile csvfile, String dataset, String column, String attribute) throws SQLException, IOException {
         csvfile.saveToDisc(testParams.getCsvFolder());
         log.info("This is path of CSV File :" + csvfile.getFilePath());
