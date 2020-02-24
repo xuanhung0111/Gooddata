@@ -94,6 +94,9 @@ integratedTests:
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
       QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
+      SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
+      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
+      REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
@@ -106,11 +109,11 @@ integratedTests:
       -Dpassword="$QA_TEST_PASSWORD"
       -Dtestng.suite.xml=testng-datasourceapp.xml
       -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
-      -DbigqueryPrivateKey=$BIGQUERY_PRIVATE_KEY
-      -DsnowflakePassword=$SNOWFLAKE_USER_PASSWORD
+      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
+      -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
       -DsnowflakeUserName=autoqasnowflake
       -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
-      -DredshiftPassword=$REDSHIFT_USER_PASSWORD
+      -DredshiftPassword="$REDSHIFT_USER_PASSWORD"
       -DredshiftUserName=qatest
       -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -Duser.domain=default
