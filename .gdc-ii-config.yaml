@@ -156,6 +156,8 @@ integratedTests:
       -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
+      -Dnet.snowflake.jdbc.temporaryCredentialCacheDir=./.cache/snowflake
+      -Dnet.snowflake.jdbc.ocspResponseCacheDir=./.cache/ocsp_response_cache
       -Dtestng.suite.xml=testng-metadata-wdp.xml
     artifacts:
       - '**/target/screenshots/**'
