@@ -21,9 +21,9 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
     private final String SNOWFLAKE = "Snowflake";
-    private final String DATASOURCE_NAME = "Auto_datasource" + generateHashString();
+    private final String DATASOURCE_NAME = "Auto_datasource_" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
-    private final String DATASOURCE_INVALID = "Auto_invalid" + generateHashString();
+    private final String DATASOURCE_INVALID = "Auto_datasource_invalid" + generateHashString();
     private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
     private final String DATASOURCE_DATABASE = "ATT_DATASOURCE_TEST";
     private final String DATASOURCE_PREFIX = "PRE_";
@@ -199,7 +199,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(DATASOURCE_INVALID), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(DATASOURCE_INVALID);
     }
 
     @AfterClass(alwaysRun = true)
@@ -223,7 +223,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(datasourceName), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(datasourceName);
     }
 
     private void checkSnowflakeDetail(String name, String url, String username,
