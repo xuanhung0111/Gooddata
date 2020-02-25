@@ -1,10 +1,19 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-datasourceapp">
-    <test name="testng-datasourceapp" enabled="true">
+    <test name="SnowflakeDataSourceE2ETest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.datasource.SnowflakeDataSourceE2ETest" />
+        </classes>
+    </test>
+    <test name="RedshiftDataSourceE2ETest" enabled="true">
+        <classes>
             <class name="com.gooddata.qa.graphene.datasource.RedshiftDataSourceE2ETest" />
+        </classes>
+    </test>
+    <test name="BigqueryDataSourceE2ETest" enabled="true">
+        <classes>
             <class name="com.gooddata.qa.graphene.datasource.BigqueryDataSourceE2ETest" />
         </classes>
     </test>
+
 </suite>
