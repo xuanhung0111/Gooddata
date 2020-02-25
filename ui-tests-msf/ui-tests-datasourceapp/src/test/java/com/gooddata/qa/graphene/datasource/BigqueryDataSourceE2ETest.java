@@ -22,9 +22,9 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
     private final String BIG_QUERY = "Google BigQuery";
-    private final String DATASOURCE_NAME = "Auto_datasource" + generateHashString();
+    private final String DATASOURCE_NAME = "Auto_datasource_" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
-    private final String DATASOURCE_INVALID = "Auto_invalid" + generateHashString();
+    private final String DATASOURCE_INVALID = "Auto_datasource_invalid" + generateHashString();
     private final String DATASOURCE_PROJECT = "gdc-us-dev";
     private final String DATASOURCE_DATASET = "att_team";
     private final String DATASOURCE_PREFIX = "PRE_";
@@ -188,7 +188,7 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(DATASOURCE_INVALID), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(DATASOURCE_INVALID);
     }
 
     @AfterClass(alwaysRun = true)
@@ -211,8 +211,9 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         DatasourceHeading heading = container.getDatasourceHeading();
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
+        initDatasourceManagementPage();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(datasourceName), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(datasourceName);
     }
 
     private void checkBigqueryDetail(String name, String clientEmail, String project, String dataset, String prefix) {

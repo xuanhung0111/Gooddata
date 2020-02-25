@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 
 public class DataSourceMenu extends AbstractFragment {
     private static final By MENU_CLASS = By.className("navigation");
@@ -85,6 +86,17 @@ public class DataSourceMenu extends AbstractFragment {
                 .get();
         ElementUtils.scrollElementIntoView(element,browser);
         actions.moveToElement(element).click().perform();
+        return this;
+    }
+
+    public DataSourceMenu waitForDatasourceNotVisible(String title) {
+        waitForElementVisible(datasourceList);
+        if (isDataSourceExist(title)) {
+            waitForElementNotVisible(datasources.stream()
+                    .filter(items -> items.getText().equals(title))
+                    .findFirst()
+                    .get());
+        }
         return this;
     }
 

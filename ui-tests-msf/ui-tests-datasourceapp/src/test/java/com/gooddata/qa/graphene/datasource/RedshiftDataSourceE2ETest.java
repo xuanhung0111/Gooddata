@@ -22,9 +22,9 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
     private final String AMAZON_REDSHIFT = "Amazon Redshift";
-    private final String DATASOURCE_NAME = "Auto_datasource" + generateHashString();
+    private final String DATASOURCE_NAME = "Auto_datasource_" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
-    private final String DATASOURCE_INVALID = "Auto_invalid" + generateHashString();
+    private final String DATASOURCE_INVALID = "Auto_datasource_invalid" + generateHashString();
     private final String DATASOURCE_DATABASE = "dev";
     private final String DATASOURCE_PREFIX = "PRE_";
     private final String DATASOURCE_SCHEMA = "automation_daily_test";
@@ -193,7 +193,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(DATASOURCE_INVALID), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(DATASOURCE_INVALID);
     }
 
     @AfterClass(alwaysRun = true)
@@ -217,7 +217,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        assertFalse(dsMenu.isDataSourceExist(datasourceName), "Datasource is still existing");
+        dsMenu.waitForDatasourceNotVisible(datasourceName);
     }
 
     private void checkRedshiftDetail(String name, String url, String username,
