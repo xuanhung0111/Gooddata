@@ -215,7 +215,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(EDUTCATION))
                 .changeAttributeFilterValues(PARTIAL_COLLEGE);
-        assertTrue(isEqualCollection(existingObjsTableReport.getAttributeValues(), singletonList(PARTIAL_COLLEGE)),
+
+        assertTrue(isEqualCollection(existingObjsTableReport.waitForLoaded().getAttributeValues(),
+                singletonList(PARTIAL_COLLEGE)),
                 "There is difference between actual and expected attributes");
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(POSITION)).changeAttributeFilterValues(STORE_MANAGER);
