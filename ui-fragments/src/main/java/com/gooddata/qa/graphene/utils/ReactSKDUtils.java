@@ -49,7 +49,9 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_DATE_FILTER_INSIGHT_HAS_MEASURE_FILTER_ATTR = "DateFilterInsightHasMeasureFilterAttribute.js";
     public static final String TEMPLATE_COMBINE_MANY_TYPE_FILTER_INSIGHT_HAS_MEASURE_FILTER_MANY_TYPE =
             "CombineManyTypeFiltersInsightHasMeasureFilterManyType.js";
-
+    public static final String TEMPLATE_VISUALIZATION_WITH_DATE_FILTER = "VisualizationWithDateFilter.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_ATTRIBUTE_FILTER = "VisualizationWithAttributeFilter.js";
+    public static final String TEMPLATE_VISUALIZATION_WITH_DATE_AND_ATTRIBUTE_FILTER = "VisualizationWithDateAndAttributeFilter.js";
     //AFM
 
     //KPI

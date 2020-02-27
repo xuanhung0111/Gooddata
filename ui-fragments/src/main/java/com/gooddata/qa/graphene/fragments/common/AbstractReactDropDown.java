@@ -72,7 +72,7 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
         return getElementTitles(getElements());
     }
 
-    public boolean isDropdownOpen() {
+    protected boolean isDropdownOpen() {
         String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
         waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), getRoot());
 

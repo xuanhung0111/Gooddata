@@ -33,7 +33,6 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 

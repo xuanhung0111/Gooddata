@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
+import com.gooddata.qa.graphene.indigo.sdk.FilterComponentTest;
 import com.gooddata.qa.graphene.indigo.sdk.EditorPermissionTest;
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedHeadlineTest;
 import com.gooddata.qa.graphene.indigo.sdk.FilterTest;
@@ -22,7 +23,8 @@ public class UITestsRegistry {
                 EmbeddedTreemapTest.class,
                 EditorPermissionTest.class,
                 VisualizationTest.class,
-                FilterTest.class
+                FilterTest.class,
+                FilterComponentTest.class
         });
 
         suites.put("all", new Object[] {
@@ -31,7 +33,8 @@ public class UITestsRegistry {
                 EmbeddedTreemapTest.class,
                 EditorPermissionTest.class,
                 VisualizationTest.class,
-                FilterTest.class
+                FilterTest.class,
+                FilterComponentTest.class
         });
 
         TestsRegistry.getInstance()
