@@ -158,8 +158,10 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXFormatWithGlobalFilterBar() throws IOException {
         initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_FILTER).waitForWidgetsLoading()
-            .getConfigurationPanel().disableDateFilter();
-        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+            .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2012", "01/01/2013")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
             .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
@@ -181,10 +183,11 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
 
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXFormatWithFilterUnderMetric() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_FILTER_UNDER_METRIC)
-            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
-
-        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_FILTER_UNDER_METRIC).waitForWidgetsLoading()
+            .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2012", "01/01/2013")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
             .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
@@ -197,16 +200,19 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
         log.info(INSIGHT_HAS_CONFIG_FILTER_UNDER_METRIC + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
 
         assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
-            asList(asList("Department", "Year (Closed)",
-                "Amount, Closed: Jan 1, 2012 - Jan 1, 2013 (Department: Direct Sales)"),
+            asList(
+                asList("Department", "Year (Closed)", "Amount, Closed: Jan 1, 2012 - Jan 1, 2013 " +
+                    "(Department: Direct Sales)"),
                 asList("Direct Sales", "2012", "2.517027098E7")));
     }
 
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXBetweenLocalAttributeAndGlobalDateFilter() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_LOCAL_ATTRIBUTE_AND_GLOBAL_DATE)
-            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
-        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_LOCAL_ATTRIBUTE_AND_GLOBAL_DATE).waitForWidgetsLoading()
+            .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2012", "01/01/2013")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
             .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
@@ -226,9 +232,11 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
 
     @Test(dependsOnMethods = "prepareInsights")
     public void exportInsightsIntoXLSXBetweenLocalDateMetricAndGlobalAttributeFilter() throws IOException {
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_ATTRIBUTE_AND_LOCAL_DATE)
-            .waitForWidgetsLoading().getConfigurationPanel().disableDateFilter();
-        indigoDashboardsPage.waitForWidgetsLoading().saveEditModeWithWidgets().selectFirstWidget(Insight.class)
+        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_CONFIG_GLOBAL_ATTRIBUTE_AND_LOCAL_DATE).waitForWidgetsLoading()
+            .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2012", "01/01/2013")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
             .exportTo(OptionalExportMenu.File.XLSX);
 
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
@@ -241,7 +249,8 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
         log.info(INSIGHT_HAS_CONFIG_GLOBAL_ATTRIBUTE_AND_LOCAL_DATE + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
 
         assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0),
-            asList(asList("Applied filters:", "Department IN (Direct Sales)"),
+            asList(
+                asList("Applied filters:", "Department IN (Direct Sales)"),
                 asList("Department", "Year (Closed)", "Amount, Closed: Jan 1, 2012 - Jan 1, 2013"),
                 asList("Direct Sales", "2012", "2.517027098E7")));
     }

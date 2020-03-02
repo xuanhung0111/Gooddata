@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -31,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog.OptionalExport
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
@@ -134,9 +134,12 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     public void exportXLSXWith_CheckMergeCellsAnd_UncheckFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).saveEditModeWithWidgets()
-                .selectDateFilterByName("All time").waitForWidgetsLoading();
-            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(File.XLSX);
+            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+                .selectStaticPeriod("01/01/2006", "01/01/2020")
+                .apply();
+            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+                .exportTo(File.XLSX);
 
             ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
             exportXLSXDialog.uncheckOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
@@ -156,9 +159,13 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     public void exportXLSXWith_UnCheckMergeCellsAndFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).saveEditModeWithWidgets()
-                .selectDateFilterByName("All time").waitForWidgetsLoading();
-            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(File.XLSX);
+            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+                .selectStaticPeriod("01/01/2006", "01/01/2020")
+                .apply();
+            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+                .exportTo(File.XLSX);
+
             ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
             exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).uncheckOption(OptionalExport.FILTERS_CONTEXT)
                 .confirmExport();
@@ -178,9 +185,12 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     public void exportXLSXWith_CheckMergeCellsAndFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).saveEditModeWithWidgets()
-                .selectDateFilterByName("All time").waitForWidgetsLoading();
-            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(File.XLSX);
+            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+                .selectStaticPeriod("01/01/2006", "01/01/2020")
+                .apply();
+            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+                .exportTo(File.XLSX);
 
             ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
             exportXLSXDialog.checkOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
@@ -201,9 +211,12 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     public void exportXLSXWith_UnCheckMergeCellsAnd_CheckFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
         try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).saveEditModeWithWidgets()
-                .selectDateFilterByName("All time").waitForWidgetsLoading();
-            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(File.XLSX);
+            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+                .selectStaticPeriod("01/01/2006", "01/01/2020")
+                .apply();
+            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+                .exportTo(File.XLSX);
 
             ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
             exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
@@ -223,9 +236,12 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getSavedInsightCSV")
     public void exportInsightsIntoCSVFormat(String insight, List<List<String>> expectedResult) throws IOException {
         try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).saveEditModeWithWidgets()
-                .selectDateFilterByName("All time").waitForWidgetsLoading();
-            indigoDashboardsPage.selectFirstWidget(Insight.class).exportTo(File.CSV);
+            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+                .selectPeriod(DateRange.ALL_TIME)
+                .apply();
+            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+                .exportTo(File.CSV);
 
             final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + insight + "." + ExportFormat.CSV.getName());
@@ -259,12 +275,14 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT)
             .addColumnsAttribute(ATTR_FORECAST_CATEGORY).saveInsight(INSIGHT_EMBEDDED).waitForReportComputing();
 
-        IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL)
+        initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL)
             .waitForDashboardLoad().waitForWidgetsLoading().switchToEditMode().addInsight(INSIGHT_EMBEDDED)
-            .waitForWidgetsLoading().saveEditModeWithWidgets().selectDateFilterByName("All time")
-            .waitForWidgetsLoading();
+            .saveEditModeWithWidgets().waitForWidgetsLoading()
+            .openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
 
-        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_EMBEDDED).exportTo(File.XLSX);
+        indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, INSIGHT_EMBEDDED)
+            .hoverToHeadline().exportTo(File.XLSX);
+
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
 
         exportXLSXDialog.checkOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
@@ -354,7 +372,16 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
             {INSIGHT_HAS_SOME_MEASURES_AND_AN_ATTRIBUTE_VIEW_BY, expectedResultsInsightAnAttributeViewBy},
             {INSIGHT_HAS_SOME_MEASURE_AND_AN_ATTRIBUTE_STACK_BY, expectedResultsInsightAnAttributeStackBy},
             {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, expectedResultsInsightAnAttributeStackAndViewBy},
-            {INSIGHT_HAS_CONFIG_SETTING, expectedResultsInsightConfigSetting},
+            {INSIGHT_HAS_CONFIG_SETTING, asList(
+                asList(ATTR_DEPARTMENT, "Year (Closed)", "New-Amount - SP year ago", "New-Amount"),
+                asList("Direct Sales", "2010", "0.150187619767568"),
+                asList("2011", "0.150187619767568", "0.498791407018685"),
+                asList("2012", "0.498791407018685", "0.313038445576533"),
+                asList("2013", "0.313038445576533", "0.0379825276372139"),
+                asList("2014", "0.0379825276372139"),
+                singletonList("2015"),
+                singletonList("2016"),
+                singletonList("2017"))},
             {INSIGHT_HAS_SAME_ATTRIBUTE_ON_VIEW_BY_AND_STACK_BY, expectedResultsInsightSameAttribute}};
     }
 
@@ -391,10 +418,26 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     @DataProvider(name = "getDataCheckMergeCellsAndFiltersContext")
     private Object[][] getSavedInsightCheckBoth() {
         return new Object[][]{
-            {INSIGHT_HAS_SOME_METRICS, expectedResultsInsightSomeMetric},
-            {INSIGHT_HAS_SOME_MEASURES_AND_AN_ATTRIBUTE_VIEW_BY, expectedResultsInsightAnAttributeViewBy},
-            {INSIGHT_HAS_SOME_MEASURE_AND_AN_ATTRIBUTE_STACK_BY, expectedResultsInsightAnAttributeStackBy},
-            {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, expectedResultsInsightAnAttributeStackAndViewBy},
+            {INSIGHT_HAS_SOME_METRICS, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList("", METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP),
+                asList("Values", "1.1662545654E8", "20286.2161315011", "5134397.65"))},
+            {INSIGHT_HAS_SOME_MEASURES_AND_AN_ATTRIBUTE_VIEW_BY, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
+                asList("Direct Sales", "8.040632496E7", "21310.979316194"),
+                asList("Inside Sales", "3.621913158E7", "18329.5200303644"))},
+            {INSIGHT_HAS_SOME_MEASURE_AND_AN_ATTRIBUTE_STACK_BY, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(ATTR_DEPARTMENT, "Direct Sales", "Inside Sales"),
+                asList("", METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
+                asList("Values", "8.040632496E7", "21310.979316194", "3.621913158E7", "18329.5200303644"))},
+            {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(ATTR_FORECAST_CATEGORY, "Exclude", "Include"),
+                asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
+                asList("Direct Sales", "3.356248251E7", "4.684384245E7"),
+                asList("Inside Sales", "1.537015708E7", "2.08489745E7"))},
             {INSIGHT_HAS_CONFIG_SETTING,
                 asList(asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
                     asList("Department IN (Direct Sales)"),
@@ -407,21 +450,44 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
                     singletonList("2015"),
                     singletonList("2016"),
                     singletonList("2017"))},
-            {INSIGHT_HAS_SAME_ATTRIBUTE_ON_VIEW_BY_AND_STACK_BY, expectedResultsInsightSameAttribute}};
+            {INSIGHT_HAS_SAME_ATTRIBUTE_ON_VIEW_BY_AND_STACK_BY, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList("", ATTR_DEPARTMENT, "Direct Sales", "Inside Sales"),
+                asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY, METRIC_AMOUNT, METRIC_AMOUNT),
+                asList("Direct Sales", "Exclude", "3.356248251E7"),
+                asList("Include", "4.684384245E7"),
+                asList("Inside Sales", "Exclude", "1.537015708E7"),
+                asList("Include", "2.08489745E7"),
+                asList("Sum", "8.040632496E7", "3.621913158E7"))}};
     }
 
     @DataProvider(name = "getDataUnCheckMergeCellsAndCheckFiltersContext")
     private Object[][] getSavedInsightFiltersContext() {
         return new Object[][]{
-            {INSIGHT_HAS_SOME_METRICS, expectedResultsInsightSomeMetric},
-            {INSIGHT_HAS_SOME_MEASURES_AND_AN_ATTRIBUTE_VIEW_BY, expectedResultsInsightAnAttributeViewBy},
+            {INSIGHT_HAS_SOME_METRICS, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList("", METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP),
+                asList("Values", "1.1662545654E8", "20286.2161315011", "5134397.65"))},
+            {INSIGHT_HAS_SOME_MEASURES_AND_AN_ATTRIBUTE_VIEW_BY, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
+                asList("Direct Sales", "8.040632496E7", "21310.979316194"),
+                asList("Inside Sales", "3.621913158E7", "18329.5200303644"))},
             {INSIGHT_HAS_SOME_MEASURE_AND_AN_ATTRIBUTE_STACK_BY,
-                asList(asList(ATTR_DEPARTMENT, "Direct Sales", "Direct Sales", "Inside Sales", "Inside Sales"),
+                asList(
+                    asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                    asList(ATTR_DEPARTMENT, "Direct Sales", "Direct Sales", "Inside Sales", "Inside Sales"),
                     asList("", METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     asList("Values", "8.040632496E7", "21310.979316194", "3.621913158E7", "18329.5200303644"))},
-            {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, expectedResultsInsightAnAttributeStackAndViewBy},
+            {INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK, asList(
+                asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(ATTR_FORECAST_CATEGORY, "Exclude", "Include"),
+                asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
+                asList("Direct Sales", "3.356248251E7", "4.684384245E7"),
+                asList("Inside Sales", "1.537015708E7", "2.08489745E7"))},
             {INSIGHT_HAS_CONFIG_SETTING,
-                asList(asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                asList(
+                    asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
                     asList("Department IN (Direct Sales)"),
                     asList(ATTR_DEPARTMENT, "Year (Closed)", "New-Amount - SP year ago", "New-Amount"),
                     asList("Direct Sales", "2010", "0.150187619767568"),
@@ -433,7 +499,9 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
                     asList("Direct Sales", "2016"),
                     asList("Direct Sales", "2017"))},
             {INSIGHT_HAS_SAME_ATTRIBUTE_ON_VIEW_BY_AND_STACK_BY,
-                asList(asList("", ATTR_DEPARTMENT, "Direct Sales", "Inside Sales"),
+                asList(
+                    asList("Applied filters:", "Date (Closed) BETWEEN 01/01/2006 AND 01/01/2020"),
+                    asList("", ATTR_DEPARTMENT, "Direct Sales", "Inside Sales"),
                     asList(ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY, METRIC_AMOUNT, METRIC_AMOUNT),
                     asList("Direct Sales", "Exclude", "3.356248251E7"),
                     asList("Direct Sales", "Include", "4.684384245E7"),
@@ -461,17 +529,6 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
         asList(ATTR_DEPARTMENT, METRIC_AMOUNT, METRIC_AMOUNT),
         asList("Direct Sales", "3.356248251E7", "4.684384245E7"),
         asList("Inside Sales", "1.537015708E7", "2.08489745E7"));
-
-    private List<List<String>> expectedResultsInsightConfigSetting = asList(
-        asList(ATTR_DEPARTMENT, "Year (Closed)", "New-Amount - SP year ago", "New-Amount"),
-        asList("Direct Sales", "2010", "0.150187619767568"),
-        asList("2011", "0.150187619767568", "0.498791407018685"),
-        asList("2012", "0.498791407018685", "0.313038445576533"),
-        asList("2013", "0.313038445576533", "0.0379825276372139"),
-        asList("2014", "0.0379825276372139"),
-        singletonList("2015"),
-        singletonList("2016"),
-        singletonList("2017"));
 
     private List<List<String>> expectedResultsInsightSameAttribute = asList(
         asList("", ATTR_DEPARTMENT, "Direct Sales", "Inside Sales"),
