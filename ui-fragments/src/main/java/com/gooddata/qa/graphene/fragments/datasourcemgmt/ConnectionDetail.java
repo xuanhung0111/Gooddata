@@ -9,10 +9,12 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ConnectionDetail extends AbstractFragment {
     private static final By CONNECTION_DETAIL_CLASS = By.className("datasource-wrapper");
+    private static final int TIMEOUT_WAIT_CONTENT_LOADED = 5 * 60;
 
     @FindBy(className = "provider-icon")
     private WebElement provider;
@@ -29,8 +31,14 @@ public class ConnectionDetail extends AbstractFragment {
     @FindBy(className = "generate-button")
     private WebElement btnGenerate;
 
-    @FindBy(className =  "delete-button")
-    private WebElement btnPublish;
+    @FindBy(className = "s-open-publish-button")
+    private WebElement openPublishIntoWorkspace;
+
+    @FindBy(className = "s-open-in-disc-link")
+    private WebElement openDiscLink;
+
+    @FindBy(className = "publish-loading-modal-container")
+    private static WebElement loadingModal;
 
     public static final ConnectionDetail getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ConnectionDetail.class, waitForElementVisible(CONNECTION_DETAIL_CLASS, searchContext));
@@ -54,9 +62,8 @@ public class ConnectionDetail extends AbstractFragment {
         btnGenerate.click();
     }
 
-    public PublishWorkspaceDialog clickPublishButton() {
-        waitForElementVisible(btnPublish);
-        btnGenerate.click();
+    public PublishWorkspaceDialog openPublishIntoWorkSpaceDialog() {
+        waitForElementVisible(openPublishIntoWorkspace).click();
         return PublishWorkspaceDialog.getInstance(browser);
     }
 
@@ -66,6 +73,19 @@ public class ConnectionDetail extends AbstractFragment {
 
     public PublishModeDialog getPublishModeDialog() {
         return PublishModeDialog.getInstance(browser);
+    }
+
+    public PublishResult getPublishResultDialog() {
+        return PublishResult.getInstance(browser);
+    }
+
+    public void openDataIntegrationConsole() {
+        waitForElementVisible(openDiscLink).click();
+    }
+
+    public ConnectionDetail waitLoadingModelPage() {
+        waitForElementNotVisible(loadingModal, TIMEOUT_WAIT_CONTENT_LOADED);
+        return this;
     }
 
     public String getTextSchema() {

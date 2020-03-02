@@ -17,6 +17,7 @@ import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.openqa.selenium.By.className;
 
 public class AbstractDatasourceManagementTest extends AbstractDataIntegrationTest {
@@ -48,5 +49,9 @@ public class AbstractDatasourceManagementTest extends AbstractDataIntegrationTes
                 new RestClient.RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
                 projectId);
         userManagementRestRequest.addUserToProject(email, userRole);
+    }
+
+    protected void waitForLoadingDatasourceManagementApp() {
+        waitForElementPresent(className("App"), browser);
     }
 }

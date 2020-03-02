@@ -7,46 +7,50 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.openqa.selenium.By.className;
 
 public class PublishWorkspaceDialog extends AbstractFragment {
-    @FindBy(className = "s-dialog-submit-button")
+    @FindBy(className = "gd-input-search")
     private WebElement searchField;
 
-    @FindBy(className = "s-dialog-cancel-button")
-    private WebElement workspace;
+    @FindBy(className = "s-select-button")
+    private WebElement selectButton;
 
-    @FindBy(css = ".gd-dialog-content span")
+    @FindBy(className = "s-cancel")
     private WebElement cancelButton;
 
-    @FindBy(css = ".gd-dialog-content span")
-    private WebElement selectButton;
+    @FindBy(className = "s-workspace-radio-input")
+    protected List<WebElement> workspacesList;
 
 
     public static PublishWorkspaceDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(PublishWorkspaceDialog.class,
-                waitForElementVisible(className("s-dataset-delete-dialog"), context));
+                waitForElementVisible(className("s-select-workspace-dialog"), context));
     }
 
-    public void clickCancel() {
+    public PublishWorkspaceDialog clickCancel() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
+        return this;
     }
 
-    public void clickSelect () {
+    public PublishWorkspaceDialog clickSelect () {
         waitForElementVisible(selectButton).click();
         waitForFragmentNotVisible(this);
-    }
-
-    public void selectWorkspace () {
-        waitForElementVisible(workspace).click();
+        return this;
     }
 
     public PublishWorkspaceDialog searchWorkspace(String name) {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(searchField).click().sendKeys(name).build().perform();
+        return this;
+    }
+
+    public PublishWorkspaceDialog selectedWorkspaceOnSearchList(String workspaceName) {
+        waitForCollectionIsNotEmpty(workspacesList).stream().filter(e -> e.getText().contains(workspaceName)).findFirst().get().click();
         return this;
     }
 }

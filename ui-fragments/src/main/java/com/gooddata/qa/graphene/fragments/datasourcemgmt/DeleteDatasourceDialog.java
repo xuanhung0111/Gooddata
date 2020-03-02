@@ -30,6 +30,10 @@ public class DeleteDatasourceDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void clickDeleteToCheckMessage() {
+        waitForElementVisible(deleteButton).click();
+    }
+
     public void clickCancel() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
@@ -37,5 +41,9 @@ public class DeleteDatasourceDialog extends AbstractFragment {
 
     public String getMessage() {
         return waitForElementVisible(message).getText();
+    }
+
+    public String getWarningMessage() {
+        return waitForElementVisible(className("gd-message-text"), browser).getText();
     }
 }
