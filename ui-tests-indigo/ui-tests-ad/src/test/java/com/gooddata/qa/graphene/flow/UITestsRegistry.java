@@ -85,6 +85,7 @@ import com.gooddata.qa.graphene.indigo.analyze.ComboChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterBarFlowTest;
+import com.gooddata.qa.graphene.indigo.analyze.ADFilterInsightValueTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -195,6 +196,7 @@ public class UITestsRegistry {
             GroupingAndSubTotalsPivotTableTest.class,
             GroupingAndSubTotalsPivotTableAdvancedTest.class,
             OrganisingMeasureAndAttributeCatalogue.class,
+            ADFilterInsightValueTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

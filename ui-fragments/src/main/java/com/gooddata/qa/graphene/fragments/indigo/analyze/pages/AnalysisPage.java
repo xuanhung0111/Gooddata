@@ -20,10 +20,13 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Visuali
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FilterBarPicker;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel.LogicalOperator;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
@@ -336,6 +339,11 @@ public class AnalysisPage extends AbstractFragment {
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
+    public AnalysisPage removeMeasureFilter(String measure, int index) {
+        return drag(getFilterBuckets().getFilter(measure, index),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
     public AnalysisPage removeDateFilter() {
         return drag(getFilterBuckets().getDateFilter(),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
@@ -552,6 +560,11 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage setFilterIsValues(String filter, String... values) {
         openFilterPanel(filter).select(values);
         return this;
+    }
+
+    public MeasureValueFilterPanel openMeasureFilterPanel(String measure, Integer index) {
+        getFilterBuckets().getFilter(measure, index).click();
+        return MeasureValueFilterPanel.getInstance(browser);
     }
 
     private AttributeFilterPickerPanel openFilterPanel(String filter) {

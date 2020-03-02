@@ -83,12 +83,14 @@ public class MetricConfiguration extends AbstractFragment {
 
     private static final String DISABLED = "is-disabled";
 
-    public MetricConfiguration chooseArithmeticMeasureA(String measureName) {
-        return chooseArithmeticMeasure("s-arithmetic-measure-operand-0-dropdown-button", measureName);
+    public MetricConfiguration chooseArithmeticMeasureA(String measureName, int index) {
+        return chooseArithmeticMeasure(
+            "s-arithmetic-measure-operand-0-dropdown-button", "M" + index + " (" + measureName +")");
     }
     
-    public MetricConfiguration chooseArithmeticMeasureB(String measureName) {
-        return chooseArithmeticMeasure("s-arithmetic-measure-operand-1-dropdown-button", measureName);
+    public MetricConfiguration chooseArithmeticMeasureB(String measureName, int index) {
+        return chooseArithmeticMeasure(
+            "s-arithmetic-measure-operand-1-dropdown-button", "M" + index + " (" + measureName +")");
     }
 
     public MetricConfiguration chooseOperator(OperatorCalculated typeOperator) {
