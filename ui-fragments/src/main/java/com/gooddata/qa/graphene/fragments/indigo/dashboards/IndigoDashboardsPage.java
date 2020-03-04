@@ -558,6 +558,17 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage waitForDrillModalDialogLoading() {
+        // ensure dots element is present
+        sleepTightInSeconds(1);
+
+        Function<WebDriver, Boolean> isFadeElementPresent =
+            browser -> !isElementPresent(className("gd-loading-equalizer-fade"), browser);
+        Graphene.waitGui().until(isFadeElementPresent);
+
+        return this;
+    }
+
     public <T extends Widget> T getWidgetByIndex(final Class<T> clazz, final int index) {
         return initWidgetObject(clazz, scrollWidgetIntoView(getWidgets().get(index)));
     }

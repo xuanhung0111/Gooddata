@@ -5,6 +5,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.Collection;
 
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -20,6 +22,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static org.openqa.selenium.By.className;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -61,6 +65,9 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-date-filter-by-item")
     private FilterByItem filterByDateFilter;
+
+    @FindBy(className = "s-drill-show-measures")
+    private WebElement addInteraction;
 
     public static ConfigurationPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConfigurationPanel.class,
@@ -222,7 +229,69 @@ public class ConfigurationPanel extends AbstractFragment {
         return isElementVisible(BY_DRILL_TO_SELECT, getRoot());
     }
 
+    public DrillMeasureDropDown.DrillConfigPanel drillIntoInsight(String metric, String insight) {
+        waitForElementVisible(addInteraction).click();
+        DrillMeasureDropDown.getInstance(browser).selectByName(metric);
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoInsight(insight);
+    }
+
     private DrillToSelect getDrillToSelect() {
         return Graphene.createPageFragment(DrillToSelect.class, waitForElementVisible(BY_DRILL_TO_SELECT, getRoot()));
+    }
+
+    public static class DrillMeasureDropDown extends AbstractReactDropDown {
+
+        public static By ROOT = className("s-drill-measure-selector-dropdown");
+
+        @Override
+        public AbstractReactDropDown selectByName(String name) {
+            getElementByName(name).click();
+            return this;
+        }
+
+        @Override
+        protected String getDropdownButtonCssSelector() {
+            return ".s-add_interaction.gd-button";
+        }
+
+        @Override
+        protected String getListItemsCssSelector() {
+            return ".gd-drill-measure-selector-list .s-drill-measure-selector-item";
+        }
+
+        @Override
+        protected String getDropdownCssSelector() {
+            return ".overlay.dropdown-body";
+        }
+
+        public static DrillMeasureDropDown getInstance(SearchContext searchContext) {
+            WebElement root = waitForElementVisible(ROOT, searchContext);
+
+            return Graphene.createPageFragment(DrillMeasureDropDown.class, root);
+        }
+
+        public static class DrillConfigPanel extends AbstractFragment {
+
+            @FindBy(className = "s-choose_action___")
+            private WebElement chooseAction;
+
+            public static By ROOT = className("s-drill-config-panel");
+            public static By DRILL_TO_INSIGHT = className("s-drilltoinsight");
+            public static By CHOOSE_INSIGHT = className("s-choose_insight___");
+
+            public static DrillConfigPanel getInstance(SearchContext searchContext) {
+                WebElement root = waitForElementVisible(ROOT, searchContext);
+
+                return Graphene.createPageFragment(DrillConfigPanel.class, root);
+            }
+
+            public DrillConfigPanel drillIntoInsight(String insight) {
+                waitForElementVisible(chooseAction).click();
+                waitForElementVisible(DRILL_TO_INSIGHT, browser).click();
+                waitForElementVisible(CHOOSE_INSIGHT, getRoot()).click();
+                AnalysisInsightSelectionPanel.getInstance(browser).openInsight(insight);
+                return this;
+            }
+        }
     }
 }

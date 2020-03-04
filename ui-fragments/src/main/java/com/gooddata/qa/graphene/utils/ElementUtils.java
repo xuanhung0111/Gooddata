@@ -26,6 +26,7 @@ public final class ElementUtils {
     public static final By BY_BUBBLE_CONTENT = By.cssSelector(".bubble:not(.s-gd-configuration-bubble) .bubble-content .content");
     public static final By BY_PROGRESS_MESSAGE_BAR = cssSelector(".gd-message.progress.gd-message-overlay");
     public static final By BY_SUCCESS_MESSAGE_BAR = cssSelector(".gd-message.success.gd-message-overlay");
+    public static final By BY_WARNING_MESSAGE_BAR = cssSelector(".gd-message.warning.gd-message-overlay");
 
     private ElementUtils() {
     }
