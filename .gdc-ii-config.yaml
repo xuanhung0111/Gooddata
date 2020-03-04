@@ -73,7 +73,7 @@ integratedTests:
       -pl ui-tests-msf/ui-tests-modeler
       -Dtest.module=ui-tests-msf/ui-tests-modeler
       -Dtest=LogicalDataModelPageTest
-      -Dhost=staging3.intgdc.com
+      -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
