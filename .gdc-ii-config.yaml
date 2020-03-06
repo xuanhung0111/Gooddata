@@ -97,6 +97,7 @@ integratedTests:
       SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
       BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
+      REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-redshift-iam"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
@@ -116,6 +117,11 @@ integratedTests:
       -DredshiftPassword="$REDSHIFT_USER_PASSWORD"
       -DredshiftUserName=qatest
       -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
+      -DredshiftIAMDbUser=redshiftdevunloader
+      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
+      -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
       -Duser.domain=default
       -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
@@ -137,6 +143,7 @@ integratedTests:
       SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
       BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
+      REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-redshift-iam"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'

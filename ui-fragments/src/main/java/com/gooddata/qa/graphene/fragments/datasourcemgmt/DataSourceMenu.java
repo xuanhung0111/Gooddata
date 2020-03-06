@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 
 public class DataSourceMenu extends AbstractFragment {
     private static final By MENU_CLASS = By.className("navigation");
@@ -40,7 +39,7 @@ public class DataSourceMenu extends AbstractFragment {
     @FindBy(className = "navigation-list")
     private WebElement datasourceList;
 
-    private static String  navigationList = ".navigation-list";
+    private static String navigationList = ".navigation-list";
 
     public static final DataSourceMenu getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DataSourceMenu.class, waitForElementVisible(MENU_CLASS, searchContext));
@@ -52,7 +51,6 @@ public class DataSourceMenu extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(resource1).click().build().perform();
     }
-
 
     public void selectRedshiftResource() {
         waitForElementVisible(addButton).click();
@@ -68,7 +66,7 @@ public class DataSourceMenu extends AbstractFragment {
         driverActions.moveToElement(resource3).click().build().perform();
     }
 
-    public List<String> getListDataSources () {
+    public List<String> getListDataSources() {
         List<String> originalList = new ArrayList<String>();
         for (WebElement e : datasources) {
             System.out.print(e.getText());
@@ -80,11 +78,12 @@ public class DataSourceMenu extends AbstractFragment {
     public DataSourceMenu selectDataSource(String title) {
         Actions actions = new Actions(browser);
         waitForElementVisible(datasourceList);
+        waitForElementVisible(By.className("navigation-list-item"), browser);
         WebElement element = datasources.stream()
                 .filter(items -> items.getText().equals(title))
                 .findFirst()
                 .get();
-        ElementUtils.scrollElementIntoView(element,browser);
+        ElementUtils.scrollElementIntoView(element, browser);
         actions.moveToElement(element).click().perform();
         return this;
     }
