@@ -19,6 +19,11 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
     private String DATASOURCE_URL;
     private String DATASOURCE_USERNAME;
     private String DATASOURCE_PASSWORD;
+    private String REDSHIFT_IAM_SECRETKEY;
+    private String REDSHIFT_IAM_ACCESSKEY;
+    private String REDSHIFT_IAM_DBUSER;
+    private String REDSHIFT_IAM_LONG_URL;
+    private String REDSHIFT_IAM_SHORT_URL;
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
     private final String AMAZON_REDSHIFT = "Amazon Redshift";
@@ -39,6 +44,11 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
+        REDSHIFT_IAM_DBUSER = testParams.getRedshiftIAMDbUser();
+        REDSHIFT_IAM_ACCESSKEY = testParams.getRedshiftIAMAccessKey();
+        REDSHIFT_IAM_SECRETKEY = testParams.getRedshiftIAMSecretKey();
+        REDSHIFT_IAM_LONG_URL = testParams.getRedshiftIAMLongUrl();
+        REDSHIFT_IAM_SHORT_URL = testParams.getRedshiftIAMShortUrl();
     }
 
     //In the first time , domain doesn’t have any Datasources, initial screen is showed
@@ -77,6 +87,14 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
     }
 
     @DataProvider
+    public Object[][] IAMInformation() {
+        return new Object[][]{{DATASOURCE_NAME, REDSHIFT_IAM_LONG_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY, REDSHIFT_IAM_SECRETKEY,
+                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection succeeded"},
+                {DATASOURCE_NAME, REDSHIFT_IAM_SHORT_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY, REDSHIFT_IAM_SECRETKEY,
+                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection succeeded"}};
+    }
+
+    @DataProvider
     public Object[][] invalidInformation() {
         return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
@@ -88,6 +106,20 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
                         INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
                 {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                         DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"}};
+    }
+
+    @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "IAMInformation")
+    public void checkDataSourceInformationWithIAMAccount(String name, String url, String dbuser, String accesskey, String iam, String database
+            , String prefix, String schema, String validateMessage) {
+        initDatasourceManagementPage();
+        dsMenu.selectRedshiftResource();
+        contentWrapper.waitLoadingManagePage();
+        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        container.addConnectionTitle(name);
+        configuration.addRedshiftIAMInfo(url, dbuser, accesskey, iam, database, prefix, schema);
+        configuration.clickValidateButton();
+        assertEquals(configuration.getValidateMessage(), validateMessage);
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")

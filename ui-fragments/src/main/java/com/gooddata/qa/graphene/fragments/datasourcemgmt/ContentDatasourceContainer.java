@@ -23,6 +23,12 @@ public class ContentDatasourceContainer extends AbstractFragment {
     @FindBy(className = "report-title")
     private WebElement connectionTitle;
 
+    @FindBy(className = "datasource-heading-container-id-value")
+    private WebElement dataSourceId;
+
+    @FindBy(className = "datasource-heading-name")
+    private WebElement dataSourceName;
+
     public static final ContentDatasourceContainer getInstance(SearchContext context) {
         return Graphene.createPageFragment(ContentDatasourceContainer.class, waitForElementVisible(className(CONTENT_CLASS), context));
     }
@@ -51,5 +57,13 @@ public class ContentDatasourceContainer extends AbstractFragment {
 
     public void clickCancelButton () {
         waitForElementVisible(cancelButton).click();
+    }
+
+    public String getDataSourceId() {
+        return waitForElementVisible(dataSourceId).getText();
+    }
+
+    public String getDataSourceName() {
+        return waitForElementVisible(dataSourceName).getText();
     }
 }
