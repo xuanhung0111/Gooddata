@@ -12,21 +12,22 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.openqa.selenium.By.className;
 
 public class PublishModeDialog extends AbstractFragment {
-    @FindBy(className = "s-dialog-submit-button")
+    private static final String PUBLISH_MODE_CLASS = "s-select-publish-mode-dialog";
+    @FindBy(className = "input-radio-label")
     private List<WebElement> modeButton;
 
-    @FindBy(css = ".gd-dialog-content span")
+    @FindBy(className = "s-cancel")
     private WebElement cancelButton;
 
-    @FindBy(css = ".gd-dialog-content span")
+    @FindBy(className = "s-publish-button")
     private WebElement publishButton;
 
-    @FindBy(css = ".gd-dialog-content span")
-    private WebElement message;
+    @FindBy(css = ".s-overwrite-warning .gd-message-text")
+    private WebElement warningMessage;
 
     public static PublishModeDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(PublishModeDialog.class,
-                waitForElementVisible(className("s-dataset-delete-dialog"), context));
+                waitForElementVisible(className(PUBLISH_MODE_CLASS), context));
     }
 
     public void clickCancel() {
@@ -34,18 +35,33 @@ public class PublishModeDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    public void clickPublish () {
+    public void clickPublish() {
         waitForElementVisible(publishButton).click();
         waitForFragmentNotVisible(this);
     }
 
-    public PublishModeDialog selectMode(int index) {
-        waitForCollectionIsNotEmpty(modeButton);
-        modeButton.get(index).click();
+    public PublishModeDialog selectMode(String mode) {
+        waitForCollectionIsNotEmpty(modeButton).stream().filter(e -> e.getText().contains(mode)).findFirst().get().click();
         return this;
     }
 
-    public String getMessage() {
-        return waitForElementVisible(message).getText();
+    public String getWarningMessage() {
+        return waitForElementVisible(warningMessage).getText();
+    }
+
+    public enum PublishMode {
+        PRESERVE_DATA("Preserve data"),
+        OVERWRITE("Overwrite");
+
+        private String type;
+
+        PublishMode(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
     }
 }

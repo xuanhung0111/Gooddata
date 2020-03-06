@@ -29,6 +29,11 @@ public class TestParameters {
     private String redshiftPassword;
     private String redshiftUserName;
     private String redshiftJdbcUrl;
+    private String redshiftIAMDbUser;
+    private String redshiftIAMAccessKey;
+    private String redshiftIAMSecretKey;
+    private String redshiftIAMShortUrl;
+    private String redshiftIAMLongUrl;
     private String bigqueryClientEmail;
     private String bigqueryPrivateKey;
     private String editorUser;
@@ -92,6 +97,11 @@ public class TestParameters {
         redshiftPassword = loadProperty("redshiftPassword");
         redshiftUserName = loadProperty("redshiftUserName");
         redshiftJdbcUrl = loadProperty("redshiftJdbcUrl");
+        redshiftIAMDbUser = loadProperty("redshiftIAMDbUser");
+        redshiftIAMAccessKey = loadProperty("redshiftIAMAccessKey");
+        redshiftIAMSecretKey = loadProperty("redshiftIAMSecretKey");
+        redshiftIAMLongUrl = loadProperty("redshiftIAMLongUrl");
+        redshiftIAMShortUrl = loadProperty("redshiftIAMShortUrl");
         bigqueryClientEmail = loadProperty("bigqueryClientEmail");
         bigqueryPrivateKey = loadProperty("bigqueryPrivateKey");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
@@ -205,6 +215,16 @@ public class TestParameters {
     public String getRedshiftJdbcUrl() {
         return redshiftJdbcUrl;
     }
+
+    public String getRedshiftIAMDbUser() {return redshiftIAMDbUser; }
+
+    public String getRedshiftIAMAccessKey() {return redshiftIAMAccessKey; }
+
+    public String getRedshiftIAMSecretKey() {return redshiftIAMSecretKey; }
+
+    public String getRedshiftIAMShortUrl() {return redshiftIAMShortUrl; }
+
+    public String getRedshiftIAMLongUrl() {return redshiftIAMLongUrl; }
 
     public String getBigqueryClientEmail() { return bigqueryClientEmail; }
 
