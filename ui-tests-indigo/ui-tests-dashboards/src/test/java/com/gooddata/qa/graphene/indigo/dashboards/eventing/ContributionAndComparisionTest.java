@@ -145,6 +145,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_table_report_pop_date_attribute");
@@ -177,6 +178,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_column_report_pop_date_attribute");
@@ -313,6 +315,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_table_combination_pop_contribution");
         final String dashboardUri = createAnalyticalDashboard("kpi_eventing_10", getInsightUriFromBrowserUrl());
@@ -344,6 +347,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
+                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_column_combination_pop_contribution");
         final String dashboardUri = createAnalyticalDashboard("kpi_eventing_11", getInsightUriFromBrowserUrl());
