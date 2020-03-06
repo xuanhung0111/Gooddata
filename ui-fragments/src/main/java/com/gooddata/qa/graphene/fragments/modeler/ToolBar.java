@@ -9,14 +9,10 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ToolBar extends AbstractFragment {
     private static final By TOOLBAR =  By.className("gdc-ldm-toolbar");
-
-    @FindBy(className = "gd-input-search")
-    private WebElement searchBox;
 
     @FindBy(className = "gd-button-text")
     private List<WebElement> buttons;
@@ -25,11 +21,7 @@ public class ToolBar extends AbstractFragment {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
     }
 
-    public boolean isSearchBoxVisible() {
-        return isElementVisible(searchBox);
-    }
-
     public boolean isButtonsVisible() {
-        return buttons.size() == 2 ? true : false;
+        return buttons.size() == 1 ? true : false;
     }
 }
