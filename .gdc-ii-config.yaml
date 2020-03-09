@@ -97,7 +97,7 @@ integratedTests:
       SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
       BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
-      REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-redshift-iam"
+      REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
