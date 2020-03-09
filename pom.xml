@@ -367,6 +367,10 @@
                                                 <value>${csvFolder}</value>
                                             </property>
                                             <property>
+                                                <name>net.snowflake.jdbc.loggerImpl</name>
+                                                <value>net.snowflake.client.log.JDK14Logger</value>
+                                            </property>
+                                            <property>
                                                 <name>test.module</name>
                                                 <value>${test.module}</value>
                                             </property>
