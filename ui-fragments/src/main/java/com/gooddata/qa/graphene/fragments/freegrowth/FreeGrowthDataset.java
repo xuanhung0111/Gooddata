@@ -17,9 +17,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 public class FreeGrowthDataset extends Dataset {
 
     private static final Map<String, String> CONNECT_TYPE_MAPPINGS
-            = ImmutableMap.of("Amazon Redshift", "/admin/disc/#/projects/%s?connect_type=redshift",
-            "Snowflake", "/admin/disc/#/projects/%s?connect_type=snowflake",
-            "Google BigQuery", "/admin/disc/#/projects/%s?connect_type=bigquery",
+            = ImmutableMap.of("Amazon Redshift", "/admin/connect/#/datasource/create?ds_type=redshift",
+            "Snowflake", "/admin/connect/#/datasource/create?ds_type=snowflake",
+            "Google BigQuery", "/admin/connect/#/datasource/create?ds_type=bigQuery",
             "CSV", "#/projects/%s/upload"
     );
 
