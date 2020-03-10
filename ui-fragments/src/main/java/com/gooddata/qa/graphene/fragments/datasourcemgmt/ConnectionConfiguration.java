@@ -7,8 +7,10 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -20,7 +22,7 @@ public class ConnectionConfiguration extends AbstractFragment {
     @FindBy(className = "gd-input-field")
     protected List<WebElement> input;
 
-    @FindBy(css = ".validation-submit .gd-button-secondary")
+    @FindBy(className = "s-test_connection")
     private WebElement validateButton;
 
     @FindBy(className = "required-message")
@@ -110,7 +112,9 @@ public class ConnectionConfiguration extends AbstractFragment {
     }
 
     public void clickValidateButton() {
-        waitForElementVisible(validateButton).click();
+        Graphene.waitGui()
+                .until(ExpectedConditions.elementToBeClickable(validateButton))
+                .click();
     }
 
     public int getNumberOfRequiredMessage() {
