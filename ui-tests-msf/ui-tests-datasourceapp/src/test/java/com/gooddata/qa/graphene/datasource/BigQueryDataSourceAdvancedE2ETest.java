@@ -90,7 +90,6 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         blankProjectId = createNewEmptyProject(blankProject);
         dataSourceRestRequest = new DataSourceRestRequest(restClient, blankProjectId);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), blankProjectId);
-        browser.manage().window().maximize();
     }
 
     @Test(dependsOnGroups = {"createProject"})
