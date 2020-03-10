@@ -184,7 +184,6 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         String valueParam = processUtils.getDataset(jsonDataset);
         Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "DEFAULT");
-        processUtils.execute(parameters);
         ProcessExecutionDetail detail = processUtils.execute(parameters);
         String executionLog = processUtils.getExecutionLog(detail.getLogUri(), blankProjectId);
         log.info("executionLog : " + executionLog);
