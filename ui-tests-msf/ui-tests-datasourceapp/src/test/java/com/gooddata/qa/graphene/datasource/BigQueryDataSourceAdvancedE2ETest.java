@@ -241,7 +241,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         createScheduleForm.addParameter("GDC_DATALOAD_DATASETS", "[{\"uploadMode\":\"DEFAULT\",\"dataset\":\"dataset.shippers\"}]");
         createScheduleForm.addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "DEFAULT");
         createScheduleForm.schedule();
-        ScheduleDetail.getInstance(browser).executeSchedule();
+        ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
     }
 
     private void removeProcess(String name) {
