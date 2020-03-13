@@ -40,7 +40,9 @@ public enum ProjectFeatureFlags {
     ENABLE_KPI_DASHBOARD_SCHEDULE("enableKPIDashboardSchedule"),
     ENABLE_KPI_DASHBOARD_SCHEDULE_RECIPIENTS("enableKPIDashboardScheduleRecipients"),
     PRESERVE_AREA_CHART_DATA_ORDER("preserveAreaChartDataOrder"),
-    ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled");
+    ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled"),
+    ENABLE_KPI_DASHBOARD_DRILL_TO_INSIGHT("enableKPIDashboardDrillToInsight"),
+    ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD("enableKPIDashboardDrillToDashboard");
 
     private final String featureFlag;
 
