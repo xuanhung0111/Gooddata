@@ -1,11 +1,12 @@
 package com.gooddata.qa.utils.cloudresources;
 
-import com.gooddata.qa.utils.cloudresources.DatabaseType;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 
 import org.apache.http.client.methods.HttpRequestBase;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class DataSourceRestRequest extends CommonRestRequest {
 
@@ -21,6 +23,8 @@ public class DataSourceRestRequest extends CommonRestRequest {
     public DataSourceRestRequest(RestClient restClient, String projectId) {
         super(restClient, projectId);
     }
+
+    private static final Logger log = Logger.getLogger(DataSourceRestRequest.class.getName());
 
     /**
      * Create data source to work with Snowflake.
@@ -134,5 +138,32 @@ public class DataSourceRestRequest extends CommonRestRequest {
             dataSourceTitles.add(item.getString("name"));
         }
         return dataSourceTitles;
+    }
+
+    public List<String> getOldAutoTeamDatasources(int rententionDay) throws IOException {
+        final JSONObject json = getJsonObject(
+                RestRequest.initGetRequest(DATA_SOURCE_REST_URI + "?offset=0&limit=300"));
+        JSONArray datasources = json.getJSONObject("dataSources").getJSONArray("items");
+        List<String> listAutoDatasource = new ArrayList<String>();
+        for (int i = 0; i < datasources.length(); i++) {
+            final JSONObject object = datasources.getJSONObject(i).getJSONObject("dataSource");
+            // get All Datasources have the name follow format "data-source-" , "Auto_datasource" , and return list dataSource ID
+            if ( (object.getString("name").contains("data-source-") || object.getString("name").contains("Auto_datasource"))
+                    && isOldDatasources(object, rententionDay)) {
+                listAutoDatasource.add(object.getString("id"));
+            }
+        }
+        log.info ("Number of deleted Datasources :" + listAutoDatasource.size());
+        log.info ("List Datasource created by Auto Team:" + listAutoDatasource);
+        return listAutoDatasource;
+    }
+
+    private boolean isOldDatasources(JSONObject object, int retentionDay) {
+        DateTime date = DateTime.parse(object.getString("lastModified"));
+        Days tmp = Days.daysBetween(date.toLocalDate(), DateTime.now().toLocalDate());
+        if (tmp.getDays() >= retentionDay) {
+            return true;
+        }
+        return false;
     }
 }
