@@ -36,6 +36,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagementTest {
     private DataSourceManagementPage dataSourceManagementPage;
@@ -88,6 +89,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
         blankProjectId = createNewEmptyProject(blankProject);
+        log.info("blankProjectId: " + blankProjectId);
         dataSourceRestRequest = new DataSourceRestRequest(restClient, blankProjectId);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), blankProjectId);
     }
@@ -98,9 +100,18 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for PreserveData : ");
+        log.info("DATASOURCE_NAME : " + DATASOURCE_NAME);
+        log.info("DATASOURCE_CLIENTEMAIL : " + DATASOURCE_CLIENTEMAIL);
+        log.info("DATASOURCE_PROJECT : " + DATASOURCE_PROJECT);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_DATASET_UPDATE : " + DATASOURCE_DATASET);
         createBigQueryDataSource(DATASOURCE_NAME, DATASOURCE_CLIENTEMAIL, privateKeyString,
                 DATASOURCE_PROJECT, DATASOURCE_PREFIX, DATASOURCE_DATASET);
         dataSourceId = container.getDataSourceId();
+        dataSourceTitle = container.getDataSourceName();
+        log.info("dataSourceId : " + dataSourceId);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         bigQueryDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.PRESERVE_DATA.toString());
         publishModeDialog.clickPublish();
@@ -109,8 +120,10 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         String sql = getResourceAsString("/sql_bigquery_modelview.txt");
+        log.info("sql for PreserveData: " + sql);
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, blankProjectId);
         modelView = modelRestRequest.getDatasetModelView(DATASOURCE_TABLE);
+        log.info("modelView for PreserveData: " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -120,10 +133,18 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for Overwrite : ");
+        log.info("DATASOURCE_NAME_UPDATE : " + DATASOURCE_NAME_UPDATE);
+        log.info("DATASOURCE_CLIENTEMAIL : " + DATASOURCE_CLIENTEMAIL);
+        log.info("DATASOURCE_PROJECT : " + DATASOURCE_PROJECT);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_DATASET_UPDATE : " + DATASOURCE_DATASET_UPDATE);
         createBigQueryDataSource(DATASOURCE_NAME_UPDATE, DATASOURCE_CLIENTEMAIL, privateKeyString,
                 DATASOURCE_PROJECT, DATASOURCE_PREFIX, DATASOURCE_DATASET_UPDATE);
         dataSource_update_Id = container.getDataSourceId();
         dataSourceTitle = container.getDataSourceName();
+        log.info("dataSource_update_Id : " + dataSource_update_Id);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         bigQueryDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.OVERWRITE.toString());
         assertEquals(publishModeDialog.getWarningMessage(), "Overwrite might break your saved insights.");
@@ -133,7 +154,9 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         sql = getResourceAsString("/sql_bigquery_modelview_update.txt");
+        log.info("sql for PreserveData: " + sql);
         modelView = new ModelRestRequest(new RestClient(getProfile(ADMIN)), blankProjectId).getDatasetModelView(DATASOURCE_TABLE_UPDATE);
+        log.info("modelView for Overwrite: " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -161,6 +184,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
 
     private void createBigQueryDataSource(String databaseName, String username, String password,
                                           String database, String prefix, String dataset) {
+        log.info("Create BigQuery DataSource........... ");
         container.addConnectionTitle(databaseName);
         configuration.addBigqueryInfo(username, password, database, dataset, prefix);
         container.clickSavebutton();
@@ -176,6 +200,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     }
 
     private void setUpProcess() {
+        log.info("SetUp Process........... ");
         deployProcess();
         setUpSchedule();
         setUpKPIs();
@@ -194,13 +219,17 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         log.info("Setup KPIs...............");
         oldProjectId = testParams.getProjectId();
         testParams.setProjectId(blankProjectId);
+
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
+        log.info("INSIGHT_NAME :" + INSIGHT_NAME);
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().waitForWidgetsLoading();
         indigoDashboardsPage.addDashboard().addInsight(INSIGHT_NAME).selectDateFilterByName("All time").waitForWidgetsLoading()
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
+        log.info("DASHBOARD_NAME :" + DASHBOARD_NAME);
         List<String> listValue = indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
                 .getChartReport().getDataLabels();
+        log.info("listValue : " + listValue);
         assertEquals(listValue, singletonList("$2,000.00"), "Unconnected filter make impact to insight");
     }
 
@@ -213,16 +242,23 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         }
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
+            log.info("DATASOURCE_NAME : " + DATASOURCE_NAME);
             deleteDatasource(DATASOURCE_NAME);
+            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME), "Datasource " + DATASOURCE_NAME + " should be deleted");
         }
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE)) {
+            log.info("DATASOURCE_NAME_UPDATE : " + DATASOURCE_NAME_UPDATE);
             deleteDatasource(DATASOURCE_NAME_UPDATE);
+            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE), "Datasource " + DATASOURCE_NAME_UPDATE + " should be deleted");
         }
     }
 
     private void deployProcess() {
+        log.info("Deploy Process........... ");
         testParams.setProjectId(blankProjectId);
+        log.info("blankProjectId : " + blankProjectId);
         processName = generateProcessName();
+        log.info("processName : " + processName);
         projectDetailPage = initDiscProjectDetailPage();
         DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
         DeploySDDProcessDialog deploySDDProcessDialog = deployForm.selectADDProcess();
@@ -233,7 +269,9 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     }
 
     private void setUpSchedule() {
+        log.info("Set Up Schedule........... ");
         String schedule = "Schedule-" + generateHashString();
+        log.info("Schedule Name : " + schedule);
         CreateScheduleForm createScheduleForm = initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(processName)
@@ -249,6 +287,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     }
 
     private void deleteDatasource(String datasourceName) {
+        log.info("Delete Datasource........... ");
         dsMenu.selectDataSource(datasourceName);
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
