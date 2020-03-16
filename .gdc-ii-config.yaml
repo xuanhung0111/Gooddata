@@ -72,7 +72,7 @@ integratedTests:
       ./integration-mvn-test.sh
       -pl ui-tests-msf/ui-tests-modeler
       -Dtest.module=ui-tests-msf/ui-tests-modeler
-      -Dtest=LogicalDataModelPageTest
+      -Dtestng.suite.xml=testng-msf-web-modeler.xml
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword="$QA_TEST_PASSWORD"
