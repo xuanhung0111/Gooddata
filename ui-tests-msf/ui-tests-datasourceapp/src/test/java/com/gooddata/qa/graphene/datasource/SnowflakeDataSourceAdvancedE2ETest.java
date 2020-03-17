@@ -275,7 +275,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
             deleteDatasource(DATASOURCE_NAME);
-            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE), "Datasource " + DATASOURCE_NAME + " should be deleted");
+            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME), "Datasource " + DATASOURCE_NAME + " should be deleted");
         }
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE)) {
             deleteDatasource(DATASOURCE_NAME_UPDATE);
