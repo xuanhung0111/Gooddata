@@ -85,6 +85,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
     private RestClient restClient;
     private DataSourceRestRequest dataSourceRestRequest;
     private IndigoRestRequest indigoRestRequest;
+    private String dataSourceTitle;
 
     @Override
     public void prepareProject() throws Throwable {
@@ -101,6 +102,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
         blankProjectId = createNewEmptyProject(blankProject);
+        log.info("blankProjectId : " + blankProjectId);
         dataSourceRestRequest = new DataSourceRestRequest(restClient, blankProjectId);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), blankProjectId);
     }
@@ -111,9 +113,20 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for PreserveData : ");
+        log.info("DATASOURCE_NAME : " + DATASOURCE_NAME);
+        log.info("DATASOURCE_URL : " + DATASOURCE_URL);
+        log.info("DATASOURCE_WAREHOUSE : " + DATASOURCE_WAREHOUSE);
+        log.info("DATASOURCE_USERNAME : " + DATASOURCE_USERNAME);
+        log.info("DATASOURCE_DATABASE : " + DATASOURCE_DATABASE);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_SCHEMA : " + DATASOURCE_SCHEMA);
         createSnowflakeDataSource(DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         dataSourceId = container.getDataSourceId();
+        dataSourceTitle = container.getDataSourceName();
+        log.info("dataSourceId : " + dataSourceId);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         snowflakeDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.PRESERVE_DATA.toString());
         publishModeDialog.clickPublish();
@@ -122,8 +135,10 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         String sql = getResourceAsString("/sql_snowflake_modelview.txt");
+        log.info("sql for PreserveData: " + sql);
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, blankProjectId);
         modelView = modelRestRequest.getDatasetModelView(DATASOURCE_DATASET);
+        log.info("modelView for PreserveData: " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -133,9 +148,20 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for Overwrite : ");
+        log.info("DATASOURCE_NAME_UPDATE : " + DATASOURCE_NAME_UPDATE);
+        log.info("DATASOURCE_URL : " + DATASOURCE_URL);
+        log.info("DATASOURCE_WAREHOUSE : " + DATASOURCE_WAREHOUSE);
+        log.info("DATASOURCE_USERNAME : " + DATASOURCE_USERNAME);
+        log.info("DATASOURCE_DATABASE_UPDATE : " + DATASOURCE_DATABASE_UPDATE);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_SCHEMA : " + DATASOURCE_SCHEMA);
         createSnowflakeDataSource(DATASOURCE_NAME_UPDATE, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE_UPDATE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         dataSource_update_Id = container.getDataSourceId();
+        dataSourceTitle = container.getDataSourceName();
+        log.info("dataSourceId : " + dataSource_update_Id);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         snowflakeDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.OVERWRITE.toString());
         assertEquals(publishModeDialog.getWarningMessage(), "Overwrite might break your saved insights.");
@@ -145,7 +171,9 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         sql = getResourceAsString("/sql_snowflake_modelview_update.txt");
+        log.info("sql for Overwrite : " + sql);
         modelView = new ModelRestRequest(restClient, blankProjectId).getDatasetModelView(DATASOURCE_DATASET_UPDATE);
+        log.info("modelView for Overwrite : " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -187,15 +215,27 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
 
     private void setUpProcess() {
         // Create New Process Schedule
+        log.info("Setup Process...............");
         project = restClient.getProjectService().getProjectById(blankProjectId);
+        log.info("dataSource_update_Id : " + dataSource_update_Id);
         dataloadProcess = new ScheduleUtils(restClient).createDataDistributionProcess(project, PROCESS_NAME,
                 dataSource_update_Id, "1");
+        log.info("dataloadProcess : " + dataloadProcess);
         processUtils = new ProcessUtils(restClient, dataloadProcess);
+        log.info("processUtils : " + processUtils);
         JSONObject jsonDataset = processUtils.setModeDefaultDataset(DATASOURCE_DATASET_UPDATE);
+        log.info("jsonDataset : " + jsonDataset);
         String valueParam = processUtils.getDataset(jsonDataset);
+        log.info("valueParam : " + valueParam);
         Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "DEFAULT");
-        ProcessExecutionDetail detail = processUtils.execute(parameters);
+        ProcessExecutionDetail detail;
+        log.info("Execute Process...............");
+        try {
+            detail = processUtils.execute(parameters);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot execute process" + e.getMessage());
+        }
         String executionLog = processUtils.getExecutionLog(detail.getLogUri(), blankProjectId);
         log.info("executionLog : " + executionLog);
         setUpKPIs();
@@ -214,6 +254,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         log.info("Setup KPIs...............");
         oldProjectId = testParams.getProjectId();
         testParams.setProjectId(blankProjectId);
+        log.info("blankProjectId : " + blankProjectId);
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().waitForWidgetsLoading();
@@ -221,6 +262,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
         List<String> listValue = indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
                 .getChartReport().getDataLabels();
+        log.info("listValue : " + listValue);
         assertEquals(listValue, singletonList("$2,000.00"), "Unconnected filter make impact to insight");
     }
 
@@ -233,13 +275,16 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
             deleteDatasource(DATASOURCE_NAME);
+            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE), "Datasource " + DATASOURCE_NAME + " should be deleted");
         }
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE)) {
             deleteDatasource(DATASOURCE_NAME_UPDATE);
+            assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME_UPDATE), "Datasource " + DATASOURCE_NAME_UPDATE + " should be deleted");
         }
     }
 
     private void deleteDatasource(String datasourceName) {
+        log.info("Delete Datasource...............");
         dsMenu.selectDataSource(datasourceName);
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();

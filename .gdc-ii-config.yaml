@@ -88,52 +88,52 @@ integratedTests:
       - '**/target/surefire-reports/*.xml'
     microservices:
       - ldm-modeler
-#  - kind: 'image'
-#    env: bash
-#    path: .
-#    vault:
-#      QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
-#      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
-#      SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
-#      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
-#      REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
-#      REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
-#    args:
-#      - '-v $HOME/.m2:$HOME/.m2'
-#      - '-e'
-#      - 'HOME=$HOME'
-#    command: >-
-#      ./integration-mvn-test.sh
-#      -pl ui-tests-msf/ui-tests-datasourceapp
-#      -Dhost=staging.intgdc.com
-#      -Duser=qa+test@gooddata.com
-#      -Dpassword="$QA_TEST_PASSWORD"
-#      -Dtestng.suite.xml=testng-datasourceapp.xml
-#      -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
-#      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
-#      -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
-#      -DsnowflakeUserName=autoqasnowflake
-#      -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
-#      -DredshiftPassword="$REDSHIFT_USER_PASSWORD"
-#      -DredshiftUserName=qatest
-#      -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
-#      -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
-#      -DredshiftIAMDbUser=redshiftdevunloader
-#      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
-#      -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
-#      -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
-#      -Duser.domain=default
-#      -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
-#      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
-#      -DuseDynamicUser=true
-#    image: harbor.intgdc.com/staging/graphene-chrome:latest
-#    artifacts:
-#      - '**/target/screenshots/**'
-#      - '**/target/media/video/**/**_failed.mp4'
-#    junitArtifacts:
-#      - '**/target/surefire-reports/*.xml'
-#    microservices:
-#      - datasource-management
+  - kind: 'image'
+    env: bash
+    path: .
+    vault:
+      QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
+      QA_PROJECT_TOKEN: "$VAULT_SPECIAL_PREFIX/gooddata-stg-project-token"
+      SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
+      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
+      REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
+      REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
+    args:
+      - '-v $HOME/.m2:$HOME/.m2'
+      - '-e'
+      - 'HOME=$HOME'
+    command: >-
+      ./integration-mvn-test.sh
+      -pl ui-tests-msf/ui-tests-datasourceapp
+      -Dhost=staging.intgdc.com
+      -Duser=qa+test@gooddata.com
+      -Dpassword="$QA_TEST_PASSWORD"
+      -Dtestng.suite.xml=testng-datasourceapp.xml
+      -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
+      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
+      -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
+      -DsnowflakeUserName=autoqasnowflake
+      -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
+      -DredshiftPassword="$REDSHIFT_USER_PASSWORD"
+      -DredshiftUserName=qatest
+      -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
+      -DredshiftIAMDbUser=redshiftdevunloader
+      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
+      -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
+      -Duser.domain=default
+      -Dproject.authorizationToken="$QA_PROJECT_TOKEN"
+      -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
+      -DuseDynamicUser=true
+    image: harbor.intgdc.com/staging/graphene-chrome:latest
+    artifacts:
+      - '**/target/screenshots/**'
+      - '**/target/media/video/**/**_failed.mp4'
+    junitArtifacts:
+      - '**/target/surefire-reports/*.xml'
+    microservices:
+      - datasource-management
   - kind: 'image'
     env: bash
     path: .
