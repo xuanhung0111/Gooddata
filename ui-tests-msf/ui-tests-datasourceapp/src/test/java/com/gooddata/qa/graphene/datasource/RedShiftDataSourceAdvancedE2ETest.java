@@ -61,6 +61,7 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     private String blankProjectId;
     private String dataSourceId;
     private String dataSource_update_Id;
+    private String dataSourceTitle;
     private ContentDatasourceContainer container;
     private ConnectionConfiguration configuration;
     private ConnectionDetail redShiftDetail;
@@ -90,6 +91,7 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
         blankProjectId = createNewEmptyProject(blankProject);
+        log.info("blankProjectId : " + blankProjectId);
         dataSourceRestRequest = new DataSourceRestRequest(restClient, blankProjectId);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), blankProjectId);
     }
@@ -100,9 +102,20 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for PreserveData : ");
+        log.info("DATASOURCE_NAME : " + DATASOURCE_NAME);
+        log.info("DATASOURCE_USERNAME : " + DATASOURCE_USERNAME);
+        log.info("DATASOURCE_DATABASE : " + DATASOURCE_DATABASE);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_SCHEMA : " + DATASOURCE_SCHEMA);
         createRedShiftDataSource(DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        Screenshots.takeScreenshot(browser,"testPublishIntWorkspaceWithPreserveData",getClass());
         dataSourceId = container.getDataSourceId();
+        dataSourceTitle = container.getDataSourceName();
+        log.info("Current ProjectID : " + testParams.getProjectId());
+        log.info("dataSourceId : " + dataSourceId);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         redShiftDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.PRESERVE_DATA.toString());
         publishModeDialog.clickPublish();
@@ -111,8 +124,10 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         String sql = getResourceAsString("/sql_redshift_modelview.txt");
+        log.info("sql for PreserveData : " + sql);
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, blankProjectId);
         modelView = modelRestRequest.getDatasetModelView(DATASOURCE_DATASET);
+        log.info("modelView for PreserveData : " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -122,9 +137,20 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         configuration = container.getConnectionConfiguration();
+        log.info("Info Create DataSource for Overwrite : ");
+        log.info("DATASOURCE_NAME_UPDATE : " + DATASOURCE_NAME_UPDATE);
+        log.info("DATASOURCE_USERNAME : " + DATASOURCE_USERNAME);
+        log.info("DATASOURCE_DATABASE : " + DATASOURCE_DATABASE);
+        log.info("DATASOURCE_PREFIX : " + DATASOURCE_PREFIX);
+        log.info("DATASOURCE_SCHEMA_UPDATE : " + DATASOURCE_SCHEMA_UPDATE);
         createRedShiftDataSource(DATASOURCE_NAME_UPDATE, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA_UPDATE);
+        Screenshots.takeScreenshot(browser,"testPublishIntWorkspaceWithOverwrite",getClass());
         dataSource_update_Id = container.getDataSourceId();
+        dataSourceTitle = container.getDataSourceName();
+        log.info("Current ProjectID : " + testParams.getProjectId());
+        log.info("dataSource_update_Id : " + dataSource_update_Id);
+        log.info("dataSourceTitle : " + dataSourceTitle);
         redShiftDetail = container.getConnectionDetail();
         OpenPublishIntoWorkSpace(PublishModeDialog.PublishMode.OVERWRITE.toString());
         assertEquals(publishModeDialog.getWarningMessage(), "Overwrite might break your saved insights.");
@@ -134,7 +160,9 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         assertEquals(publishResult.getResultMessage(), "Model successfully published");
         publishResult.closeResultDialog();
         sql = getResourceAsString("/sql_redshift_modelview_update.txt");
+        log.info("modelView for Overwrite: " + sql);
         modelView = new ModelRestRequest(restClient, blankProjectId).getDatasetModelView(DATASOURCE_DATASET_UPDATE);
+        log.info("modelView for Overwrite: " + modelView.toString());
         assertEquals(modelView.toString(), sql);
     }
 
@@ -176,17 +204,42 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
 
     private void setUpProcess() {
         // Create New Process Schedule
+        log.info("SetUp Process...............");
+        log.info("Current ProjectID : " + testParams.getProjectId());
+        log.info("blankProjectId : " + blankProjectId);
         project = restClient.getProjectService().getProjectById(blankProjectId);
+        log.info("SetUp Dataload Process...............");
+        log.info("getUser :" + testParams.getUser());
+        log.info("UserADomain :" + testParams.getUserDomain());
+        log.info("DomainAUser :" + testParams.getDomainUser());
+        log.info("SetUp Dataload Process...............");
         dataloadProcess = new ScheduleUtils(restClient).createDataDistributionProcess(project, PROCESS_NAME,
                 dataSource_update_Id, "1");
+        log.info("PROCESS_NAME :" + PROCESS_NAME);
+        log.info("dataSource_update_Id : " + dataSource_update_Id);
+        log.info("dataloadProcess : " + dataloadProcess);
+        log.info("project.getDataLoadUri() :" + project.getDataLoadUri());
         processUtils = new ProcessUtils(restClient, dataloadProcess);
+        log.info("processUtils : " + processUtils);
         JSONObject jsonDataset = processUtils.setModeDefaultDataset(DATASOURCE_DATASET_UPDATE);
+        log.info("jsonDataset : " + jsonDataset);
         String valueParam = processUtils.getDataset(jsonDataset);
+        log.info("valueParam : " + valueParam);
         Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "DEFAULT");
-        ProcessExecutionDetail detail = processUtils.execute(parameters);
+        ProcessExecutionDetail detail;
+        log.info("parameters : " + parameters.getParameters().toString());
+        log.info("Execute Process...............");
+        try {
+            detail = processUtils.execute(parameters);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot execute process" + e.getMessage());
+        }
+        log.info("detail : " + detail);
         String executionLog = processUtils.getExecutionLog(detail.getLogUri(), blankProjectId);
         log.info("executionLog : " + executionLog);
+        log.info("project.getSchedulesUri() :" + project.getSchedulesUri());
+        log.info("project.getExecuteUri() :" + project.getExecuteUri());
         setUpKPIs();
     }
 
@@ -201,8 +254,11 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
 
     private void setUpKPIs() {
         log.info("Setup KPIs...............");
+        log.info("Current ProjectID : " + testParams.getProjectId());
         oldProjectId = testParams.getProjectId();
+        log.info("oldProjectId : " + oldProjectId);
         testParams.setProjectId(blankProjectId);
+        log.info("Current ProjectID : " + testParams.getProjectId());
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().waitForWidgetsLoading();
@@ -216,10 +272,13 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws ParseException, JSONException {
         log.info("Clean up...............");
+        log.info("Current ProjectID : " + testParams.getProjectId());
         if (dataloadProcess != null) {
             restClient.getProcessService().removeProcess(dataloadProcess);
         }
         dataSourceRestRequest.deleteDataSource(dataSource_update_Id);
+        log.info("dataSource_update_Id : " + dataSource_update_Id);
         new DataSourceRestRequest(restClient, oldProjectId).deleteDataSource(dataSourceId);
+        log.info("dataSourceId : " + dataSourceId);
     }
 }
