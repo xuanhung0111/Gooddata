@@ -43,7 +43,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
-public class KPIDashboardsDrillToInsight extends AbstractDashboardTest {
+public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
 
     private final String SOURCE_INSIGHT_HAS_TWO_MEASURES = "Two Measures";
     private final String SOURCE_INSIGHT_HAS_PROTECTED_DATA = "Protected Data";
