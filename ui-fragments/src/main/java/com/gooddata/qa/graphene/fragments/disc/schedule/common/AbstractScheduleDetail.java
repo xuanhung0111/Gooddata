@@ -320,7 +320,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
         }
 
         public String getErrorMessage() {
-            return waitForElementVisible(By.className("execution-history-error"), getRoot()).getText();
+            return waitForElementVisible(By.className("execution-history-span"), getRoot()).getText();
         }
 
         public boolean isItemGroup() {
