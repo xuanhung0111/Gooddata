@@ -20,7 +20,7 @@
             <class name="com.gooddata.qa.graphene.datasource.SnowflakeDataSourceAdvancedE2ETest" />
         </classes>
     </test>
-    <test name="RedShiftDataSourceAdvancedE2ETest" enabled="false">
+    <test name="RedShiftDataSourceAdvancedE2ETest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.datasource.RedShiftDataSourceAdvancedE2ETest" />
         </classes>
