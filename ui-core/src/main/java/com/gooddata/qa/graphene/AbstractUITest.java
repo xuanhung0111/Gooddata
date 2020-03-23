@@ -130,7 +130,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void signInFromReact(String username, String password) {
-        openNodeJsUrl(ACCOUNT_PAGE);
+        openNodeJsUrl(PAGE_LOGIN);
         LoginFragment.getInstance(browser).login(username, password, true);
         System.out.println(format("Successful login with user: %s to react project", username));
     }
