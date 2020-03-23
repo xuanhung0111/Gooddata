@@ -59,8 +59,8 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
     private final String DATASOURCE_NAME_UPDATE = "Auto_datasource_update" + generateHashString();
     private final String PROCESS_NAME = "AutoProcess Test" + generateHashString();
     private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
-    private final String DATASOURCE_DATABASE_UPDATE = "ATT_DATABASE_UPDATE";
-    private final String DATASOURCE_DATABASE = "ATT_DATABASE";
+    private final String DATASOURCE_DATABASE_UPDATE = "ATT_TEST_DATABASE_UPDATE";
+    private final String DATASOURCE_DATABASE = "ATT_TEST_DATABASE";
     private final String DATASOURCE_DATASET = "orders";
     private final String DATASOURCE_DATASET_UPDATE = "shippers";
     private final String DATASOURCE_PREFIX = "PRE_";
