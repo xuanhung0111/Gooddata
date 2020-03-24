@@ -116,6 +116,7 @@ import com.gooddata.qa.graphene.reports.TimeFormattingTest;
 import com.gooddata.qa.graphene.reports.LockingReportTest;
 import com.gooddata.qa.graphene.reports.DragAndDropMetricsOrAttributesColumnOnReportTest;
 import com.gooddata.qa.graphene.reports.PreserveAreaChartDataOrderOnReportTest;
+import com.gooddata.qa.graphene.reports.ExportReportUngroupedXLSXTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDashboardTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogFiltersTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogRecurrenceTest;
@@ -208,7 +209,8 @@ public class UITestsRegistry {
             BulkPermissionReportSetting.class,
             HelpLinkReferenceTest.class,
             DragAndDropMetricsOrAttributesColumnOnReportTest.class,
-            PreserveAreaChartDataOrderOnReportTest.class
+            PreserveAreaChartDataOrderOnReportTest.class,
+            ExportReportUngroupedXLSXTest.class
         });
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{

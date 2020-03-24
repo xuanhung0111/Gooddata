@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +32,7 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static java.lang.String.format;
@@ -329,6 +331,33 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 asList(INTEREST, "1.844726614E7"), asList(DISCOVERY, "4249027.88"), asList(SHORT_LIST, "5612062.6"),
                 asList(RISK_ASSESSMENT, "2606293.46"), asList(CONVICTION, "3067466.12"), asList(NEGOTIATION, "1862015.73"),
                 asList(CLOSED_WON, "3.831075345E7"), asList(CLOSED_LOST, "4.247057116E7")));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void exportReportToXLSXWithUnmergedCellEmbeddedDashboard() throws IOException {
+        String report = "Report" + generateHashString();
+        dashboardTitle = generateDashboardName();
+
+        createReport(GridReportDefinitionContent.create(report,
+            singletonList(METRIC_GROUP),
+            asList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME)),
+                new AttributeInGrid(getAttributeByTitle(ATTR_DEPARTMENT))),
+            singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+
+        openDashboardHasReportAndFilter(report,
+            createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME), SHORT_LIST));
+        embeddedUri = dashboardsPage.openEmbedDashboardDialog().getPreviewURI();
+
+        embeddedDashboard = initEmbeddedDashboard();
+
+        Screenshots.takeScreenshot(browser, report, getClass());
+        final File exportFile = new File(testParams.getDownloadFolder(),
+            embeddedDashboard.exportDashboardToXLSXWithUnMergedCell(dashboardTitle));
+        waitForExporting(exportFile);
+        List<String> xlsxContent = XlsxUtils.excelFileToRead(exportFile.getPath(), 0).stream()
+            .flatMap(List::stream).collect(Collectors.toList());
+        log.info(report + ": " + xlsxContent);
+        assertEquals(Collections.frequency(xlsxContent, SHORT_LIST), 2);
     }
 
     private void openDashboardHasReportAndFilter(String titleReport, FilterItemContent filterItemContent)

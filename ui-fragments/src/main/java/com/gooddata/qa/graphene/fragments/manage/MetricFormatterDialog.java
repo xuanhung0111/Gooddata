@@ -67,7 +67,7 @@ public class MetricFormatterDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    public static enum Formatter {
+    public enum Formatter {
         DEFAULT("#,##0.00"),
         GDC("GDC#,##0.00"),
         BARS(new StringBuilder("[>=9][color=2190c0]██████████;")
@@ -89,6 +89,7 @@ public class MetricFormatterDialog extends AbstractFragment {
             .append("[<=-1000]-$#,.0 K;")
             .append("$#,##0")
             .toString()),
+        CONDITION_NULL("[=Null][backgroundcolor=DDDDDD][red]No Value"),
         COLORS(new StringBuilder("[<0][red]$#,#.##;")
             .append("[<1000][blue]$#,#.##;")
             .append("[>=1000][green]$#,#.##")
@@ -98,11 +99,13 @@ public class MetricFormatterDialog extends AbstractFragment {
         BACKGROUND_COLOR_FORMAT("[RED][backgroundColor=aff8ef]#,##0.00"),
         XSS("<button>#,##0.00</button>"),
         NULL_VALUE("#'##0,00 formatted; [=null] null value!"),
-        LONG("$#,##0,00 long format long format long format long format long format long format long format");
+        LONG("$#,##0,00 long format long format long format long format long format long format long format"),
+        UNIT_CONVERSION("{{{86400||#}}} days\\, {{{3600|24|00}}}:{{{60|60|00}}}:{{{|60.|00.000}}} hours"),
+        REGION("# ##0,00");
 
         private String text;
 
-        private Formatter(String text) {
+        Formatter(String text) {
             this.text = text;
         }
 
