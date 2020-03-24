@@ -13,7 +13,7 @@ yarn create react-app $REACT_PROJECT_NAME
 cd $REACT_PROJECT_NAME
 
 # Configure HTTPS on NodeJs
-jq --arg enableHTTPs "HTTPS=true react-scripts start" '.scripts.start=$enableHTTPs' package.json > enableHTTPsNodeJs.json
+jq --arg enableHTTPs "HTTPS=true forever start -c 'react-scripts start' ./" '.scripts.start=$enableHTTPs' package.json > enableHTTPsNodeJs.json
 cp enableHTTPsNodeJs.json package.json
 rm -rf enableHTTPsNodeJs.json
 
@@ -33,10 +33,13 @@ if [ -n "$TESTING_HOST" ]; then
     sed s/replaceWithTestingHost/$TESTING_HOST/g $RESOURCE_DIR/setupProxy.js > ./src/setupProxy.js
 fi
 
+# Install the latest forever
+yarn global add forever
+
 # Start react-sdk-app project up
 echo "Starting react project"
 export BROWSER='none'
-nohup yarn start >> $REACT_PROJECT_NAME.log 2>&1 &
+yarn start
 echo "Done"
 
 
