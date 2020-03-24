@@ -134,8 +134,8 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         String treemap = "Treemap " + generateHashString();
         createInsight(treemap, ReportType.TREE_MAP, singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_DEPARTMENT));
         createCatalogJSON(Pair.of("visualizationName", treemap));
-        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         indigoRestRequest.deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(treemap));
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         assertEquals(initSDKAnalysisPage().getWarning(),
                 "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.");
     }
