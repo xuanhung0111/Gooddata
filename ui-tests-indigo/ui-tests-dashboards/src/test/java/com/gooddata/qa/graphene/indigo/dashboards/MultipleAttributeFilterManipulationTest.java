@@ -57,6 +57,7 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
     private AnalysisPage analysisPage;
     private MetricConfiguration metricConfiguration;
     private String currentWindowHandle;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -66,8 +67,9 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_TABLE_COLUMN_AUTO_RESIZING, false);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createNumberOfActivitiesMetric();
         metricCreator.createPercentOfPipelineMetric(METRIC_LONG_NAME, getMetricCreator().createAmountMetric());

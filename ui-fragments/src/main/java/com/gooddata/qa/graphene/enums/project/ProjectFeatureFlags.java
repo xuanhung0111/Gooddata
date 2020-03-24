@@ -42,7 +42,8 @@ public enum ProjectFeatureFlags {
     PRESERVE_AREA_CHART_DATA_ORDER("preserveAreaChartDataOrder"),
     ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled"),
     ENABLE_KPI_DASHBOARD_DRILL_TO_INSIGHT("enableKPIDashboardDrillToInsight"),
-    ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD("enableKPIDashboardDrillToDashboard");
+    ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD("enableKPIDashboardDrillToDashboard"),
+    ENABLE_TABLE_COLUMN_AUTO_RESIZING("enableTableColumnsAutoResizing");
 
     private final String featureFlag;
 
