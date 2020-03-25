@@ -268,7 +268,7 @@ public class BigQueryUtils {
             // filter schemas are created by script test
             if (dataset.getGeneratedId().contains("customersmappingprojectid")) {
                 log.info("dataset.getGeneratedId() : " + dataset.getGeneratedId());
-                String date = dataset.getGeneratedId().replace("gdc-us-dev:customersmappingprojectid2__", "");
+                String date = dataset.getGeneratedId().replace("gdc-us-dev:customersmappingprojectid2_", "");
                 // list old schemas
                 log.info("Retention Date : " + getRetentionDate(retentionDays));
                 log.info("Schema Created Date : " + convertStringToDate(date));
