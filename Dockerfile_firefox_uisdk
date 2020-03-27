@@ -7,7 +7,7 @@ LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
 LABEL parent_image="harbor.intgdc.com/staging/graphene-firefox:60.0.1-0.20.1"
 LABEL git_commit=$GIT_COMMIT
 
-ARG NODEJS_VERSION=8.10.0
+ARG NODEJS_VERSION=8.12.0
 ARG REACT_PRORJECT_SETUP_TOOL=~/ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources/scripts
 
 ##################
