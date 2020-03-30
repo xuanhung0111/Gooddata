@@ -42,7 +42,7 @@ public enum ReportType {
             return "TO SEGMENT BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
         }
     },
-
+    BULLET_CHART("bullet"),
     HEAD_LINE("headline"),
     BAR_CHART("bar"),
     STACKED_AREA_CHART("area") {
