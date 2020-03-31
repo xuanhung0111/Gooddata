@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -230,7 +232,11 @@ public class GoodSalesPivotTableReportTest extends AbstractAnalyseTest {
 
             WebElement attributeElement = pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0);
             String attributeStyle = attributeElement.getAttribute("style");
-            assertEquals(attributeStyle, "width: 200px; left: 0px; color: rgb(255, 0, 0);");
+            if (BrowserUtils.isFirefox()) {
+                assertEquals(attributeStyle, "width: 107px; left: 0px; color: rgb(255, 0, 0);");
+            } else {
+                assertEquals(attributeStyle, "width: 108px; left: 0px; color: rgb(255, 0, 0);");
+            }
         } finally {
             dashboardRequest.changeMetricFormat(metricUri, oldFormat);
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
@@ -247,7 +253,8 @@ public class GoodSalesPivotTableReportTest extends AbstractAnalyseTest {
             .waitForReportComputing()
             .getPivotTableReport()
             .sortBaseOnHeader(METRIC_NUMBER_OF_ACTIVITIES);
-
+        
+        Screenshots.takeScreenshot(browser,"makeSureReportRenderWhenSortingTabular", getClass());
         assertFalse(analysisPage.waitForReportComputing().isExplorerMessageVisible(),
             "Explorer message shouldn't be visible");
     }
