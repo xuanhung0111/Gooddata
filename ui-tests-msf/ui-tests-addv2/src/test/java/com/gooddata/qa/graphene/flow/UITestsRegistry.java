@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.bigquery.CleanUpBigQueryTest;
+import com.gooddata.qa.graphene.redshift.CleanUpDatasourceTest;
 import com.gooddata.qa.graphene.redshift.CleanUpRedShiftTest;
 import com.gooddata.qa.graphene.snowflake.DeployProcessTest;
 import com.gooddata.qa.graphene.snowflake.SegmentDeleteByLabelTest;
@@ -53,7 +54,8 @@ public class UITestsRegistry {
                 BigQuerySegmentLoadTest.class,
                 CleanUpSnowflakeTest.class,
                 CleanUpBigQueryTest.class,
-                CleanUpRedShiftTest.class
+                CleanUpRedShiftTest.class,
+                CleanUpDatasourceTest.class
         });
 
         TestsRegistry.getInstance()
