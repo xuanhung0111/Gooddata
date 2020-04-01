@@ -51,10 +51,6 @@ public class Widget extends AbstractFragment {
         return this;
     }
 
-    public void hoverOnOptionsButton() {
-        getActions().moveToElement(optionsButton).moveByOffset(1, 1).perform();
-    }
-
     public List<String> getLegends() {
         return waitForCollectionIsNotEmpty(legendNames).stream()
                 .map(e -> e.getText())

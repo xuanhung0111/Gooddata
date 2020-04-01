@@ -255,29 +255,13 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void cannotExportKPIWidgetAndHeadLineInsight() {
-        createInsightHasOnlyMetric(INSIGHT_HAS_HEAD_LINE_REPORT, ReportType.HEAD_LINE, singletonList(METRIC_AMOUNT));
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_HAS_HEAD_LINE_REPORT)
-            .addKpi(new KpiConfiguration.Builder().metric(METRIC_AMOUNT).dataSet(DATE_DATASET_CLOSED)
-            .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).build()).saveEditModeWithWidgets()
-            .selectDateFilterByName("All time")
-            .waitForWidgetsLoading();
-
-        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_HAS_HEAD_LINE_REPORT).hoverOnOptionsButton();
-        assertEquals(ElementUtils.getBubbleMessage(browser), "Export is not supported");
-
-        indigoDashboardsPage.selectWidgetByHeadline(Kpi.class, METRIC_AMOUNT).hoverOnOptionsButton();
-        assertEquals(ElementUtils.getBubbleMessage(browser), "Export is not supported");
-    }
-
-    @Test(dependsOnGroups = "createProject")
     public void exportInsightIsRenderedWithEmbedding() throws IOException {
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT)
             .addColumnsAttribute(ATTR_FORECAST_CATEGORY).saveInsight(INSIGHT_EMBEDDED).waitForReportComputing();
 
-        initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL)
-            .waitForDashboardLoad().waitForWidgetsLoading().switchToEditMode().addInsight(INSIGHT_EMBEDDED)
-            .saveEditModeWithWidgets().waitForWidgetsLoading()
+        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_EMBEDDED)
+            .changeDashboardTitle("Embedded Dashboard").saveEditModeWithWidgets().waitForWidgetsLoading();
+        initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL).waitForWidgetsLoading()
             .openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
 
         indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, INSIGHT_EMBEDDED)
