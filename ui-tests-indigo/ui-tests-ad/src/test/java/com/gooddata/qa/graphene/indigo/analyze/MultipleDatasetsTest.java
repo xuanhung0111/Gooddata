@@ -55,17 +55,6 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         uploadPayrollDataset();
     }
 
-    //force FF to refresh after each test
-    //because FF is only refreshed when url is different from previous one
-    @BeforeMethod
-    public void refreshStartPage(Method m) {
-        if (!m.getDeclaringClass().equals(this.getClass())) return;
-
-        if (m.getAnnotation(Test.class) != null) {
-            browser.navigate().refresh();
-        }
-    }
-
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
         initAnalysePage().getCatalogPanel().changeDataset(PRODUCTION_DATASET);
