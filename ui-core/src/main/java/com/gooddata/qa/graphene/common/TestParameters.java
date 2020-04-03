@@ -360,6 +360,13 @@ public class TestParameters {
         return this.hostProxy;
     }
 
+    /**
+     * If test run under proxy the backend url is proxy url
+     */
+    public String getBackendUrl() {
+        return isHostProxy() ? this.hostProxy : this.host;
+    }
+
     public String getLanguageCode() {
         return languageCode;
     }
