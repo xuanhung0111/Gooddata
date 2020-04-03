@@ -72,11 +72,11 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private void checkSuccessfulNotification(Document message, String datasetName) {
         checkGeneralNotification(message);
-        String datasetUrl = format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
+        String datasetUrl = format(DATASET_LINK, testParams.getBackendUrl(), testParams.getProjectId(),
                 getDatasetId(datasetName));
         assertEquals(message.getElementsContainingText(datasetName).attr("href"), datasetUrl);
 
-        String analysisUrl = format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
+        String analysisUrl = format(AD_REPORT_LINK, testParams.getBackendUrl(), testParams.getProjectId(),
                 getDatasetId(datasetName));
         assertEquals(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
                 analysisUrl);
@@ -84,7 +84,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private void checkGeneralNotification(Document message) {
         String backendProjectUrl = format(PROJECT_PAGE_URL,
-                testParams.getHostProxy().isEmpty() ? testParams.getHost() : testParams.getHostProxy(),
+                testParams.getBackendUrl(),
                 testParams.getProjectId());
         assertEquals(message.getElementsMatchingOwnText(projectTitle).attr("href"), backendProjectUrl);
         assertEquals(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
