@@ -224,7 +224,7 @@ public class PivotTableReport extends AbstractFragment {
             .click();
         // Because the mouse pointer hovered the attribute which is sorted, so making unexpected result
         // Move the mouse pointer to the top-left corner of the fragment to avoid this
-        ElementUtils.moveToElementActions(getRoot(), 0, 0).perform();
+        ElementUtils.moveToTopLetCorner();
         return this;
     }
 
