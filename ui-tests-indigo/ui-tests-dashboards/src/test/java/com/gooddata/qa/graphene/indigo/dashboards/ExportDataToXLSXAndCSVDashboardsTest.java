@@ -3,20 +3,17 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
@@ -33,9 +30,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 
 import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
@@ -133,125 +128,113 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getDataCheckMergeCellsAndUncheckFiltersContext")
     public void exportXLSXWith_CheckMergeCellsAnd_UncheckFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
-        try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
-                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
-                .selectStaticPeriod("01/01/2006", "01/01/2020")
-                .apply();
-            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
-                .exportTo(File.XLSX);
+        String insightExported = insight + generateHashString();
+        initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+            .getWidgetByHeadline(Insight.class, insight).setHeadline(insightExported);
+        indigoDashboardsPage.saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2006", "01/01/2020")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+            .exportTo(File.XLSX);
 
-            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
-            exportXLSXDialog.uncheckOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.uncheckOption(OptionalExport.FILTERS_CONTEXT).confirmExport();
 
-            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + insight + "." + ExportFormat.EXCEL_XLSX.getName());
+        final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + insightExported + "." + ExportFormat.EXCEL_XLSX.getName());
 
-            waitForExporting(exportFile);
-            log.info(insight + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
-            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
-        } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(insight + "." + ExportFormat.EXCEL_XLSX.getName())));
-        }
+        waitForExporting(exportFile);
+        log.info(insightExported + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getDataUnCheckMergeCellsAndFiltersContext")
     public void exportXLSXWith_UnCheckMergeCellsAndFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
-        try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
-                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
-                .selectStaticPeriod("01/01/2006", "01/01/2020")
-                .apply();
-            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
-                .exportTo(File.XLSX);
+        String insightExported = insight + generateHashString();
+        initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+            .getWidgetByHeadline(Insight.class, insight).setHeadline(insightExported);
+        indigoDashboardsPage.saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2006", "01/01/2020")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+            .exportTo(File.XLSX);
 
-            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
-            exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).uncheckOption(OptionalExport.FILTERS_CONTEXT)
-                .confirmExport();
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).uncheckOption(OptionalExport.FILTERS_CONTEXT)
+            .confirmExport();
 
-            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + insight + "." + ExportFormat.EXCEL_XLSX.getName());
+        final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + insightExported + "." + ExportFormat.EXCEL_XLSX.getName());
 
-            waitForExporting(exportFile);
-            log.info(insight + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
-            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
-        } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(insight + "." + ExportFormat.EXCEL_XLSX.getName())));
-        }
+        waitForExporting(exportFile);
+        log.info(insightExported + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getDataCheckMergeCellsAndFiltersContext")
     public void exportXLSXWith_CheckMergeCellsAndFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
-        try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
-                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
-                .selectStaticPeriod("01/01/2006", "01/01/2020")
-                .apply();
-            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
-                .exportTo(File.XLSX);
+        String insightExported = insight + generateHashString();
+        initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+            .getWidgetByHeadline(Insight.class, insight).setHeadline(insightExported);
+        indigoDashboardsPage.saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2006", "01/01/2020")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+            .exportTo(File.XLSX);
 
-            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
-            exportXLSXDialog.checkOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
-                .confirmExport();
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.checkOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
+            .confirmExport();
 
-            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + insight + "." + ExportFormat.EXCEL_XLSX.getName());
+        final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + insightExported + "." + ExportFormat.EXCEL_XLSX.getName());
 
-            waitForExporting(exportFile);
-            log.info(insight + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
-            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
-        } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(insight + "." + ExportFormat.EXCEL_XLSX.getName())));
-        }
+        waitForExporting(exportFile);
+        log.info(insightExported + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getDataUnCheckMergeCellsAndCheckFiltersContext")
     public void exportXLSXWith_UnCheckMergeCellsAnd_CheckFiltersContext(String insight, List<List<String>> expectedResult)
         throws IOException {
-        try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
-                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
-                .selectStaticPeriod("01/01/2006", "01/01/2020")
-                .apply();
-            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
-                .exportTo(File.XLSX);
+        String insightExported = insight + generateHashString();
+        initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+            .getWidgetByHeadline(Insight.class, insight).setHeadline(insightExported);
+        indigoDashboardsPage.saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectStaticPeriod("01/01/2006", "01/01/2020")
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+            .exportTo(File.XLSX);
 
-            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
-            exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
-                .confirmExport();
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.uncheckOption(OptionalExport.CELL_MERGED).checkOption(OptionalExport.FILTERS_CONTEXT)
+            .confirmExport();
 
-            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + insight + "." + ExportFormat.EXCEL_XLSX.getName());
+        final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + insightExported + "." + ExportFormat.EXCEL_XLSX.getName());
 
-            waitForExporting(exportFile);
-            log.info(insight + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
-            assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
-        } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(insight + "." + ExportFormat.EXCEL_XLSX.getName())));
-        }
+        waitForExporting(exportFile);
+        log.info(insightExported + ":" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), expectedResult);
     }
 
     @Test(dependsOnMethods = "prepareInsights", dataProvider = "getSavedInsightCSV")
     public void exportInsightsIntoCSVFormat(String insight, List<List<String>> expectedResult) throws IOException {
-        try {
-            initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
-                .saveEditModeWithWidgets().openExtendedDateFilterPanel()
-                .selectPeriod(DateRange.ALL_TIME)
-                .apply();
-            indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
-                .exportTo(File.CSV);
+        initIndigoDashboardsPage().addDashboard().addInsight(insight).waitForWidgetsLoading()
+            .saveEditModeWithWidgets().openExtendedDateFilterPanel()
+            .selectPeriod(DateRange.ALL_TIME)
+            .apply();
+        indigoDashboardsPage.waitForWidgetsLoading().selectFirstWidget(Insight.class)
+            .exportTo(File.CSV);
 
-            final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + insight + "." + ExportFormat.CSV.getName());
+        final java.io.File exportFile = new java.io.File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + insight + "." + ExportFormat.CSV.getName());
 
-            waitForExporting(exportFile);
-            log.info(insight + ":" + CSVUtils.readCsvFile(exportFile));
-            assertEquals(CSVUtils.readCsvFile(exportFile), expectedResult);
-        } finally {
-            deleteIfExists(Paths.get(testParams.getExportFilePath(insight + "." + ExportFormat.CSV.getName())));
-        }
+        waitForExporting(exportFile);
+        log.info(insight + ":" + CSVUtils.readCsvFile(exportFile));
+        assertEquals(CSVUtils.readCsvFile(exportFile), expectedResult);
     }
 
     @Test(dependsOnGroups = "createProject")
