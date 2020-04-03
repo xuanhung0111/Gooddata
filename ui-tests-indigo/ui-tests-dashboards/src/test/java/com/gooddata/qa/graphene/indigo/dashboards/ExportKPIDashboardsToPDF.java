@@ -207,7 +207,8 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
                 asList("–", "No data for your filter selection", "Insight No Data", KD_HAS_NO_DATA + " " + today,
                     "Page 1/1") },
             { KD_HAS_XSS_SPECIAL_UNICODE,
-                asList("<button>% of Goal</button> @#$%^&*()âêûťžŠô Metric has long name which is… Tiếng Việt ພາສາລາວ résumé",
+                asList("<button>% of Goal</button> @#$%^&*()âêûťžŠô Metric has long name which is" +
+                                " used to test shorten be applied Metric has long name w… Tiếng Việt ພາສາລາວ résumé",
                     "<button>1.00</button> 1 1 1", "Insight XSS", KD_HAS_XSS_SPECIAL_UNICODE + " " + today, "Page 1/1") },
             { KD_HAS_HEADER,
                 asList("Title", "Description", "–", METRIC_AMOUNT, KD_HAS_HEADER + " " + today, "Page 1/1") },
