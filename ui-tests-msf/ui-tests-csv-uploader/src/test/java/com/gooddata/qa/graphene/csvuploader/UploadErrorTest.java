@@ -66,8 +66,8 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
                 {withoutFact, asList(DATA_WITHOUT_FACT)},
                 {invalidDelimiter, asList(DATA_WITHOUT_FACT)},
                 {BAD_STRUCTURE_FILE, asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
-                {tooManyColumns, asList(format(TOO_MANY_COLUMNS_ERROR, 1, 250))},
-                {tooLongField, asList(format(TOO_LONG_TEXT_OF_COLUMN, 2, 255))},
+//                {tooManyColumns, asList(format(TOO_MANY_COLUMNS_ERROR, 1, 250))},
+//                {tooLongField, asList(format(TOO_LONG_TEXT_OF_COLUMN, 2, 255))},
                 {crazyData, asList("There are 5 rows containing less columns than the header row: 44-48.",
                         "There are 5 rows without at least one numerical value: 44-48. "
                                 + "Each row must contain numerical data for analysis.")}
