@@ -134,7 +134,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
                 .addFilter("Education", "Bachelors Degree", "Partial High School");
         analysisPage.waitForReportComputing();
         takeScreenshot(browser, "add-metric-filter-after-switching-dataset", getClass());
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("171,741.48", "2,553,804.79"),
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("171,741.48", "2,553,804.80"),
                 "Metric filter was not applied");
     }
 
