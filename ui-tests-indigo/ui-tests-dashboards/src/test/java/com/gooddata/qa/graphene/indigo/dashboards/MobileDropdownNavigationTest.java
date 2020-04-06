@@ -101,7 +101,7 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
             HamburgerMenu hamburgerMenu = Header.getInstance(browser).openHamburgerMenu();
             takeScreenshot(browser, "hamburger-menu-test-with-" + role, getClass());
             assertEquals(hamburgerMenu.getAllMenuItems(),
-                    asList("Dashboards", "Reports", "KPIs", "Analyze", "Load", "Manage"));
+                    asList("Dashboards", "Reports", "KPIs", "Analyze", "Load", "Manage", "Help"));
             hamburgerMenu.goToPage("Analyze");
             assertThat(browser.getCurrentUrl(), containsString("analyze/#/"+ testParams.getProjectId()));
         } finally {

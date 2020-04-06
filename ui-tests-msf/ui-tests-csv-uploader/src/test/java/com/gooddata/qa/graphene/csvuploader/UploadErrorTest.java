@@ -32,9 +32,9 @@ import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     private static final String TOO_MANY_COLUMNS_ERROR =
-            "Row %s contains a value that exceeds the limit of characters, or has more than the limit of %s columns.";
+            "Row %s has more than the limit of %s columns.";
     private static final String TOO_LONG_TEXT_OF_COLUMN =
-            "Row %s contains a value that exceeds the limit of %s characters, or has more than the limit of columns.";
+            "Row %s contains a value that exceeds the limit of %s characters.";
     private static final String ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW =
             "Row %s contains more columns than the header row.";
     private static final String DATA_WITHOUT_FACT =
@@ -66,7 +66,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
                 {withoutFact, asList(DATA_WITHOUT_FACT)},
                 {invalidDelimiter, asList(DATA_WITHOUT_FACT)},
                 {BAD_STRUCTURE_FILE, asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
-                {tooManyColumns, asList(format(TOO_MANY_COLUMNS_ERROR, 1))},
+                {tooManyColumns, asList(format(TOO_MANY_COLUMNS_ERROR, 1, 250))},
                 {tooLongField, asList(format(TOO_LONG_TEXT_OF_COLUMN, 2, 255))},
                 {crazyData, asList("There are 5 rows containing less columns than the header row: 44-48.",
                         "There are 5 rows without at least one numerical value: 44-48. "

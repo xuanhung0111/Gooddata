@@ -58,7 +58,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
             ReportType.LINE_CHART.getFormat(), ReportType.STACKED_AREA_CHART.getFormat(), ReportType.COMBO_CHART.getFormat(),
             ReportType.HEAD_LINE.getFormat(), ReportType.SCATTER_PLOT.getFormat(), ReportType.BUBBLE_CHART.getFormat(),
             ReportType.PIE_CHART.getFormat(), ReportType.DONUT_CHART.getFormat(),
-            ReportType.TREE_MAP.getFormat(), ReportType.HEAT_MAP.getFormat());
+            ReportType.TREE_MAP.getFormat(), ReportType.HEAT_MAP.getFormat(), ReportType.BULLET_CHART.getFormat());
     private List<String> listRecommendedDate = Arrays.asList(DATE_DATASET_CLOSED, DATE_DATASET_CREATED,
             DATE_DATASET_ACTIVITY, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
 

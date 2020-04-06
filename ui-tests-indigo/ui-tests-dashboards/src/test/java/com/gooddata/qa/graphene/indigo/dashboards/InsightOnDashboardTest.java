@@ -60,7 +60,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
         // ignore checking existing of insight panel
         // because below assertions definitely fail in that case
-        assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterActive(FilterType.BY_ME),
+        assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterActive(FilterType.ALL),
                 "Created by me tab is not default filter");
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterVisible(FilterType.ALL),
                 "All tab is not visible in filter section");
