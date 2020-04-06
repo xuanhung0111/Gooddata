@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
@@ -17,6 +18,7 @@ import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.annotations.Test;
 
@@ -59,6 +61,7 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
     private static final String INSIGHT_EXPORTED = "Insight exported";
 
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
     private String sourceProjectId;
     private String targetProjectId;
     private String insightJsonObject;
@@ -88,6 +91,8 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
         metrics.createAmountBOPMetric();
 
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_TABLE_COLUMN_AUTO_RESIZING, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -112,6 +117,7 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
     public void sortOnGroupedPivotTable() {
         PivotTableReport pivotTableReport = initAnalysePage()
             .openInsight(INSIGHT_HAS_MEASURES_AND_ATTRIBUTES_COLUMN_AND_ROW).getPivotTableReport();
+        analysisPage.waitForReportComputing();
         pivotTableReport.sortBaseOnHeader(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
 
@@ -131,6 +137,11 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
             "Inside Sales", "East Coast", "West Coast"));
 
         analysisPage.addDate().waitForReportComputing();
+        pivotTableReport.sortBaseOnHeader(ATTR_DEPARTMENT);
+        analysisPage.waitForReportComputing();
+
+        pivotTableReport.sortBaseOnHeader(ATTR_DEPARTMENT);
+        analysisPage.waitForReportComputing();
         assertEquals(pivotTableReport.getRowAttributeColumns(), asList("Direct Sales", "East Coast", "2010", "2011",
             "2012", "2013", "2014", "2016", "West Coast", "2010", "2011", "2012", "2013", "Inside Sales", "East Coast",
             "2010", "2011", "2012", "2013", "West Coast", "2010", "2011", "2012", "2013", "2014", "2017"));
@@ -265,6 +276,7 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
                 Pair.of(ATTR_FORECAST_CATEGORY, Type.COLUMNS)));
 
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(insight).getPivotTableReport();
+        analysisPage.waitForReportComputing();
         pivotTableReport.sortBaseOnHeader(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
 
