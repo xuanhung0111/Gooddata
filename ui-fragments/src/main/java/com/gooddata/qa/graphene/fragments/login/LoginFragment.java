@@ -36,6 +36,9 @@ public class LoginFragment extends AbstractFragment {
     @FindBy(css = ".s-registration-link")
     private WebElement registrationLink;
 
+    @FindBy(className = "s-btn-use_organisation_login")
+    private WebElement useOrganisationLoginButton;
+
     private static final String ERROR_CLASS = "has-error";
     private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".login-message.is-success");
 
@@ -63,6 +66,10 @@ public class LoginFragment extends AbstractFragment {
             waitForElementNotVisible(this.getRoot());
             waitForElementNotVisible(email);
         }
+    }
+
+    public void clickUseLoginOrganisation() {
+        waitForElementVisible(useOrganisationLoginButton).click();
     }
 
     public boolean allLoginElementsAvailable() {

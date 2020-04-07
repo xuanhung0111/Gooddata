@@ -19,6 +19,7 @@ public class TestParameters {
     private Properties testVariables;
     private long createProjectTimeout;
     private String host;
+    private String isolatedDomainSalesForce;
     private String projectId;
     private String domainUser = null;
     private String user;
@@ -89,6 +90,7 @@ public class TestParameters {
         this.testVariables = testVariables;
         this.createProjectTimeout = Long.parseLong(loadProperty("createProjectTimeout"));
         host = loadProperty("host");
+        isolatedDomainSalesForce = loadProperty("isolatedDomainSalesForce");
         user = loadProperty("user");
         password = loadProperty("password");
         snowflakePassword = loadProperty("snowflakePassword");
@@ -162,6 +164,10 @@ public class TestParameters {
 
     public String getHost() {
         return host;
+    }
+
+    public String getIsolatedDomainSalesForce() {
+        return isolatedDomainSalesForce;
     }
 
     public String getProjectId() {
