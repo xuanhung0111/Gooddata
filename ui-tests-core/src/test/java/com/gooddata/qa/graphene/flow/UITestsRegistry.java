@@ -120,6 +120,7 @@ import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDashboardTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogFiltersTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogRecurrenceTest;
 import com.gooddata.qa.graphene.rolap.GoodSalesMetadataDeletedTest;
+import com.gooddata.qa.graphene.schedules.SingleSignOnTest;
 import com.gooddata.qa.utils.flow.PredefineParameterTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -330,6 +331,10 @@ public class UITestsRegistry {
             "testng-imap-GoodSales-email-schedule-saved-view-embedded-dashboard.xml",
             "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml",
             "testng-imap-GoodSales-email-schedule-report.xml",
+        });
+
+        suites.put("sso", new Object[] {
+            "testng-imap-SSO.xml"
         });
 
         suites.put("misc", new Object[] {
