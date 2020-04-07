@@ -40,11 +40,15 @@ public class Header extends AbstractFragment {
     private List<WebElement> measureMenuItems;
 
     public Optional<WebElement> getDashboardMenuItem() {
-        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-dashboards")).findAny();
+        return measureMenuItems.stream()
+                .filter(item -> item.findElement(By.tagName("span")).getAttribute("class").contains("s-menu-dashboards"))
+                .findAny();
     }
 
     public Optional<WebElement> getReportMenuItem() {
-        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-reports")).findAny();
+        return measureMenuItems.stream()
+                .filter(item -> item.findElement(By.tagName("span")).getAttribute("class").contains("s-menu-reports"))
+                .findAny();
     }
 
     public Optional<WebElement> getActiveMenuItem() {
@@ -52,7 +56,9 @@ public class Header extends AbstractFragment {
     }
 
     public Optional<WebElement> getManageMenuItem() {
-        return measureMenuItems.stream().filter(item -> item.getAttribute("class").contains("s-menu-manage")).findAny();
+        return measureMenuItems.stream()
+                .filter(item -> item.findElement(By.tagName("span")).getAttribute("class").contains("s-menu-manage"))
+                .findAny();
     }
 
     public static final Header getInstance(SearchContext searchContext) {
