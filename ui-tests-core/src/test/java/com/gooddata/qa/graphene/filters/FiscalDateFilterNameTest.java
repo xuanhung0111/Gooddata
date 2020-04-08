@@ -141,7 +141,7 @@ public class FiscalDateFilterNameTest extends AbstractDashboardWidgetTest {
         TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
         List<String> filters = tableReport.getAllFilterNames();
         assertEquals(filters, EXPECTED_FILTERS_IN_REPORT,
-                "actual filter list in report " + tableReport.getReportTiTle() + " does not match expected");
+                "actual filter list in report " + tableReport.getReportTitle() + " does not match expected");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -162,7 +162,7 @@ public class FiscalDateFilterNameTest extends AbstractDashboardWidgetTest {
         TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
         List<String> filterNames = tableReport.openReportInfoViewPanel().getAllFilterNames();
         assertEquals(filterNames, EXPECTED_FILTERS_IN_REPORT,
-                "actual filter list in report " + tableReport.getReportTiTle() + " does not match expected");
+                "actual filter list in report " + tableReport.getReportTitle() + " does not match expected");
     }
 
     @Test(dependsOnGroups = {"createProject"})

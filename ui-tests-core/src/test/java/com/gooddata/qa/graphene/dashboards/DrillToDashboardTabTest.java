@@ -454,7 +454,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(reportAfterDrillAction.getAttributeHeaders(), singletonList(ATTR_OPPORTUNITY),
                     REPORT_TOP_5_OPEN_BY_CASH + "report is not displayed after drill action");
             reportAfterDrillAction.drillOnFirstValue(CellType.METRIC_VALUE);
-            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded().getReportTiTle(),
+            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded().getReportTitle(),
                     REPORT_TOP_5_OPEN_BY_CASH, REPORT_TOP_5_OPEN_BY_CASH + " and " + SECOND_TAB + " are not displayed");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())

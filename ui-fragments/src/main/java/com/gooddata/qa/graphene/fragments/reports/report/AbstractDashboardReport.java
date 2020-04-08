@@ -84,7 +84,7 @@ public class AbstractDashboardReport extends AbstractReport {
         return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
     }
 
-    public String getReportTiTle() {
+    public String getReportTitle() {
         return waitForElementVisible(getRoot().findElement(REPORT_TITLE)).getText();
     }
 }

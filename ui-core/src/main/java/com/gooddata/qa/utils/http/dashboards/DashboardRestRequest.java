@@ -152,6 +152,13 @@ public class DashboardRestRequest extends CommonRestRequest {
         throw new RuntimeException("No tab matches with title: " + tabTitle);
     }
 
+    public String getDashboardId(String dashboardTitle) throws JSONException, IOException {
+         return getJsonObject(getDashboardUri(dashboardTitle))
+            .getJSONObject("projectDashboard")
+            .getJSONObject("meta")
+            .getString("identifier");
+    }
+
     /**
      * Set default dashboard content
      *

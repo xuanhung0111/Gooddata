@@ -97,7 +97,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
                             dashboardsPage.getTabs().getSelectedTab().getLabel().equals(TAB_ON_PRIVATE_DASHBOARD);
             Graphene.waitGui().until(targetTabIsLoaded);
 
-            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTiTle(),
+            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTitle(),
                     REPORT_TOP_SALES_REPS_BY_WON_AND_LOST);
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
