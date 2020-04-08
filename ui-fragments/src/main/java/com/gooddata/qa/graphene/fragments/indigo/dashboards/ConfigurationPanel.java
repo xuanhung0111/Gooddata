@@ -273,12 +273,12 @@ public class ConfigurationPanel extends AbstractFragment {
 
         public static class DrillConfigPanel extends AbstractFragment {
 
-            @FindBy(className = "s-choose_action___")
+            @FindBy(className = "s-choose_action_")
             private WebElement chooseAction;
 
             public static By ROOT = className("s-drill-config-panel");
             public static By DRILL_TO_INSIGHT = className("s-drilltoinsight");
-            public static By CHOOSE_INSIGHT = className("s-choose_insight___");
+            public static By CHOOSE_INSIGHT = className("s-choose_insight_");
 
             public static DrillConfigPanel getInstance(SearchContext searchContext) {
                 WebElement root = waitForElementVisible(ROOT, searchContext);
