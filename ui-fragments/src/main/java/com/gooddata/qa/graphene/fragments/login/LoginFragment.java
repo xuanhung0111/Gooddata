@@ -36,7 +36,7 @@ public class LoginFragment extends AbstractFragment {
     @FindBy(css = ".s-registration-link")
     private WebElement registrationLink;
 
-    @FindBy(className = "s-btn-use_organisation_login")
+    @FindBy(className = "s-btn-use_organization_login")
     private WebElement useOrganisationLoginButton;
 
     private static final String ERROR_CLASS = "has-error";

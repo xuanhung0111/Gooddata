@@ -43,6 +43,7 @@ public class WorkspaceHeader extends Header {
 
     public void verifyKpiDashboardMenuActive() {
         Optional<WebElement> activeItem = this.getActiveMenuItem();
-        assertTrue(activeItem.get().getAttribute("class").contains("s-menu-kpis"), "Kpi db is not default active menu");
+        assertTrue(activeItem.get().findElement(By.tagName("span")).getAttribute("class").contains("s-menu-kpis"),
+                "Kpi db is not default active menu");
     }
 }

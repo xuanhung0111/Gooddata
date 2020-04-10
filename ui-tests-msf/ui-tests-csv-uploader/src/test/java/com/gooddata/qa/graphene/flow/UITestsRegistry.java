@@ -29,7 +29,7 @@ public class UITestsRegistry {
             DataPreviewAfterUploadTest.class,
             DeleteDatasetTest.class,
             EmptyStateTest.class,
-//            UploadErrorTest.class,
+            UploadErrorTest.class,
             UploadTest.class,
             UploadDateTest.class,
             ProjectSwitchTest.class,
