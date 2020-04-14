@@ -7,21 +7,19 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
-
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ToolBar extends AbstractFragment {
-    private static final By TOOLBAR =  By.className("gdc-ldm-toolbar");
+    private static final By TOOLBAR = By.className("gdc-ldm-toolbar");
 
-    @FindBy(className = "gd-button-text")
-    private List<WebElement> buttons;
+    @FindBy(className = "s-publish")
+    private WebElement btnPublishOnToolbar;
 
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
     }
 
-    public boolean isButtonsVisible() {
-        return buttons.size() == 1 ? true : false;
+    public void clickPublish() {
+        btnPublishOnToolbar.click();
     }
 }
