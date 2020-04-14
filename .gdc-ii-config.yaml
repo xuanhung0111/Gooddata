@@ -64,6 +64,10 @@ integratedTests:
     path: .
     vault:
       QA_TEST_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-user"
+      SNOWFLAKE_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-snowflake-user"
+      BIGQUERY_PRIVATE_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-bigquery-user"
+      REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
+      REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
@@ -73,14 +77,27 @@ integratedTests:
       -pl ui-tests-msf/ui-tests-modeler
       -Dtest.module=ui-tests-msf/ui-tests-modeler
       -Dtestng.suite.xml=testng-msf-web-modeler.xml
-      -Dhost=staging.intgdc.com
+      -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
+      -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
+      -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
+      -DsnowflakeUserName=autoqasnowflake
+      -DsnowflakeJdbcUrl=jdbc:snowflake://gooddata.snowflakecomputing.com
+      -DredshiftPassword="$REDSHIFT_USER_PASSWORD"
+      -DredshiftUserName=qatest
+      -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
+      -DredshiftIAMDbUser=redshiftdevunloader
+      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
+      -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
+      -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
+      -Dhost=staging2.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
       -Dproject.authorizationToken=pgtestingauto01
       -Dproject.dwhDriver=pg -DdeleteMode=delete_if_successful
       -DuseDynamicUser=true
-    image: harbor.intgdc.com/staging/graphene-chrome:latest
+    image: harbor.intgdc.com/staging/graphene-firefox:latest
     artifacts:
       - '**/target/screenshots/**'
       - '**/target/media/video/**/**_failed.mp4'

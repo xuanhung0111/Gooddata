@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.modeler;
 
-import com.gooddata.project.ProjectService;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
-import com.gooddata.qa.utils.http.RestClient;
 
 public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
 
