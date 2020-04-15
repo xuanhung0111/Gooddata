@@ -74,6 +74,8 @@ integratedTests:
       - 'HOME=$HOME'
     command: >-
       ./integration-mvn-test.sh
+      -Dtest.execution.env=local-firefox
+      -DfirefoxDriverBinaryPath=/bin/geckodriver
       -pl ui-tests-msf/ui-tests-modeler
       -Dtest.module=ui-tests-msf/ui-tests-modeler
       -Dtestng.suite.xml=testng-msf-web-modeler.xml
@@ -121,6 +123,9 @@ integratedTests:
       - 'HOME=$HOME'
     command: >-
       ./integration-mvn-test.sh
+      -Dtest.execution.env=local-chrome
+      -DchromeDriverBinaryPath=/bin/chromedriver
+      -DchromeDriverArguments=no-sandbox
       -pl ui-tests-msf/ui-tests-datasourceapp
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
@@ -168,6 +173,9 @@ integratedTests:
     image: harbor.intgdc.com/staging/graphene-chrome:latest
     command: >-
       ./integration-mvn-test.sh
+      -Dtest.execution.env=local-chrome
+      -DchromeDriverBinaryPath=/bin/chromedriver
+      -DchromeDriverArguments=no-sandbox
       -pl ui-tests-core,ui-tests-msf/ui-tests-add,ui-tests-msf/ui-tests-addv2
       -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
