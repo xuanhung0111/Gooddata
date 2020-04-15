@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
+import com.gooddata.qa.graphene.fragments.common.FilterContextHerokuAppPage;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -14,6 +15,7 @@ import org.jboss.arquillian.graphene.Graphene;
 
 public abstract class AbstractEmbeddedModeTest extends AbstractDashboardWidgetTest {
 
+    protected static final String HEROKU_APP_LINK = "https://test-filter-context.herokuapp.com";
     protected String embeddedUri;
     protected String embeddedReportUri;
 
@@ -60,4 +62,9 @@ public abstract class AbstractEmbeddedModeTest extends AbstractDashboardWidgetTe
         }
     }
     //--------------------------Embedded Report - Finish ---------------------------------------
+
+    public FilterContextHerokuAppPage initFilterContextHerokuAppPage() {
+        browser.get(HEROKU_APP_LINK);
+        return FilterContextHerokuAppPage.getInstance(browser);
+    }
 }

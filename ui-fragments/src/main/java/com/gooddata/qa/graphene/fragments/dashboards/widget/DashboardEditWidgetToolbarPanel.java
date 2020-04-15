@@ -49,7 +49,10 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
 
     private static DashboardEditWidgetToolbarPanel getInstanceFor(WebElement element,
             SearchContext searchContext) {
-        waitForElementVisible(element).click();
+        if (!isElementVisible(LOCATOR, searchContext)) {
+            waitForElementVisible(element).click();
+        }
+
         return Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
                 waitForElementVisible(LOCATOR, searchContext));
     }
