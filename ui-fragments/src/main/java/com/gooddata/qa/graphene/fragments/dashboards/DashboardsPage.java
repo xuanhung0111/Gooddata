@@ -272,19 +272,19 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String exportDashboardToXLSX() {
-        int exportingTextDisplayedTimeoutInSeconds = 600;
-        String dashboardName = getDashboardName();
         openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.confirmExport();
 
-        String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
-        waitForElementVisible(BY_EXPORTING_PANEL, browser);
-        sleepTightInSeconds(3);
-        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
-        sleepTightInSeconds(3);
+        return waitForExportingXLSX(exportXLSXDialog);
+    }
 
-        return fileName;
+    public String exportDashboardToXLSXWithUnMergedCell() {
+        openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.unCheckCellMerged().confirmExport();
+
+        return waitForExportingXLSX(exportXLSXDialog);
     }
 
     public boolean isPrintButtonVisible() {
@@ -748,6 +748,27 @@ public class DashboardsPage extends AbstractFragment {
         return this.addTextToDashboard(TextObject.HEADLINE, "GoodData", "gooddata.com").saveDashboard();
     }
 
+    public void hasNotSAC(){
+        openPermissionsDialog().checkShareAll().submit();
+    }
+
+    public void hasSAC(){
+        openPermissionsDialog().unCheckShareAll().submit();
+    }
+
+    public void addUserGroup(PermissionsDialog permissionsDialog, AddGranteesDialog addGranteesDialog , String userRoles){
+        selectCandidatesAndShare(addGranteesDialog, userRoles);
+        permissionsDialog.submit();
+    }
+
+    public void takeToMyDashboard(){
+        waitForElementVisible(By.cssSelector("#strictAccessControl > a"), browser).click();
+    }
+
+    public String getDashboardNoPermissionAccessText(){
+        return waitForElementVisible(By.cssSelector("#strictAccessControl > p.noPermissionAccess"), browser).getText();
+    }
+
     private DashboardMenu openDashboardMenu() {
         waitForElementVisible(dashboardSwitcherButton);
         if (dashboardSwitcherButton.getAttribute("class").contains("disabled")) {
@@ -782,20 +803,6 @@ public class DashboardsPage extends AbstractFragment {
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
     }
 
-    public void hasNotSAC(){
-        openPermissionsDialog().checkShareAll().submit();
-    }
-
-    public void hasSAC(){
-        openPermissionsDialog().unCheckShareAll().submit();
-    }
-
-    public void addUserGroup(PermissionsDialog permissionsDialog, AddGranteesDialog addGranteesDialog , String userRoles){
-        selectCandidatesAndShare(addGranteesDialog, userRoles);
-        permissionsDialog.submit();
-
-    }
-
     private void selectCandidatesAndShare(AddGranteesDialog addGranteesDialog, String... candidates) {
         selectCandidates(addGranteesDialog, candidates);
         addGranteesDialog.share();
@@ -808,11 +815,15 @@ public class DashboardsPage extends AbstractFragment {
         }
     }
 
-    public void takeToMyDashboard(){
-        waitForElementVisible(By.cssSelector("#strictAccessControl > a"), browser).click();
-    }
+    private String waitForExportingXLSX(ExportXLSXDialog exportXLSXDialog) {
+        int exportingTextDisplayedTimeoutInSeconds = 600;
+        String dashboardName = getDashboardName();
+        String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
+        waitForElementVisible(BY_EXPORTING_PANEL, browser);
+        sleepTightInSeconds(3);
+        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
+        sleepTightInSeconds(3);
 
-    public String getDashboardNoPermissionAccessText(){
-        return waitForElementVisible(By.cssSelector("#strictAccessControl > p.noPermissionAccess"), browser).getText();
+        return fileName;
     }
 }

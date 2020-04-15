@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -77,6 +78,13 @@ public class ReportInfoViewPanel extends AbstractFragment {
         waitForElementVisible(downloadAsButton).click();
 
         SimpleMenu.getInstance(browser).select(format.getLabel());
+    }
+
+    public void downloadXLSXReportWithUnMergeCell() {
+        waitForElementVisible(downloadAsButton).click();
+
+        SimpleMenu.getInstance(browser).select(ExportFormat.EXCEL_XLSX.getLabel());
+        ExportXLSXDialog.getInstance(browser).unCheckCellMerged().confirmExport();
     }
 
     private List<String> getAllFilterOrMetricNames(List<WebElement> filtersOrMetrics) {

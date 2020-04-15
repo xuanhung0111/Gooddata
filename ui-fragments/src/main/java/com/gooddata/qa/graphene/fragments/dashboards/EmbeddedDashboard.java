@@ -59,19 +59,21 @@ public class EmbeddedDashboard extends DashboardsPage {
     }
 
     public String exportDashboardToXLSX(String dashboardName) {
-        int exportingTextDisplayedTimeoutInSeconds = 600;
         openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.confirmExport();
-        String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
 
-        waitForElementVisible(BY_EXPORTING_PANEL, browser);
-        sleepTightInSeconds(3);
-        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
-        sleepTightInSeconds(3);
-
-        return fileName;
+        return waitForExportingXLSX(dashboardName, exportXLSXDialog);
     }
+
+    public String exportDashboardToXLSXWithUnMergedCell(String dashboardName) {
+        openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.unCheckCellMerged().confirmExport();
+
+        return waitForExportingXLSX(dashboardName, exportXLSXDialog);
+    }
+
 
     @Override
     public DashboardEditBar editDashboard() {
@@ -99,5 +101,17 @@ public class EmbeddedDashboard extends DashboardsPage {
         browser.get(embeddedUri);
         waitForReportLoaded(browser);
         return this;
+    }
+
+    private String waitForExportingXLSX(String dashboardName, ExportXLSXDialog exportXLSXDialog) {
+        int exportingTextDisplayedTimeoutInSeconds = 600;
+        String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
+
+        waitForElementVisible(BY_EXPORTING_PANEL, browser);
+        sleepTightInSeconds(3);
+        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
+        sleepTightInSeconds(3);
+
+        return fileName;
     }
 }

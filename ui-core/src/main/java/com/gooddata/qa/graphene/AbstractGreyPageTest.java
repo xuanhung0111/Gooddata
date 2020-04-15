@@ -5,6 +5,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
+import com.gooddata.qa.graphene.fragments.greypages.exporter.ReportExporterExecutorFragment;
+import com.gooddata.qa.graphene.fragments.greypages.exporter.Xtab2Executor3Fragment;
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.SingleLoadInterfaceFragment;
@@ -60,6 +62,9 @@ public abstract class AbstractGreyPageTest extends AbstractTest {
     protected static final String HOST_NAME = "%{HostName}";
     protected static final String PROJECT_ID = "%{ProjectID}";
     protected static final String PAGE_TOKEN = PAGE_GDC + "/account/token";
+    protected static final String XTAB2_EXECUTOR3 = PAGE_GDC + "/xtab2/executor3";
+    protected static final String EXPORTER_EXECUTOR = PAGE_GDC + "/exporter/executor";
+
     /**
      * ----- Grey pages fragments -----
      */
@@ -105,6 +110,12 @@ public abstract class AbstractGreyPageTest extends AbstractTest {
 
     @FindBy(tagName = "form")
     protected InstanceUsersFragment storageUsersForm;
+
+    @FindBy(tagName = "form")
+    protected ReportExporterExecutorFragment reportExporterExecutor;
+
+    @FindBy(tagName = "form")
+    protected Xtab2Executor3Fragment xtab2Executor3;
 
     public JSONObject loadJSON() throws JSONException {
         waitForElementPresent(BY_GP_PRE_JSON, browser);

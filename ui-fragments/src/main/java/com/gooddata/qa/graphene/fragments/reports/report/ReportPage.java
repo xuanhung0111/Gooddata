@@ -297,15 +297,13 @@ public class ReportPage extends AbstractFragment {
             getExportXLSXDialog().confirmExport();
         }
 
-        sleepTightInSeconds(5);
-        final int reportExportingTimeoutInSeconds = 300;
-        waitForElementVisible(exportButton, reportExportingTimeoutInSeconds);
+        return waitForExporting(format);
+    }
 
-        sleepTightInSeconds(3);
-        String reportName = getReportName();
-
-        System.out.println("Report " + reportName + " exported to " + format.getName());
-        return reportName;
+    public String exportReportToXLSXWithUnMergedCell() {
+        doExporting(ExportFormat.EXCEL_XLSX);
+        getExportXLSXDialog().unCheckCellMerged().confirmExport();
+        return waitForExporting(ExportFormat.EXCEL_XLSX);
     }
 
     public ExportXLSXDialog getExportXLSXDialog() {
@@ -913,6 +911,18 @@ public class ReportPage extends AbstractFragment {
             return isElementPresent(By.className("targetPointer"), getRoot());
         };
         Graphene.waitGui().until(droppable);
+    }
+
+    private String waitForExporting(ExportFormat format) {
+        sleepTightInSeconds(5);
+        final int reportExportingTimeoutInSeconds = 300;
+        waitForElementVisible(exportButton, reportExportingTimeoutInSeconds);
+
+        sleepTightInSeconds(3);
+        String reportName = getReportName();
+
+        System.out.println("Report " + reportName + " exported to " + format.getName());
+        return reportName;
     }
 
     public enum DataType {

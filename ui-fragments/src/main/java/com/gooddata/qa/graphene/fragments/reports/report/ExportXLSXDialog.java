@@ -5,7 +5,6 @@ import java.util.TimeZone;
 import java.util.Date;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.SearchContext;
@@ -50,5 +49,16 @@ public class ExportXLSXDialog extends AbstractDialog {
         formatter.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 
         return formatter.format(new Date()).toLowerCase();
+    }
+
+    public ExportXLSXDialog unCheckCellMerged() {
+        return toggle(false);
+    }
+
+    public ExportXLSXDialog toggle(Boolean isChecked) {
+        if (isCellMergedChecked() != isChecked) {
+            waitForElementVisible(cellMergedCheckbox).click();
+        }
+        return this;
     }
 }
