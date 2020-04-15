@@ -70,8 +70,10 @@ integratedTests:
       REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
       - '-v $HOME/.m2:/tmp/.m2'
+      - '-v $(pwd):/graphene-tests'
+      - '-w /graphene-tests'
       - '-e'
-      - 'HOME=$HOME'
+      - 'HOME=/graphene-tests'
     command: >-
       ./integration-mvn-test.sh
       -Dtest.execution.env=local-firefox
@@ -119,8 +121,10 @@ integratedTests:
       REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
       - '-v $HOME/.m2:/tmp/.m2'
+      - '-v $(pwd):/graphene-tests'
+      - '-w /graphene-tests'
       - '-e'
-      - 'HOME=$HOME'
+      - 'HOME=/graphene-tests'
     command: >-
       ./integration-mvn-test.sh
       -Dtest.execution.env=local-chrome
@@ -168,8 +172,10 @@ integratedTests:
       REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
       - '-v $HOME/.m2:/tmp/.m2'
+      - '-v $(pwd):/graphene-tests'
+      - '-w /graphene-tests'
       - '-e'
-      - 'HOME=$HOME'
+      - 'HOME=/graphene-tests'
     image: harbor.intgdc.com/staging/graphene-chrome:latest
     command: >-
       ./integration-mvn-test.sh
