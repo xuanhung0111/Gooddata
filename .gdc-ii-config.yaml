@@ -69,7 +69,7 @@ integratedTests:
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
       REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
-      - '-v $HOME/.m2:$HOME/.m2'
+      - '-v $HOME/.m2:=/tmp/.m2'
       - '-e'
       - 'HOME=$HOME'
     command: >-
@@ -118,7 +118,7 @@ integratedTests:
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
       REDSHIFT_IAM_SECRET_KEY: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
-      - '-v $HOME/.m2:$HOME/.m2'
+      - '-v $HOME/.m2:/tmp/.m2'
       - '-e'
       - 'HOME=$HOME'
     command: >-
@@ -167,7 +167,7 @@ integratedTests:
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
       REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
-      - '-v $HOME/.m2:$HOME/.m2'
+      - '-v $HOME/.m2:/tmp/.m2'
       - '-e'
       - 'HOME=$HOME'
     image: harbor.intgdc.com/staging/graphene-chrome:latest
