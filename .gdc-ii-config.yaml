@@ -71,7 +71,7 @@ integratedTests:
     args:
       - '-v $HOME/.m2:$HOME/.m2'
       - '-e'
-      - 'HOME=$HOME'
+      - 'HOME=/tmp'
     command: >-
       ./integration-mvn-test.sh
       -Dtest.execution.env=local-firefox
