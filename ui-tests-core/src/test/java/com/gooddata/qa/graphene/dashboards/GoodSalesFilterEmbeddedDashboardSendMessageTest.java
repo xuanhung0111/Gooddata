@@ -10,7 +10,6 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.common.FilterContextHerokuAppPage;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
@@ -38,12 +37,8 @@ import java.util.stream.Stream;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.RIGHT;
-import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.DOWN;
 import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.BOTTOM;
 import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.LEFT;
-import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.UP;
-import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.MIDDLE;
-import static com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection.PENULTIMATE_BOTTOM;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
@@ -68,7 +63,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesFilterEmbeddedDashboardOuterAppTest extends AbstractEmbeddedModeTest {
+public class GoodSalesFilterEmbeddedDashboardSendMessageTest extends AbstractEmbeddedModeTest {
 
     private final static int CURRENT_YEAR = LocalDate.now().getYear();
 
@@ -120,7 +115,6 @@ public class GoodSalesFilterEmbeddedDashboardOuterAppTest extends AbstractEmbedd
         new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
             .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.CONTROL_EXECUTION_CONTEXT_ENABLED, true);
         getMetricCreator().createAmountMetric();
-
         dashboardRestRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
 
         Variables variables = getVariableCreator();
@@ -533,163 +527,6 @@ public class GoodSalesFilterEmbeddedDashboardOuterAppTest extends AbstractEmbedd
         assertEquals(getCurrentValueFilter(DATE_DIMENSION_TIMELINE), "May 25 2010 - Dec 25 2012");
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithSingleTab() {
-        dashboardTitle = generateDashboardName();
-        initDashboardsPage().addNewDashboard(dashboardTitle);
-
-        addAndResizeTwoTableReport();
-
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
-        RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_SALES_REP);
-        LEFT.moveElementToRightPlace(getFilter(ATTR_SALES_REP).getRoot());
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_YEAR_SNAPSHOT);
-        getFilter(ATTR_YEAR_SNAPSHOT).changeSelectionToMultipleValues().editAttributeFilterValues("2010", "2011");
-        MIDDLE.moveElementToRightPlace(getFilter(ATTR_YEAR_SNAPSHOT).getRoot());
-
-        EmbeddedWidget embeddedWidget = addAndResizeWebContentToDashboard();
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST, DISCOVERY, SHORT_LIST);
-
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(stageNameId + "|" + INTEREST,
-            stageNameId + "|" + DISCOVERY, stageNameId + "|" + SHORT_LIST));
-
-        getFilter(ATTR_SALES_REP).changeAttributeFilterValues("Cory Owens");
-
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(salesRepId + "|" + "Cory Owens"));
-
-        getFilter(ATTR_YEAR_SNAPSHOT).changeAttributeFilterValues(
-            "2007", "2008", "2009", "2010", "2011", "2012", "2013");
-
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(
-            yearSnapshotId + "|" + "2007", yearSnapshotId + "|" + "2008", yearSnapshotId + "|" + "2009",
-            yearSnapshotId + "|" + "2010", yearSnapshotId + "|" + "2011", yearSnapshotId + "|" + "2012",
-            yearSnapshotId + "|" + "2013"));
-
-        TableReport firstTableReport = getReport(FIRST_REPORT).waitForLoaded();
-        TableReport secondTableReport = getReport(SECOND_REPORT).waitForLoaded();
-
-        takeScreenshot(browser, "filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithSingleTab", this.getClass());
-
-        assertThat(firstTableReport.getAttributeValues().toString(),
-            containsString(INTEREST + ", Cory Owens, 2009, 2010, 2011, 2012"));
-        assertThat(secondTableReport.waitForLoaded().getAttributeValues(), hasItems(DISCOVERY, SHORT_LIST));
-    }
-
-    @Test(dependsOnGroups = "createProject")
-    public void filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithSameMode() {
-        dashboardTitle = generateDashboardName();
-        initDashboardsPage().addNewDashboard(dashboardTitle);
-
-        addAndResizeTwoTableReport();
-
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
-        DOWN.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-
-        EmbeddedWidget embeddedWidget = addAndResizeWebContentToDashboard();
-        dashboardsPage.duplicateDashboardTab(0).openTab(0);
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY, SHORT_LIST, CLOSED_WON);
-        TableReport firstTableReport = getReport(FIRST_REPORT).waitForLoaded();
-        TableReport secondTableReport = getReport(SECOND_REPORT).waitForLoaded();
-
-        assertThat(firstTableReport.getAttributeValues().toString(),
-            containsString(DISCOVERY + ", Adam Bradley, 2011, 2012"));
-        assertThat(secondTableReport.waitForLoaded().getAttributeValues(),
-            hasItems(DISCOVERY, SHORT_LIST, CLOSED_WON));
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(
-            stageNameId + "|" + DISCOVERY, stageNameId + "|" + SHORT_LIST, stageNameId + "|" + CLOSED_WON));
-
-        dashboardsPage.openTab(1);
-        firstTableReport = getReport(FIRST_REPORT).waitForLoaded();
-        secondTableReport = getReport(SECOND_REPORT).waitForLoaded();
-
-        takeScreenshot(browser, "filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithSameMode", this.getClass());
-        assertThat(firstTableReport.getAttributeValues().toString(),
-            containsString(DISCOVERY + ", Adam Bradley, 2011, 2012"));
-        assertThat(secondTableReport.waitForLoaded().getAttributeValues(),
-            hasItems(DISCOVERY, SHORT_LIST, CLOSED_WON));
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(
-            stageNameId + "|" + DISCOVERY, stageNameId + "|" + SHORT_LIST, stageNameId + "|" + CLOSED_WON));
-    }
-
-    @Test(dependsOnGroups = "createProject")
-    public void filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithMultipleMode() {
-        dashboardTitle = generateDashboardName();
-        initDashboardsPage().addNewDashboard(dashboardTitle);
-        addAndResizeTwoTableReport();
-
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
-        DOWN.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue().editAttributeFilterValues(INTEREST);
-
-        addAndResizeWebContentToDashboard();
-
-        dashboardsPage.addNewTab(SECOND_TAB);
-        addAndResizeTwoTableReport();
-        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
-        DOWN.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        getFilter(ATTR_STAGE_NAME).changeSelectionToMultipleValues()
-            .editAttributeFilterValues(INTEREST, SHORT_LIST, CLOSED_WON);
-
-        EmbeddedWidget embeddedWidget = addAndResizeWebContentToDashboard();
-        dashboardsPage.saveDashboard().openTab(0);
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(RISK_ASSESSMENT);
-        TableReport firstTableReport = getReport(FIRST_REPORT).waitForLoaded();
-        TableReport secondTableReport = getReport(SECOND_REPORT).waitForLoaded();
-
-        assertThat(firstTableReport.getAttributeValues().toString(),
-            containsString(RISK_ASSESSMENT + ", Adam Bradley, 2011, 2012"));
-        assertTrue(secondTableReport.hasNoData(), "Report should have no data");
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(stageNameId + "|" + RISK_ASSESSMENT));
-
-        dashboardsPage.openTab(1);
-        firstTableReport = getReport(FIRST_REPORT).waitForLoaded();
-        secondTableReport = getReport(SECOND_REPORT).waitForLoaded();
-
-        takeScreenshot(browser, "filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithMultipleMode", this.getClass());
-        assertThat(firstTableReport.getAttributeValues().toString(),
-            containsString(INTEREST + ", Adam Bradley, 2010, 2011, 2012"));
-        assertThat(secondTableReport.waitForLoaded().getAttributeValues(), hasItems(SHORT_LIST, CLOSED_WON));
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(
-            stageNameId + "|" + INTEREST, stageNameId + "|" + SHORT_LIST, stageNameId + "|" + CLOSED_WON));
-    }
-
-    @Test(dependsOnGroups = "createProject")
-    public void filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithGroup() throws IOException {
-        dashboardTitle = generateDashboardName();
-        JSONObject dashboardContent = new Dashboard()
-            .setName(dashboardTitle)
-            .addTab(initTab(FIRST_TAB, FIRST_REPORT, asList(
-                Pair.of(allValuesFilterStageName, TabItem.ItemPosition.LEFT),
-                Pair.of(allValuesFilterYearAttributeCreated, TabItem.ItemPosition.RIGHT))))
-            .addFilter(allValuesFilterStageName)
-            .addFilter(allValuesFilterYearAttributeCreated).getMdObject();
-        dashboardRestRequest.createDashboard(dashboardContent);
-
-        initDashboardsPage().selectDashboard(dashboardTitle).editDashboard();
-        UP.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        MIDDLE.moveElementToRightPlace(getFilter(ATTR_YEAR_CREATED).getRoot());
-        RIGHT.moveElementToRightPlace(getFilter(ATTR_YEAR_CREATED).getRoot());
-
-        TableReport tableReport = dashboardsPage.getReport(FIRST_REPORT, TableReport.class);
-        tableReport.getRoot().click();
-        tableReport.resizeFromTopLeftButton(-300, 0);
-
-        EmbeddedWidget embeddedWidget = addAndResizeWebContentToDashboard();
-        dashboardsPage.groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_YEAR_CREATED).saveDashboard();
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(SHORT_LIST);
-        getFilter(ATTR_YEAR_CREATED).changeAttributeFilterValues("2012");
-        dashboardsPage.applyValuesForGroupFilter();
-
-        takeScreenshot(browser, "filterFromGDCEmbeddedDashboard_ToInnerFilterWidget_WithGroup", this.getClass());
-
-        assertThat(tableReport.waitForLoaded().getAttributeValues().toString(),
-            containsString(SHORT_LIST + ", Adam Bradley, 2012"));
-        assertThat(embeddedWidget.getLatestIncomingMessage(), hasItems(
-            stageNameId + "|" + SHORT_LIST, yearCreatedId + "|" + "2012"));
-    }
-
     private void setFilterContextAndWaitForLoading(List<String> filters, String identifier,
                                                    List<String> values, List<String> reports) {
         waitForFilterLoaded(filters);
@@ -710,22 +547,6 @@ public class GoodSalesFilterEmbeddedDashboardOuterAppTest extends AbstractEmbedd
         waitForFilterLoaded(filters);
         FilterContextHerokuAppPage.getInstance(browser).setDateFilterContext(values);
         waitForReportLoaded(reports);
-    }
-
-    private EmbeddedWidget addAndResizeWebContentToDashboard() {
-        dashboardsPage.addWebContentToDashboard(HEROKU_APP_LINK);
-        EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
-        LEFT.moveElementToRightPlace(waitForElementVisible(embeddedWidget.getRoot()));
-        PENULTIMATE_BOTTOM.moveElementToRightPlace(waitForElementVisible(embeddedWidget.getRoot()));
-        embeddedWidget.resizeFromBottomRightButton(500, 300);
-        return embeddedWidget;
-    }
-
-    private void addAndResizeTwoTableReport() {
-        dashboardsPage.addReportToDashboard(FIRST_REPORT)
-            .getReport(FIRST_REPORT, TableReport.class).resizeFromTopLeftButton(-300, 0);
-        dashboardsPage.addReportToDashboard(SECOND_REPORT);
-        RIGHT.moveElementToRightPlace(getReport(SECOND_REPORT).getRoot());
     }
 
     private String getCurrentValueFilter(String attribute) {

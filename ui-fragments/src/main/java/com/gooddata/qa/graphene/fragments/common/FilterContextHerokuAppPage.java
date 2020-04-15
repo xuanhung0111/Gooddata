@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.common;
 
 import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
@@ -14,8 +14,11 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
-
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.TimeoutException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -23,7 +26,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 
-public class FilterContextHerokuAppPage extends EmbeddedWidget {
+public class FilterContextHerokuAppPage extends AbstractFragment {
 
     @FindBy(tagName = "input")
     private WebElement inputEmbedded;
@@ -34,6 +37,8 @@ public class FilterContextHerokuAppPage extends EmbeddedWidget {
     @FindBy(css = "[id$=json-message-input-content-box]")
     private WebElement inputFilterContent;
 
+    private static final By BY_ALL_INCOMING_MESSAGES = By.cssSelector(".incoming-message div");
+    private static final By BY_LATEST_INCOMING_MESSAGE = By.cssSelector(".incoming-message:first-of-type div");
     private static final By BY_IFRAME = By.tagName("iframe");
     private static final String ROOT_CLASS = "test-message-container";
     private static final By BUSY_MASK = By.className("gdc-busy-mask-visible");
@@ -125,8 +130,20 @@ public class FilterContextHerokuAppPage extends EmbeddedWidget {
             browser.findElements(BY_LATEST_INCOMING_MESSAGE)));
 
         //wait for the latest message text is updated
-        messages = waitToChange(messages.get(0));
+        messages = waitToChange(messages.get(0), BY_LATEST_INCOMING_MESSAGE);
         log.info("Incoming Message :" + messages.toString() + "\n");
+        BrowserUtils.switchToMainWindow(browser);
+        return messages;
+    }
+
+    public List<String> getAllIncomingMessages() {
+        List<String> messages = ElementUtils.getElementTexts(waitForCollectionIsNotEmpty(
+            browser.findElements(BY_ALL_INCOMING_MESSAGES)));
+
+        //wait for the latest message text is updated
+        messages = waitToChange(messages.get(0), BY_ALL_INCOMING_MESSAGES);
+        log.info("Incoming Message :" + messages.toString() + "\n");
+        BrowserUtils.switchToMainWindow(browser);
         return messages;
     }
 
@@ -135,8 +152,8 @@ public class FilterContextHerokuAppPage extends EmbeddedWidget {
     }
 
     private FilterContextHerokuAppPage waitForLoaded() {
-        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
         try {
+            browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
             sleepTightInSeconds(2);
             if (isPageLoaded()) {
                 WebElement computingElement = browser.findElement(BUSY_MASK);
@@ -152,5 +169,17 @@ public class FilterContextHerokuAppPage extends EmbeddedWidget {
 
     private boolean isPageLoaded() {
         return isElementPresent(BUSY_MASK, browser);
+    }
+
+    private List<String> waitToChange(String currentMessage, By incomingMessage) {
+        List<String> messages = ElementUtils.getElementTexts(waitForCollectionIsNotEmpty(
+            browser.findElements(incomingMessage)));
+        try {
+            Function<WebDriver, Boolean> elementChanged = browser -> !messages.get(0).equals(currentMessage);
+            Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(elementChanged);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+        return messages;
     }
 }
