@@ -42,6 +42,14 @@ public class Metrics extends CommonRestRequest{
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
+    //This function used by Modeler E2ETest
+    public Metric createSumAgeMetric() {
+        return createMetricIfNotExist(METRIC_AGE,
+                format("SELECT SUM([%s])",
+                        getFactByTitle("age").getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
     public Metric createAmountBOPMetric() {
         return createMetricIfNotExist(METRIC_AMOUNT_BOP,
                 format("SELECT SUM([%s]) where [%s]= [%s]",
