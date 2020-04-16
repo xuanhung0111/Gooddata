@@ -416,7 +416,7 @@ public class TableReport extends AbstractDashboardReport {
         ATTRIBUTE_HEADER {
             @Override
             public By getLocator() {
-                return isElementPresent(By.id("analysisAttributesContainer"), BrowserUtils.getBrowserContext())
+                return isElementVisible(By.id("analysisAttributesContainer"), BrowserUtils.getBrowserContext())
                         ? By.cssSelector("#analysisAttributesContainer .attribute")
                         : By.className("attribute");
             }
@@ -430,7 +430,7 @@ public class TableReport extends AbstractDashboardReport {
         METRIC_HEADER {
             @Override
             public By getLocator() {
-                return isElementPresent(By.id("analysisMetricsContainer"), BrowserUtils.getBrowserContext())
+                return isElementVisible(By.id("analysisMetricsContainer"), BrowserUtils.getBrowserContext())
                         ? By.cssSelector("#analysisMetricsContainer .metric")
                         : By.className("metric");
             }

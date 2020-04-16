@@ -232,8 +232,10 @@ public class DashboardsPage extends AbstractFragment {
             openEditExportEmbedMenu().select("Edit");
         }
 
-        //wait for animation for displaying dashboard edit bar finished.
-        waitForElementNotVisible(By.className(ApplicationHeaderBar.ROOT_LOCATOR));
+        try {
+            //wait for animation for displaying dashboard edit bar finished.
+            waitForElementNotVisible(By.className(ApplicationHeaderBar.ROOT_LOCATOR));
+        } catch (TimeoutException e) { }
 
         return getDashboardEditBar();
     }

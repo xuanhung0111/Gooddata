@@ -134,7 +134,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
 
-            assertEquals(tableReport.getReportTiTle(), expectedReport);
+            assertEquals(tableReport.getReportTitle(), expectedReport);
             if (!expectedFilterValues.isEmpty()) {
                 for (Pair<String, List<String>> expectedFilterValue : expectedFilterValues) {
                     checkSelectedFilterValues(expectedFilterValue.getLeft(), expectedFilterValue.getRight());
@@ -166,7 +166,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
 
-            assertEquals(tableReport.getReportTiTle(), REPORT_AMOUNT_BY_PRODUCT);
+            assertEquals(tableReport.getReportTitle(), REPORT_AMOUNT_BY_PRODUCT);
             assertEquals(dashboardsPage.getContent().getFilterWidgetByName(ATTR_STAGE_NAME).getCurrentValue(),
                     SHORT_LIST);
             assertEquals(dashboardsPage.getContent().getFilterWidgetByName(ATTR_PRODUCT).getCurrentValue(),

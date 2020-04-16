@@ -29,7 +29,7 @@ public class UrlParserUtils {
         return urlSuffix.split("/")[0];
     }
 
-    public static String getObjdUri(String currentUrl) {
+    public static String getObjIdUri(String currentUrl) {
         return Stream.of(currentUrl.split("\\|"))
                 .filter(part -> part.matches("/gdc/md/.*/obj/.*"))
                 .findFirst()
@@ -38,6 +38,6 @@ public class UrlParserUtils {
     }
 
     public static String getObjId(final String currentUrl) {
-        return Iterables.getLast(asList(getObjdUri(currentUrl).split("/")));
+        return Iterables.getLast(asList(getObjIdUri(currentUrl).split("/")));
     }
 }
