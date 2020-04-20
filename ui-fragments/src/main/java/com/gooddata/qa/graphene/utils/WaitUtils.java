@@ -234,6 +234,13 @@ public final class WaitUtils {
         return items;
     }
 
+    public static <T extends Collection<?>> T waitForCollectionIsNotEmpty(final T items, int size) {
+        Function<WebDriver, Boolean> collectionNotEmpty = browser -> !items.isEmpty() && items.size() == size;
+        Graphene.waitGui().until(collectionNotEmpty);
+
+        return items;
+    }
+
     public static void waitForStringInUrl(final String url) {
         Function<WebDriver, Boolean> containsString = driver -> driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(containsString);
