@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.csvuploader.UploadErrorTest;
 import com.gooddata.qa.graphene.csvuploader.UploadHistoryInfoTest;
 import com.gooddata.qa.graphene.csvuploader.UploadTest;
 import com.gooddata.qa.graphene.csvuploader.UploadNewFormatDateTest;
+import com.gooddata.qa.graphene.csvuploader.AllowBigNumberTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -40,6 +41,7 @@ public class UITestsRegistry {
             RefreshTest.class,
             UploadHistoryInfoTest.class,
             UploadNewFormatDateTest.class,
+            AllowBigNumberTest.class,
             "testng-csv-imap-Notification.xml"
         });
 
