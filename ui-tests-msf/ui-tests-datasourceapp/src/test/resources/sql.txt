@@ -1,18 +1,23 @@
+--- INFO
+--- We use the DECIMAL (12, 2) data type.
+--- Verify that your facts (f__) can be converted to this data type.
+--- If you need a greater precision and/or scale, manually increase the data size in the generated DDL before executing it and/or update the logical data model.
+--- Maximum precision/scale support is DECIMAL(15,6), if you even need a greater precision and/or scale, contact GoodData Support.
+
 USE DATABASE "ATT_DATASOURCE_TEST";
 USE SCHEMA "PUBLIC";
 
 --------------------------------------------------
 -- PRE_USER --
+-- WARNING: Some columns are converted to smaller LDM data type.
+-- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
 --------------------------------------------------
 CREATE OR REPLACE VIEW "PRE_USER" AS SELECT
- -- WARNING: For the 'ROLE' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
- -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+ -- WARNING: For the 'ROLE' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type.
   "ROLE"::VARCHAR(128) AS "a__role",
- -- WARNING: For the 'USERNAME' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
- -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+ -- WARNING: For the 'USERNAME' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type.
   "USERNAME"::VARCHAR(128) AS "a__username",
- -- WARNING: For the 'ID' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type, which has a smaller size.
- -- Verify that your data fits the converted size. If needed, manually increase the data size in the generated DDL before executing it.
+ -- WARNING: For the 'ID' source column, the VARCHAR(16777216) data type is converted to the VARCHAR(128) LDM data type.
   "ID"::VARCHAR(128) AS "cp__id",
   "DATE" AS "d__date",
   "AGE" AS "f__age"
