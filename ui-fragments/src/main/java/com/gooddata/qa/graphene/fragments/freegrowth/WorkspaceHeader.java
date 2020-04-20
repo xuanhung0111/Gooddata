@@ -38,7 +38,8 @@ public class WorkspaceHeader extends Header {
 
     public void verifyLoadMenuActive() {
         Optional<WebElement> activeItem = this.getActiveMenuItem();
-        assertTrue(activeItem.get().getAttribute("class").contains("s-menu-load"), "Load is not default active menu");
+        assertTrue(activeItem.get().findElement(By.tagName("span")).getAttribute("class").contains("s-menu-load"),
+                "Load is not default active menu");
     }
 
     public void verifyKpiDashboardMenuActive() {
