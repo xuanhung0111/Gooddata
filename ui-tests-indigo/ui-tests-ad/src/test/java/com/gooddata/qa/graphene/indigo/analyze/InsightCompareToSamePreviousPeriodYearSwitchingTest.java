@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
@@ -251,8 +252,11 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(format("%s\n:\n%s\nCompare (1) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
-        assertFalse(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
-                .isItemSelected(METRIC_AMOUNT + "M1"), "Checkbox of newly ones should be unchecked");
+
+        compareApplyMeasure = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures();
+        WaitUtils.waitForCollectionIsNotEmpty(compareApplyMeasure.getValues(), 2);
+        assertFalse(compareApplyMeasure.isItemSelected(METRIC_AMOUNT + "M1"),
+            "Checkbox of newly ones should be unchecked");
     }
 
     @Test(dependsOnGroups = {"createProject"})
