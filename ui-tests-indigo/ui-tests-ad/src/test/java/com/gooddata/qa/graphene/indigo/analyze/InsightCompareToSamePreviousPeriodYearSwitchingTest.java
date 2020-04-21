@@ -226,8 +226,11 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(format("%s\n:\n%s\nCompare (all) to", DATE_DATASET_CLOSED, "Jan 1, 2006 - Jan 1, 2020"),
                         SAME_PERIOD_PREVIOUS_YEAR));
-        assertTrue(filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).openCompareApplyMeasures()
-                .isItemSelected(METRIC_AMOUNT + "M1"), "Checkbox of newly ones should be unchecked");
+        CompareApplyMeasure compareApplyMeasure = filterBucket.openDatePanelOfFilter(
+            filterBucket.getDateFilter()).openCompareApplyMeasures();
+        WaitUtils.waitForCollectionIsNotEmpty(compareApplyMeasure.getValues(), 1);
+        assertTrue(compareApplyMeasure.isItemSelected(METRIC_AMOUNT + "M1"),
+            "Checkbox of newly ones should be checked");
     }
 
     @Test(dependsOnGroups = {"createProject"})
