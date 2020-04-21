@@ -248,6 +248,10 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     // User run ADDv2 makes sure he can upload data with valid Model publish above and verify on UI
     @Test(dependsOnMethods = "publishModel")
     public void runADDAndVerifyUI() throws IOException, SQLException {
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support verify on ADD");
+            return;
+        }
         setUpDatasource();
         setUpProcess();
         setUpKPIs();
@@ -267,6 +271,10 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws ParseException, JSONException {
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("No need to cleanUp on Client Demo");
+            return;
+        }
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
             return;
         }
