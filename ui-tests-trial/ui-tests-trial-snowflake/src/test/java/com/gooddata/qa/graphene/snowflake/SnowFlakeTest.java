@@ -53,7 +53,7 @@ public class SnowFlakeTest extends AbstractSnowFlakeTest {
         "-- Create S3 stage with sample data\n"+
         "CREATE OR REPLACE STAGE gdstage\n"+
         "file_format = gdtrialfileformat\n"+
-        "url = 's3://gdc-prod-gdtrial/data';\n"+
+        "url = 's3://gdc-prod-gdtrial/platform-trial';\n"+
         "\n"+
         "-- Copy sample CSV from S3 into table\n"+
         "COPY INTO out_csv_order_lines\n"+
