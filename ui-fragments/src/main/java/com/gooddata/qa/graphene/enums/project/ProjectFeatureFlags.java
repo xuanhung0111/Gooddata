@@ -29,7 +29,7 @@ public enum ProjectFeatureFlags {
     IS_REDIRECTED_FOR_ONE_PROJECT("isRedirectedForOneProject"),
     CASCADING_FILTERS_BOOSTING_ENABLE("cascadingFiltersBoostingEnabled"),
     ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS("enableKPIDashboardExtendedDateFilters"),
-    ENABLE_KPI_DASHBOARD_WEEK_FILTERS("enableKPIDashboardWeekFilters"),
+    ENABLE_WEEK_FILTERS("enableWeekFilters"),
     ENABLE_KPI_DASHBOARD_EXPORT_PDF("enableKPIDashboardExportPDF"),
     AD_CATALOG_GROUPING("ADCatalogGrouping"),
     DISABLE_ZEBRA_EFFECT("disableZebraEffect"),

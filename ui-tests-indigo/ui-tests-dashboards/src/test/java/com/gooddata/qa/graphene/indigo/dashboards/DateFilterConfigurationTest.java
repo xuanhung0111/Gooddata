@@ -37,7 +37,7 @@ public class DateFilterConfigurationTest extends AbstractDashboardTest {
         ProjectRestRequest projectRestRequest =
                 new ProjectRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS, true);
-        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_WEEK_FILTERS, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_WEEK_FILTERS, true);
         String dateFilterConfigUrl = String.format("/gdc/md/%s/objects/query?category=dateFilterConfig&limit=5", testParams.getProjectId());
         commonRestRequest = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
         defaultConfig = commonRestRequest.getJsonObject(RestRequest.initGetRequest(dateFilterConfigUrl)).getJSONObject("objects")
