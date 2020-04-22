@@ -261,6 +261,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getContent().getNumberOfReports(), 0);
 
         } finally {
+            // syncDataset is just a workaround solution
+            syncDataset("dataset.stage");
             tryDeleteDashboard();
             getMetricCreator().createNumberOfOpportunitiesMetric();
         }
@@ -361,6 +363,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             addReportToNewDashboard(REPORT_ACTIVITIES_BY_TYPE, DASHBOARD_NAME);
             tryDropObject(folderIdentifier, DropStrategy.ALL_IN);
         } finally {
+            // syncDataset is just a workaround solution
+            syncDataset("dataset.stagehistory");
             tryDeleteDashboard();
         }
     }
@@ -520,6 +524,11 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
             return false;
         return true;
+    }
+
+    private void syncDataset(String datasetIdentifier) {
+        String maql = String.format("SYNCHRONIZE {%s} PRESERVE DATA", datasetIdentifier);
+        postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
     }
 
     private void dropObject(String identifier, DropStrategy strategy) throws JSONException {
