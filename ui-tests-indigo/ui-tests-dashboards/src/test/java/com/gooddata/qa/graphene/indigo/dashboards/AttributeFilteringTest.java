@@ -342,8 +342,11 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
             assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().getLastFilter()
                     .getTitle().length() < longNameAttribute.length(), "long name attribute is not shortened");
         } finally {
-            getMdService().removeObjByUri(
-                    getMdService().getObjUri(getProject(), Attribute.class, title(longNameAttribute)));
+            // delete dataset using GUI is a workaround solution
+            initManagePage();
+            ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(longNameAttribute);
+            DatasetDetailPage datasetDetailPage = DatasetDetailPage.getInstance(browser);
+            datasetDetailPage.deleteObject();
         }
     }
 
