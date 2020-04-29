@@ -13,7 +13,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class RowHeader extends AbstractFragment {
-    
+
     @FindBy(css = ROW_TITLE_CLASS_NAME_EDIT_MODE)
     private WebElement rowTitle;
 
@@ -42,11 +42,23 @@ public class RowHeader extends AbstractFragment {
         return getRoot().findElement(By.cssSelector(ROW_TITLE_DESCRIPTION_NAME)).getText();
     }
 
+    public void clickOnTitle() {
+        //TODO: use click function get error element is not clickable, so use Action click as work around
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(rowTitle).click().build().perform();
+    }
+
+    public void clickOnDescription() {
+        //TODO: use click function get error element is not clickable, so use Action click as work around
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(rowDescription).click().build().perform();
+    }
+
     public RowHeader changeDashboardRowTitle(String newTitle, boolean scroll) {
         waitForElementVisible(rowTitle);
         sleepTightInSeconds(1);
-        Actions driverActions = new Actions(browser);
         if(scroll == true) scrollElementIntoView(rowTitle, browser);
+        Actions driverActions = new Actions(browser);
         driverActions.moveToElement(rowTitle).click().sendKeys(newTitle, Keys.ENTER).build().perform();
         return this;
     }
