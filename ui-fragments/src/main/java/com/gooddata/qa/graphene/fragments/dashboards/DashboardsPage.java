@@ -828,4 +828,8 @@ public class DashboardsPage extends AbstractFragment {
 
         return fileName;
     }
+
+    public static void waitForFirstTabLoading(SearchContext searchContext) {
+        waitForElementVisible(className("s-tab-first_tab"), searchContext, 300);
+    }
 }
