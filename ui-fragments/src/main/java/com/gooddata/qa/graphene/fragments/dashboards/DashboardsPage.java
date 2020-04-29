@@ -815,4 +815,8 @@ public class DashboardsPage extends AbstractFragment {
     public String getDashboardNoPermissionAccessText(){
         return waitForElementVisible(By.cssSelector("#strictAccessControl > p.noPermissionAccess"), browser).getText();
     }
+
+    public static void waitForFirstTabLoading(SearchContext searchContext) {
+        waitForElementVisible(className("s-tab-first_tab"), searchContext, 300);
+    }
 }
