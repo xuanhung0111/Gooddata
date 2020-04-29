@@ -5,9 +5,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static java.util.stream.Collectors.toList;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Stream;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -35,6 +38,9 @@ public class DataPreviewTable extends FixedDataTable {
     @FindBy(css = ".data-type-picker.s-data-type-picker")
     private List<DataTypePicker> columnTypes;
 
+    @FindBy(css = ".public_fixedDataTableRow_main:not(.public_fixedDataTable_header)")
+    private List<WebElement> rows;
+
     public List<String> getColumnNames() {
         waitForCollectionIsNotEmpty(columnNames);
         return columnNames.stream()
@@ -44,6 +50,24 @@ public class DataPreviewTable extends FixedDataTable {
 
     public List<WebElement> getColumnNameInputs() {
         return waitForCollectionIsNotEmpty(columnNames);
+    }
+
+    public int getIndexOfColumnByName(String columnName) {
+        WebElement columnElement =  columnNames.stream()
+                .filter(column -> Objects.equals(columnName, column.getAttribute("value")))
+                .findFirst()
+                .get();
+        log.info("index of column:" + columnNames.indexOf(columnElement));
+        return columnNames.indexOf(columnElement);
+    }
+
+    public List<String> getListValueByColumnName(String columnName) {
+        List<String> listValue = new ArrayList<>();
+        int index = getIndexOfColumnByName(columnName);
+        rows.stream().forEach(row -> listValue.add(row.findElements(By.className("public_fixedDataTableCell_cellContent"))
+                .get(index).getText()));
+        log.info("list Value of Column:" + listValue.toString());
+        return listValue;
     }
 
     public List<String> getColumnTypes() {
