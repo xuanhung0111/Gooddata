@@ -51,7 +51,8 @@ public enum ReportType {
             return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE ATTRIBUTE IN VIEW BY";
         }
     },
-    COMBO_CHART("combo2");
+    COMBO_CHART("combo2"),
+    GEO_CHART("pushpin");
 
     private String label;
 
