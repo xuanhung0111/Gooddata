@@ -145,7 +145,9 @@ public class DashboardPermissionsAdvancedTest extends GoodSalesAbstractTest {
         String dashboardName = "Show warning page when access SAC dashboard";
         String dashboardUri = preparePrivateDashboard(dashboardName);
         dashboardsPage.hasSAC();
+        Screenshots.takeScreenshot(browser, "shouldShowWaringMessagePage " + userRoles.getName(), getClass());
         try {
+            waitForDashboardPageLoaded(browser);
             signInAndAccessDashboardWithUserRoles(dashboardUri, userRoles);
 
             String warningMess = dashboardsPage.getDashboardNoPermissionAccessText();
@@ -153,6 +155,9 @@ public class DashboardPermissionsAdvancedTest extends GoodSalesAbstractTest {
             assertEquals(warningMess, "You do not have permission to access this dashboard.");
 
             dashboardsPage.takeToMyDashboard();
+            Screenshots.takeScreenshot(browser, " Redirect to default Dashboard", DashboardPermissionsBasicTest.class);
+
+            dashboardsPage.waitForFirstTabLoading(browser);
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -232,7 +237,9 @@ public class DashboardPermissionsAdvancedTest extends GoodSalesAbstractTest {
         String dashboardName = "Editor login/logout SAC dashboard";
         String dashboardUri = preparePrivateDashboard(dashboardName);
         dashboardsPage.hasSAC();
+        Screenshots.takeScreenshot(browser, "editorLoginLogoutSACdashboard " + userRoles.getName(), getClass());
         try {
+            waitForDashboardPageLoaded(browser);
             log.info("Logout and Login with user : " + userRoles);
             signInAndAccessDashboardWithUserRoles(dashboardUri, userRoles);
             Screenshots.takeScreenshot(browser, userRoles.getName() +
@@ -243,6 +250,8 @@ public class DashboardPermissionsAdvancedTest extends GoodSalesAbstractTest {
             assertEquals(warningMess, WAR_MSG);
 
             dashboardsPage.takeToMyDashboard();
+            Screenshots.takeScreenshot(browser, " Redirect to default Dashboard", DashboardPermissionsBasicTest.class);
+            dashboardsPage.waitForFirstTabLoading(browser);
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)), testParams.getProjectId())
