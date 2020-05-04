@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testng-acceptance-ad-test">
+    <test name="GoodSalesInsightTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesInsightTest"/>
+        </classes>
+    </test>
+
+    <test name="DateFilterADMeasureTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest"/>
+        </classes>
+    </test>
+
+    <test name="AnalyticalDesignerSanityTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest"/>
+        </classes>
+    </test>
+</suite>

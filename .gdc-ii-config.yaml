@@ -3,16 +3,27 @@ microservices:
     docker:
       dockerfile: './Dockerfile_chrome'
       customTags:
-        - '67.0.3396.79-2.39-2.3.8'
+        - '83.0.4103.116-2.39-2.3.8'
+        - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
       - 'Dockerfile_chrome'
+    tests:
+      isolated:
+        dockerComposePath: './docker-compose-chrome-acceptance-test.yaml'
+        artifacts:
+          - '**/target/screenshots/**'
+          - '**/target/downloads/**'
+          - '**/target/media/video/**/**_failed.mp4'
+        junitArtifacts:
+          - '**/target/surefire-reports/*.xml'
   graphene-firefox:
     docker:
       dockerfile: './Dockerfile_firefox'
       customTags:
         - '69.0-0.25.0-2.3.8'
+        - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
