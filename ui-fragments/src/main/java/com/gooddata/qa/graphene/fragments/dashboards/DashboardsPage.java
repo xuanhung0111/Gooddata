@@ -146,7 +146,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardContent getContent() {
-        return content;
+        return waitForFragmentVisible(content);
     }
 
     public boolean isEmptyDashboard() {

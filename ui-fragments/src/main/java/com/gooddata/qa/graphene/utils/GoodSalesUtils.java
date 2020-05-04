@@ -116,6 +116,8 @@ public final class GoodSalesUtils {
     public static final String ATTR_MONTH_YEAR_CREATED = "Month/Year (Created)";
     public static final String ATTR_DATE_CREATED = "Date (Created)";
     public static final String ATTR_YEAR_CREATED = "Year (Created)";
+    public static final String ATTR_WEEK_CREATED = "Week (Created)";
+    public static final String ATTR_QUARTER_CREATED = "Quarter (Created)";
     public static final String ATTR_MONTH_OF_QUARTER_CREATED = "Month of Quarter (Created)";
 
     public static final String ATTR_DATE_ACTIVITY = "Date (Activity)";
@@ -124,6 +126,7 @@ public final class GoodSalesUtils {
     public static final String ATTR_MONTH_OF_QUARTER_ACTIVITY = "Month of Quarter (Activity)";
     public static final String ATTR_QUARTER_YEAR_ACTIVITY = "Quarter/Year (Activity)";
     public static final String ATTR_YEAR_ACTIVITY = "Year (Activity)";
+    public static final String ATTR_YEAR_TIMELINE = "Year (Timeline)";
 
     // facts
     public static final String FACT_AMOUNT = "Amount";
