@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.util.Collections.singletonList;
@@ -15,7 +14,6 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -37,9 +35,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 
 public class DashboardHeadersTest extends AbstractDashboardTest {
     private static String TEST_INSIGHT = "Test-Insight";
-    private static String FIFTY_CHARACTERS_LONG = "This is too longgggggggggggggggggggggggggggggggggg";
-    private static String SEVENTY_FIVE_CHARACTERS_LONG = "This is too longgggggggggggggggggggggggggggg"
-            + "ggggggggggggggggggggggggggggggg";
     private ProjectRestRequest projectRestRequest;
     private KpiConfiguration kpi;
 
@@ -71,8 +66,6 @@ public class DashboardHeadersTest extends AbstractDashboardTest {
     public void prepareInsights() {
         createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                 singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
-        // indigoRestRequest.createAnalyticalDashboard(asList(createAmountKpi(),
-        // insightWidget));
         kpi = new KpiConfiguration.Builder().metric(METRIC_AMOUNT).dataSet(DATE_DATASET_CLOSED)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).build();
         initIndigoDashboardsPage().addDashboard();
@@ -129,11 +122,6 @@ public class DashboardHeadersTest extends AbstractDashboardTest {
             rowheader.changeDashboardRowDescription("", false);
             assertEquals(rowheader.getHeaderRowInEditMode(), "Ajouter un titre ici...");
             assertEquals(rowheader.getDescriptionRowInEditMode(), "Ajouter une description ici...");
-            rowheader.changeDashboardRowDescription("more than" + SEVENTY_FIVE_CHARACTERS_LONG, false);
-            indigoDashboardsPage.saveEditModeWithWidgets();
-            assertEquals(rowheader.getMoreDescription().getText(), "Plus");
-            rowheader.getMoreDescription().click();
-            assertEquals(rowheader.getMoreDescription().getText(), "Moins");
         } finally {
             initAccountPage().changeLanguage("English US");
         }
@@ -141,33 +129,31 @@ public class DashboardHeadersTest extends AbstractDashboardTest {
 
     @DataProvider
     public Object[][] inputLimitCharacter() {
-        return new Object[][] { { "/string-content/limit50characters.txt", "/string-content/limit300characters.txt", 0,
-                FIFTY_CHARACTERS_LONG, SEVENTY_FIVE_CHARACTERS_LONG + "..." } };
+        return new Object[][]{{"/string-content/limit256characters.txt", "/string-content/limit1024characters.txt",
+                "/string-content/limit256characters_result.txt", "/string-content/limit1024characters_result.txt", 0}};
     }
 
     @Test(dependsOnMethods = "checkLocalization", dataProvider = "inputLimitCharacter")
-    public void checkLimitCharacterInHeaderRows(String newTitle, String newDescription, int index, String titleResult,
-            String descriptionResult) {
+    public void checkLimitCharacterInHeaderRows(String newTitle, String newDescription, String newTitleResult
+            , String newDescriptionResult, int index) {
         String contentTitle = getResourceAsString(newTitle);
+        String contentTitleResult = getResourceAsString(newTitleResult);
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
         indigoDashboardsPage.waitForDashboardLoad().waitForWidgetsLoading();
         RowHeader rowheader = indigoDashboardsPage.getRows().get(index).getRowHeader();
         rowheader.changeDashboardRowTitle(contentTitle, false);
-        rowheader.getRowTitle().click();
-        assertEquals(getBubbleMessage(browser), "0 / 50 characters left");
+        rowheader.clickOnTitle();
+        assertEquals(getBubbleMessage(browser), "0 / 256 characters left");
         String contentDescription = getResourceAsString(newDescription);
+        String contentDescriptionResult = getResourceAsString(newDescriptionResult);
+        rowheader.clickOnDescription();
         rowheader.changeDashboardRowDescription(contentDescription, false);
-        rowheader.getRowDescription().click();
-        assertEquals(getBubbleMessage(browser), "0 / 300 characters left");
+        rowheader.clickOnDescription();
+        assertEquals(getBubbleMessage(browser), "0 / 1024 characters left");
         indigoDashboardsPage.saveEditModeWithWidgets();
         checkRedBar(browser);
-        assertEquals(rowheader.getHeaderRowInViewMode(), titleResult);
-        assertTrue(isElementVisible(By.cssSelector(".more-link.active .underline"), browser));
-        rowheader.getMoreDescription().click();
-        assertEquals(rowheader.getDescriptionRowInViewMode(), contentDescription + "Less");
-        assertTrue(isElementVisible(By.cssSelector(".more-link.passive .underline"), browser));
-        rowheader.getMoreDescription().click();
-        assertEquals(rowheader.getDescriptionRowInViewMode(), descriptionResult + "More");
+        assertEquals(rowheader.getHeaderRowInViewMode(), contentTitleResult);
+        assertEquals(rowheader.getDescriptionRowInViewMode(), contentDescriptionResult);
     }
 
     @Test(dependsOnMethods = "checkLimitCharacterInHeaderRows")
