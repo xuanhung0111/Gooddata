@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
@@ -113,6 +114,7 @@ public class MetricsDropdownTest extends AbstractDashboardTest {
         assertTrue(ms.getSearchText().isEmpty(), "Search box should be empty");
         Screenshots.takeScreenshot(browser, "checkDropdownSearchEmpty", MetricsDropdownTest.class);
         ms.ensureDropdownOpen();
+        waitForCollectionIsNotEmpty(ms.getValues());
         assertTrue(ms.getValues().size() > 10, "Missing some selected metrics");
         Screenshots.takeScreenshot(browser, "checkDropdownValues", MetricsDropdownTest.class);
     }
