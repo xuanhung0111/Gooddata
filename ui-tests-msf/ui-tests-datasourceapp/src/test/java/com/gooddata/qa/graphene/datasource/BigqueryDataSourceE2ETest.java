@@ -78,19 +78,30 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, privateKeyString, DATASOURCE_PROJECT,
+        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_PROJECT,
                 DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Connection validation failed"},
-                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, INVALID_VALUE, DATASOURCE_PROJECT,
-                        DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, privateKeyString, INVALID_VALUE,
+                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, INVALID_VALUE,
                         DATASOURCE_DATASET, DATASOURCE_PREFIX, "Connection failed! Project not found"},
-                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, privateKeyString, DATASOURCE_PROJECT,
+                {DATASOURCE_NAME, DATASOURCE_CLIENT_EMAIL, DATASOURCE_PROJECT,
                         INVALID_VALUE, DATASOURCE_PREFIX, "Connection failed! Dataset not found"}
         };
     }
 
-    @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")
-    public void checkInvalidDataSourceInformation(String name, String clientEmail, String privateKey, String project,
+    @Test(dependsOnMethods = "checkRequiredDataSourceInformation")
+    public void checkInvalidPasword() {
+        initDatasourceManagementPage();
+        dsMenu.selectBigQueryResource();
+        contentWrapper.waitLoadingManagePage();
+        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        container.addConnectionTitle(DATASOURCE_NAME);
+        configuration.addBigqueryInfo(DATASOURCE_CLIENT_EMAIL, INVALID_VALUE, DATASOURCE_PROJECT, DATASOURCE_DATASET, DATASOURCE_PREFIX);
+        configuration.clickValidateButton();
+        assertEquals(configuration.getValidateMessage(), "Connection failed! Incorrect credentials");
+    }
+
+    @Test(dependsOnMethods = "checkInvalidPasword", dataProvider = "invalidInformation")
+    public void checkInvalidDataSourceInformation(String name, String clientEmail, String project,
                                                   String dataset, String prefix, String validateMessage) {
         initDatasourceManagementPage();
         dsMenu.selectBigQueryResource();
@@ -98,7 +109,7 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addBigqueryInfo(clientEmail, privateKey, project, dataset, prefix);
+        configuration.addBigqueryInfo(clientEmail, privateKeyString, project, dataset, prefix);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }
