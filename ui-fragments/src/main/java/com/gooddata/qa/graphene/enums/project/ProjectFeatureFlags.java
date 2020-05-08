@@ -43,7 +43,8 @@ public enum ProjectFeatureFlags {
     ENABLE_ACCURATE_PIE_CHART("accuratePieChartEnabled"),
     ENABLE_KPI_DASHBOARD_DRILL_TO_INSIGHT("enableKPIDashboardDrillToInsight"),
     ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD("enableKPIDashboardDrillToDashboard"),
-    ENABLE_TABLE_COLUMN_AUTO_RESIZING("enableTableColumnsAutoResizing");
+    ENABLE_TABLE_COLUMN_AUTO_RESIZING("enableTableColumnsAutoResizing"),
+    AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION("ADMeasureValueFilterNullAsZeroOption");
 
     private final String featureFlag;
 
