@@ -88,28 +88,26 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
 
     @DataProvider
     public Object[][] IAMInformation() {
-        return new Object[][]{{DATASOURCE_NAME, REDSHIFT_IAM_LONG_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY, REDSHIFT_IAM_SECRETKEY,
+        return new Object[][]{{DATASOURCE_NAME, REDSHIFT_IAM_LONG_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection succeeded"},
-                {DATASOURCE_NAME, REDSHIFT_IAM_SHORT_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY, REDSHIFT_IAM_SECRETKEY,
+                {DATASOURCE_NAME, REDSHIFT_IAM_SHORT_URL, REDSHIFT_IAM_DBUSER, REDSHIFT_IAM_ACCESSKEY,
                         DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection succeeded"}};
     }
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"}};
+        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_DATABASE, DATASOURCE_PREFIX,
+                DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
+                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA,
+                        "Connection failed! Incorrect credentials"},
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA,
+                        "Connection failed! Database not found"},
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE,
+                        "Connection failed! Schema not found"}};
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "IAMInformation")
-    public void checkDataSourceInformationWithIAMAccount(String name, String url, String dbuser, String accesskey, String iam, String database
+    public void checkDataSourceInformationWithIAMAccount(String name, String url, String dbuser, String accesskey, String database
             , String prefix, String schema, String validateMessage) {
         initDatasourceManagementPage();
         dsMenu.selectRedshiftResource();
@@ -117,13 +115,27 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addRedshiftIAMInfo(url, dbuser, accesskey, iam, database, prefix, schema);
+        configuration.addRedshiftIAMInfo(url, dbuser, accesskey, REDSHIFT_IAM_SECRETKEY, database, prefix, schema);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }
 
-    @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")
-    public void checkInvalidDataSourceInformation(String name, String url, String username, String password, String database
+    @Test(dependsOnMethods = "checkDataSourceInformationWithIAMAccount")
+    public void checkInvalidPasword() {
+        initDatasourceManagementPage();
+        dsMenu.selectRedshiftResource();
+        contentWrapper.waitLoadingManagePage();
+        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        container.addConnectionTitle(DATASOURCE_NAME);
+        configuration.addRedshiftBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, INVALID_VALUE,
+                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        configuration.clickValidateButton();
+        assertEquals(configuration.getValidateMessage(), "Connection failed! Incorrect credentials");
+    }
+
+    @Test(dependsOnMethods = "checkInvalidPasword", dataProvider = "invalidInformation")
+    public void checkInvalidDataSourceInformation(String name, String url, String username, String database
             , String prefix, String schema, String validateMessage) {
         initDatasourceManagementPage();
         dsMenu.selectRedshiftResource();
@@ -131,7 +143,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addRedshiftBasicInfo(url, username, password, database, prefix, schema);
+        configuration.addRedshiftBasicInfo(url, username, DATASOURCE_PASSWORD, database, prefix, schema);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }
