@@ -79,32 +79,43 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
+                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_DATABASE,
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, INVALID_VALUE, DATASOURCE_PASSWORD, DATASOURCE_DATABASE,
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, INVALID_VALUE, DATASOURCE_DATABASE,
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
                         INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
                         DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME,
                         DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"}};
     }
 
-    @Test(dependsOnMethods = "checkRequiredDataSourceInformation", dataProvider = "invalidInformation")
+    @Test(dependsOnMethods = "checkRequiredDataSourceInformation")
+    public void checkInvalidPassword() {
+        initDatasourceManagementPage();
+        dsMenu.selectSnowflakeResource();
+        contentWrapper.waitLoadingManagePage();
+        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        container.addConnectionTitle(DATASOURCE_NAME);
+        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        configuration.clickValidateButton();
+        assertEquals(configuration.getValidateMessage(), "Connection failed! Incorrect credentials");
+    }
+
+    @Test(dependsOnMethods = "checkInvalidPassword", dataProvider = "invalidInformation")
     public void checkInvalidDataSourceInformation(String name, String url, String warehouse, String username
-            , String password, String database, String prefix, String schema, String validateMessage) {
+            , String database, String prefix, String schema, String validateMessage) {
         initDatasourceManagementPage();
         dsMenu.selectSnowflakeResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addSnowflakeInfo(url, warehouse, username, password, database, prefix, schema);
+        configuration.addSnowflakeInfo(url, warehouse, username, DATASOURCE_PASSWORD, database, prefix, schema);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), validateMessage);
     }

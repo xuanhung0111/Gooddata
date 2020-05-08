@@ -44,6 +44,10 @@ public class CsvFile {
     }
 
     public static CsvFile loadFile(final String filePath) {
+       return loadFileUsingSpecialCharacter(filePath, CsvPreference.STANDARD_PREFERENCE);
+    }
+
+    public static CsvFile loadFileUsingSpecialCharacter(final String filePath, CsvPreference csvPreference) {
         final File rootCsvFile = new File(filePath);
         if (!rootCsvFile.exists()) {
             throw new IllegalArgumentException("Csv file with path: [" + filePath + "] does not exist!");
@@ -54,7 +58,7 @@ public class CsvFile {
 
         long totalDataRow = 0;
         try (final CsvListReader reader = new CsvListReader(new FileReader(rootCsvFile),
-                CsvPreference.STANDARD_PREFERENCE)) {
+                csvPreference)) {
             final List<String> headers = asList(reader.getHeader(true));
             if (!headers.stream().anyMatch(NumberUtils::isParsable)) {
                 csv.columns = headers.stream().map(Column::new).collect(toList());
@@ -63,7 +67,7 @@ public class CsvFile {
             }
 
             // filter multiple headers
-            List<String> row; 
+            List<String> row;
             while ((row = reader.read()) != null && !row.stream().anyMatch(NumberUtils::isParsable)) {
                 csv.columns = row.stream().map(Column::new).collect(toList());
             }
