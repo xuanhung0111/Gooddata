@@ -225,6 +225,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             waitForFragmentVisible(indigoDashboardsPage).openExtendedDateFilterPanel()
                 .selectPeriod(DateRange.THIS_QUARTER).apply();
             indigoDashboardsPage.getLastWidget(Kpi.class).openAlertDialog().applyAlertFilters();
+            indigoDashboardsPage.waitForWidgetsLoading();
 
             DateRange dateFilterSelection = indigoDashboardsPage.openExtendedDateFilterPanel().getSelectedDateFilter();
             assertEquals(dateFilterSelection, DateRange.THIS_MONTH);
