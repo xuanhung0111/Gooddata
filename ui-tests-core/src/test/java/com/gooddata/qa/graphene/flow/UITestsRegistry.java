@@ -53,7 +53,8 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardMacroTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesPublicDashboardTest;
 import com.gooddata.qa.graphene.dashboards.ControlExecutionContextTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesFilterEmbeddedDashboardOuterAppTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesFilterEmbeddedDashboardSendMessageTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesFilterEmbeddedDashboardLogMessageTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesUriParameterEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.LockingAndVisibilityDashboardTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
@@ -261,7 +262,8 @@ public class UITestsRegistry {
                     GoodSalesUriParameterEmbeddedDashboardTest.class,
                     LockingAndVisibilityDashboardTest.class,
                     DefaultPermissionDashboardTest.class,
-                    GoodSalesFilterEmbeddedDashboardOuterAppTest.class,
+                    GoodSalesFilterEmbeddedDashboardSendMessageTest.class,
+                    GoodSalesFilterEmbeddedDashboardLogMessageTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",

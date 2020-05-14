@@ -203,7 +203,7 @@ public class TableReport extends AbstractDashboardReport {
         WebElement loadingElement = findLoadingElement();
 
         try {
-            waitForElementVisible(loadingElement, 1);
+            waitForElementVisible(loadingElement, 3);
             waitForElementNotVisible(loadingElement);
 
         } catch (TimeoutException e) {
