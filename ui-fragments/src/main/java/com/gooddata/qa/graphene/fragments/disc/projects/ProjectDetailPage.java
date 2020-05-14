@@ -1,26 +1,28 @@
 package com.gooddata.qa.graphene.fragments.disc.projects;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static java.util.stream.Collectors.toList;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.process.DataloadProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 
 public class ProjectDetailPage extends AbstractFragment {
 
@@ -59,8 +61,9 @@ public class ProjectDetailPage extends AbstractFragment {
         return waitForElementVisible(projectIdMetadata).getText();
     }
 
-    public void goToAnalyze() {
+    public AnalysisPage goToAnalyze() {
         waitForElementVisible(goToAnalyzeLink).click();
+        return Graphene.createPageFragment(AnalysisPage.class, waitForElementVisible(className("adi-editor"), browser));
     }
 
     public String getEmptyStateTitle() {
@@ -128,12 +131,12 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public void deployEtlProcess(String processName,
-                                        ProcessType processType,
-                                        String s3ConfigurationPath,
-                                        String s3AccessKey,
-                                        String s3SecretKey,
-                                        String s3Region,
-                                        boolean serverSideEncryption) {
+                                 ProcessType processType,
+                                 String s3ConfigurationPath,
+                                 String s3AccessKey,
+                                 String s3SecretKey,
+                                 String s3Region,
+                                 boolean serverSideEncryption) {
         clickDeployButton().deployEtlProcess(processName, processType, s3ConfigurationPath, s3AccessKey, s3SecretKey,
                 s3Region, serverSideEncryption);
     }
@@ -173,6 +176,11 @@ public class ProjectDetailPage extends AbstractFragment {
 
     private String getProcessTitle(WebElement process) {
         return process.findElement(By.className("ait-process-title")).getText();
+    }
+
+    public DataloadProcessDetail getDataProcessName(String processName) {
+        return findProcess(Restriction.NAME, processName)
+                .map(p -> Graphene.createPageFragment(DataloadProcessDetail.class, p)).get();
     }
 
     private enum Restriction {
