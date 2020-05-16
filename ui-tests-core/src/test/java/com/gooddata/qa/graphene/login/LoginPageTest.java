@@ -65,7 +65,7 @@ public class LoginPageTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS", enabled = false)
     public void loginWithXSSShouldNotWork(String lastUrl) throws JSONException {
         try {
             signIn(true, UserRoles.ADMIN);
@@ -77,7 +77,7 @@ public class LoginPageTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS", enabled = false)
     public void openLoginPageWithXSSShouldNotWork(String lastUrl) throws JSONException {
         openUrl(ACCOUNT_PAGE + lastUrl);
         assertFalse(CheckUtils.isAlertDisplayed(),
