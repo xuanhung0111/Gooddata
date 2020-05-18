@@ -26,6 +26,7 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
     private WebElement addLinkButton;
 
     public static final By LOCATOR = By.className("s-dashboardwidget-toolbar");
+    private static final String IS_SELECTED = "yui3-c-dashboardwidget-selected";
 
     public static boolean isVisible(SearchContext searchContext) {
         return isElementVisible(LOCATOR, searchContext);
@@ -49,8 +50,8 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
 
     private static DashboardEditWidgetToolbarPanel getInstanceFor(WebElement element,
             SearchContext searchContext) {
-        if (!isElementVisible(LOCATOR, searchContext)) {
-            waitForElementVisible(element).click();
+        if (!waitForElementVisible(element).getAttribute("class").contains(IS_SELECTED)) {
+            element.click();
         }
 
         return Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
