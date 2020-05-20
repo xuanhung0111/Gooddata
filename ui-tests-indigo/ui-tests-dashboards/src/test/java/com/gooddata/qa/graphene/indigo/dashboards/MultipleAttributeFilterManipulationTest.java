@@ -247,7 +247,7 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
         indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
         indigoDashboardsPage.waitForWidgetsLoading();
         takeScreenshot(browser, "check-shorten-measure-name-on-KPI-dashboard", getClass());
-        assertTrue(indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport().isShortenHeader(HEADER_NAME, 0,660),
+        assertTrue(indigoDashboardsPage.getFirstWidget(Insight.class).getPivotTableReport().isShortenHeader(HEADER_NAME, 0, 180),
                 "Measure Name should be shorten by too long");
     }
 
