@@ -155,7 +155,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     // change urn date dimension
     // delete unnecessary dataset, attribute, label
     @Test(dependsOnMethods = {"addNewModel"})
-    public void editModel() {
+    public void editModel(){
         Model modelUser = mainModelContent.getModel(USER_DATASET);
         Model modelClass = mainModelContent.getModel(CLASS_DATASET);
 
@@ -169,27 +169,21 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.editLabelName(USERCODE_FIRST_LABEL, USERCODE_LABEL);
         mainModelContent.focusOnDataset(USER_DATASET);
-        modelUser.editDatatypeOfMainLabel(USER_DATASET, USERNUMBER_ATTRIBUTE
-                , Model.DATA_TYPE.TEXT_128.getName(), Model.DATA_TYPE.INTEGER.getClassName());
+        modelUser.editDatatypeOfMainLabel(USERNUMBER_ATTRIBUTE, Model.DATA_TYPE.INTEGER.getClassName());
         mainModelContent.focusOnDataset(USER_DATASET);
-        modelUser.editDatatypeOfMainLabel(USER_DATASET, USERCODE_ATRIBUTE
-                , Model.DATA_TYPE.TEXT_128.getName(), Model.DATA_TYPE.BIG_INTEGER.getClassName());
+        modelUser.editDatatypeOfMainLabel(USERCODE_ATRIBUTE, Model.DATA_TYPE.BIG_INTEGER.getClassName());
 
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.openEditDialog();
         assertEquals(USERCODE_LABEL, modelUser.getTextLabel(USERCODE_LABEL));
-        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelUser.getTextDatatype(USER_DATASET, USERNUMBER_ATTRIBUTE,
-                Model.DATA_TYPE.INTEGER.getName()));
-        assertEquals(Model.DATA_TYPE.BIG_INTEGER.getName(), modelUser.getTextDatatype(USER_DATASET, USERCODE_ATRIBUTE,
-                Model.DATA_TYPE.BIG_INTEGER.getName()));
+        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelUser.getTextDatatype(USERNUMBER_ATTRIBUTE));
+        assertEquals(Model.DATA_TYPE.BIG_INTEGER.getName(), modelUser.getTextDatatype(USERCODE_ATRIBUTE));
         modelUser.clickCancelEditPopUp();
 
         mainModelContent.focusOnDataset(CLASS_DATASET);
         modelClass.setPrimaryKey(CLASSID_GRAIN);
         mainModelContent.focusOnDataset(CLASS_DATASET);
         modelClass.addNewLabel(CLASSNAME2_ATTRIBUTE, CLASSNAME2_LABEL);
-        mainModelContent.focusOnDataset(CLASS_DATASET);
-        modelClass.deleteLabel(CLASSNAME2_LABEL);
         mainModelContent.focusOnDataset(CLASS_DATASET);
         modelClass.deleteAttribute(CLASSNAME2_ATTRIBUTE);
     }

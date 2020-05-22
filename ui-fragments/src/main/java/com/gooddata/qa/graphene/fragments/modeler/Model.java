@@ -77,7 +77,7 @@ public class Model extends AbstractFragment {
         addMore.deleteDataset();
     }
 
-    public void addNewLabel(String attribute, String labelName) {
+    public void addNewLabel(String attribute, String labelName){
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.editDatasetDialog().addNewLabel(attribute, labelName);
     }
@@ -102,22 +102,14 @@ public class Model extends AbstractFragment {
         addMore.editDatasetDialog().changeLabelName(label, newName);
     }
 
-    public void editDatatypeOfOptionalLabel(String dataset, String attribute, String label
-            , String dataTypeText, String dataTypeClass) {
+    public void editDatatypeOfMainLabel(String attribute, String dataTypeClass) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
-        addMore.editDatasetDialog().changeDatatypeOfOptionalLabel(dataset, attribute, label, dataTypeText, dataTypeClass);
+        addMore.editDatasetDialog().changeDatatypeOfMainLabel(attribute, dataTypeClass);
     }
 
-    public void editDatatypeOfMainLabel(String dataset, String attribute
-            , String dataTypeText, String dataTypeClass) {
-        AddMorePopUp addMore = openMorePopUpOnDataset();
-        addMore.editDatasetDialog().changeDatatypeOfMainLabel(dataset, attribute, dataTypeText, dataTypeClass);
-    }
-
-    public String getTextDatatype(String dataset, String attribute
-            , String dataTypeText) {
+    public String getTextDatatype(String attribute) {
         EditDatasetDialog edit = EditDatasetDialog.getInstance(browser);
-        return edit.getTextDatatype(dataset, attribute, dataTypeText);
+        return edit.getTextDatatype(attribute);
     }
 
     public String getTextLabel(String label) {
