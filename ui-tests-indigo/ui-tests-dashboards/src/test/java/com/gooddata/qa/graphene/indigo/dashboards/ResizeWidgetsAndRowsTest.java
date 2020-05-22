@@ -109,7 +109,7 @@ public class ResizeWidgetsAndRowsTest extends AbstractDashboardTest {
 
         indigoDashboardsPage.resizeMinimumWidget();
         assertThat(indigoDashboardsPage.getWidgetFluidLayout(INSIGHT_COLUMN_HAS_SOME_METRICS).getAttribute("class"),
-                containsString("s-fluid-layout-column-width-" + ResizeBullet.SIX.getNumber()));
+                containsString("s-fluid-layout-column-width-" + ResizeBullet.FOUR.getNumber()));
 
         initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_TABLE_HAS_SOME_METRICS).waitForWidgetsLoading();
         assertThat(indigoDashboardsPage.getWidgetFluidLayout(INSIGHT_TABLE_HAS_SOME_METRICS).getAttribute("class"),
