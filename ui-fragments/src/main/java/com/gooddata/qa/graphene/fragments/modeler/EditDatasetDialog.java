@@ -2,10 +2,8 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -14,12 +12,6 @@ import static org.openqa.selenium.By.className;
 
 public class EditDatasetDialog extends AbstractFragment {
     private static final String EDIT_DATASET_DIALOG = "edit-dataset-dialog";
-
-    @FindBy(className = "s-delete")
-    WebElement deleteButton;
-
-    @FindBy(className = "s-add_label")
-    WebElement addLabelButton;
 
     @FindBy(className = "s-cancel")
     WebElement cancelButton;
@@ -40,28 +32,23 @@ public class EditDatasetDialog extends AbstractFragment {
         return viewDetailDialog;
     }
 
-    public void addNewLabel(String attribute, String labelName) {
+    public void addNewLabel(String attribute, String labelName){
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.clickOnAttribute(attribute);
-        addLabelButton.click();
-        Actions driverActions = new Actions(browser);
-        driverActions.sendKeys(labelName).sendKeys(Keys.ENTER).build().perform();
+        viewDetail.addNewLabel(attribute, labelName);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
 
     public void deleteLabel(String label) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.clickOnLabel(label);
-        deleteButton.click();
+        viewDetail.deleteLabel(label);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
 
     public void deleteAttribute(String attribute) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.clickOnAttribute(attribute);
-        deleteButton.click();
+        viewDetail.deleteAttribute(attribute);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
@@ -80,29 +67,22 @@ public class EditDatasetDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    public void changeDatatypeOfMainLabel(String dataset, String attribute, String dataTypeText, String dataTypeClass) {
+    public void changeDatatypeOfMainLabel(String attribute, String dataTypeClass) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.editDatatypeOfMainLabel(dataset, attribute, dataTypeText, dataTypeClass);
+        viewDetail.editDatatypeOfLabel(attribute, dataTypeClass);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
 
-    public void changeDatatypeOfOptionalLabel(String dataset, String attribute, String label
-            , String dataTypeText, String dataTypeClass) {
-        ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.editDatatypeOfOptionalLabel(dataset, attribute, label, dataTypeText, dataTypeClass);
-        saveChangeButton.click();
-        waitForFragmentNotVisible(this);
-    }
 
     public String getTextLabel(String label) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         return viewDetail.getTextLabel(label);
     }
 
-    public String getTextDatatype(String dataset, String attribute, String datatypeText) {
+    public String getTextDatatype(String attribute) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        return viewDetail.getTextDataType(dataset, attribute, datatypeText);
+        return viewDetail.getTextDataType(attribute);
     }
 
     public void clickCancel() {
