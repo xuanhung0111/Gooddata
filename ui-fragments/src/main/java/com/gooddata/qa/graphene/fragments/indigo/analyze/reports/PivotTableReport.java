@@ -275,7 +275,8 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     public PivotTableReport hoverOnBurgerMenuColumn(String columnTitle, int columnIndex) {
-        hoverItem(getHeaderElement(columnTitle, columnIndex));
+        hoverItem(waitForElementPresent(
+            getHeaderElement(columnTitle, columnIndex).findElement(className("ag-react-container"))));
         return this;
     }
 
