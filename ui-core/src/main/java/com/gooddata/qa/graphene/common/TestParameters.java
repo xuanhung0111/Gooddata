@@ -65,6 +65,7 @@ public class TestParameters {
     // variables of SDK
     private String reactFolder;
     private String reactProjectTitle;
+    private String uisdkVersion;
     private String localhostSDK;
     private String brickAppstore;
     private String lcmDataloadProcessComponentVersion;
@@ -135,6 +136,7 @@ public class TestParameters {
         lcmDataloadProcessComponentVersion = loadProperty("lcmDataloadProcessComponentVersion");
         reactFolder = loadProperty("reactFolder");
         reactProjectTitle = loadProperty("reactProjectTitle");
+        uisdkVersion = loadProperty("uisdkVersion");
         localhostSDK = loadProperty("localhostSDK");
     }
 
@@ -437,6 +439,10 @@ public class TestParameters {
 
     public String getReactProjectTitle() {
         return reactProjectTitle;
+    }
+
+    public String getUIsdkVersion() {
+        return uisdkVersion;
     }
 
     public String getLocalhostSDK() {

@@ -50,6 +50,7 @@
         <language>en-US</language>
         <user.domain>default</user.domain>
         <host>defaultHost</host>
+        <uisdkVersion>latest</uisdkVersion>
         <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
@@ -419,6 +420,7 @@
                                 <arguments>
                                     <argument>ui-tests-gd-react-sdk</argument>
                                     <argument>${host}</argument>
+                                    <argument>${uisdkVersion}</argument>
                                 </arguments>
                             </configuration>
                         </plugin>
