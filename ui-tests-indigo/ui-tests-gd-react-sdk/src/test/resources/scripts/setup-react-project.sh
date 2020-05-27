@@ -5,6 +5,7 @@
 RESOURCE_DIR=$(dirname "$(realpath $0)")
 REACT_PROJECT_NAME=$1
 TESTING_HOST=$2
+UI_SDK_VERSION=$3
 
 # Create React application
 mkdir /tmp/react
@@ -23,7 +24,7 @@ cp addYarnStop.json package.json
 rm -rf addYarnStop.json
 
 # Install the latest @gooddata/react-components
-yarn add @gooddata/react-components
+yarn add @gooddata/react-components@$UI_SDK_VERSION
 
 # Install node-saas as https://jira.intgdc.com/browse/ONE-3381
 yarn add node-sass
