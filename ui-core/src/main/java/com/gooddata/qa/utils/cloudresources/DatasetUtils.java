@@ -28,10 +28,25 @@ import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.FACT_AMOU
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.PK_CUSKEY;
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.PK_CUSKEY_LABEL;
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.PK_CUSKEY_LINK;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.DATASET_USER;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.PK_USERID;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.DATE_JOIN;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.ATTR_USERNAME;
+import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.ATTR_SCORE;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 
 public class DatasetUtils {
+    public static CsvFile datasetUser() {
+        return new CsvFile(DATASET_USER).columns(new CsvFile.Column(PK_USERID), new CsvFile.Column(ATTR_SCORE),
+                new CsvFile.Column(FACT_AGE), new CsvFile.Column(DATE_JOIN) );
+    }
+
+    public static CsvFile datasetUserUpdate() {
+        return new CsvFile(DATASET_USER).columns(new CsvFile.Column(PK_USERID), new CsvFile.Column(FACT_AGE),
+                new CsvFile.Column(DATE_JOIN), new CsvFile.Column(ATTR_USERNAME), new CsvFile.Column(ATTR_SCORE));
+    }
+
     public static CsvFile datasetNormal() {
         return new CsvFile(DATASET_CUSTOMERS).columns(new CsvFile.Column(PK_CUSKEY), new CsvFile.Column(ATTR_NAME),
                 new CsvFile.Column(FACT_AGE), new CsvFile.Column(COLUMN_X_TIMESTAMP), new CsvFile.Column(COLUMN_X_DELETED),

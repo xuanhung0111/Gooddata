@@ -1,0 +1,1 @@
+create table pre_user (cp__userid varchar(128), a__score INTEGER, f__age NUMERIC (12,2), d__joindate date);

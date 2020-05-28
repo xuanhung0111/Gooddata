@@ -1,0 +1,1 @@
+create table user (userid varchar(128), score INTEGER, age NUMERIC (12,2), joindate date);
