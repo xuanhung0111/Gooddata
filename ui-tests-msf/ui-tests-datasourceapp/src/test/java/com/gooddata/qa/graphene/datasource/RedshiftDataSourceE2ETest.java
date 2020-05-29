@@ -7,6 +7,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.*;
@@ -211,6 +212,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         generateDialog.clickCopy();
         DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
         assertEquals(messageBar.waitForSuccessMessageBar().getText(), "SQL copied to clipboard");
+        waitForElementNotVisible(messageBar.getRoot());
         generateDialog.clickClose();
         // check generate outputStage in case invalid datasource
         heading.clickEditButton();
