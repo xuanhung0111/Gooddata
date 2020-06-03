@@ -105,7 +105,7 @@ public class LoginFragment extends AbstractFragment {
 
         if (href.endsWith("request-a-demo")) {
             Function<WebDriver, Boolean> requestADemoPageDisplayed = browser ->
-                    browser.getCurrentUrl().equals("https://www.gooddata.com/request-a-demo");
+                    browser.getCurrentUrl().startsWith("https://www.gooddata.com/request-a-demo");
             Graphene.waitGui().until(requestADemoPageDisplayed);
         } else {
             RegistrationPage.getInstance(browser);
