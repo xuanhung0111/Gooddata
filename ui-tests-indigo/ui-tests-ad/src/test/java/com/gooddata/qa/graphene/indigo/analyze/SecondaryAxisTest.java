@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static org.hamcrest.Matchers.hasItems;
 
 import com.gooddata.fixture.ResourceManagement;
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;

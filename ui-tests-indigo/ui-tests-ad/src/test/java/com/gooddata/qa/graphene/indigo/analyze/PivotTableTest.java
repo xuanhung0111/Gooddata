@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
@@ -55,8 +55,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GO
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -713,7 +713,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
     private void changeDatasetTitleByRest(final String datasetIdentifier, final String newTitle)
             throws IOException, JSONException {
-        String datasetUri = getMdService().getObjUri(getProject(), com.gooddata.md.Dataset.class,
+        String datasetUri = getMdService().getObjUri(getProject(), com.gooddata.sdk.model.md.Dataset.class,
                 identifier(datasetIdentifier));
         final CommonRestRequest restRequest = new CommonRestRequest(new RestClient(getProfile(ADMIN)),
                 testParams.getProjectId());

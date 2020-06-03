@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

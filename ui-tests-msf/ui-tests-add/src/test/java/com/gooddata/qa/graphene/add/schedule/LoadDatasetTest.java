@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.add.schedule;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -12,8 +12,8 @@ import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;

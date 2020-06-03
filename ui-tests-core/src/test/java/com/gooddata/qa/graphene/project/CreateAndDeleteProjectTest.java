@@ -21,7 +21,7 @@ import org.openqa.selenium.TimeoutException;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-import com.gooddata.project.ProjectDriver;
+import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;

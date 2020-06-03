@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
@@ -27,10 +27,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;

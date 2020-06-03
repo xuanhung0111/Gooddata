@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.snowflake;
 
-import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
 import static com.gooddata.qa.utils.DateTimeUtils.parseToTimeStampFormat;
 import static com.gooddata.qa.utils.cloudresources.DataSourceUtils.LOCAL_STAGE;
 import static com.gooddata.qa.utils.cloudresources.DatasetUtils.datasetNormal;
@@ -59,10 +59,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.md.Attribute;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.AbstractADDProcessTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;

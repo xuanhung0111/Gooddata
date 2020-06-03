@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.bigquery;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.md.Attribute;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.AbstractADDProcessTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.utils.DateTimeUtils.parseToTimeStampFormat;
 import static com.gooddata.qa.utils.cloudresources.BigQueryUtils.deleteDataset;

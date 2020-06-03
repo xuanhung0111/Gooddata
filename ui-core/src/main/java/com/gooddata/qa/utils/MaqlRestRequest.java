@@ -1,6 +1,6 @@
 package com.gooddata.qa.utils;
 
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 

@@ -1,14 +1,14 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.OneNumberReportDefinitionContent;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.OneNumberReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.Restriction.title;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;

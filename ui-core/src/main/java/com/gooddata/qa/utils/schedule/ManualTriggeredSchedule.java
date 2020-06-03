@@ -1,8 +1,8 @@
 package com.gooddata.qa.utils.schedule;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 
 /**
  * This schedule using to create a 'manual' schedule for dataload process

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;

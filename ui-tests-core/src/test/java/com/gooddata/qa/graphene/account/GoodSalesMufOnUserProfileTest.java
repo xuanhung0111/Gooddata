@@ -13,7 +13,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 
-import static com.gooddata.md.Restriction.*;
+import static com.gooddata.sdk.model.md.Restriction.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -21,8 +21,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;

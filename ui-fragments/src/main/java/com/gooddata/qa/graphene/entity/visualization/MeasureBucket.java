@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.entity.visualization;
 
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Metric;
 
 import java.util.UUID;
 

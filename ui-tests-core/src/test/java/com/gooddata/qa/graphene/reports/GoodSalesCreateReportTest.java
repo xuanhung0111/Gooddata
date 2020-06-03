@@ -1,16 +1,16 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.service.md.MetadataService;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.md.report.ReportDefinition;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;

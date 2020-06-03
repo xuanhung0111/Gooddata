@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.entity.visualization;
 
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.md.Attribute;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

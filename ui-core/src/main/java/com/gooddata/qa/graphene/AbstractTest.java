@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectDriver;
-import com.gooddata.project.ProjectService;
-import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.model.project.ProjectDriver;
+import com.gooddata.sdk.service.project.ProjectService;
+import com.gooddata.sdk.model.project.ProjectValidationResults;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.utils.http.RestClient;

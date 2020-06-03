@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.TABLE_BODY_FONT_SIZE;
 import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.TABLE_HEADER_FONT_SIZE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;

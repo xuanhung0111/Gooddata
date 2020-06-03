@@ -9,11 +9,11 @@ import java.util.UUID;
 import com.gooddata.qa.utils.datasource.DataDistributionProcess;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessService;
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.dataload.processes.ScheduleExecution;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.service.dataload.processes.ProcessService;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.ScheduleExecution;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;

@@ -18,8 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;

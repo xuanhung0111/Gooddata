@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -18,10 +18,10 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
-import com.gooddata.md.Dataset;
-import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.service.md.ObjNotFoundException;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.AbstractTest;
@@ -63,7 +63,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.COLORS;

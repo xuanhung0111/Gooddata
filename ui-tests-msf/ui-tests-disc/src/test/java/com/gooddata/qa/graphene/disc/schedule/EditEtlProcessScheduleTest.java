@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.disc.schedule;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractEtlProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
@@ -131,7 +131,7 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
     }
 
     private Schedule getEtlProcessScheduleByName(DataloadProcess process, String scheduleName) {
-        return getProcessService().listSchedules(getProject()).stream()
+        return getProcessService().listSchedules(getProject()).allItemsStream()
                 .filter(s -> s.getProcessId().equals(process.getId()))
                 .filter(s -> scheduleName.equals(s.getName()))
                 .findFirst()

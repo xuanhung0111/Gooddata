@@ -20,18 +20,18 @@ import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodDataException;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessType;
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.dataload.processes.ScheduleExecution;
+import com.gooddata.sdk.common.GoodDataException;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessType;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.ScheduleExecution;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
-import com.gooddata.warehouse.Warehouse;
+import com.gooddata.sdk.model.warehouse.Warehouse;
 
 public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.GoodDataRestException;
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectService;
+import com.gooddata.sdk.common.GoodDataRestException;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;

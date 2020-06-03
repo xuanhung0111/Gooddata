@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.Filter;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.Filter;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.filter.TimeRange;
@@ -38,8 +38,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.Restriction.title;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;

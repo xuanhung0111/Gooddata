@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.project;
 
-import com.gooddata.project.Environment;
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectService;
+import com.gooddata.sdk.model.project.Environment;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestClient;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
+import java.time.ZonedDateTime;
 import org.testng.annotations.Test;
+import org.threeten.extra.Days;
 
 import java.util.Collection;
 import java.util.List;
@@ -132,6 +132,6 @@ public class ManyProjectsDeletingTest extends AbstractTest {
      * @return number of days old
      */
     private int getProjectAge(Project project) {
-        return Days.daysBetween(project.getCreated(), DateTime.now()).getDays();
+        return Days.between(project.getCreated(), ZonedDateTime.now()).getAmount();
     }
 }

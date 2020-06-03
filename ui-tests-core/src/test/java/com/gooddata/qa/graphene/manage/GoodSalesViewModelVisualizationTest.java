@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.http.CommonRestRequest;
@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.function.Function;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;

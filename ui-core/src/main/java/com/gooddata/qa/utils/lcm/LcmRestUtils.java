@@ -1,6 +1,6 @@
 package com.gooddata.qa.utils.lcm;
 
-import com.gooddata.project.ProjectService;
+import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.google.common.collect.Sets;

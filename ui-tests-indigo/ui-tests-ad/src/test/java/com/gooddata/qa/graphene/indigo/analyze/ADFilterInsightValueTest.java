@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
@@ -46,7 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel

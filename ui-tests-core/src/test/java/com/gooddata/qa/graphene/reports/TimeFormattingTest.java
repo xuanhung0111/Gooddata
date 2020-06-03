@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static java.util.Arrays.asList;

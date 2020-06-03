@@ -25,9 +25,9 @@ import org.openqa.selenium.By;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodDataException;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.common.GoodDataException;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
