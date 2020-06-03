@@ -27,8 +27,8 @@ import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;

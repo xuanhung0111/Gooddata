@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.project.ProjectDriver;
+import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;

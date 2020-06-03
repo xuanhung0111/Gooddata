@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.fixture.ResourceManagement;
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;

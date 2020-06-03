@@ -7,11 +7,11 @@ import java.time.LocalTime;
 
 import com.gooddata.qa.utils.http.RestClient;
 import org.openqa.selenium.support.FindBy;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.dataload.processes.ProcessService;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecution;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.service.dataload.processes.ProcessService;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
@@ -81,7 +81,7 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
     }
 
     private Schedule getScheduleByName(DataloadProcess process, String scheduleName) {
-        return getProcessService().listSchedules(getProject()).stream()
+        return getProcessService().listSchedules(getProject()).allItemsStream()
                 .filter(s -> s.getProcessId().equals(process.getId()))
                 .filter(s -> scheduleName.equals(s.getName()))
                 .findFirst()

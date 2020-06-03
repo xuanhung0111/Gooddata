@@ -1,24 +1,25 @@
 package com.gooddata.qa.utils.http;
 
-import com.gooddata.GoodData;
-import com.gooddata.account.AccountService;
-import com.gooddata.connector.ConnectorService;
-import com.gooddata.dataload.OutputStageService;
-import com.gooddata.dataload.processes.ProcessService;
-import com.gooddata.dataset.DatasetService;
-import com.gooddata.featureflag.FeatureFlagService;
-import com.gooddata.gdc.DataStoreService;
-import com.gooddata.gdc.GdcService;
+import com.gooddata.sdk.service.GoodData;
+import com.gooddata.sdk.service.account.AccountService;
+import com.gooddata.sdk.service.connector.ConnectorService;
+import com.gooddata.sdk.service.dataload.OutputStageService;
+import com.gooddata.sdk.service.dataload.processes.ProcessService;
+import com.gooddata.sdk.service.dataset.DatasetService;
+import com.gooddata.sdk.service.export.ExportService;
+import com.gooddata.sdk.service.featureflag.FeatureFlagService;
+import com.gooddata.sdk.service.gdc.DataStoreService;
+import com.gooddata.sdk.service.gdc.GdcService;
 import com.gooddata.http.client.GoodDataHttpClient;
 import com.gooddata.http.client.LoginSSTRetrievalStrategy;
 import com.gooddata.http.client.SSTRetrievalStrategy;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.maintenance.ExportImportService;
-import com.gooddata.model.ModelService;
-import com.gooddata.notification.NotificationService;
-import com.gooddata.project.ProjectService;
-import com.gooddata.report.ReportService;
-import com.gooddata.warehouse.WarehouseService;
+import com.gooddata.sdk.service.md.MetadataService;
+import com.gooddata.sdk.service.md.maintenance.ExportImportService;
+import com.gooddata.sdk.service.project.model.ModelService;
+import com.gooddata.sdk.service.notification.NotificationService;
+import com.gooddata.sdk.service.project.ProjectService;
+import com.gooddata.sdk.service.export.ExportService;
+import com.gooddata.sdk.service.warehouse.WarehouseService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -127,8 +128,8 @@ public class RestClient {
         return goodDataClient.getDatasetService();
     }
 
-    public ReportService getReportService() {
-        return goodDataClient.getReportService();
+    public ExportService getExportService() {
+        return goodDataClient.getExportService();
     }
 
     public ProcessService getProcessService() {

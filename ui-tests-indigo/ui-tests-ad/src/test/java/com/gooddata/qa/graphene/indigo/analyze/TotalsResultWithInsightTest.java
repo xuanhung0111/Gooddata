@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;

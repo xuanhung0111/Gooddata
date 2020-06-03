@@ -1,8 +1,8 @@
 package com.gooddata.qa.fixture.utils.GoodSales;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.service.md.ObjNotFoundException;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 

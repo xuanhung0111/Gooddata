@@ -1,12 +1,12 @@
 package com.gooddata.qa.utils.lcm;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.dataload.processes.ProcessService;
-import com.gooddata.dataload.processes.ProcessType;
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectService;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecution;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.service.dataload.processes.ProcessService;
+import com.gooddata.sdk.model.dataload.processes.ProcessType;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile.Column;
@@ -16,7 +16,7 @@ import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
-import com.gooddata.warehouse.Warehouse;
+import com.gooddata.sdk.model.warehouse.Warehouse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;

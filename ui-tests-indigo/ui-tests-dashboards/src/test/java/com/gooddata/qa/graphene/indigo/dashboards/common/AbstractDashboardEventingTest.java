@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;

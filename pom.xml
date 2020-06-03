@@ -84,8 +84,9 @@
         <version.org.apache.maven.surefire-plugin>2.19.1</version.org.apache.maven.surefire-plugin>
         <json-path.version>0.9.1</json-path.version>
         <gooddata-http-client.version>0.9.4</gooddata-http-client.version>
-        <gooddata-java.version>2.35.0+api1</gooddata-java.version>
-        <jackson.version>2.8.3</jackson.version>
+        <gooddata-java.version>3.0.0+api3</gooddata-java.version>
+        <jackson.version>2.11.0</jackson.version>
+        <slf4j.version>1.7.30</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -163,6 +164,18 @@
             <groupId>com.gooddata</groupId>
             <artifactId>gooddata-java</artifactId>
             <version>${gooddata-java.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.project.Environment;
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectDriver;
+import com.gooddata.sdk.model.project.Environment;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import org.apache.commons.lang.StringUtils;

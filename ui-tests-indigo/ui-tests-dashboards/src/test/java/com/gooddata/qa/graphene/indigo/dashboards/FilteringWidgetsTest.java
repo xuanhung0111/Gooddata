@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.md.Metric;
-import static com.gooddata.md.Restriction.title;
+import com.gooddata.sdk.model.md.Metric;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;

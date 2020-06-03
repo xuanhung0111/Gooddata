@@ -15,11 +15,11 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.FutureResult;
-import com.gooddata.GoodDataException;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.service.FutureResult;
+import com.gooddata.sdk.common.GoodDataException;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecution;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -28,7 +28,7 @@ import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.warehouse.Warehouse;
+import com.gooddata.sdk.model.warehouse.Warehouse;
 
 public class DataloadProcessTest extends AbstractDataloadProcessTest {
 

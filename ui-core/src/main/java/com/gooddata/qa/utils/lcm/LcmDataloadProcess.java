@@ -3,7 +3,7 @@ package com.gooddata.qa.utils.lcm;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 
 /**
  * Wrapper class to support creating LCM type dataload process by rest api, this process expected to run on k8s executor

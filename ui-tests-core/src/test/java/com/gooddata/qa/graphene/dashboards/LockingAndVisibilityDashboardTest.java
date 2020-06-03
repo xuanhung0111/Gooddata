@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.ProjectDashboard;
+import com.gooddata.sdk.model.md.ProjectDashboard;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog;
