@@ -1,0 +1,6 @@
+CREATE OR REPLACE VIEW "PRE_user" AS SELECT
+		score AS "a__score",
+		userid AS "cp__userid",
+		joindate AS "d__joindate",
+		age AS "f__age"
+FROM "USER";

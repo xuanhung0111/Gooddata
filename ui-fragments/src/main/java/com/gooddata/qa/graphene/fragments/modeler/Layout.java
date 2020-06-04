@@ -36,7 +36,8 @@ public class Layout extends AbstractFragment {
         return toolBar;
     }
 
-    public void waitForLoading() {
+    public Layout waitForLoading() {
         waitForElementNotVisible(loading);
+        return this;
     }
 }

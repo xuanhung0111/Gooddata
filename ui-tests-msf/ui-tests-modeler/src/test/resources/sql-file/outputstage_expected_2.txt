@@ -1,0 +1,22 @@
+--- INFO
+--- We use the DECIMAL (12, 2) data type.
+--- Verify that your facts (f__) can be converted to this data type.
+--- If you need a greater precision and/or scale, manually increase the data size in the generated DDL before executing it and/or update the logical data model.
+--- Maximum precision/scale support is DECIMAL(15,6), if you even need a greater precision and/or scale, contact GoodData Support.
+
+USE DATABASE "DATABASE_NEED_TO_CHANGE";
+USE SCHEMA "PUBLIC";
+
+--------------------------------------------------
+-- PRE_user --
+--------------------------------------------------
+CREATE TABLE "PRE_user" (
+  "a__score" INTEGER,
+  "cp__userid" VARCHAR(128),
+  "d__joindate" DATE,
+  "f__age" NUMERIC(12,2)
+
+  , "x__client_id" VARCHAR(128) NOT NULL  /* Remove this line if loading into all client workspaces */
+  , "x__deleted" BOOLEAN DEFAULT false  /* Remove this line if inserting only */
+  , "x__timestamp" TIMESTAMP NOT NULL  /* Remove this line if it's not incremental load */
+);

@@ -8,14 +8,18 @@ public class SnowflakeTableUtils {
     public static final String DATE_DATASET_BIRTHDAY = "birthday";
     public static final String DATE_DATASET = "Date";
     public static final String PK_CUSKEY = "custkey";
+    public static final String PK_USERID = "userid";
     public static final String PK_CUSKEY_LABEL = "custkeylabel";
     public static final String PK_CUSKEY_LINK = "custkeylink";
     public static final String ATTR_NAME = "name";
+    public static final String ATTR_SCORE = "score";
+    public static final String ATTR_USERNAME = "username";
     public static final String ATTR_ADDRESS = "address";
     public static final String ATTR_CITY = "city";
     public static final String ATTR_FIRST_GRAIN = "custkeygrain";
     public static final String ATTR_SECOND_GRAIN = "custkeygrain2";
     public static final String DATE_BIRTHDAY = "birthday";
+    public static final String DATE_JOIN = "joindate";
     public static final String FACT_AGE = "age";
     public static final String FACT_AMOUNT = "amount";
     public static final String DATASET_CUSTOMERS = "customers";
@@ -35,6 +39,8 @@ public class SnowflakeTableUtils {
     public static final String DATASET_CUSTOMERS_TIMESTAMP_DELETED = "customers8";
     public static final String OPTIONAL_PREFIX = "PRE_";
     public static final String DELETED_PREFIX = "DELETED_";
+    public static final String DATASET_USER = "user";
+
     // ADS Table names
     public static final String TABLE_CUSTOMERS = OPTIONAL_PREFIX + "CUSTOMERS";
     public static final String TABLE_CUSTOMERS_MUlTILABELS_NORMAL = OPTIONAL_PREFIX + "CUSTOMERSMULTINORMAL";
@@ -100,5 +106,7 @@ public class SnowflakeTableUtils {
             + "CUSTOMERSMAPPINGCLIENTID2";
     public static final String TABLE_DELETE_MAPPING_BOTH_HAS_CLIENT_ID_COLUMN = OPTIONAL_PREFIX + DELETED_PREFIX
             + "CUSTOMERSMAPPINGBOTH2";
+    public static final String TABLE_USER = "USER";
+    public static final String TABLE_PRE_USER = "PRE_USER";
 
 }
