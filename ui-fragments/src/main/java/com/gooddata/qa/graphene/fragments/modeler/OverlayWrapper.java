@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -19,6 +21,12 @@ public class OverlayWrapper extends AbstractFragment {
 
     @FindBy(className = "gd-confirm")
     private ConfirmDeleteDatasetDialog confirmDeleteDatasetDialog;
+
+    @FindBy(className = "create-output-stage-dialog")
+    private OutputStage outputStage;
+
+    @FindBy(className = "actions-menu-generate-output-stage-item")
+    private WebElement dropDownOutputStage;
 
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -38,5 +46,32 @@ public class OverlayWrapper extends AbstractFragment {
     public ConfirmDeleteDatasetDialog getConfirmDeleteDatasetDialog() {
         waitForElementVisible(confirmDeleteDatasetDialog.getRoot());
         return confirmDeleteDatasetDialog;
+    }
+
+    public OutputStage openOutputStage() {
+        waitForElementVisible(dropDownOutputStage).click();
+        return outputStage;
+    }
+
+    public void selectOption(String option) {
+        waitForElementVisible(outputStage.getRoot());
+        outputStage.selectProperty();
+        this.getRoot().findElement(By.xpath("//div[@class='gd-list-item "+ option +"']")).click();
+    }
+
+    public enum PROPERTIES_OPTION {
+        CREATE_VIEW("s-create_views"),
+        CREATE_TABLE("s-create_tables"),
+        ALTER_TABLE("s-alter_tables");
+
+        private final String name;
+
+        private PROPERTIES_OPTION(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

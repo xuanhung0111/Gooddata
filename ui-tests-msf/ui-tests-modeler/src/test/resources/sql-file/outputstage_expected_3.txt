@@ -1,0 +1,34 @@
+--- INFO
+--- We use the DECIMAL (12, 2) data type.
+--- Verify that your facts (f__) can be converted to this data type.
+--- If you need a greater precision and/or scale, manually increase the data size in the generated DDL before executing it and/or update the logical data model.
+--- Maximum precision/scale support is DECIMAL(15,6), if you even need a greater precision and/or scale, contact GoodData Support.
+
+USE DATABASE "DATABASE_NEED_TO_CHANGE";
+USE SCHEMA "PUBLIC";
+
+--------------------------------------------------
+-- PRE_USER --
+--------------------------------------------------
+-- Columns specified in the LDM are missing in the output stage. Run the following commands to add the columns:
+ALTER TABLE "PRE_USER" ADD COLUMN "a__username" VARCHAR(128);
+
+/*
+-- Data types for some mapped columns do not match. Run the following command pairs to change the data type of one column:
+ALTER TABLE "PRE_USER" DROP COLUMN "A__SCORE";
+ALTER TABLE "PRE_USER" ADD COLUMN "A__SCORE" VARCHAR(128);
+*/
+
+-- System columns:
+/*
+-- Uncomment these lines if loading into a client workspace
+ALTER TABLE "PRE_USER" ADD COLUMN "x__client_id" VARCHAR(128);
+*/
+/*
+-- Uncomment these lines if supporting deleted
+ALTER TABLE "PRE_USER" ADD COLUMN "x__deleted" BOOLEAN;
+*/
+/*
+-- Uncomment these lines if incremental load
+ALTER TABLE "PRE_USER" ADD COLUMN "x__timestamp" TIMESTAMP;
+*/
