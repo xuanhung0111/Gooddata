@@ -9,12 +9,13 @@ import java.util.function.Supplier;
 public final class RolloutProcess extends LcmProcess {
 
     private String adsUri;
+    private TestParameters testParameters = TestParameters.getInstance();
 
     /**
      * Init a relase process which expected to run on old executor
      */
-    RolloutProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
-        super(testParameters, projectId, Brick.ofRolloutBrick(testParameters.getBrickAppstore()));
+    RolloutProcess(final String adsUri, final String projectId) {
+        super(projectId, Brick.ofRolloutBrick(TestParameters.getInstance().getBrickAppstore()));
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }
@@ -22,8 +23,8 @@ public final class RolloutProcess extends LcmProcess {
     /**
      * Init a relase process which expected to run on k8s executor
      */
-    RolloutProcess(final TestParameters testParameters, final String adsUri, final String projectId, final String lcmProcessName) {
-        super(testParameters, projectId, lcmProcessName);
+    RolloutProcess(final String adsUri, final String projectId, final String lcmProcessName) {
+        super(projectId, lcmProcessName);
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }

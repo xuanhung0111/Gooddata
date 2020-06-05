@@ -11,12 +11,13 @@ import java.util.function.Supplier;
 public final class ReleaseProcess extends LcmProcess {
 
     private String adsUri;
+    private TestParameters testParameters = TestParameters.getInstance();
 
     /**
      * Init a relase process which expected to run on old executor
      */
-    ReleaseProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
-        super(testParameters, projectId, Brick.ofReleaseBrick(testParameters.getBrickAppstore()));
+    ReleaseProcess(final String adsUri, final String projectId) {
+        super(projectId, Brick.ofReleaseBrick(TestParameters.getInstance().getBrickAppstore()));
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }
@@ -24,8 +25,8 @@ public final class ReleaseProcess extends LcmProcess {
     /**
      * Init a relase process which expected to run on k8s executor
      */
-    ReleaseProcess(final TestParameters testParameters, final String adsUri, final String projectId, final String lcmProcessName) {
-        super(testParameters, projectId, lcmProcessName);
+    ReleaseProcess(final String adsUri, final String projectId, final String lcmProcessName) {
+        super(projectId, lcmProcessName);
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }
