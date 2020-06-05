@@ -1,8 +1,14 @@
 package com.gooddata.qa.graphene.fragments.disc.projects;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.Collection;
@@ -10,15 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
-import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ProjectsPage extends AbstractFragment {
 
@@ -237,6 +237,12 @@ public class ProjectsPage extends AbstractFragment {
         }
 
         return Optional.ofNullable(null);
+    }
+
+    public ProjectDetailPage clickOnProjectTitleLink(String projectTitle) {
+        findProjectElement(projectTitle).get().findElement(By.className("ait-project-list-item-title")).click();
+        return Graphene.createPageFragment(ProjectDetailPage .class,
+                waitForElementVisible(By.className("ait-project-detail-fragment"), browser));
     }
 
     public enum FilterOption {

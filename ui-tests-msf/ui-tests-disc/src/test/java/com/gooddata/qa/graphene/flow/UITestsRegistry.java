@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.flow;
 import com.gooddata.qa.graphene.disc.LongRunTimeTest;
 import com.gooddata.qa.graphene.disc.OverviewPageTest;
 import com.gooddata.qa.graphene.disc.SanityTest;
+import com.gooddata.qa.graphene.disc.lcm.LcmProcessesTest;
 import com.gooddata.qa.graphene.disc.notification.NotificationsTest;
 import com.gooddata.qa.graphene.disc.process.DeployEtlProcessTest;
 import com.gooddata.qa.graphene.disc.process.DeployProcessByGitStoreTest;
@@ -44,6 +45,7 @@ public class UITestsRegistry {
             ScheduleDetailTest.class,
             EtlProcessScheduleDetailTest.class,
             NotificationsTest.class,
+            LcmProcessesTest.class,
             "testng-imap-notification.xml"
         });
 

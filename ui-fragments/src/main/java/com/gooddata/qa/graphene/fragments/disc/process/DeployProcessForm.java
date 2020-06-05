@@ -1,12 +1,12 @@
 package com.gooddata.qa.graphene.fragments.disc.process;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 
 import java.io.File;
@@ -148,6 +148,13 @@ public class DeployProcessForm extends AbstractFragment {
         getProcessTypeDropdown()
                 .expand()
                 .selectProcessType(processType.getTitle());
+        return this;
+    }
+
+    public DeployProcessForm quickSelectSpecialProcessType(ProcessType processType, int range) {
+        getProcessTypeDropdown()
+                .expand()
+                .quickScrollToSelectProcessType(processType.getTitle(), range);
         return this;
     }
 
@@ -331,7 +338,10 @@ public class DeployProcessForm extends AbstractFragment {
         ADS_INTEGRATOR("gdc-etl-ads-integrator", "ADS Integrator"),
         SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor"),
         AUTOMATED_DATA_DISTRIBUTION("gdc-data-distribution", "Automated Data Distribution"),
-        INVALID_PROCESS_TYPE("invalid-process-type", "Invalid Process Type");
+        INVALID_PROCESS_TYPE("invalid-process-type", "Invalid Process Type"),
+        LCM_RELEASE("lcm-release", "Release 3.7.18 (M3)"),
+        LCM_ROLLOUT("lcm-rollout", "Rollout 3.7.18 (M3)"),
+        LCM_RPOVISIONING("lcm-rollout", "Workspace Provisioning 3.7.18 (M3)");
 
         private String value;
         private String title;

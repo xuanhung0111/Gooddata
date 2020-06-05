@@ -1,0 +1,34 @@
+{
+  "SEGMENTS": [{
+    "segment_id": "${SEGMENT_ID}",
+    "development_pid": "${DEVELOPMENT_PID}",
+    "driver": "pg",
+    "master_name": "${mstpn} ##{version}"
+  }],
+  "TOKENS": {
+    "pg": "INT01PRODPDWH01STG1LCM",
+    "vertica": "INT00VDWH01STG1LCMPROD"
+  },
+  "ads_client": {
+    "username": "rubydev+admin@gooddata.com",
+    "password": "${GDC_PASSWORD}",
+    "jdbc_url": "${JDBC_URL}"
+  },
+  "SEGMENTS_FILTER": ["${SEGMENT_ID}"],
+  "technical_user": ["nxhung@lhv.vn", "nxhung+1@lhv.vn"],
+  "additional_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "additional_hidden_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "dynamic_params": {
+    "input_source": {
+      "type": "ads",
+      "query": "select client_id, param_name, param_value, schedule_name from CLIENT_PARAMS_CA;"
+    }
+  },
+  "schedule_title_column": "schedule_name"
+}
