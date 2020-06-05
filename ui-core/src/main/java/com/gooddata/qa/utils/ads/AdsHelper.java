@@ -136,7 +136,7 @@ public final class AdsHelper extends CommonRestRequest {
 
     private void removeReferencedProjects(List<String> pids) throws ParseException, JSONException, IOException {
         for (String pid : pids) {
-            log.info(String.format("Removing ads instance reference from '%s'", pid));
+            System.out.println(String.format("Removing ads instance reference from '%s'", pid));
             resetOutputStageOfProject(pid);
         }
     }
