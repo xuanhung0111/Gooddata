@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
@@ -25,9 +25,9 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;

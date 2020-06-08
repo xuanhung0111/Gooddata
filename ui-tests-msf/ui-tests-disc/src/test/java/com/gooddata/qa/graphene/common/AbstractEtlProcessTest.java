@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.common;
 
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;

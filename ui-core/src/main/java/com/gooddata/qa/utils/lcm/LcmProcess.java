@@ -1,9 +1,9 @@
 package com.gooddata.qa.utils.lcm;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecution;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.utils.http.RestClient;

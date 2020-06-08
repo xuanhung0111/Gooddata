@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc.schedule;
 
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.common.AbstractEtlProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;

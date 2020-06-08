@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.CRC32;
 
-import com.gooddata.GoodDataException;
+import com.gooddata.sdk.common.GoodDataException;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;

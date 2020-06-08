@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.common;
 
 import static java.util.Objects.nonNull;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;

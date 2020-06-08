@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.add.schedule;
 
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;

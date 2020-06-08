@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;

@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e.common;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public abstract class AbstractAdE2ETest extends AbstractAnalyseTest {

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
@@ -17,9 +17,9 @@ import java.util.List;
 
 import javax.mail.Message;
 
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Metric;
-import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.service.md.ObjNotFoundException;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 
 import com.gooddata.qa.utils.http.RestClient;
@@ -31,8 +31,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Restriction;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;

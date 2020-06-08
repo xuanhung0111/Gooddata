@@ -1,9 +1,9 @@
 package com.gooddata.qa.utils.http.project;
 
-import com.gooddata.featureflag.FeatureFlagService;
-import com.gooddata.featureflag.ProjectFeatureFlag;
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectService;
+import com.gooddata.sdk.service.featureflag.FeatureFlagService;
+import com.gooddata.sdk.model.featureflag.ProjectFeatureFlag;
+import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;

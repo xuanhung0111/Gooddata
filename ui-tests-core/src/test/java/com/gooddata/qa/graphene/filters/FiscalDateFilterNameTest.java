@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -27,8 +27,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static java.lang.String.format;

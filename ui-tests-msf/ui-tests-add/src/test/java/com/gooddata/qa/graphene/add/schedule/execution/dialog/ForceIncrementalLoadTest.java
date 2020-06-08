@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.add.schedule.execution.dialog;
 
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.IncrementalPeriod;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;

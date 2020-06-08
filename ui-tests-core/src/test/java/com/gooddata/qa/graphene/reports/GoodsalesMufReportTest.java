@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;

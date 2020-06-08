@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc.process;
 
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.common.AbstractEtlProcessTest;
 import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
