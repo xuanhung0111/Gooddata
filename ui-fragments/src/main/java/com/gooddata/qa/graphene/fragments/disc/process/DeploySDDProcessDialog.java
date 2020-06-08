@@ -67,6 +67,10 @@ public class DeploySDDProcessDialog extends AbstractFragment {
         return this;
     }
 
+    public Boolean checkExistingDataSource(String dataSourceTitle) {
+        return getDataSourceDropdown().expand().IsDataSourceExist(dataSourceTitle);
+    }
+
     public boolean isSelectedSegment(String title) {
         return waitForElementVisible(By.cssSelector(".s-" + simplifyText(title) + " input"), browser).isSelected();
     }

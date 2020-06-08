@@ -158,6 +158,19 @@ public class DataSourceRestRequest extends CommonRestRequest {
         return listAutoDatasource;
     }
 
+    public String getDatasourceByName (String name) throws IOException {
+        final JSONObject json = getJsonObject(
+                RestRequest.initGetRequest(DATA_SOURCE_REST_URI + "?offset=0&limit=300"));
+        JSONArray datasources = json.getJSONObject("dataSources").getJSONArray("items");
+        for (int i = 0; i < datasources.length(); i++) {
+            final JSONObject object = datasources.getJSONObject(i).getJSONObject("dataSource");
+            if ( object.getString("name").equals(name)) {
+                return object.getString("id");
+            }
+        }
+        return null;
+    }
+
     private boolean isOldDatasources(JSONObject object, int retentionDay) {
         DateTime date = DateTime.parse(object.getString("lastModified"));
         Days tmp = Days.daysBetween(date.toLocalDate(), DateTime.now().toLocalDate());
