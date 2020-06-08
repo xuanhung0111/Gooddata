@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;
@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;

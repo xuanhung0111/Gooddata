@@ -16,8 +16,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.project.Environment;
-import com.gooddata.project.ProjectDriver;
+import com.gooddata.sdk.model.project.Environment;
+import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {

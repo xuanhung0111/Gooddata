@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
@@ -29,9 +29,9 @@ import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;

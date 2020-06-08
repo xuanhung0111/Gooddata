@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
 import com.gooddata.qa.utils.http.RestClient;
@@ -26,9 +26,9 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;

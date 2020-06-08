@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.*;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;

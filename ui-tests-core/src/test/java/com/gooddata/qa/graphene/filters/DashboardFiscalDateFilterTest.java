@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import java.net.URL;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;

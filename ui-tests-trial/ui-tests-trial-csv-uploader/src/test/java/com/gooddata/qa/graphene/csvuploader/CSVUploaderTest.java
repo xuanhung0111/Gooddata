@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import com.gooddata.project.Environment;
+import com.gooddata.sdk.model.project.Environment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.ProcessBuilderUtils;
 import org.testng.annotations.Test;

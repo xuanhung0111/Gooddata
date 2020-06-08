@@ -1,18 +1,18 @@
 package com.gooddata.qa.fixture.utils.GoodSales;
 
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.Filter;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.Filter;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.md.report.ReportDefinition;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 
 import java.util.Arrays;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;

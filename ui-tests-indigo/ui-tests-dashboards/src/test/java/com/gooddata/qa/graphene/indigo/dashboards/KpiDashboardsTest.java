@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.AttributeElement;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.redshift;
 
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;

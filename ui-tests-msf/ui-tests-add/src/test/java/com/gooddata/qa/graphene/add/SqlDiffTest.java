@@ -18,7 +18,7 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
-import com.gooddata.warehouse.Warehouse;
+import com.gooddata.sdk.model.warehouse.Warehouse;
 
 public class SqlDiffTest extends AbstractDataloadProcessTest {
 

@@ -1,13 +1,13 @@
 package com.gooddata.qa.utils.http.variable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gooddata.md.AbstractObj;
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
-import com.gooddata.md.Meta;
-import com.gooddata.md.ObjNotFoundException;
-import com.gooddata.md.Queryable;
-import com.gooddata.md.Updatable;
+import com.gooddata.sdk.model.md.AbstractObj;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.AttributeElement;
+import com.gooddata.sdk.model.md.Meta;
+import com.gooddata.sdk.service.md.ObjNotFoundException;
+import com.gooddata.sdk.model.md.Queryable;
+import com.gooddata.sdk.model.md.Updatable;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;

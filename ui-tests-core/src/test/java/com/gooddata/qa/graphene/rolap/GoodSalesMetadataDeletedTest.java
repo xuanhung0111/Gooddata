@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.rolap;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
@@ -50,10 +50,10 @@ import org.openqa.selenium.By;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;

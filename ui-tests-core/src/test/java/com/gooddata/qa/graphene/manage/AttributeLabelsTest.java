@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import com.gooddata.md.Fact;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
@@ -14,7 +14,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.Test;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;

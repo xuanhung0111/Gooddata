@@ -13,7 +13,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;

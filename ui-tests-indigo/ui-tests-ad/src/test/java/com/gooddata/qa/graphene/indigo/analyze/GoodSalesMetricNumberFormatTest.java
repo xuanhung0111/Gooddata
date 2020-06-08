@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.md.Metric;
+import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;

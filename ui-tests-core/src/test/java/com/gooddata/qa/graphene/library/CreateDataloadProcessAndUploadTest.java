@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.library;
 
-import com.gooddata.GoodData;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessType;
+import com.gooddata.sdk.service.GoodData;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessType;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;

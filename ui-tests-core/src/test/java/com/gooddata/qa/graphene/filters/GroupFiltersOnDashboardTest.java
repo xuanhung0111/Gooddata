@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.AttributeElement;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;

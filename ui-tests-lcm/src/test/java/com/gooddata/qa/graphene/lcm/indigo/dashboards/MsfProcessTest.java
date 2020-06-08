@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessType;
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.md.Attribute;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessType;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
