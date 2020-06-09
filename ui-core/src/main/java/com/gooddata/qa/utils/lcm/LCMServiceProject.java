@@ -102,12 +102,12 @@ public final class LCMServiceProject {
      */
     public void cleanUp(final String domain) {
         try {
-            log.info("---Removing ads instance");
+            System.out.println("Removing ads instance");
             AdsHelper adsHelper = new AdsHelper(restClient, this.projectId);
             adsHelper.removeAds(ads);
-            log.info("---Deleting associated segments");
+            System.out.println("Removing associated segments");
             LcmRestUtils.deleteSegments(this.restClient, domain, this.associatedSegments);
-            log.info("---Deleting service project");
+            System.out.println("Removing service project");
             deleteProject(this.projectId);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

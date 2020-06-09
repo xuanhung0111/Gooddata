@@ -511,7 +511,6 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
         if (dataloadProcess != null) {
             domainRestClient.getProcessService().removeProcess(dataloadProcess);
         }
-        lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         redshiftUtils.dropTables(TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN,
                 TABLE_DELETE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN);

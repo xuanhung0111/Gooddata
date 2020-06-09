@@ -398,7 +398,6 @@ public class CustomSegmentMappingClientIdTest extends AbstractADDProcessTest {
         if (dataloadProcess != null) {
             domainRestClient.getProcessService().removeProcess(dataloadProcess);
         }
-        lcmBrickFlowBuilder.destroy();
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);

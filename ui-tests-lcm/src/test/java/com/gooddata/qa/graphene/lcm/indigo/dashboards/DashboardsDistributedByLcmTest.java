@@ -271,7 +271,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = "testSyncLockedFlag")
-    public void testDefaultDataProduce() throws IOException {
+    public void testDefaultDataProduce() {
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
         String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(FIRST_TEST_INSIGHT))).get(0);

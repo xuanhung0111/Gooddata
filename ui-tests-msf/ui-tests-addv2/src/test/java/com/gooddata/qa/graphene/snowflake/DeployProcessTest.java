@@ -256,13 +256,4 @@ public class DeployProcessTest extends AbstractADDProcessTest {
             dataSourceUtils.getDataSourceRestRequest().deleteDataSource(dataSourceID);
         }
     }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() {
-        testParams.setProjectId(testParams.getProjectId());
-        if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
-            return;
-        }
-        lcmBrickFlowBuilder.destroy();
-    }
 }
