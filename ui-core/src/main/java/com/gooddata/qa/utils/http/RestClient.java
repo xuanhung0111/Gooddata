@@ -176,7 +176,7 @@ public class RestClient {
                                              HttpRequestRetryHandler retryHandler) {
         final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setRetryHandler(retryHandler);
-        httpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        httpClientBuilder.setSSLHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
         if (useSST) {
             HttpClient httpClient = httpClientBuilder.build();
