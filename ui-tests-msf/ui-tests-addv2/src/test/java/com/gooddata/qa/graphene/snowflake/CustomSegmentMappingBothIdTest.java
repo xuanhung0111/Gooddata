@@ -300,7 +300,6 @@ public class CustomSegmentMappingBothIdTest extends AbstractADDProcessTest {
         if (dataloadProcess != null) {
             domainRestClient.getProcessService().removeProcess(dataloadProcess);
         }
-        lcmBrickFlowBuilder.destroy();
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_2);
         dataMappingProjectIdUtils.deleteProjectIdDataMapping(clientProjectId1);
