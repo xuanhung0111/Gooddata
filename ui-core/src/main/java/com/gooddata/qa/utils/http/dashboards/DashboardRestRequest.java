@@ -6,7 +6,7 @@ import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

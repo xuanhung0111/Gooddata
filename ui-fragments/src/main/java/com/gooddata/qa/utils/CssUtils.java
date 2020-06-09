@@ -3,7 +3,7 @@
  */
 package com.gooddata.qa.utils;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.WebElement;
 
 public final class CssUtils {
@@ -18,7 +18,7 @@ public final class CssUtils {
      * classes.
      */
     public static String simplifyText(String text) {
-        return StringEscapeUtils.escapeHtml(text)
+        return StringEscapeUtils.escapeHtml4(text)
                 .replaceAll("[^a-zA-Z0-9]", "_")
                 .toLowerCase();
     }

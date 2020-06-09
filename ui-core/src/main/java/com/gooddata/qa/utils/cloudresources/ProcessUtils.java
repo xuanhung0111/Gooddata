@@ -1,6 +1,6 @@
 package com.gooddata.qa.utils.cloudresources;
 
-import static org.apache.commons.lang.Validate.notNull;
+import static org.apache.commons.lang3.Validate.notNull;
 import com.gooddata.sdk.common.GoodDataException;
 import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.sdk.model.dataload.processes.ProcessExecution;

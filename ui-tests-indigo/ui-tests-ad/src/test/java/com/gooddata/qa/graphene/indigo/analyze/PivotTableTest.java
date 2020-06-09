@@ -67,7 +67,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class PivotTableTest extends AbstractAnalyseTest {
 

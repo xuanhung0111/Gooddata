@@ -12,7 +12,7 @@ import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static org.apache.commons.lang.Validate.notNull;
+import static org.apache.commons.lang3.Validate.notNull;
 
 public abstract class LcmProcess {
 

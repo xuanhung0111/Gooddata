@@ -16,7 +16,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
