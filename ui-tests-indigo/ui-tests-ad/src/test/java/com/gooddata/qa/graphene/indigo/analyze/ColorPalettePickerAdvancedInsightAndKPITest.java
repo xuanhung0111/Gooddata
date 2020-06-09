@@ -138,7 +138,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
         }
     }
 
-    /*@Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnAttribute() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
                 .openConfigurationPanelBucket().openColorConfiguration()
@@ -388,7 +388,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                 deleteProject(targetProjectId);
             }
         }
-    }*/
+    }
 
     private void createInsightHasAttributeOnViewBy(String title, String metric, String attribute, ReportType reportType) {
             indigoRestRequest.createInsight(
