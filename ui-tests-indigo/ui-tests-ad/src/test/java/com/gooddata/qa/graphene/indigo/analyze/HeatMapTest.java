@@ -128,9 +128,9 @@ public class HeatMapTest extends AbstractAnalyseTest {
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing();
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("Department", "Direct Sales"), asList("# of Activities", "21,615")));
+                asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
         assertEquals(chartReport.getXaxisLabels(), asList("Direct Sales", "Inside Sales"));
-        assertEquals(chartReport.getYaxisLabels(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+        assertEquals(chartReport.getYaxisLabels(), asList("Web Meeting", "Phone Call", "In Person Meeting", "Email"));
         assertEquals(chartReport.getTrackerLegends(), 7);
     }
 
@@ -231,11 +231,11 @@ public class HeatMapTest extends AbstractAnalyseTest {
 
         analysisPage.addDateFilter().getFilterBuckets().configDateFilter("01/01/2015", "01/01/2019");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("6", "1", "3", "2"));
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("2", "3", "1", "6"));
 
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("6", "3"));
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("3", "6"));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -245,12 +245,12 @@ public class HeatMapTest extends AbstractAnalyseTest {
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_ACTIVITY, "01/01/2015", "01/01/2019");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("6", "1", "3", "2"));
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("2", "3", "1", "6"));
 
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration()
                 .addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 3);
-        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("6", "3", "2"));
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("2", "3", "6"));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -263,14 +263,14 @@ public class HeatMapTest extends AbstractAnalyseTest {
                 .addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting");
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getTrackersCount(), 3);
-        assertEquals(chartReport.getDataLabels(), asList("2", "2", "1"));
+        assertEquals(chartReport.getDataLabels(), asList("1", "2", "2"));
 
         analysisPage.addDateFilter().getFilterBuckets().configDateFilter("01/01/2016", "01/01/2019");
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         assertEquals(chartReport.getTrackersCount(), 2);
         assertEquals(chartReport.getDataLabels(), asList("2", "2"));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"),
+                asList(asList("Activity Type", "Phone Call"),
                         asList("# of Activities, Activity: Jan 1, 2015 - Jan 1, 2016 (Activity Type: Email, Phone Call, Web Meeting)", "2")));
     }
 
@@ -282,9 +282,9 @@ public class HeatMapTest extends AbstractAnalyseTest {
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration()
                 .addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         assertEquals(chartReport.getTrackersCount(), 2);
-        assertEquals(chartReport.getDataLabels(), asList("33,920", "50,780"));
+        assertEquals(chartReport.getDataLabels(), asList("50,780", "33,920"));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("# of Activities (Activity Type: Email, Phone Call)", "33,920")));
+                asList(asList("Activity Type", "Phone Call"), asList("# of Activities (Activity Type: Email, Phone Call)", "50,780")));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -333,12 +333,12 @@ public class HeatMapTest extends AbstractAnalyseTest {
         ChartReport chartReport = analysisPage.addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTrackersCount(), 8);
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("Department", "Direct Sales"), asList("# of Activities", "21,615")));
+                asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
 
         analysisPage.reorderRowAndColumn(ATTR_DEPARTMENT, ATTR_ACTIVITY_TYPE);
         assertEquals(chartReport.getTrackersCount(), 8);
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Department", "Direct Sales"), asList("Activity Type", "Email"), asList("# of Activities", "21,615")));
+                asList(asList("Department", "Inside Sales"), asList("Activity Type", "Email"), asList("# of Activities", "12,305")));
 
         analysisPage.getAttributesBucket().setTitleItemBucket(ATTR_DEPARTMENT, ATTR_DEPARTMENT + "Rename");
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT + "Rename\n" + ATTR_DEPARTMENT));

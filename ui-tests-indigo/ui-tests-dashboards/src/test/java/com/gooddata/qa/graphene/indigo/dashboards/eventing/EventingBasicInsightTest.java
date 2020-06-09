@@ -601,7 +601,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
 
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
         verifyColumnIntersection(intersection.getJSONObject(1), "Direct Sales", departmentUri);
-        verifyColumnIntersection(intersection.getJSONObject(2), "Email", activityTypeUri);
+        verifyColumnIntersection(intersection.getJSONObject(2), "Web Meeting", activityTypeUri);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -649,7 +649,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
 
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
         verifyColumnIntersection(intersection.getJSONObject(1), "East Coast", regionUri);
-        verifyColumnIntersection(intersection.getJSONObject(2), "2008", yearActivity);
+        verifyColumnIntersection(intersection.getJSONObject(2), "2016", yearActivity);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -697,7 +697,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
 
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
         verifyColumnIntersection(intersection.getJSONObject(1), "2008", yearActivity);
-        verifyColumnIntersection(intersection.getJSONObject(2), "East Coast", regionUri);
+        verifyColumnIntersection(intersection.getJSONObject(2), "West Coast", regionUri);
     }
 
     private void verifyTableReport(JSONObject content, String columnTitle, String expectedUri) {
