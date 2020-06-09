@@ -365,7 +365,6 @@ public class SegmentDeleteByLabelTest extends AbstractADDProcessTest {
         if (dataloadProcess != null) {
             domainRestClient.getProcessService().removeProcess(dataloadProcess);
         }
-        lcmBrickFlowBuilder.destroy();
         dataSourceRestRequest.deleteDataSource(dataSourceId);
         snowflakeUtils.dropDatabaseIfExists(DATABASE_NAME);
         snowflakeUtils.closeSnowflakeConnection();

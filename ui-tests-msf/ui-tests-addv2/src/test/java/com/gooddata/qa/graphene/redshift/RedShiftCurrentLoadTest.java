@@ -119,7 +119,7 @@ public class RedShiftCurrentLoadTest extends AbstractADDProcessTest {
     protected IndigoDashboardsPage indigoDashboardsPage;
 
     @Override
-    protected void customizeProject() throws Throwable {
+    protected void customizeProject() {
         domainRestClient = new RestClient(getProfile(DOMAIN));
         dataSource = new DataSourceUtils(testParams.getDomainUser());
         dataSourceRestRequest = new DataSourceRestRequest(domainRestClient, testParams.getProjectId());
