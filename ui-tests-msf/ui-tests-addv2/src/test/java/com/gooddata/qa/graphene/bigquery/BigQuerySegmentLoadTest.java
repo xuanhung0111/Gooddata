@@ -486,7 +486,7 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
 
     private void createLCM() throws ParseException, IOException {
         log.info("Creating LCM .......................");
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(useK8sExecutor);
         serviceProjectId = lcmBrickFlowBuilder.getLCMServiceProject().getServiceProjectId();
         serviceProject = domainRestClient.getProjectService().getProjectById(serviceProjectId);
 

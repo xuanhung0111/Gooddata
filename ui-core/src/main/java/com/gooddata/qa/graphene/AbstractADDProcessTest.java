@@ -20,7 +20,7 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(useK8sExecutor);
         domainRestClient = new RestClient(getProfile(DOMAIN));
     }
 

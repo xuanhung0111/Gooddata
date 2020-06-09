@@ -102,7 +102,7 @@ public class MsfProcessTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnMethods = {"prepareAdsData"}, groups = {"precondition"})
     public void deployLcmFlow() throws ParseException, JSONException, IOException {
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(useK8sExecutor);
         devProjectId = testParams.getProjectId();
         clientProjectId = createNewEmptyProject(domainRestClient, CLIENT_PROJECT_TITLE);
         lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)

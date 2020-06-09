@@ -18,7 +18,7 @@ final public class LcmBrickFlowBuilder {
 
     private static final Logger log = Logger.getLogger(LcmBrickFlowBuilder.class.getName());
     private LCMServiceProject lcmServiceProject;
-    private TestParameters testParams;
+    private TestParameters testParams = TestParameters.getInstance();
     private String devProjectId;
     private String[] clientProjectIds;
     private JSONArray releaseSegments;
@@ -29,11 +29,10 @@ final public class LcmBrickFlowBuilder {
     private String segmentId;
     private String clientId;
 
-    public LcmBrickFlowBuilder(final TestParameters testParameters, boolean useK8sExecutor) {
-        this.testParams = testParameters;
+    public LcmBrickFlowBuilder(boolean useK8sExecutor) {
         this.devProjectId = testParams.getProjectId();
         this.clients = new HashMap<>();
-        this.lcmServiceProject = LCMServiceProject.newWorkFlow(testParams, useK8sExecutor);
+        this.lcmServiceProject = LCMServiceProject.newWorkFlow(useK8sExecutor);
     }
 
     public LcmBrickFlowBuilder setDevelopProject(final String developProject) {

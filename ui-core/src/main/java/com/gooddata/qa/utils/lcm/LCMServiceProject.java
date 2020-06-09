@@ -62,33 +62,33 @@ public final class LCMServiceProject {
 
     private RestClient restClient;
     private boolean useK8sExecutor;
+    private TestParameters testParameters = TestParameters.getInstance();
 
     /**
      * Create a service project that contains 3 ruby-run process: release, provision, rollout and one ads dataload process
      *
-     * @param testParameters
      * @param useK8sExecutor create built-in LCM dataload processess if true otherwise create generic RUBY brick processess
      * @return LCMServiceProject
      */
-    public static LCMServiceProject newWorkFlow(final TestParameters testParameters, boolean useK8sExecutor) {
-        return new LCMServiceProject(testParameters, useK8sExecutor);
+    public static LCMServiceProject newWorkFlow(boolean useK8sExecutor) {
+        return new LCMServiceProject(useK8sExecutor);
     }
 
     private LCMServiceProject() {
         //prevent default constructor
     }
 
-    private LCMServiceProject(final TestParameters testParameters, boolean useK8sExecutor) {
+    private LCMServiceProject(boolean useK8sExecutor) {
         try {
             this.useK8sExecutor = useK8sExecutor;
-            this.restClient = createDomainRestClient(testParameters);
-            this.projectId = createNewEmptyProject(testParameters, "ATT Service Project");
+            this.restClient = createDomainRestClient();
+            this.projectId = createNewEmptyProject("ATT Service Project");
             log.info("--->Created service project:" + this.projectId);
             log.info("--->useK8SExecutor:" + useK8sExecutor);
 
-            initAdsInstance(testParameters);
+            initAdsInstance();
             log.info("--->Created ads instance has uri:" + ads.getUri());
-            createLCMProcesses(testParameters);
+            createLCMProcesses();
         } catch (Exception e) {
             if(projectId != null ) {
                 deleteProject(projectId);
@@ -244,9 +244,8 @@ public final class LCMServiceProject {
      * @throws IOException
      * @throws URISyntaxException
      */
-    private LCMServiceProject initAdsInstance(final TestParameters testParameters)
-            throws IOException {
-        AdsHelper adsHelper = new AdsHelper(createDomainRestClient(testParameters), this.projectId);
+    private LCMServiceProject initAdsInstance() throws IOException {
+        AdsHelper adsHelper = new AdsHelper(createDomainRestClient(), this.projectId);
         ads = adsHelper.createAds("ads-lcm-" + generateHashString(),
                 testParameters.loadProperty("dss.authorizationToken"));
 
@@ -262,10 +261,10 @@ public final class LCMServiceProject {
         return this;
     }
 
-    private LCMServiceProject createLCMProcesses(final TestParameters testParameters) {
-        this.releaseProcess = LcmProcess.ofRelease(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
-        this.provisionProcess = LcmProcess.ofProvision(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
-        this.rolloutProcess = LcmProcess.ofRollout(testParameters, ads.getConnectionUrl(), this.projectId, useK8sExecutor);
+    private LCMServiceProject createLCMProcesses() {
+        this.releaseProcess = LcmProcess.ofRelease(ads.getConnectionUrl(), this.projectId, useK8sExecutor);
+        this.provisionProcess = LcmProcess.ofProvision(ads.getConnectionUrl(), this.projectId, useK8sExecutor);
+        this.rolloutProcess = LcmProcess.ofRollout(ads.getConnectionUrl(), this.projectId, useK8sExecutor);
         return this;
     }
 
@@ -369,7 +368,7 @@ public final class LCMServiceProject {
         });
     }
 
-    private String createNewEmptyProject(final TestParameters testParameters, final String projectTitle) {
+    private String createNewEmptyProject(final String projectTitle) {
         final Project project = new Project(projectTitle, testParameters.getAuthorizationToken());
         project.setDriver(testParameters.getProjectDriver());
         project.setEnvironment(testParameters.getProjectEnvironment());
@@ -377,7 +376,7 @@ public final class LCMServiceProject {
         return restClient.getProjectService().createProject(project).get(testParameters.getCreateProjectTimeout(), TimeUnit.MINUTES).getId();
     }
 
-    private RestClient createDomainRestClient(final TestParameters testParameters) {
+    private RestClient createDomainRestClient() {
         return new RestClient(
                 new RestProfile(testParameters.getHost(), testParameters.getDomainUser(),
                         testParameters.getPassword(), true));

@@ -513,7 +513,8 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
         snowflakeUtils.closeSnowflakeConnection();
     }
 
-    private String createNewEmptyProject(final TestParameters testParameters, final String projectTitle) {
+    protected String createNewEmptyProject(final String projectTitle) {
+        TestParameters testParameters = TestParameters.getInstance();
         final Project project = new Project(projectTitle, testParameters.getAuthorizationToken());
         project.setDriver(testParameters.getProjectDriver());
         project.setEnvironment(testParameters.getProjectEnvironment());
@@ -524,8 +525,8 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
 
     private void setUpProject() throws IOException {
         projectMappingPID = testParams.getProjectId();
-        projectMappingClientID = createNewEmptyProject(testParams, "Project Using Mapping ProjectID");
-        projectMappingBoth = createNewEmptyProject(testParams, "Project Using Mapping Both ID");
+        projectMappingClientID = createNewEmptyProject("Project Using Mapping ProjectID");
+        projectMappingBoth = createNewEmptyProject("Project Using Mapping Both ID");
         addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, projectMappingClientID);
         addUserToSpecificProject(testParams.getUser(), UserRoles.ADMIN, projectMappingBoth);
         projectFirst = getAdminRestClient().getProjectService().getProjectById(projectMappingPID);

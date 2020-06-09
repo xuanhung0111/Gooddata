@@ -9,12 +9,13 @@ import java.util.function.Supplier;
 public final class ProvisionProcess extends LcmProcess {
 
     private String adsUri;
+    private TestParameters testParameters = TestParameters.getInstance();
 
     /**
      * Init a relase process which expected to run on old executor
      */
-    ProvisionProcess(final TestParameters testParameters, final String adsUri, final String projectId) {
-        super(testParameters, projectId, Brick.ofProvisionBrick(testParameters.getBrickAppstore()));
+    ProvisionProcess(final String adsUri, final String projectId) {
+        super(projectId, Brick.ofProvisionBrick(TestParameters.getInstance().getBrickAppstore()));
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }
@@ -22,8 +23,8 @@ public final class ProvisionProcess extends LcmProcess {
     /**
      * Init a relase process which expected to run on k8s executor
      */
-    ProvisionProcess(final TestParameters testParameters, final String adsUri, final String projectId, final String lcmProcessName) {
-        super(testParameters, projectId, lcmProcessName);
+    ProvisionProcess(final String adsUri, final String projectId, final String lcmProcessName) {
+        super(projectId, lcmProcessName);
         this.adsUri = adsUri;
         this.defaultParameters = buildDefaultParams();
     }
