@@ -125,20 +125,20 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
             analysisPage.openConfigurationPanelBucket().openColorConfiguration()
                     .openColorsPaletteDialog(ColorPalette.DARK_CYAN.toCssFormatString()).getColorsPaletteDialog()
                     .selectColor(ColorPalette.PURE_ORANGE.toReportFormatString());
-            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 1), ColorPalette.PURE_ORANGE.toString());
             analysisPage.changeReportType(ReportType.TREE_MAP).waitForReportComputing();
             assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.YELLOW.toString());
             assertEquals(analysisPage.getChartReport().getLegendColors(), asList(
                     ColorPalette.YELLOW.toString(), ColorPalette.LIME_GREEN.toString(),
                     ColorPalette.BRIGHT_RED.toString(), ColorPalette.PURE_ORANGE.toString()));
             analysisPage.changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
-            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 2), ColorPalette.PURE_ORANGE.toString());
+            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 1), ColorPalette.PURE_ORANGE.toString());
         } finally {
             setCustomColorPickerFlag(false);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    /*@Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnAttribute() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
                 .openConfigurationPanelBucket().openColorConfiguration()
@@ -388,7 +388,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
                 deleteProject(targetProjectId);
             }
         }
-    }
+    }*/
 
     private void createInsightHasAttributeOnViewBy(String title, String metric, String attribute, ReportType reportType) {
             indigoRestRequest.createInsight(

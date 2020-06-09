@@ -138,8 +138,8 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTrackerLegends(), 7);
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("Department", "Direct Sales"), asList("# of Activities", "21,615")));
-        assertEquals(chartReport.getYaxisLabels(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+                asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
+        assertEquals(chartReport.getYaxisLabels(), asList("Web Meeting", "Phone Call", "In Person Meeting", "Email"));
         assertEquals(chartReport.getXaxisLabels(), asList("Direct Sales", "Inside Sales"));
     }
 
@@ -155,7 +155,7 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
                     .waitForReportComputing().getChartReport();
             Screenshots.takeScreenshot(browser, "Test Imported and Exported Project", getClass());
             assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                    asList(asList("Activity Type", "Email"), asList("Department", "Direct Sales"), asList("# of Activities", "21,615")));
+                    asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
             assertEquals(chartReport.getTrackersCount(), 8);
         } finally {
             testParams.setProjectId(sourceProjectId);
@@ -172,7 +172,7 @@ public class HeatMapAdvancedTest extends AbstractAnalyseTest {
             ChartReport chartReport = initAnalysePage().openInsight(INSIGHT_HAS_METRIC_AND_ATTRIBUTTE)
                     .waitForReportComputing().getChartReport();
             Screenshots.takeScreenshot(browser, "Imported and Exported Partial Project", getClass());
-            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList("Activity Type", "Email"), asList("# of Activities", "33,920")));
+            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList("Activity Type", "Web Meeting"), asList("# of Activities", "33,596")));
             assertEquals(chartReport.getTrackersCount(), 4);
         } finally {
             testParams.setProjectId(sourceProjectId);
