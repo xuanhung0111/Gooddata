@@ -247,7 +247,7 @@ public final class LCMServiceProject {
     private LCMServiceProject initAdsInstance(final TestParameters testParameters)
             throws IOException {
         AdsHelper adsHelper = new AdsHelper(createDomainRestClient(testParameters), this.projectId);
-        ads = adsHelper.createAds("ads-lcm-" + generateHashString(),
+        ads = adsHelper.createAds("att-ads-" + generateHashString(),
                 testParameters.loadProperty("dss.authorizationToken"));
 
         adsHelper.associateAdsWithProject(ads, projectId, "", "");
