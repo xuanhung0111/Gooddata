@@ -112,7 +112,7 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
         metrics.createWonMetric();
         metrics.createTimelineBOPMetric();
 
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(useK8sExecutor);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)
                 .setDevelopProject(devProjectId).setClientProjects(clientProjectId).buildLcmProjectParameters();
         System.out.println("*******************************************************");

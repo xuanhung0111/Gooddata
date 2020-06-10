@@ -92,7 +92,7 @@ public class EmbeddedDashboardUsingClientIdTest extends AbstractProjectTest {
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
             testParams.getDomainUser());
 
-        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(useK8sExecutor);
+        lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         lcmBrickFlowBuilder.setSegmentId(SEGMENT_ID).setClientId(CLIENT_ID)
             .setDevelopProject(devProjectId).setClientProjects(clientProjectId).buildLcmProjectParameters();
 
