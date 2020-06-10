@@ -5,7 +5,7 @@ import com.gooddata.sdk.model.project.Project;
 import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

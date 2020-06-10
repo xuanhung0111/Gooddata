@@ -4,7 +4,7 @@
 package com.gooddata.qa.utils.mail;
 
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang.Validate.notNull;
+import static org.apache.commons.lang3.Validate.notNull;
 import static java.util.stream.Collectors.toList;
 
 import java.io.Closeable;

@@ -28,7 +28,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest.UserStatus;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
