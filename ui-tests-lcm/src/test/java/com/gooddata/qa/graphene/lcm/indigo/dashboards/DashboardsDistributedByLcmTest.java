@@ -39,7 +39,7 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LcmRestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;

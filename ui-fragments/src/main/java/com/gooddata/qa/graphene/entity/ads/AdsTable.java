@@ -3,7 +3,7 @@ package com.gooddata.qa.graphene.entity.ads;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.math.NumberUtils.isNumber;
+import static org.apache.commons.lang3.math.NumberUtils.isNumber;
 
 import java.util.ArrayList;
 import java.util.List;

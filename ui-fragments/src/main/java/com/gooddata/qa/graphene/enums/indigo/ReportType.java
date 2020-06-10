@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.enums.indigo;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.openqa.selenium.By;
 
 public enum ReportType {

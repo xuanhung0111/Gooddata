@@ -21,7 +21,7 @@ import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;

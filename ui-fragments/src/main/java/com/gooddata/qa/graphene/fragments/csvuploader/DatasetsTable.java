@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.apache.commons.lang.Validate.notEmpty;
+import static org.apache.commons.lang3.Validate.notEmpty;
 
 import java.util.List;
 
