@@ -6,11 +6,11 @@
     "master_name": "${mstpn} ##{version}"
   }],
   "TOKENS": {
-    "pg": "INT01PRODPDWH01STG1LCM",
+    "pg": "${TOKEN}",
     "vertica": "INT00VDWH01STG1LCMPROD"
   },
   "ads_client": {
-    "username": "rubydev+admin@gooddata.com",
+    "username": "${GDC_USERNAME}",
     "password": "${GDC_PASSWORD}",
     "jdbc_url": "${JDBC_URL}"
   },

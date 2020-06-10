@@ -1,6 +1,6 @@
 {
   "ads_client": {
-    "username": "rubydev+admin@gooddata.com",
+    "username": "${GDC_USERNAME}",
     "password": "${ads_password}",
     "jdbc_url": "${JDBC_URL}"
   },

@@ -5,7 +5,7 @@ public enum LcmDirectoryConfiguration {
     GD_ENDCODE_PARAM("gd_encoded_params", "gd_encoded_params"),
     CLIENT_GDC_HOSTNAME("CLIENT_GDC_HOSTNAME", "staging-lcm-prod.intgdc.com"),
     GDC_PASSWORD("GDC_PASSWORD", "GDC_PASSWORD"),
-    ORGANIZATION("organization", "staging-lcm-prod"),
+    ORGANIZATION("organization", "default"),
     ADS_PASSWORD("ads_password", "ads_password"),
     GDC_USERNAME("GDC_USERNAME", "GDC_USERNAME"),
     CLIENT_GDC_PROTOCOL("CLIENT_GDC_PROTOCOL", "https"),
@@ -16,7 +16,8 @@ public enum LcmDirectoryConfiguration {
     SEGMENT_ID("SEGMENT_ID", "segement_id"),
     JDBC_URL("JDBC_URL", "jbbc_url"),
     DEVELOPMENT_PID("DEVELOPMENT_PID", "development_pid"),
-    MASTER_PROJECT_NAME("mstpn", "master_project_name");
+    MASTER_PROJECT_NAME("mstpn", "master_project_name"),
+    TOKEN_ID("TOKEN", "token_id");
 
     private String paramName;
     private String paramValue;
