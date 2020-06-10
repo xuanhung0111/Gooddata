@@ -15,7 +15,8 @@ import java.util.function.Supplier;
 import static org.apache.commons.lang3.Validate.notNull;
 
 public abstract class LcmProcess {
-    protected TestParameters testParameters = TestParameters.getInstance();
+
+    protected TestParameters testParameters;
     protected Brick brick;
     protected String projectId;
     protected String name;
@@ -32,13 +33,14 @@ public abstract class LcmProcess {
      * Init a lcm process base on generic ruby process
      *
      */
-    protected LcmProcess(final String projectId, final Brick brick) {
+    protected LcmProcess(final TestParameters testParameters, final String projectId, final Brick brick) {
         notNull(testParameters, "testParameters cannot be null");
         notNull(projectId, "projectId cannot be null");
         notNull(brick, "brick cannot be null");
         this.restClient = new RestClient(
                 new RestProfile(testParameters.getHost(), testParameters.getDomainUser(), testParameters.getPassword(),
                         true));
+        this.testParameters = testParameters;
         this.projectId = projectId;
         this.type = "RUBY";
         this.executable = "main.rb";
@@ -51,13 +53,14 @@ public abstract class LcmProcess {
      * Init a lcm process base on built-in LCM process - this process run on k8s executor
      *
      */
-    protected LcmProcess(final String projectId, final String lcmProcessName) {
+    protected LcmProcess(final TestParameters testParameters, final String projectId, final String lcmProcessName) {
         notNull(testParameters, "goodDataClient cannot be null");
         notNull(projectId, "projectId cannot be null");
         notNull(lcmProcessName, "lcmProcessName cannot be null");
         this.restClient = new RestClient(
                 new RestProfile(testParameters.getHost(), testParameters.getDomainUser(), testParameters.getPassword(),
                         true));
+        this.testParameters = testParameters;
         this.projectId = projectId;
         this.type = "LCM";
         this.executable = "";
@@ -106,25 +109,28 @@ public abstract class LcmProcess {
         return restClient.getProjectService().getProjectById(projectId);
     }
 
-    static LcmProcess ofRelease(final String adsUri, String projectId, boolean useK8sExecutor) {
+    static LcmProcess ofRelease(final TestParameters testParameters, final String adsUri, String projectId, boolean useK8sExecutor) {
         if (useK8sExecutor) {
-            return new ReleaseProcess(adsUri, projectId, "LCM Dataload Release Process V" + TestParameters.getInstance().getLcmDataloadProcessComponentVersion());
+            return new ReleaseProcess(testParameters, adsUri, projectId,
+                    "LCM Dataload Release Process V" + testParameters.getLcmDataloadProcessComponentVersion());
         }
-        return new ReleaseProcess(adsUri, projectId);
+        return new ReleaseProcess(testParameters, adsUri, projectId);
     }
 
-    static LcmProcess ofProvision(final String adsUri, String projectId, boolean useK8sExecutor) {
+    static LcmProcess ofProvision(final TestParameters testParameters, final String adsUri, String projectId, boolean useK8sExecutor) {
         if (useK8sExecutor) {
-            return new ProvisionProcess(adsUri, projectId, "LCM Dataload provision Process V" + TestParameters.getInstance().getLcmDataloadProcessComponentVersion());
+            return new ProvisionProcess(testParameters, adsUri, projectId,
+                    "LCM Dataload provision Process V" + testParameters.getLcmDataloadProcessComponentVersion());
         }
-        return new ProvisionProcess(adsUri, projectId);
+        return new ProvisionProcess(testParameters, adsUri, projectId);
     }
 
-    static LcmProcess ofRollout(final String adsUri, String projectId, boolean useK8sExecutor) {
+    static LcmProcess ofRollout(final TestParameters testParameters, final String adsUri, String projectId, boolean useK8sExecutor) {
         if (useK8sExecutor) {
-            return new RolloutProcess(adsUri, projectId, "LCM Dataload Rollout Process V" + TestParameters.getInstance().getLcmDataloadProcessComponentVersion());
+            return new RolloutProcess(testParameters, adsUri, projectId,
+                    "LCM Dataload Rollout Process V" + testParameters.getLcmDataloadProcessComponentVersion());
         }
-        return new RolloutProcess(adsUri, projectId);
+        return new RolloutProcess(testParameters, adsUri, projectId);
     }
 
     static class Brick {

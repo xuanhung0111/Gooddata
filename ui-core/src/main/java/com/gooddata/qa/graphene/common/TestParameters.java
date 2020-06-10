@@ -69,28 +69,25 @@ public class TestParameters {
     private String localhostSDK;
     private String brickAppstore;
     private String lcmDataloadProcessComponentVersion;
-    private static TestParameters testParameters = null;
 
     public static TestParameters getInstance() {
-        if (testParameters == null) {
-            String propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
-                    "/ui-tests-core/src/test/resources/variables-env-test.properties".replace("/",
-                            System.getProperty("file.separator")));
-            System.out.println("User properties: " + propertiesPath);
+        String propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
+                "/ui-tests-core/src/test/resources/variables-env-test.properties".replace("/",
+                        System.getProperty("file.separator")));
+        System.out.println("User properties: " + propertiesPath);
 
-            Properties testVariables = new Properties();
-            try {
-                FileInputStream in = new FileInputStream(propertiesPath);
-                testVariables.load(in);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Properties weren't loaded from path: " + propertiesPath);
-            }
-            testParameters = new TestParameters(testVariables);
+        Properties testVariables = new Properties();
+        try {
+            FileInputStream in = new FileInputStream(propertiesPath);
+            testVariables.load(in);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Properties weren't loaded from path: " + propertiesPath);
         }
-        return testParameters;
+
+        return new TestParameters(testVariables);
     }
 
-    private TestParameters(Properties testVariables) {
+    public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
         this.createProjectTimeout = Long.parseLong(loadProperty("createProjectTimeout"));
         host = loadProperty("host");
