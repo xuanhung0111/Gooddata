@@ -65,10 +65,10 @@ public class LoginPageTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS", enabled = false)
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
     public void loginWithXSSShouldNotWork(String lastUrl) throws JSONException {
         try {
-            signIn(true, UserRoles.ADMIN);
+            signIn(false, UserRoles.ADMIN);
             openUrl(ACCOUNT_PAGE + lastUrl);
             assertFalse(CheckUtils.isAlertDisplayed(),
                 "Javascript from the input parameters should be not executed");
@@ -77,7 +77,7 @@ public class LoginPageTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS", enabled = false)
+    @Test(dependsOnMethods = {"reopenLoginPageAfterSignIn"}, dataProvider = "getLastUrlXSS")
     public void openLoginPageWithXSSShouldNotWork(String lastUrl) throws JSONException {
         openUrl(ACCOUNT_PAGE + lastUrl);
         assertFalse(CheckUtils.isAlertDisplayed(),
