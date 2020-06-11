@@ -94,7 +94,7 @@ integratedTests:
       -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
       -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
-      -Dhost=staging2.intgdc.com
+      -Dhost=staging.intgdc.com
       -Duser=qa+test@gooddata.com
       -Dpassword="$QA_TEST_PASSWORD"
       -Duser.domain=default
