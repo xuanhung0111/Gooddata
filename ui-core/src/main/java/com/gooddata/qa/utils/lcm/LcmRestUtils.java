@@ -86,7 +86,7 @@ public class LcmRestUtils {
 
     public static Map<String, Set<String>> getClientProjectIds(final RestClient restClient, final String domain,
                                                                final String segmentId) {
-        return getClientProjectIds(restClient, domain, segmentId, "/gdc/domains/%s/dataproducts/clients?segment=%s&limit=1000");
+        return getClientProjectIds(restClient, domain, segmentId, "/gdc/domains/%s/dataproducts/att_lcm_default_data_product/clients?segment=%s&limit=1000");
     }
 
     public static Map<String, Set<String>> getClientProjectIdsDefault(final RestClient restClient, final String domain,
