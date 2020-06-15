@@ -1,25 +1,31 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
-import static java.util.Collections.singletonList;
-import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static org.testng.Assert.assertNotEquals;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -44,6 +50,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
 
     private String dashboardOnlyUser;
     private IndigoRestRequest indigoRestRequest;
+    private AttributeFiltersPanel filterPanel;
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -265,6 +272,102 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
         } finally {
             getMdService().removeObjByUri(dashboardUri);
         }
+    }
+
+    private void addMultipleFilters(Collection<String> filters) {
+        filters.forEach(att -> indigoDashboardsPage.addAttributeFilter(att)
+                .getAttributeFiltersPanel().getAttributeFilter(att).ensureDropdownClosed());
+    }
+
+    @Test(dependsOnMethods = {"setAlertInEmbeddedDashboard"}, dependsOnGroups = {"createProject"})
+    public void createKpisDashboard() {
+        Collection<String> filters = asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT);
+        initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL);
+        addMultipleFilters(filters);
+    }
+
+    @Test(dependsOnMethods = {"createKpisDashboard"}, dependsOnGroups = {"createProject"})
+    public void changePositionExistingAttributeFilter() {
+        filterPanel = indigoDashboardsPage.getAttributeFiltersPanel();
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_DEPARTMENT, ATTR_ACTIVITY));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getLastIndexWebElementAttributeFilter(),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_DEPARTMENT, ATTR_ACTIVITY, ATTR_ACCOUNT));
+    }
+
+    @Test(dependsOnMethods = {"changePositionExistingAttributeFilter"}, dependsOnGroups = {"createProject"})
+    public void changePositionNewAttributeFilter() {
+        indigoDashboardsPage.addAttributeFilter(ATTR_REGION, "East Coast");
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_DEPARTMENT, ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_REGION));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_REGION, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(2),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_REGION, ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getIndexWebElementAttributeFilter(2));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_REGION, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT, ATTR_REGION));
+    }
+
+    @Test(dependsOnMethods = {"changePositionNewAttributeFilter"}, dependsOnGroups = {"createProject"})
+    public void changePositionOfDateFilter() {
+        indigoDashboardsPage.dragDateAttributeToFilterPlaceholder();
+        assertEquals(indigoDashboardsPage.getFirstAttributeFilter(), "Date range");
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT,ATTR_REGION));
+    }
+
+    @Test(dependsOnMethods = {"changePositionOfDateFilter"}, dependsOnGroups = {"createProject"}, expectedExceptions =
+            {TimeoutException.class})
+    public void changePositionAttributeOnTwoRows() {
+        indigoDashboardsPage.addAttributeFilter(ATTR_STAGE_HISTORY).addAttributeFilter(ATTR_STATUS)
+                .addAttributeFilter(ATTR_IS_CLOSED).addAttributeFilter(ATTR_OPP_SNAPSHOT)
+                .addAttributeFilter(ATTR_IS_ACTIVE).addAttributeFilter(ATTR_IS_TASK)
+                .addAttributeFilter(ATTR_FORECAST_CATEGORY).addAttributeFilter(ATTR_OPPORTUNITY)
+                .addAttributeFilter(ATTR_PRIORITY).addAttributeFilter(ATTR_ACTIVITY_TYPE, "In Person Meeting")
+                .addAttributeFilter(ATTR_STAGE_NAME, "Risk Assessment")
+                .clickFilterShowAllOnFilterBar()
+                .addAttributeFilter(ATTR_SALES_REP, "Alejandro Vabiano")
+                .addAttributeFilter(ATTR_IS_WON, "false")
+                .addAttributeFilter(ATTR_PRODUCT, "Grammar Plus")
+                .clickFilterShowAllOnFilterBar();
+
+        List<String> expectedAttFilter = indigoDashboardsPage.getListCurrentAttributeFilter();
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
+        List<String> currentAttFilter = indigoDashboardsPage.getListCurrentAttributeFilter();
+        assertNotEquals(expectedAttFilter, currentAttFilter);
+        indigoDashboardsPage.clickFilterShowLessOnFilterBar();
+        sleepTightInSeconds(1);
+        dragAndDropWithCustomBackend(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
@@ -13,6 +15,7 @@ import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNotEquals;
 
 import java.io.IOException;
 
@@ -20,10 +23,12 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.Test;
 import com.gooddata.sdk.model.md.*;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
@@ -34,7 +39,6 @@ import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import org.testng.annotations.DataProvider;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import java.util.*;
@@ -46,6 +50,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
     private static final String WITHOUT_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/without.date.csv";
     private static final String WITHOUT_DATE_DATASET = "Without Date";
     private IndigoRestRequest indigoRestRequest;
+    private AttributeFiltersPanel filterPanel;
 
     @Override
     public void initProperties() {
@@ -448,5 +453,109 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
     private void addMultipleFilters(Collection<String> filters) {
         filters.forEach(att -> indigoDashboardsPage.addAttributeFilter(att)
                 .getAttributeFiltersPanel().getAttributeFilter(att).ensureDropdownClosed());
+    }
+
+    @Test(dependsOnMethods = "testListOfAttributesAndValuesOnFilter", groups = {"desktop"})
+    public void createKpisDashboard() {
+        Collection<String> filters = asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT);
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
+        addMultipleFilters(filters);
+        indigoDashboardsPage.saveEditModeWithWidgets();
+    }
+
+    @Test(dependsOnMethods = {"createKpisDashboard"}, groups = {"desktop"})
+    public void changePositionExistingAttributeFilter() {
+        indigoDashboardsPage.switchToEditMode();
+        filterPanel = indigoDashboardsPage.getAttributeFiltersPanel();
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_DEPARTMENT, ATTR_ACTIVITY));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getLastIndexWebElementAttributeFilter(),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_DEPARTMENT, ATTR_ACTIVITY, ATTR_ACCOUNT));
+    }
+
+    @Test(dependsOnMethods = {"changePositionExistingAttributeFilter"}, groups = {"desktop"})
+    public void changePositionNewAttributeFilter() {
+        indigoDashboardsPage.addAttributeFilter(ATTR_REGION, "East Coast");
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_DEPARTMENT, ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_REGION));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_REGION, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(2),
+                filterPanel.getIndexWebElementAttributeFilter(0));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_REGION, ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getIndexWebElementAttributeFilter(2));
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_REGION, ATTR_ACCOUNT, ATTR_DEPARTMENT));
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(1),
+                indigoDashboardsPage.getDropzonePosition());
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT, ATTR_REGION));
+    }
+
+    @Test(dependsOnMethods = {"changePositionNewAttributeFilter"}, groups = {"desktop"})
+    public void changePositionOfDateFilter() {
+        indigoDashboardsPage.dragDateAttributeToFilterPlaceholder();
+        assertEquals(indigoDashboardsPage.getFirstAttributeFilter(), "Date range");
+        assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                asList(ATTR_ACTIVITY, ATTR_ACCOUNT, ATTR_DEPARTMENT, ATTR_REGION));
+    }
+
+    @Test(dependsOnMethods = {"changePositionOfDateFilter"}, groups = {"desktop"}, expectedExceptions = {TimeoutException.class})
+    public void changePositionAttributeOnTwoRows() {
+        indigoDashboardsPage.addAttributeFilter(ATTR_STAGE_HISTORY).addAttributeFilter(ATTR_STATUS)
+                .addAttributeFilter(ATTR_IS_CLOSED).addAttributeFilter(ATTR_OPP_SNAPSHOT)
+                .addAttributeFilter(ATTR_IS_ACTIVE).addAttributeFilter(ATTR_IS_TASK)
+                .addAttributeFilter(ATTR_FORECAST_CATEGORY).addAttributeFilter(ATTR_OPPORTUNITY)
+                .addAttributeFilter(ATTR_PRIORITY).addAttributeFilter(ATTR_ACTIVITY_TYPE, "In Person Meeting")
+                .addAttributeFilter(ATTR_STAGE_NAME, "Risk Assessment").clickFilterShowAllOnFilterBar()
+                .addAttributeFilter(ATTR_SALES_REP, "Alejandro Vabiano")
+                .addAttributeFilter(ATTR_IS_WON, "false")
+                .addAttributeFilter(ATTR_PRODUCT, "Grammar Plus").clickFilterShowAllOnFilterBar();
+
+        List<String> expectedAttFilter = indigoDashboardsPage.getListCurrentAttributeFilter();
+        filterPanel.dragAndDropAttributeFilter(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
+        List<String> currentAttFilter = indigoDashboardsPage.getListCurrentAttributeFilter();
+        assertNotEquals(expectedAttFilter, currentAttFilter);
+        indigoDashboardsPage.clickFilterShowLessOnFilterBar();
+        sleepTightInSeconds(1);
+        dragAndDropWithCustomBackend(browser, filterPanel.getIndexWebElementAttributeFilter(0),
+                filterPanel.getLastIndexWebElementAttributeFilter());
+    }
+
+    @Test(dependsOnMethods = {"changePositionAttributeOnTwoRows"}, groups = {"desktop"})
+    public void verifyAttributeFilterWithoutSaving() {
+        try {
+            indigoDashboardsPage.cancelEditModeWithChanges();
+            assertEquals(indigoDashboardsPage.getListCurrentAttributeFilter(),
+                    asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_DEPARTMENT));
+        } finally {
+            indigoDashboardsPage.switchToEditMode()
+                    .deleteAttributeFilter(ATTR_ACCOUNT)
+                    .deleteAttributeFilter(ATTR_ACTIVITY).deleteAttributeFilter(ATTR_DEPARTMENT)
+                    .saveEditModeWithWidgets();
+        }
     }
 }
