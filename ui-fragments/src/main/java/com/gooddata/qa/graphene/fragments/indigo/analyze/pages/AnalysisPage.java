@@ -79,6 +79,9 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-bucket-secondary_measures")
     private MetricsBucket metricsSecondaryBucket;
 
+    @FindBy(className = "s-bucket-tertiary_measures")
+    private MetricsBucket metricsTertiaryBucket;
+
     @FindBy(css = ".s-bucket-attribute, .s-bucket-view, .s-bucket-trend")
     private AttributesBucket attributesBucket;
 
@@ -210,9 +213,19 @@ public class AnalysisPage extends AbstractFragment {
         return addMetricToSecondaryBucket(metric, FieldType.METRIC);
     }
 
+    public AnalysisPage addMetricToTertiaryBucket(String metric) {
+        return addCatalogItemToTertiaryBucket(metric, FieldType.METRIC);
+    }
+
     public AnalysisPage addMetricToSecondaryBucket(String data, FieldType type) {
         WebElement source = getCatalogPanel().searchAndGet(data, type);
         WebElement target = getMetricsSecondaryBucket().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addCatalogItemToTertiaryBucket(String data, FieldType type) {
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        WebElement target = getMetricsTertiaryBucket().getInvitation();
         return drag(source, target);
     }
 
@@ -325,6 +338,12 @@ public class AnalysisPage extends AbstractFragment {
         WebElement header = getMetricsBucket().get(metric).findElement(By.className("s-bucket-item-header"));
         return drag(header ,
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeSecondaryMetric(String metric) {
+        WebElement header = getMetricsSecondaryBucket().get(metric).findElement(By.className("s-bucket-item-header"));
+        return drag(header ,
+            () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
     public AnalysisPage removeAttribute(String attr) {
@@ -447,6 +466,10 @@ public class AnalysisPage extends AbstractFragment {
     //using this fragment when applying the Headline insight(Headline Report Type) for Analysis Page
     public MetricsBucket getMetricsSecondaryBucket() {
         return waitForFragmentVisible(metricsSecondaryBucket);
+    }
+
+    public MetricsBucket getMetricsTertiaryBucket() {
+        return waitForFragmentVisible(metricsTertiaryBucket);
     }
 
     public MeasureAsColumnBucket getMeasureAsColumnBucketBucket() {

@@ -30,7 +30,7 @@ public class MeasureBucket {
     }
 
     public enum Type {
-        MEASURES, SECONDARY_MEASURES
+        MEASURES, SECONDARY_MEASURES, TERTIARY_MEASURES
     }
 
     public static MeasureBucket createMeasureBucketWithShowInPercent (Metric metric, boolean hasShowInPercent) {

@@ -238,6 +238,10 @@ public class ChartReport extends AbstractFragment {
     }
 
     public List<String> getLegends() {
+        if (legendNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return waitForCollectionIsNotEmpty(legendNames).stream()
             .map(e -> e.getText())
             .collect(toList());
