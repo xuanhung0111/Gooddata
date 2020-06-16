@@ -151,10 +151,10 @@ public class DeployProcessForm extends AbstractFragment {
         return this;
     }
 
-    public DeployProcessForm quickSelectSpecialProcessType(ProcessType processType, int range) {
+    public DeployProcessForm scrollToSelectProcessType(ProcessType processType, int range) {
         getProcessTypeDropdown()
                 .expand()
-                .quickScrollToSelectProcessType(processType.getTitle(), range);
+                .selectLatestProcessTypeVersion(processType.getTitle(), range);
         return this;
     }
 
@@ -339,9 +339,9 @@ public class DeployProcessForm extends AbstractFragment {
         SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor"),
         AUTOMATED_DATA_DISTRIBUTION("gdc-data-distribution", "Automated Data Distribution"),
         INVALID_PROCESS_TYPE("invalid-process-type", "Invalid Process Type"),
-        LCM_RELEASE("lcm-release", "Release 3.7.18 (M3)"),
-        LCM_ROLLOUT("lcm-rollout", "Rollout 3.7.18 (M3)"),
-        LCM_RPOVISIONING("lcm-rollout", "Workspace Provisioning 3.7.18 (M3)");
+        LCM_RELEASE("lcm-release", "Release"),
+        LCM_ROLLOUT("lcm-rollout", "Rollout"),
+        LCM_RPOVISIONING("lcm-rollout", "Workspace Provisioning");
 
         private String value;
         private String title;

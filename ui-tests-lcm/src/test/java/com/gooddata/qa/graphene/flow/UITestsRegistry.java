@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
+import com.gooddata.qa.graphene.lcm.disc.LcmProcessesTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcmOnK8sTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.DashboardsDistributedByLcmTest;
 import com.gooddata.qa.graphene.lcm.indigo.dashboards.MsfProcessOnK8sTest;
@@ -26,7 +27,8 @@ public class UITestsRegistry {
                 RenderingInsightUsingClientIdTest.class,
                 RenderingAnalyticalDashboardUsingClientIdTest.class,
                 OrganisingCatalogueUsingClientIdTest.class,
-                EmbeddedDashboardUsingClientIdTest.class
+                EmbeddedDashboardUsingClientIdTest.class,
+                LcmProcessesTest.class
         });
 
         TestsRegistry.getInstance()

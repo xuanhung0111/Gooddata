@@ -1,6 +1,6 @@
 {
   "ads_client": {
-    "username": "rubydev+admin@gooddata.com",
+    "username": "${GDC_USERNAME}",
     "password": "${ads_password}",
     "jdbc_url": "${JDBC_URL}"
   },
@@ -9,7 +9,7 @@
   ],
   "input_source": {
     "type": "ads",
-    "query": "select segment_id, client_id, project_title, project_token from clients where id = 108;"
+    "query": "select segment_id, client_id, project_title, project_token from clients where id = 1;"
   },
   "additional_hidden_params": {
     "PARAM2": "VALUE2"

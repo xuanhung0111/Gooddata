@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.disc.lcm;
+package com.gooddata.qa.graphene.lcm.disc;
 
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
@@ -12,7 +12,6 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.json.JSONException;
@@ -24,7 +23,9 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.lcm.LcmRestUtils.deleteSegmentDefault;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertEquals;
 
 public class LcmProcessesTest extends AbstractDataloadProcessTest {
 
@@ -34,27 +35,34 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
     private final String LCM_ROLLOUT_PROCESS = "LCM_ROLLOUT_" + generateHashString();
     private final String LCM_PROVISIONING_PROCESS = "LCM_PROVISIONING_" + generateHashString();
     private final String MASTER_NAME_PROJECT = "MASTERPROJECT" + generateHashString();
+    private final String CLIENT_PROJECT = "LcmClientProject_" + generateHashString();
+    private final String SEGMENT_ID = "ATTSegmentProject_" + generateHashString();
     private static String END_CODE_PARAM;
     private static String END_CODE_HIDDEN_PARAM;
     private static String DEVELOPMENT_PID;
     private static String DEVELOPMENT_TITLE;
     private static String ADS_WAREHOUSE;
     private static final String INSIGHT_LCM = "Insight-LCM";
-    private static final String CLIENT_PROJECT = "LcmProjectClient";
-    private static final String SEGMENT_ID = "SegmentProject";
+    private static final String RELEASE_SCHEDULE_NAME = "Release_Schedule";
+    private static final String CLIENT_NAME = "LcmClient";
 
     @Override
     public void initProperties() {
         super.initProperties();
         projectTitle += "_LCM_TEST_UI";
+        useDynamicUser = false;
     }
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException {
-        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
-        Parameters parameters = defaultParameters.get().addParameter(Parameter.SQL_QUERY,
-                SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
+        String adsTableText = SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName())
+                .replace("${SEGMENT_ID}", SEGMENT_ID )
+                .replace("${CLIENT_NAME}", CLIENT_NAME )
+                .replace("${CLIENT_PROJECT}",  CLIENT_PROJECT)
+                .replace("${TOKEN_ID}", testParams.getAuthorizationToken());
 
+        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
+        Parameters parameters = defaultParameters.get().addParameter(Parameter.SQL_QUERY, adsTableText);
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
     }
 
@@ -140,7 +148,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
         projectsPage.searchProject(DEVELOPMENT_PID).clickOnProjectTitleLink(DEVELOPMENT_TITLE)
                 .goToAnalyze().getPageHeader().expandInsightSelection().deleteInsight(INSIGHT_LCM);
         initDiscProjectDetailPage();
-        projectDetailPage.getDataProcessName(LCM_RELEASE_PROCESS).openSchedule("lcm-brick[M3]-release");
+        projectDetailPage.getDataProcessName(LCM_RELEASE_PROCESS).openSchedule(RELEASE_SCHEDULE_NAME);
         scheduleDetail.executeSchedule().waitForExecutionFinish().close();
         initDiscProjectsPage();
         projectsPage.searchProject(MASTER_NAME_PROJECT + " #2");
@@ -167,7 +175,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
 
     private void createDeployProcess(ProcessType processType, String processName) {
         DeployProcessForm deployProcess = DeployProcessForm.getInstance(browser);
-        deployProcess.quickSelectSpecialProcessType(processType, 5000).enterProcessName(processName).submit();
+        deployProcess.scrollToSelectProcessType(processType, 10000).enterProcessName(processName).submit();
     }
 
     private void createAndRunProcess(String processTypeName, String endcodeParam) {
@@ -217,6 +225,8 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
 
     private void createReleaseProcess(String endcodeParam) {
         scheduleForm.addParameter(LcmDirectoryConfiguration.GD_ENDCODE_HIDEN_PARAMS.getParamName(), endcodeParam);
+        scheduleForm.addParameter(LcmDirectoryConfiguration.TOKEN_ID.getParamName(), testParams.getAuthorizationToken());
+        scheduleForm.enterScheduleName(RELEASE_SCHEDULE_NAME);
         scheduleForm.schedule();
     }
 
@@ -227,7 +237,8 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
 
     @AfterClass(alwaysRun = true)
     private void deleteClientAndProject() {
-        deleteSegmentDefault(new RestClient(getProfile(ADMIN)), testParams.getHost().split(".intgdc.")[0],
-                SEGMENT_ID);
+        if (scheduleForm != null) {
+            deleteSegmentDefault(new RestClient(getProfile(ADMIN)), testParams.getUserDomain(), SEGMENT_ID);
+        }
     }
 }

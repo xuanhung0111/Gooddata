@@ -61,9 +61,14 @@ public final class ElementUtils {
     }
 
     public static boolean scrollElementIntoView(By viewLocator, By keyLocator, WebDriver browser, int scrollRangeInPixels) {
+        return scrollElementIntoViewInTime(viewLocator, keyLocator, browser, scrollRangeInPixels, 60000);
+    }
+
+    public static boolean scrollElementIntoViewInTime(By viewLocator, By keyLocator, WebDriver browser,
+                                                      int scrollRangeInPixels, int timeout) {
         long startTime = System.currentTimeMillis();
         int scrollTop = 0;
-        while ((System.currentTimeMillis() - startTime) < 60000) {
+        while ((System.currentTimeMillis() - startTime) < timeout) {
             sleepTight(500);
             if (isElementVisible(keyLocator, browser)) {
                 return true;
@@ -72,7 +77,7 @@ public final class ElementUtils {
             BrowserUtils.runScript(browser, "arguments[0].scrollTop = arguments[1];",
                     browser.findElement(viewLocator), scrollTop);
         }
-        throw new TimeoutException("Tried for 60 second(s), element doesn't find by selector " + keyLocator);
+        throw new TimeoutException("Tried for " + timeout + "second(s), element doesn't find by selector " + keyLocator);
     }
 
     /**
