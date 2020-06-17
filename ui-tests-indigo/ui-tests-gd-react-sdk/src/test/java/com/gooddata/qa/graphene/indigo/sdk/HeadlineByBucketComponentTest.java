@@ -28,6 +28,7 @@ import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter
 import com.gooddata.qa.graphene.indigo.sdk.common.AbstractReactSdkTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -51,6 +52,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithMeasures() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURE);
         Headline headline = initSDKAnalysisPage().getHeadline();
@@ -74,6 +78,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithMeasureAndFormat() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("typeFormat", Formatter.DEFAULT.toString()));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_MEASURE_AND_FORMAT);
@@ -98,6 +105,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithAliasMeasures() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         String alias = "alias";
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("secondaryMeasureTitle", METRIC_AVG_AMOUNT),
@@ -111,6 +121,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithSPPYComparison() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("dateDataSetTitle", DATE_DIMENSION_ACTIVITY),
                 Pair.of("popAttributeTitle", ATTR_YEAR_ACTIVITY));
@@ -122,6 +135,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithPPComparison() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("dateDataSetTitle", DATE_DIMENSION_ACTIVITY),
                 Pair.of("from", "2011-01-01"),
@@ -177,6 +193,9 @@ public class HeadlineByBucketComponentTest extends AbstractReactSdkTest {
 
     @Test(dependsOnMethods = "login")
     public void createInsightWithPercentMeasure() throws IOException {
+        if (isUIsdk8()) {
+            throw new SkipException("Not support with SDK 8");
+        }
         createCatalogJSON(Pair.of("primaryMeasureTitle", METRIC_NUMBER_OF_ACTIVITIES),
                 Pair.of("isPercent", "true"));
         replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_PERCENT_MEASURE);

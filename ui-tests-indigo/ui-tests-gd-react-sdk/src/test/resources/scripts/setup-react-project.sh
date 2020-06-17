@@ -24,7 +24,11 @@ cp addYarnStop.json package.json
 rm -rf addYarnStop.json
 
 # Install the latest @gooddata/react-components
-yarn add @gooddata/react-components@$UI_SDK_VERSION
+if [ ${UI_SDK_VERSION:0:1} == "8" ]; then
+   yarn add @gooddata/sdk-ui-all@$UI_SDK_VERSION @gooddata/sdk-backend-bear@$UI_SDK_VERSION
+else
+   yarn add @gooddata/react-components@$UI_SDK_VERSION
+fi
 
 # Install node-saas as https://jira.intgdc.com/browse/ONE-3381
 yarn add node-sass

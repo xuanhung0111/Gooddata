@@ -3,16 +3,19 @@ package com.gooddata.qa.graphene.indigo.sdk;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHT;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHTS;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_INSIGHT_URI;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER_INSIGHT;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_FILTER_INSIGHT;
-import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_NO_DATA_INSIGHT;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATIONS;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_BY_IDENTIFIER;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_BY_URI;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_ABSOLUTE_DATE_FILTER;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_FILTER;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_NEGATIVE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_CAN_NOT_DISPLAY;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_NOT_FOUND;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
@@ -54,11 +57,11 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
     public void embedHeadlineInsight() throws IOException {
         String headline = "Headline " + generateHashString();
         String insightUri = createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
-        createCatalogJSON(Pair.of("visualizationName", headline), Pair.of("visualizationUri", insightUri));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
+        createCatalogJSON(Pair.of("visualizationName", headline), Pair.of("visualizationUrl", insightUri));
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
 
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT_URI);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_URI);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "154,271");
     }
 
@@ -72,7 +75,7 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         File catalogJSON = createCatalogJSON(Pair.of("firstVisualizationName", headline),
                 Pair.of("secondVisualizationName", tableReport));
         exportCatalogJSON(catalogJSON);
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHTS);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATIONS);
         SDKAnalysisPage sdkAnalysisPage = initSDKAnalysisPage();
         assertEquals(sdkAnalysisPage.getHeadline().getPrimaryItem(), "154,271");
         assertEquals(sdkAnalysisPage.getPivotTableReport().getHeaders(), singletonList(METRIC_AMOUNT));
@@ -83,7 +86,7 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         String headline = "Headline " + generateHashString();
         createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
         createCatalogJSON(Pair.of("visualizationName", headline));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         initAnalysePage().openInsight(headline).addMetricToSecondaryBucket(METRIC_AMOUNT)
                 .changeReportType(ReportType.TABLE).saveInsight();
         assertEquals(initSDKAnalysisPage().getPivotTableReport().getHeaders(),
@@ -98,7 +101,7 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         String headline = "Headline " + generateHashString();
         createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
         createCatalogJSON(Pair.of("visualizationName", headline));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         try {
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMetricFormat(),
@@ -114,9 +117,9 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         String headline = "Headline " + generateHashString();
         createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
         createCatalogJSON(Pair.of("visualizationName", headline));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
         indigoRestRequest.deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(headline));
-        assertEquals(initSDKAnalysisPage().getWarning(), WARNING_CAN_NOT_DISPLAY);
+        assertThat(initSDKAnalysisPage().getWarning(), isUIsdk8() ? containsString(WARNING_NOT_FOUND) : containsString(WARNING_CAN_NOT_DISPLAY));
     }
 
     @Test(dependsOnMethods = "login", groups = "hasData")
@@ -126,20 +129,20 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("visualizationName", headline),
                 Pair.of("elementAttributeUri", getAttributeElementUri(ATTR_DEPARTMENT, "Direct Sales")),
                 Pair.of("attributeUri", getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri()));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_WITH_NEGATIVE_FILTER);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "53,217");
 
         createCatalogJSON(Pair.of("visualizationName", headline),
                 Pair.of("elementAttributeUri", getAttributeElementUri(ATTR_DEPARTMENT, "Direct Sales")),
                 Pair.of("attributeUri", getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri()));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_FILTER_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_WITH_FILTER);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "101,054");
 
         createCatalogJSON(Pair.of("visualizationName", headline),
                 Pair.of("dateAttributeName", "Date (Created)"),
                 Pair.of("from", "2010-01-01"),
                 Pair.of("to", "2011-01-01"));
-        replaceContentAppJSFrom(TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER_INSIGHT);
+        replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_WITH_ABSOLUTE_DATE_FILTER);
         assertEquals(initSDKAnalysisPage().getHeadline().getPrimaryItem(), "50,494");
     }
 
@@ -147,7 +150,8 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
     @Test(dependsOnGroups = "hasData")
     public void verifyHeadlineInsightWithNoData() throws IOException {
         replaceContentAppJSFrom(TEMPLATE_NO_DATA_INSIGHT);
-        assertEquals(initSDKAnalysisPage().getWarning(), WARNING_CAN_NOT_DISPLAY);
+        assertThat(initSDKAnalysisPage().getWarning(),
+                isUIsdk8() ? containsString(WARNING_NOT_FOUND) : containsString(WARNING_CAN_NOT_DISPLAY));
     }
 
     private void exportCatalogJSON(File catalogJSON) throws IOException {

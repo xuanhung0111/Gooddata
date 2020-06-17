@@ -40,10 +40,16 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         return createCatalogExportConfig(testParams.getProjectId(), "catalog.json");
     }
 
+    public boolean isUIsdk8() {
+        return testParams.getUIsdkVersion().startsWith("8");
+    }
+
     public void replaceContentAppJSFrom(String fileName) throws IOException {
         Path appPath = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/App.js");
         File appFile = appPath.toFile();
-        Files.copy(Paths.get(getFilePathFromResource("/" + fileName)), appPath, REPLACE_EXISTING);
+        Files.copy(Paths.get(
+                getFilePathFromResource(isUIsdk8() ? "/template-sdk-8/" + fileName : "/" + fileName)),
+                appPath, REPLACE_EXISTING);
         log.info("Waiting for updating " + appFile.getAbsolutePath());
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
                 browser -> appFile.isFile() && appFile.exists() && appFile.length() > 0);

@@ -4,14 +4,6 @@ public class ReactSKDUtils {
 
     //Visualization - Headline
     public static final String TEMPLATE_NO_DATA_INSIGHT = "NoDataInsight.js";
-    public static final String TEMPLATE_HEADLINE_INSIGHT = "HeadlineInsight.js";
-    public static final String TEMPLATE_HEADLINE_INSIGHTS = "HeadlineInsights.js";
-    public static final String TEMPLATE_HEADLINE_INSIGHT_URI = "HeadlineInsightUri.js";
-    public static final String TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER_INSIGHT =
-            "HeadlineWithAbsoluteDateFilterInsight.js";
-    public static final String TEMPLATE_HEADLINE_WITH_FILTER_INSIGHT = "HeadlineWithFilterInsight.js";
-    public static final String TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT =
-            "HeadlineWithNegativeFilterInsight.js";
 
     //Component - Headline
     public static final String TEMPLATE_HEADLINE_WITH_ATTRIBUTE = "HeadlineWithAttribute.js";
@@ -58,4 +50,9 @@ public class ReactSKDUtils {
 
     //Warning
     public static final String WARNING_CAN_NOT_DISPLAY = "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.";
+    public static final String WARNING_NOT_FOUND = "NOT FOUND IN PROJECT";
+    public static final String WARNING_DATA_TOO_LARGE_TO_COMPUTE = "DATA_TOO_LARGE_TO_COMPUTE";
+    public static final String WARNING_DATA_TOO_LARGE_TO_DISPLAY = "DATA_TOO_LARGE_TO_DISPLAY";
+    public static final String WARNING_NO_DATA = "NO_DATA";
+    public final static String NO_DATA_MESSAGE = "NO DATA\nNo data for your filter selection.";
 }
