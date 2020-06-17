@@ -11,18 +11,18 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.gooddata.FutureResult;
+import com.gooddata.sdk.service.FutureResult;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.warehouse.WarehouseUser;
+import com.gooddata.sdk.model.warehouse.WarehouseUser;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.gooddata.GoodDataException;
-import com.gooddata.project.Environment;
-import com.gooddata.warehouse.Warehouse;
+import com.gooddata.sdk.common.GoodDataException;
+import com.gooddata.sdk.model.project.Environment;
+import com.gooddata.sdk.model.warehouse.Warehouse;
 import org.springframework.http.HttpStatus;
 
 public final class AdsHelper extends CommonRestRequest {

@@ -1,12 +1,12 @@
 package com.gooddata.qa.utils.http;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Fact;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.Report;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Dataset;
+import com.gooddata.sdk.model.md.Fact;
+import com.gooddata.sdk.service.md.MetadataService;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.project.Project;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.identifier;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.http.RestRequest.initGetRequest;
 import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;

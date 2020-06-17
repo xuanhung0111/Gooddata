@@ -12,9 +12,9 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
+import com.gooddata.sdk.service.md.MetadataService;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;

@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.add.schedule;
 
-import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.md.MetadataService;
+import com.gooddata.sdk.model.dataload.processes.Schedule;
+import com.gooddata.sdk.service.md.MetadataService;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.lang.String.format;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonList;
@@ -200,6 +200,6 @@ public class PresenceOfTimestampColumnTest extends AbstractDataloadProcessTest {
     private void deleteDatasets(String... datasets) {
         MetadataService mdService = getMdService();
         Stream.of(datasets).forEach(dataset -> mdService.removeObj(
-                mdService.getObj(getProject(), com.gooddata.md.Dataset.class, title(dataset))));
+                mdService.getObj(getProject(), com.gooddata.sdk.model.md.Dataset.class, title(dataset))));
     }
 }

@@ -9,7 +9,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.disc.notification.VariableList;

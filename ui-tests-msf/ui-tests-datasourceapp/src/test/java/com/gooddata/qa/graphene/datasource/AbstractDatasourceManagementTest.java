@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.datasource;
 
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPage;
 import com.gooddata.qa.graphene.enums.user.UserRoles;

@@ -1,7 +1,7 @@
 package com.gooddata.qa.utils.datasource;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 
 public class DataDistributionProcess extends DataloadProcess {
 

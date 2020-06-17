@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.manage;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Metric;
+import com.gooddata.sdk.model.md.Restriction;
+import com.gooddata.sdk.model.md.report.AttributeInGrid;
+import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
+import com.gooddata.sdk.model.md.report.MetricElement;
+import com.gooddata.sdk.model.md.report.Report;
+import com.gooddata.sdk.model.md.report.ReportDefinition;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
@@ -22,8 +22,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
-import com.gooddata.report.ReportExportFormat;
-import com.gooddata.report.ReportService;
+import com.gooddata.sdk.service.export.ExportService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -47,7 +46,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CLOSE;
@@ -830,9 +829,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     private ByteArrayOutputStream exportReport(ReportDefinition rd) {
-        ReportService reportService = new RestClient(getProfile(Profile.ADMIN)).getReportService();
+        ExportService exportService = new RestClient(getProfile(Profile.ADMIN)).getExportService();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        reportService.exportReport(rd, ReportExportFormat.CSV, output).get();
+        exportService.export(rd, com.gooddata.sdk.model.export.ExportFormat.CSV, output).get();
         return output;
     }
 

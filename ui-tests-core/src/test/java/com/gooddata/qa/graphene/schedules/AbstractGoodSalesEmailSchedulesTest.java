@@ -28,7 +28,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
-import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang3.Range;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,7 +109,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
             if (messages.stream()
                     .map(ImapUtils::getMessageReceiveDate)
                     .map(DateTime::getMinuteOfHour)
-                    .anyMatch(m -> new IntRange(0, 10).containsInteger(m) || new IntRange(30, 40).containsInteger(m))) {
+                    .anyMatch(m -> Range.between(0, 10).contains(m) || Range.between(30, 40).contains(m))) {
                 log.info(format("scheduled email is set up so close to the default scheduled time. So we get %s emails.",
                         messages.size()));
                 return messages;

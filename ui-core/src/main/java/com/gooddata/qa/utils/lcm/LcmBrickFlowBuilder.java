@@ -1,6 +1,6 @@
 package com.gooddata.qa.utils.lcm;
 
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.graphene.common.TestParameters;
 
 import org.json.JSONArray;

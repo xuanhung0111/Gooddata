@@ -1,11 +1,11 @@
 package com.gooddata.qa.utils.cloudresources;
 
-import static org.apache.commons.lang.Validate.notNull;
-import com.gooddata.GoodDataException;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.dataload.processes.ProcessService;
+import static org.apache.commons.lang3.Validate.notNull;
+import com.gooddata.sdk.common.GoodDataException;
+import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecution;
+import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.sdk.service.dataload.processes.ProcessService;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;

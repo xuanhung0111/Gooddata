@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import com.gooddata.project.Project;
+import com.gooddata.sdk.model.project.Project;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
