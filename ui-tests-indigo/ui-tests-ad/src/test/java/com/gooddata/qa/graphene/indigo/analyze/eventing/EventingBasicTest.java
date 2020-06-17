@@ -629,7 +629,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
         chartReport.clickOnElement(Pair.of(0, 0));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("Region", "West Coast"), asList("# of Activities", "23,854")));
+                asList(asList("Activity Type", "Web Meeting"), asList("Region", "West Coast"), asList("# of Activities", "21,045")));
         assertEquals(chartReport.getTrackersCount(), 8);
         Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
         
@@ -667,7 +667,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
         chartReport.clickOnElement(Pair.of(0, 0));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Year (Activity)", "2008"), asList("Activity Type", "In Person Meeting"), asList("# of Activities", "48")));
+                asList(asList("Year (Activity)", "2016"), asList("Activity Type", "In Person Meeting"), asList("# of Activities", "1")));
         Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
 
         JSONObject content = getLatestPostMessageObj();
@@ -704,7 +704,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
         chartReport.clickOnElement(Pair.of(0, 0));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Activity Type", "Email"), asList("Year (Activity)", "2009"), asList("# of Activities", "772")));
+                asList(asList("Activity Type", "Web Meeting"), asList("Year (Activity)", "2009"), asList("# of Activities", "415")));
         Screenshots.takeScreenshot(browser, "eventing HeatMap", getClass());
 
         JSONObject content = getLatestPostMessageObj();

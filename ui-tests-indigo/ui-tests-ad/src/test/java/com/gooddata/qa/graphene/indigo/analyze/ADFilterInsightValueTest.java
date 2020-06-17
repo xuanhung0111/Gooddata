@@ -6,7 +6,11 @@ import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration.OperatorCalculated;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.OptionalStacking;
@@ -21,8 +25,11 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFil
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.utils.CSVUtils;
+import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
@@ -35,10 +42,19 @@ import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import static com.gooddata.sdk.model.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
+    .LogicalOperator.GREATER_THAN;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
+    .LogicalOperator.LESS_THAN;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
+    .LogicalOperator.EQUAL_TO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
@@ -49,11 +65,9 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_EOP;
-import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
-    .LogicalOperator.EQUAL_TO;
-import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
-    .LogicalOperator.GREATER_THAN;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -61,17 +75,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 public class ADFilterInsightValueTest extends AbstractAnalyseTest {
 
-    private static final String CALCULATED_RATIO_OF = "Ratio of …";
     private final String METRIC_AMOUNT_PERCENT = "metricAmountPercent";
     private final String METRIC_CLOSE_EOP_PERCENT = "metricCloseEOPPercent";
     private final String TIME_RANGE_FROM = "01/01/2000";
     private final String TIME_RANGE_TO = "01/01/2020";
     private final String INSIGHT_TEST_REMOVING = "Removing";
     private final String ADVANCED_INSIGHT = "Advanced Insight";
+    private static final String CALCULATED_RATIO_OF = "Ratio of …";
+    private static final String FOUR_DATE_DATA = "4dates";
+    private static final String DISABLED = "Disabled";
+    private static final String ENABLED_CHECKED_BY_DEFAULT = "EnabledCheckedByDefault";
+    private static final String ENABLED_UNCHECKED_BY_DEFAULT = "EnabledUncheckedByDefault";
+    private static final String FOUR_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/4dates.csv";
+    private static final String FACT_NUMBER = "Number";
+    private static final String SUM_OF_FACT_NUMBER = "Sum of Number";
+    private static final String ATTR_NAME = "Name";
+    private static String TREAT_NULL_VALUES_AS_ZERO_INSIGHT = "TreatNull";
 
     private ProjectRestRequest projectRestRequest;
     private IndigoRestRequest indigoRestRequest;
@@ -445,6 +469,118 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
             .openCompareApplyMeasures().selectByNames(metric).apply();
         dateFilterPickerPanel.apply();
         analysisPage.waitForReportComputing();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void prepareInsightWithTreatNullValuesAsZero() {
+        uploadCSV(getFilePathFromResource(FOUR_DATE_CSV_PATH));
+        takeScreenshot(browser, "uploaded-fourdate", getClass());
+
+        initAnalysePage().getCatalogPanel().changeDataset(FOUR_DATE_DATA);
+        analysisPage.changeReportType(ReportType.TABLE).addMetric(FACT_NUMBER, FieldType.FACT).addAttribute(ATTR_NAME)
+            .openFilterBarPicker().checkItem(SUM_OF_FACT_NUMBER, 1).apply();
+        analysisPage.saveInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT);
+    }
+
+    @Test(dependsOnMethods = "prepareInsightWithTreatNullValuesAsZero")
+    public void testADMeasureValueFilterNullAsZeroOptionFeatureFlag() throws IOException {
+        try {
+            projectRestRequest.updateProjectConfiguration(
+                AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION.getFlagName(), DISABLED);
+
+            initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).waitForReportComputing();
+            MeasureValueFilterPanel measureValueFilterPanel = analysisPage.openMeasureFilterPanel(SUM_OF_FACT_NUMBER, 1)
+                .selectLogicalOperator(GREATER_THAN);
+
+            assertFalse(measureValueFilterPanel.isTreatNullValuesCheckboxPresent(),
+                "Checkbox should not be visible");
+
+            projectRestRequest.updateProjectConfiguration(
+                AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION.getFlagName(), ENABLED_UNCHECKED_BY_DEFAULT);
+
+            initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).waitForReportComputing();
+            measureValueFilterPanel = analysisPage.openMeasureFilterPanel(SUM_OF_FACT_NUMBER, 1)
+                .selectLogicalOperator(GREATER_THAN);
+
+            assertFalse(measureValueFilterPanel.isTreatNullValuesCheckboxChecked(), "Checkbox should not be checked");
+            assertEquals(measureValueFilterPanel.getTreatNullValuesAsZero(), "Treat blank values as 0");
+
+            projectRestRequest.updateProjectConfiguration(
+                AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION.getFlagName(), ENABLED_CHECKED_BY_DEFAULT);
+
+            initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).waitForReportComputing();
+            measureValueFilterPanel = analysisPage.openMeasureFilterPanel(SUM_OF_FACT_NUMBER, 1)
+                .selectLogicalOperator(GREATER_THAN);
+
+            assertTrue(measureValueFilterPanel.isTreatNullValuesCheckboxChecked(), "Checkbox should be checked");
+            assertEquals(measureValueFilterPanel.getTreatNullValuesAsZero(), "Treat blank values as 0");
+        } finally {
+            projectRestRequest.updateProjectConfiguration(
+                AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION.getFlagName(), ENABLED_CHECKED_BY_DEFAULT);
+        }
+    }
+
+    @Test(dependsOnMethods = "testADMeasureValueFilterNullAsZeroOptionFeatureFlag")
+    public void addMeasureValueFilterWithTreatNullValueAsZero() {
+        PivotTableReport pivotTableReport = initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT)
+            .waitForReportComputing().getPivotTableReport();
+
+        analysisPage.openMeasureFilterPanel(SUM_OF_FACT_NUMBER, 1)
+            .addMeasureValueFilter(LESS_THAN, "10");
+        analysisPage.saveInsight().waitForReportComputing();
+
+        log.info("Body Content :" + pivotTableReport.getBodyContent());
+        assertThat(pivotTableReport.getBodyContent(),
+            hasItems(asList("HongDao", "–"), asList("HongNga", "–"), asList("HungCao", "–"), asList("TrucXinh", "–"),
+                asList("PhucNguyen", "–"), asList("VinhPham", "–")));
+    }
+
+    @Test(dependsOnMethods = "addMeasureValueFilterWithTreatNullValueAsZero")
+    public void exportInsightWithTreatNullValueAsZeroToXSLX() throws IOException {
+        initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).exportTo(OptionalExportMenu.File.XLSX);
+        ExportXLSXDialog.getInstance(browser).checkOption(ExportXLSXDialog.OptionalExport.CELL_MERGED)
+            .checkOption(ExportXLSXDialog.OptionalExport.FILTERS_CONTEXT).confirmExport();
+
+        final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + TREAT_NULL_VALUES_AS_ZERO_INSIGHT + "." + ExportFormat.EXCEL_XLSX.getName());
+
+        waitForExporting(exportFile);
+        log.info("XSLX :" + XlsxUtils.excelFileToRead(exportFile.getPath(), 0));
+
+        assertThat(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), hasItems(singletonList("HongDao"),
+            singletonList("HongNga"), singletonList("HungCao"), singletonList("TrucXinh"), singletonList("PhucNguyen"),
+            singletonList("VinhPham")));
+    }
+
+    @Test(dependsOnMethods = "addMeasureValueFilterWithTreatNullValueAsZero")
+    public void exportInsightWithTreatNullValueAsZeroToCSV() throws IOException {
+        initAnalysePage().openInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).exportTo(OptionalExportMenu.File.CSV);
+
+        final File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+            + TREAT_NULL_VALUES_AS_ZERO_INSIGHT + "." + ExportFormat.CSV.getName());
+
+        waitForExporting(exportFile);
+        log.info("CSV: "+ CSVUtils.readCsvFile(exportFile));
+
+        assertThat(CSVUtils.readCsvFile(exportFile), hasItems(asList("HongDao", null), asList("HongNga", null),
+            asList("HungCao", null), asList("TrucXinh", null), asList("PhucNguyen", null), asList("VinhPham", null)));
+    }
+
+    @Test(dependsOnMethods = "addMeasureValueFilterWithTreatNullValueAsZero")
+    public void exportInsightWithTreatNullValueAsZeroToPDF() {
+        String dashboardTitle = generateHashString();
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
+        indigoDashboardsPage.addDashboard().changeDashboardTitle(dashboardTitle)
+            .addInsight(TREAT_NULL_VALUES_AS_ZERO_INSIGHT).openExtendedDateFilterPanel()
+            .selectPeriod(DateRange.ALL_TIME).apply();
+
+        indigoDashboardsPage.saveEditModeWithWidgets().waitForWidgetsLoading()
+            .exportDashboardToPDF();
+
+        List<String> contents = asList(getContentFrom(dashboardTitle).split("\n"));
+
+        log.info("PDF: " + contents);
+        assertThat(contents, hasItems("HongDao –", "HongNga –", "HungCao –"));
     }
 
     private void createCalculatedMeasure(
