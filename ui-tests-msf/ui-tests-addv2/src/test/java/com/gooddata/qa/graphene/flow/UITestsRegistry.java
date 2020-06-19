@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.bigquery.CleanUpBigQueryTest;
+import com.gooddata.qa.graphene.redshift.CleanUpADSInstanceTest;
 import com.gooddata.qa.graphene.redshift.CleanUpDatasourceTest;
 import com.gooddata.qa.graphene.redshift.CleanUpRedShiftTest;
 import com.gooddata.qa.graphene.snowflake.DeployProcessTest;
@@ -55,7 +56,8 @@ public class UITestsRegistry {
                 CleanUpSnowflakeTest.class,
                 CleanUpBigQueryTest.class,
                 CleanUpRedShiftTest.class,
-                CleanUpDatasourceTest.class
+                CleanUpDatasourceTest.class,
+                CleanUpADSInstanceTest.class
         });
 
         TestsRegistry.getInstance()
