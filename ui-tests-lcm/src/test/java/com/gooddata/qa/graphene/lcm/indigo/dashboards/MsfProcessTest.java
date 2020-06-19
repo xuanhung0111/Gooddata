@@ -62,7 +62,7 @@ public class MsfProcessTest extends AbstractDataloadProcessTest {
     public void setup() throws ParseException, JSONException, IOException {
         // need to create ads instance by domain user then we can remove the reference from master, develop, client project
         adsHelper = new AdsHelper(domainRestClient, testParams.getProjectId());
-        ads = adsHelper.createAds("att-lcm-ads-" + generateHashString(), getAdsToken());
+        ads = adsHelper.createAds("att-ads-" + generateHashString(), getAdsToken());
 
         log.info(String.format("Created ads instance:'%s'", ads.getUri()));
         // need add admin user to the ads instance's users group

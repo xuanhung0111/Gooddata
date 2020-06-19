@@ -64,7 +64,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"initDataload"})
     public void setup() throws ParseException, JSONException, IOException {
         adsHelper = new AdsHelper(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
-        ads = adsHelper.createAds("ads-" + generateHashString(), getAdsToken());
+        ads = adsHelper.createAds("att-ads-" + generateHashString(), getAdsToken());
 
         log.info("---created ads uri:" + ads.getUri());
 
