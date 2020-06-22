@@ -34,6 +34,7 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
             "To open the insight as a report, remove date filters from the measure definition.";
     private static final String ADD_ATTRIBUTE_FILTER_BUTTON = "Add attribute filter";
     private static final String FILTER_BY_DATE_BUTTON = "Filter by date";
+    private static final String FORMAT_ATTRIBUTE_BUTTON = "Format: Inherit";
 
     @Override
     public void initProperties() {
@@ -57,7 +58,7 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
     public void checkFilterByDateButton() {
         assertEquals(initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration().getByDateAndAttributeFilterButton(),
-                asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
+                asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON, FORMAT_ATTRIBUTE_BUTTON));
     }
 
     @Test(dependsOnGroups = {"createProject"})
