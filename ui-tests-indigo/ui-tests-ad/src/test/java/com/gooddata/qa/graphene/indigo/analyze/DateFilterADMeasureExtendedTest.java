@@ -352,7 +352,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
         metricConfiguration.expandFilterByDate();
-        assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
+        log.info("List item is: " + metricConfiguration.getByDateAndAttributeFilterButton());
+        assertEquals(metricConfiguration.getByDateAndAttributeFilter(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
@@ -388,7 +389,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
         metricConfiguration.expandFilterByDate();
-        assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
+        log.info("List item is: " + metricConfiguration.getByDateAndAttributeFilterButton());
+        assertEquals(metricConfiguration.getByDateAndAttributeFilter(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
@@ -407,7 +409,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).addFilter(ATTR_DEPARTMENT)
                 .waitForReportComputing().saveInsight(TEST_INSIGHT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
-        assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
+        log.info("List item is: " + metricConfiguration.getByDateAndAttributeFilterButton());
+        assertEquals(metricConfiguration.getByDateAndAttributeFilter(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)),
                 asList(ATTR_DEPARTMENT, "All"));
@@ -435,7 +438,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing().saveInsight(TEST_INSIGHT);
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
+        log.info("List item is: " + metricConfiguration.getByDateAndAttributeFilterButton());
+        assertEquals(metricConfiguration.getByDateAndAttributeFilter(),
                 asList(FILTER_BY_DATE_BUTTON, ATTR_ACCOUNT + ":\nAll", ADD_ATTRIBUTE_FILTER_BUTTON));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
 
@@ -458,7 +462,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).addDate().getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().showPercents();
         analysisPage.waitForReportComputing().saveInsight(TEST_INSIGHT);
-        assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
+        log.info("List item is: " + metricConfiguration.getByDateAndAttributeFilterButton());
+        assertEquals(metricConfiguration.getByDateAndAttributeFilter(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList("% " + METRIC_AMOUNT));
 
