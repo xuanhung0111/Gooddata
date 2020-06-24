@@ -34,12 +34,12 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void switchProjectsTest() {
-        initDataUploadPage().switchProject(NEW_PROJECT_NAME);
+        initDataUploadPage().switchProjectAndWaitProjectIsSelected(NEW_PROJECT_NAME);
 
         takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
-        DatasetsListPage.getInstance(browser).switchProject(projectTitle);
+        DatasetsListPage.getInstance(browser).switchProjectAndWaitProjectIsSelected(projectTitle);
 
         takeScreenshot(browser, "Switch-to-project-" + projectTitle, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));

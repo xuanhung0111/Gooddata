@@ -12,12 +12,15 @@ import org.openqa.selenium.support.FindBy;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class DatasetsListPage extends AbstractFragment {
 
     private static final By BY_EMPTY_STATE = className("empty-state");
     private static final By BY_MY_DATASETS_EMPTY_STATE = className("my-datasets-empty-state");
+    private String PROJECT_DROPDOWN_SELECTOR = ".gd-header-project";
 
     @FindBy(className = "s-datasets-list-header")
     private WebElement datasetsHeader;
@@ -146,6 +149,13 @@ public class DatasetsListPage extends AbstractFragment {
         Graphene.createPageFragment(Header.class, waitForElementVisible(By.className("gd-header"), browser))
                 .switchProject(name);
 
+        return waitForFragmentVisible(this);
+    }
+
+    public DatasetsListPage switchProjectAndWaitProjectIsSelected(String name) {
+        switchProject(name);
+        By buttonTitle = cssSelector(PROJECT_DROPDOWN_SELECTOR + ".s-" + simplifyText(name));
+        waitForElementVisible(buttonTitle, browser);
         return waitForFragmentVisible(this);
     }
 }
