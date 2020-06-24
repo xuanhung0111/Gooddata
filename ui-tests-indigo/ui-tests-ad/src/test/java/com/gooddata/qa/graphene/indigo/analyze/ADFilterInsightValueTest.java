@@ -283,7 +283,7 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
         assertEquals(MeasureValueFilterPanel.getInstance(browser).getWarningMessage(),
             "The filter uses actual measure values, not percentages.");
 
-        measureValueFilterPanel.addMeasureValueFilter(GREATER_THAN, "40,000,000");
+        measureValueFilterPanel.addMeasureValueFilter(GREATER_THAN, "4,000,000,000");
 
         assertEquals(chartReport.getDataLabels(), asList("100.00%"));
         analysisPage.changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
