@@ -56,7 +56,7 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createAndSaveNewKpiDashboard() throws IOException, JSONException {
-        initIndigoDashboardsPageWithWidgets().addDashboard().clickDashboardBody();
+        initIndigoDashboardsPageWithWidgets().addDashboard();
         takeScreenshot(browser, "New-Dashboard", getClass());
 
         assertEquals(indigoDashboardsPage.getDashboardTitle(), DEFAULT_TITLE);

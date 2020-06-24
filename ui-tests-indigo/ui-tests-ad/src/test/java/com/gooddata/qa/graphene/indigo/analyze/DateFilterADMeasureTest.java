@@ -56,7 +56,7 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkFilterByDateButton() {
         assertEquals(initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration().getByDateAndAttributeFilter(),
+                .expandConfiguration().getByDateAndAttributeFilterButton(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
     }
 

@@ -62,9 +62,6 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME)
     private List<WebElement> byDateAndAddAttributeFilter;
 
-    @FindBy(className = DATE_AND_ATTRIBUTE_FILTER)
-    private List<WebElement> dateAndAddAttributeFilter;
-
     @FindBy(className = "adi-bucket-item-sequence-number")
     private WebElement itemSequenceNumber;
 
@@ -83,7 +80,6 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
     private static final String DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME = "button-dropdown";
     private static final String SHOW_ON_SECONDARY_AXIS_CLASS_NAME = "s-show-on-secondary-axis";
-    private static final String DATE_AND_ATTRIBUTE_FILTER = "s-measures-bucket-id";
 
     private static final String DISABLED = "is-disabled";
 
@@ -105,10 +101,6 @@ public class MetricConfiguration extends AbstractFragment {
 
     public List<String> getByDateAndAttributeFilterButton() {
         return byDateAndAddAttributeFilter.stream().map(WebElement::getText).collect(Collectors.toList());
-    }
-
-    public List<String> getByDateAndAttributeFilter() {
-        return dateAndAddAttributeFilter.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     public boolean isDateAndAddAttributeFilterVisible() {
