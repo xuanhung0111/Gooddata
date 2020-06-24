@@ -296,7 +296,7 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     private boolean isDrillable(WebElement element) {
-        return waitForElementVisible(element).getAttribute("class").contains("drillable");
+        return element.getAttribute("class").contains("drillable");
     }
 
     private boolean isDrillableToExternalPage(WebElement element) {
