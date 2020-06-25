@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.common;
 
+import com.gooddata.qa.boilerplate.enums.AppType;
 import com.gooddata.sdk.model.project.Environment;
 import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
@@ -66,6 +67,7 @@ public class TestParameters {
     private String reactFolder;
     private String reactProjectTitle;
     private String uisdkVersion;
+    private String appType;
     private String localhostSDK;
     private String brickAppstore;
     private String lcmDataloadProcessComponentVersion;
@@ -137,6 +139,7 @@ public class TestParameters {
         reactFolder = loadProperty("reactFolder");
         reactProjectTitle = loadProperty("reactProjectTitle");
         uisdkVersion = loadProperty("uisdkVersion");
+        appType = loadProperty("appType");
         localhostSDK = loadProperty("localhostSDK");
     }
 
@@ -443,6 +446,10 @@ public class TestParameters {
 
     public String getUIsdkVersion() {
         return uisdkVersion;
+    }
+
+    public boolean useBoilerPlate() {
+        return appType.equals(AppType.BOILER_PLATE.toString());
     }
 
     public String getLocalhostSDK() {

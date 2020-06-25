@@ -6,15 +6,30 @@ RESOURCE_DIR=$(dirname "$(realpath $0)")
 REACT_PROJECT_NAME=$1
 TESTING_HOST=$2
 UI_SDK_VERSION=$3
+APP_TYPE=$4
+USE_BOILER_PLATE=false
+
+if [ $APP_TYPE == 'boilerplate' ]; then
+    USE_BOILER_PLATE=true;
+fi
 
 # Create React application
 mkdir /tmp/react
 cd /tmp/react
-yarn create react-app $REACT_PROJECT_NAME
+if $USE_BOILER_PLATE; then
+   npx @gooddata/create-gooddata-react-app $REACT_PROJECT_NAME --domainUrl $TESTING_HOST
+   echo "****Using Boiler Plate****"
+else
+   yarn create react-app $REACT_PROJECT_NAME
+fi
 cd $REACT_PROJECT_NAME
 
 # Configure HTTPS on NodeJs
-jq --arg enableHTTPs "HTTPS=true forever start -c 'react-scripts start' ./" '.scripts.start=$enableHTTPs' package.json > enableHTTPsNodeJs.json
+if $USE_BOILER_PLATE; then
+   jq --arg enableHTTPs "forever start -c 'cross-env HTTPS=true react-scripts start' ./" '.scripts.start=$enableHTTPs' package.json > enableHTTPsNodeJs.json
+else
+   jq --arg enableHTTPs "HTTPS=true forever start -c 'react-scripts start' ./" '.scripts.start=$enableHTTPs' package.json > enableHTTPsNodeJs.json
+fi
 cp enableHTTPsNodeJs.json package.json
 rm -rf enableHTTPsNodeJs.json
 
@@ -29,7 +44,7 @@ yarn add @gooddata/react-components@$UI_SDK_VERSION
 # Install node-saas as https://jira.intgdc.com/browse/ONE-3381
 yarn add node-sass
 
-if [ -n "$TESTING_HOST" ]; then
+if [ -n "$TESTING_HOST" ] && ! $USE_BOILER_PLATE; then
     # Setup proxy to prevent cross-origin issues
     sed s/replaceWithTestingHost/$TESTING_HOST/g $RESOURCE_DIR/setupProxy.js > ./src/setupProxy.js
 fi
