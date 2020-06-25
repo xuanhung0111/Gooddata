@@ -148,7 +148,7 @@ public class MetricFilterByDatePicker extends AbstractPicker {
 
     public DateDimensionSelect getDateDatasetSelect() {
         return Graphene.createPageFragment(DateDimensionSelect.class,
-                waitForElementVisible(By.cssSelector(".adi-date-dataset-select-dropdown div"), browser));
+                waitForElementVisible(By.cssSelector(".adi-date-dataset-select-dropdown"), browser));
     }
 
     public MetricFilterByDatePicker configTimeFilter(String from, String to) {
