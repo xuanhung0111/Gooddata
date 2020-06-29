@@ -1,5 +1,7 @@
-DROP TABLE IF EXISTS opportunity;CREATE TABLE opportunity(cp__name varchar(128), a__title varchar(128), f__price NUMERIC(15,2), f__totalprice NUMERIC(15,2));DROP TABLE IF EXISTS person;CREATE TABLE person(a__person varchar(128), l__person__personid varchar(128), l__person__firstname varchar(128), l__person__lastname varchar(128), f__age NUMERIC(15,2));
-COPY opportunity(cp__name, a__title, f__price, f__totalprice) FROM LOCAL '${DATA_SOURCE_DIR}/opportunity.csv' DELIMITER ',';COPY person(a__person, l__person__personid, l__person__firstname, l__person__lastname, f__age) FROM LOCAL '${DATA_SOURCE_DIR}/person.csv' DELIMITER ',';
+DROP TABLE IF EXISTS geopushpin;
+CREATE TABLE geopushpin(a__country varchar(512), a__city varchar(512), a__district varchar(512), a__state varchar(512), f__population NUMERIC(12,2), l__city__latlong varchar(512), l__district__id varchar(512), l__state__code varchar(512));
+
+COPY geopushpin(a__country, a__city, a__district, a__state, f__population, l__city__latlong, l__district__id, l__state__code) FROM LOCAL '${DATA_SOURCE_DIR}/geopushpin.csv' DELIMITER ',';
 
 DROP TABLE IF EXISTS clients;
 CREATE TABLE clients(id int, segment_id varchar(512), client_id varchar(512), project_title varchar(512), project_token varchar(512));

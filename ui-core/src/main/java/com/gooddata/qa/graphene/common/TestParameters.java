@@ -46,6 +46,7 @@ public class TestParameters {
     private String viewerDisabledExport;
     private String dashboardOnlyUser;
     private String authorizationToken;
+    private String adsToken;
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private Environment projectEnvironment = Environment.TESTING;
@@ -111,6 +112,7 @@ public class TestParameters {
         bigqueryPrivateKey = loadProperty("bigqueryPrivateKey");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
+        adsToken = loadProperty("dss.authorizationToken");
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
         retentionDays = Integer.parseInt(loadProperty("project.retentionDayNumber"));
@@ -305,6 +307,10 @@ public class TestParameters {
 
     public String getAuthorizationToken() {
         return authorizationToken;
+    }
+
+    public String getAdsToken() {
+        return adsToken;
     }
 
     public ProjectDriver getProjectDriver() {

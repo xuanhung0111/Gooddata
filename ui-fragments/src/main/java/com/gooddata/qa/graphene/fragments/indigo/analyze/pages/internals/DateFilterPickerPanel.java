@@ -33,6 +33,7 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public static final String TO_DATE_CSS_SELECTOR = ".adi-date-input-to .input-text";
     public static final String APPLY_BUTTON_CLASS_NAME = "s-date-filter-apply";
     public static final String CANCEL_BUTTON_CLASS_NAME = "s-date-filter-cancel";
+    public static final String TO_COMPARE_TIME_PERIOD = "s-comparison-types-button";
 
     @FindBy(className = "s-date-preset-button")
     private WebElement presetsDropdown;
@@ -164,6 +165,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public Boolean isToDateVisible() {
         return isElementVisible(By.cssSelector(TO_DATE_CSS_SELECTOR), getRoot());
+    }
+
+    public Boolean isCompareTimePeriodPresent() {
+        return isElementVisible(By.cssSelector(TO_COMPARE_TIME_PERIOD), getRoot());
     }
 
     public String getCompareApplyMeasuresText() {

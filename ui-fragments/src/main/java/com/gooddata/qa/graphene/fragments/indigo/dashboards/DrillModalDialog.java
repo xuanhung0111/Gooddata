@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
@@ -25,6 +26,9 @@ public class DrillModalDialog extends AbstractFragment {
     @FindBy(className = "s-drill-title")
     private WebElement titleInsight;
 
+    @FindBy(className = "s-geo-category-legend")
+    private WebElement pushpinCategoryLegend;
+
     private static final By ROOT = className("s-drill-modal-dialog");
     private static final By BY_CHART_REPORT = className("highcharts-container");
     private static final By BY_HIGHCHARTS_TOOLTIP = cssSelector(".highcharts-tooltip-container div.highcharts-tooltip");
@@ -35,6 +39,11 @@ public class DrillModalDialog extends AbstractFragment {
     public static DrillModalDialog getInstance(final SearchContext searchContext) {
         return Graphene.createPageFragment(DrillModalDialog.class,
             waitForElementVisible(ROOT, searchContext));
+    }
+
+    public String getCategoryPushpinLegend() {
+        return waitForElementPresent(pushpinCategoryLegend)
+                .findElement(By.cssSelector(".series .series-name")).getText();
     }
 
     public String getTitleInsight() {

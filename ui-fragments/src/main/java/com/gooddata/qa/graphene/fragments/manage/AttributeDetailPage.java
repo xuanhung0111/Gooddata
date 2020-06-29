@@ -62,6 +62,9 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
     @FindBy(className = "s-labelRow")
     private Collection<AttributeLabel> attributeLabels;
 
+    @FindBy(css = "div.labels-editor .s-latlong button.s-labelEditButton")
+    private WebElement geoLabelEditButton;
+
     private static final By BY_EXTERNAL_PAGE_LINK = By.cssSelector("button.s-btn-external_page");
 
     public static final AttributeDetailPage getInstance(SearchContext context) {
@@ -83,6 +86,15 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
 
     public void selectLabelType(String labelType) {
         waitForElementVisible(labelEditButton).click();
+        selectLabelTypeProcess(labelType);
+    }
+
+    public void selectGeoLableType(String labelType) {
+        waitForElementVisible(geoLabelEditButton).click();
+        selectLabelTypeProcess(labelType);
+    }
+
+    private void selectLabelTypeProcess(String labelType) {
         waitForElementVisible(labelTypeSelect);
         sleepTightInSeconds(2);
         labelTypeSelect.selectByVisibleText(labelType);

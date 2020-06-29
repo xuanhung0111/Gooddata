@@ -4,7 +4,8 @@ public enum FieldType {
     METRIC("type-metric"),
     FACT("type-fact"),
     ATTRIBUTE("type-attribute"),
-    DATE("type-date");
+    DATE("type-date"),
+    GEO("type-geo_attribute");
 
     private String type;
 

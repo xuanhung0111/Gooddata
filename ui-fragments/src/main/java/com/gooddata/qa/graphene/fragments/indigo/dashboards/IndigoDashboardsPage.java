@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.OptionalHeaderMenu;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.GeoPushpinChartPicker;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.CalculateUtils;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -126,6 +127,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = "button-filter-bar-show-all")
     protected WebElement showAllFilterBtn;
+
+    @FindBy(className = "s-dash-item-action-placeholder")
+    private WebElement exportCsvAndXlsxIcon;
 
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";

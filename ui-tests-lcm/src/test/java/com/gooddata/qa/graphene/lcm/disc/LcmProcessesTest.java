@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.lcm.disc;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
@@ -7,14 +8,19 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.LcmDirectoryConfiguration;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.GeoPushpinChartPicker;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.json.JSONException;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -23,6 +29,7 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.lcm.LcmRestUtils.deleteSegmentDefault;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
@@ -45,6 +52,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
     private static final String INSIGHT_LCM = "Insight-LCM";
     private static final String RELEASE_SCHEDULE_NAME = "Release_Schedule";
     private static final String CLIENT_NAME = "LcmClient";
+    private GeoPushpinChartPicker geoChart;
 
     @Override
     public void initProperties() {
@@ -55,6 +63,10 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException {
+        if (BrowserUtils.isFirefox()) {
+            throw new SkipException("Skip test case on Firefox Browser due to disabled weblg ");
+        }
+
         String adsTableText = SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName())
                 .replace("${SEGMENT_ID}", SEGMENT_ID )
                 .replace("${CLIENT_NAME}", CLIENT_NAME )
@@ -67,6 +79,11 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnMethods = {"initData"}, groups = {"precondition"})
+    public void configAttributeToGeoPushpin() {
+        initAttributePage().initAttribute("city").selectGeoLableType("Geo pushpin");
+    }
+
+    @Test(dependsOnMethods = {"configAttributeToGeoPushpin"}, groups = {"precondition"})
     public void runAddLoadingData() throws JSONException {
         initDiscProjectDetailPage();
         ADS_WAREHOUSE = ads.getConnectionUrl();
@@ -77,8 +94,11 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
         assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 
         scheduleDetail.close();
-        initAnalysePage().addMetric(FACT_TOTAL_PRICE, FieldType.FACT).addAttribute(ATTR_NAME).waitForReportComputing()
-                .saveInsight(INSIGHT_LCM);
+        initAnalysePage().changeReportType(ReportType.GEO_CHART)
+                .addAttributeToLocationPushpin(ATTR_GEO_PUSHPIN, FieldType.GEO)
+                .addAttributeToMeasureSize(ATTR_AMOUNT, FieldType.FACT)
+                .addAttributeToMeasureColor(ATTR_AMOUNT, FieldType.FACT)
+                .addStack(ATTR_COUNTRY).waitForReportComputing().saveInsight(INSIGHT_LCM);
     }
 
     @Test(dependsOnMethods = {"runAddLoadingData"}, groups = {"precondition"})
@@ -137,9 +157,18 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
         assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 
         scheduleDetail.close();
-
-        assertTrue(projectDetailPage.goToAnalyze().getPageHeader().expandInsightSelection().isExist(INSIGHT_LCM),
+        AnalysisPage analysisPage= projectDetailPage.goToAnalyze();
+        assertTrue(analysisPage.getPageHeader().expandInsightSelection().isExist(INSIGHT_LCM),
                 "There is no insight in Master Project");
+
+        analysisPage.getPageHeader().expandInsightSelection().openInsight(INSIGHT_LCM);
+        analysisPage.waitForReportComputing();
+        sleepTightInSeconds(2); // waiting for chart rendering, have no option on graphene test to wait
+        geoChart = GeoPushpinChartPicker.getInstance(browser);
+        geoChart.hoverOnGeoPushpin(-445, -120);
+        assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be displayed");
+        assertEquals(geoChart.getGeoPopupTooltip(), asList("city", "Sum of population", "Sum of population", "state"));
+        assertTrue(geoChart.isPushpinCategoryLegendVisible(), "Geo pushpin category is not visibled");
     }
 
     @Test(dependsOnMethods = {"runLcmProvisioningProcess"}, groups = {"precondition"})

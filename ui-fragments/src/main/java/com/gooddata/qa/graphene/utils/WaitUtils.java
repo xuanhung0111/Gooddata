@@ -109,6 +109,10 @@ public final class WaitUtils {
                 searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
+    public static void waitForMainPageLoading(SearchContext searchContext) {
+        waitForElementNotPresent(By.className("main-loading"), searchContext);
+    }
+
     public static WebElement waitForElementVisible(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(searchContext, byElement).is().visible();
         return searchContext.findElement(byElement);

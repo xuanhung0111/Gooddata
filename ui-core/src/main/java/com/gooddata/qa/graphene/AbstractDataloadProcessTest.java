@@ -49,6 +49,9 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     protected static final String ATTR_PERSON = "person";
     protected static final String ATTR_NAME = "name";
     protected static final String ATTR_TITLE = "title";
+    protected static final String ATTR_AMOUNT = "population";
+    protected static final String ATTR_COUNTRY = "state";
+    protected static final String ATTR_GEO_PUSHPIN = "city";
 
     protected static final String FACT_AGE = "age";
     protected static final String FACT_PRICE = "price";
