@@ -56,6 +56,10 @@ public final class ElementUtils {
         return element.getAttribute("class").contains("disabled");
     }
 
+    public static boolean isElementContainDisabledAttribute(WebElement element) {
+        return element.getAttribute("disabled") == null  ? false : true;
+    }
+
     public static void scrollElementIntoView(WebElement element, WebDriver browser) {
         BrowserUtils.runScript(browser, "arguments[0].scrollIntoView(true);", element);
     }

@@ -97,6 +97,26 @@ public class Model extends AbstractFragment {
         addMore.editDatasetDialog().changeAttributeName(attribute, newName);
     }
 
+    public void editAttributeNameAndNotSave(String attribute, String newName) {
+        OverlayWrapper.getInstance(browser).getEditDatasetDialog().changeAttributeNameAndNotSave(attribute, newName);
+    }
+
+    public void addAttribute(String attributeName) {
+        OverlayWrapper.getInstance(browser).getEditDatasetDialog().addAttribute(attributeName);
+    }
+
+    public boolean isAttributeExist(String attributeName) {
+        return OverlayWrapper.getInstance(browser).getEditDatasetDialog().isAttributeExist(attributeName);
+    }
+
+    public void addFact(String factName) {
+        OverlayWrapper.getInstance(browser).getEditDatasetDialog().addFact(factName);
+    }
+
+    public boolean isFactExist(String factName) {
+        return OverlayWrapper.getInstance(browser).getEditDatasetDialog().isFactExist(factName);
+    }
+
     public void editLabelName(String label, String newName) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.editDatasetDialog().changeLabelName(label, newName);
@@ -105,6 +125,16 @@ public class Model extends AbstractFragment {
     public void editDatatypeOfMainLabel(String attribute, String dataTypeClass) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.editDatasetDialog().changeDatatypeOfMainLabel(attribute, dataTypeClass);
+    }
+
+    public int getSizeOfDataType() {
+        EditDatasetDialog edit = EditDatasetDialog.getInstance(browser);
+        return edit.getDatatypeSize();
+    }
+
+    public int getNumberOfAttrtibutes() {
+        EditDatasetDialog edit = EditDatasetDialog.getInstance(browser);
+        return edit.getNumberOfAttributes();
     }
 
     public String getTextDatatype(String attribute) {

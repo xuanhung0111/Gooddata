@@ -22,6 +22,9 @@ public class ViewDetailDialog extends AbstractFragment {
     @FindBy(className = "label")
     List<WebElement> listLabels;
 
+    @FindBy(className = "attribute")
+    List<WebElement> listAttributes;
+
     @FindBy(className= "data-type")
     List<WebElement>listDatatypes;
 
@@ -33,6 +36,7 @@ public class ViewDetailDialog extends AbstractFragment {
 
     private static final String VIEW_DETAIL_DIALOG = "indigo-table-component";
     private static final String ATTRIBUTE_NAME = "//div[@class='title attribute'][contains(text(),'%s')]";
+    private static final String FACT_NAME = "//div[@class='title fact'][contains(text(),'%s')]";
     private static final String LABEL_NAME = "//div[@class='title label'][contains(text(),'%s')]";
     private static final String DATATYPE_CHANGE = "//div[@class='gd-list-item %s']";
 
@@ -46,6 +50,18 @@ public class ViewDetailDialog extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(attributeName).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
+    }
+
+    public boolean isAttributeExist(String attribute) {
+        List<WebElement> attributeList = this.getRoot().findElements(xpath(format(ATTRIBUTE_NAME, attribute)));
+        if(attributeList.isEmpty()) return false;
+        return true;
+    }
+
+    public boolean isFactExist(String fact) {
+        List<WebElement> factList = this.getRoot().findElements(xpath(format(FACT_NAME, fact)));
+        if(factList.isEmpty()) return false;
+        return true;
     }
 
     public void editLabelName(String label, String newName) {
@@ -111,6 +127,14 @@ public class ViewDetailDialog extends AbstractFragment {
 
     public WebElement getDatatypeElementByIndex(int index) {
         return listDatatypes.get(index);
+    }
+
+    public int getSizeDatatype() {
+        return listDatatypes.size();
+    }
+
+    public int getNumberOfAttributes() {
+        return listAttributes.size();
     }
 
     private void hoverOnElementByJS(WebElement element) {

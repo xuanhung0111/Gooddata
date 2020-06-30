@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
@@ -37,10 +38,12 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static java.lang.String.format;
 
 public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private LogicalDataModelPage ldmPage;
@@ -77,6 +80,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private final String USERCODE_ATRIBUTE = "usercode";
     private final String USERCODE_LABEL = "usercode";
     private final String USERNUMBER_ATTRIBUTE = "usernumber";
+    private final String USERNOTSAVE_ATTRIBUTE = "usernotsave";
+    private final String USERNOTSAVE_ATTRIBUTE_2 = "usernotsave2";
+    private final String USERNOTSAVE_FACT = "userfactnotsave";
     private final String CLASSID_GRAIN = "classid";
     private final String CLASSCODE_GRAIN = "classcode";
     private final String CLASSNAME_ATTRIBUTE = "classname";
@@ -115,6 +121,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
                 "canvas to build your model."));
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "initial_model.txt"));
+        //MSF-17161: Update links in the modeler page header
+        assertEquals(ldmPage.getLinkDISC(), format("https://%s/admin/disc/#/projects", testParams.getHost()));
+        assertTrue(ldmPage.getMenuItems().equals(Arrays.asList("Model data", "Load data")));
         initLogicalDataModelPage();
     }
 
@@ -125,6 +134,13 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     public void addNewModel() {
         mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
         Model modelClass = mainModelContent.getModel(CLASS_DATASET);
+
+        //MSF-17107 : Disable URN changing for already existing date dimension
+        DateModel modelDate = mainModelContent.getDateModel(DATE_DATASET);
+        mainModelContent.focusOnDateDataset(DATE_DATASET);
+        EditDateDimensionDialog dateModelDialog = modelDate.openEditDateDimensionDialog();
+        assertTrue(dateModelDialog.isInputFieldDisable());
+        dateModelDialog.clickCancel();
 
         mainModelContent.focusOnDataset(CLASS_DATASET);
         mainModelContent.addAttributeToDataset(CLASSNAME_ATTRIBUTE, CLASS_DATASET);
@@ -169,15 +185,32 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.editLabelName(USERCODE_FIRST_LABEL, USERCODE_LABEL);
         mainModelContent.focusOnDataset(USER_DATASET);
+        //MSF-17077 : Attr/fact with empty name should not be added into the dataset
+        mainModelContent.addAttributeToDataset("", USER_DATASET);
         modelUser.editDatatypeOfMainLabel(USERNUMBER_ATTRIBUTE, Model.DATA_TYPE.INTEGER.getClassName());
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.editDatatypeOfMainLabel(USERCODE_ATRIBUTE, Model.DATA_TYPE.BIG_INTEGER.getClassName());
-
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.openEditDialog();
         assertEquals(USERCODE_LABEL, modelUser.getTextLabel(USERCODE_LABEL));
         assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelUser.getTextDatatype(USERNUMBER_ATTRIBUTE));
         assertEquals(Model.DATA_TYPE.BIG_INTEGER.getName(), modelUser.getTextDatatype(USERCODE_ATRIBUTE));
+        //MSF-17631 : [Web Modeler] Should not displayed data type value on attribute row
+        assertEquals(modelUser.getSizeOfDataType(), 5);
+        //MSF-17077 : Attr/fact with empty name should not be added into the dataset
+        //make sure that just show 3 attribute, not add empty attribute above
+        assertEquals(modelUser.getNumberOfAttrtibutes(), 3);
+        modelUser.clickCancelEditPopUp();
+
+        //MSF-17514: Update dataset detail - add fact/attr
+        mainModelContent.focusOnDataset(USER_DATASET);
+        modelUser.openMorePopUpOnDataset().editDatasetDialog();
+        modelUser.addAttribute(USERNOTSAVE_ATTRIBUTE);
+        assertTrue(modelUser.isAttributeExist(USERNOTSAVE_ATTRIBUTE));
+        modelUser.editAttributeNameAndNotSave(USERNOTSAVE_ATTRIBUTE, USERNOTSAVE_ATTRIBUTE_2 );
+        assertTrue(modelUser.isAttributeExist(USERNOTSAVE_ATTRIBUTE_2));
+        modelUser.addFact(USERNOTSAVE_FACT);
+        assertTrue(modelUser.isFactExist(USERNOTSAVE_FACT));
         modelUser.clickCancelEditPopUp();
 
         mainModelContent.focusOnDataset(CLASS_DATASET);
