@@ -25,16 +25,24 @@ public class LcmRestUtils {
 
     public static final String ATT_LCM_DATA_PRODUCT = "att_lcm_default_data_product";
 
-    public static void deleteClient(final RestClient restClient, final String domain, final String clientId) {
-        final String deleteUri = String.format("/gdc/domains/%s/dataproducts/%s/clients/%s",
-                domain, ATT_LCM_DATA_PRODUCT, clientId);
+    public static void deleteClient(final RestClient restClient, final String domain, final String clientId,
+                                    final String segmentUrl) {
+        final String deleteUri = String.format(segmentUrl, domain, clientId);
         restClient.execute(RestRequest.initDeleteRequest(deleteUri), HttpStatus.NO_CONTENT);
     }
 
-    public static String getMasterProjectId(final RestClient restClient, final String domain, final String segmentId) {
+    public static void deleteClient(final RestClient restClient, final String domain, final String clientId) {
+        deleteClient(restClient, domain, clientId, "/gdc/domains/%s/dataproducts/att_lcm_default_data_product/clients/%s");
+    }
+
+    public static void deleteClientDefault(final RestClient restClient, final String domain, final String clientId) {
+        deleteClient(restClient, domain, clientId, "/gdc/domains/%s/dataproducts/default/clients/%s");
+    }
+
+    public static String getMasterProjectId(final RestClient restClient, final String domain, final String segmentId,
+                                            final String segmentUrl) {
         try {
-            final String segment = String.format("/gdc/domains/%s/dataproducts/%s/segments/%s",
-                    domain, ATT_LCM_DATA_PRODUCT, segmentId);
+            final String segment = String.format(segmentUrl, domain, segmentId);
             final String masterUri = getJsonObject(restClient, segment).getJSONObject("segment").getString("masterProject");
             return masterUri.split("/gdc/projects/")[1];
         } catch (Exception ex) {
@@ -42,11 +50,20 @@ public class LcmRestUtils {
         }
     }
 
+    public static String getMasterProjectId(final RestClient restClient, final String domain, final String segmentId) {
+        return  getMasterProjectId(restClient, domain, segmentId,
+                "/gdc/domains/%s/dataproducts/att_lcm_default_data_product/segments/%s");
+    }
+
+    public static String getMasterProjectIdDefault(final RestClient restClient, final String domain, final String segmentId) {
+        return  getMasterProjectId(restClient, domain, segmentId,
+                "/gdc/domains/%s/dataproducts/default/segments/%s");
+    }
+
     public static Map<String, Set<String>> getClientProjectIds(final RestClient restClient, final String domain,
-                                                               final String dataProduct, final String segmentId) {
+                                                               final String segmentId, final String segmentUrl) {
         try {
-            final String segment = String.format("/gdc/domains/%s/dataproducts/%s/clients?segment=%s&limit=1000",
-                    domain, dataProduct, segmentId);
+            final String segment = String.format(segmentUrl, domain, segmentId);
             final JSONArray clients = getJsonObject(restClient, segment).getJSONObject("clients").getJSONArray("items");
             Map<String, Set<String>> clientProjects = new HashMap<>();
             clients.forEach(client -> {
@@ -67,6 +84,16 @@ public class LcmRestUtils {
         }
     }
 
+    public static Map<String, Set<String>> getClientProjectIds(final RestClient restClient, final String domain,
+                                                               final String segmentId) {
+        return getClientProjectIds(restClient, domain, segmentId, "/gdc/domains/%s/dataproducts/att_lcm_default_data_product/clients?segment=%s&limit=1000");
+    }
+
+    public static Map<String, Set<String>> getClientProjectIdsDefault(final RestClient restClient, final String domain,
+                                                                      final String segmentId) {
+        return getClientProjectIds(restClient, domain, segmentId, "/gdc/domains/%s/dataproducts/default/clients?segment=%s&limit=1000");
+    }
+
     /**
      * Delete a segment will also delete all related objects involved into the segment: segment master project,
      * client ids, client projects
@@ -77,7 +104,7 @@ public class LcmRestUtils {
         try {
             //delete clients projects
             final ProjectService service = restClient.getProjectService();
-            getClientProjectIds(restClient, domain,ATT_LCM_DATA_PRODUCT, segmentId).forEach((k, v) -> {
+            getClientProjectIds(restClient, domain, segmentId).forEach((k, v) -> {
                 v.forEach(clientProj -> {
                     service.removeProject(service.getProjectById(clientProj));
                 });
@@ -93,7 +120,27 @@ public class LcmRestUtils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
 
+    public static void deleteSegmentDefault(final RestClient restClient, final String domain, final String segmentId) {
+        try {
+            //delete clients projects
+            final ProjectService service = restClient.getProjectService();
+            getClientProjectIdsDefault(restClient, domain, segmentId).forEach((k, v) -> {
+                v.forEach(clientProj -> {
+                    service.removeProject(service.getProjectById(clientProj));
+                });
+                deleteClientDefault(restClient, domain, k);
+            });
+            //delete master project
+            final String masterProject = getMasterProjectIdDefault(restClient, domain, segmentId);
+            service.removeProject(service.getProjectById(masterProject));
+            //delete segment
+            final String segment = String.format("/gdc/domains/%s/dataproducts/default/segments/%s", domain, segmentId);
+            restClient.execute(RestRequest.initDeleteRequest(segment), HttpStatus.NO_CONTENT);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**

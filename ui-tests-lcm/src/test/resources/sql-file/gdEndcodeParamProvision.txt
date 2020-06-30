@@ -1,0 +1,20 @@
+{
+  "ads_client": {
+    "username": "${GDC_USERNAME}",
+    "password": "${ads_password}",
+    "jdbc_url": "${JDBC_URL}"
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "input_source": {
+    "type": "ads",
+    "query": "select segment_id, client_id, project_title, project_token from clients where id = 1;"
+  },
+  "additional_hidden_params": {
+    "PARAM2": "VALUE2"
+  },
+  "additional_params": {
+    "PARAM1": "VALUE1"
+  }
+}

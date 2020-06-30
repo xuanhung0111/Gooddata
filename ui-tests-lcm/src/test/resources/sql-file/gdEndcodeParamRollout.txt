@@ -1,0 +1,22 @@
+{
+  "ads_client": {
+    "username": "${GDC_USERNAME}",
+    "password": "${ads_password}",
+    "jdbc_url": "${JDBC_URL}"
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "data_product": "default",
+  "dynamic_params": {
+    "input_source": {
+      "type": "ads",
+      "query": "select 'ClientProject' as client_id, 'PARAMA' as param_name, 'Add by dynamic param' as param_value, 'hello.rb' as schedule_name;"
+    }
+  },
+  "schedule_title_column": "schedule_name",
+  "update_preference": {
+    "keep_data": false,
+    "allow_cascade_drops": true
+  }
+}

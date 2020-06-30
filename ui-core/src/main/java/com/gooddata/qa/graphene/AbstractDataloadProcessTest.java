@@ -47,9 +47,12 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     protected static final String ATTR_OPPORTUNITY = "opportunity";
     protected static final String ATTR_PERSON = "person";
+    protected static final String ATTR_NAME = "name";
+    protected static final String ATTR_TITLE = "title";
 
     protected static final String FACT_AGE = "age";
     protected static final String FACT_PRICE = "price";
+    protected static final String FACT_TOTAL_PRICE = "totalprice";
 
     private static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
 
@@ -191,7 +194,10 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     protected enum TxtFile {
         CREATE_LDM("createLdm.txt"),
         ADS_TABLE("adsTable.txt"),
-        LARGE_ADS_TABLE("largeAdsTable.txt");
+        LARGE_ADS_TABLE("largeAdsTable.txt"),
+        GD_ENDCODE_PARAM_RELEASE("gdEndcodeParam.txt"),
+        GD_ENDCODE_PARAM_PROVISIONING("gdEndcodeParamProvision.txt"),
+        GD_ENDCODE_PARAM_ROLLOUT("gdEndcodeParamRollout.txt");
 
         private String name;
 
