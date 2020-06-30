@@ -5,9 +5,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.NO_DATA_MESSAGE;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_ATTRIBUTE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_DATE_AND_ATTRIBUTE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_DATE_FILTER;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_NO_DATA;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.String.format;
@@ -44,7 +46,6 @@ import java.util.stream.Stream;
 
 public class FilterComponentTest extends AbstractReactSdkTest {
 
-    private final static String NO_DATA_MESSAGE = "NO DATA\nNo data for your filter selection.";
     private final static String INSIGHT_TITLE = "Column Chart";
     private String uri;
     private int thisYear = LocalDate.now().getYear();
@@ -77,7 +78,7 @@ public class FilterComponentTest extends AbstractReactSdkTest {
         assertEquals(sdkAnalysisPage.getChartReport().getDataLabels(), asList("1,591", "881"));
         openExtendedDateFilterPanel().selectPeriod(DateRange.LAST_7_DAYS).checkExcludeCurrent().apply();
         sdkAnalysisPage.waitForVisualizationLoading();
-        assertEquals(sdkAnalysisPage.getWarning(), NO_DATA_MESSAGE);
+        assertEquals(sdkAnalysisPage.getWarning(), isUIsdk8() ? WARNING_NO_DATA : NO_DATA_MESSAGE);
 
         assertThat(openExtendedDateFilterPanel().getDateRangeOptions(),
                 equalTo(Stream.of(DateRange.values()).map(DateRange::toString).collect(toList())));
@@ -85,7 +86,7 @@ public class FilterComponentTest extends AbstractReactSdkTest {
         openExtendedDateFilterPanel()
                 .selectFloatingRange(ExtendedDateFilterPanel.DateGranularity.DAYS, "yesterday", "4 days ahead").apply();
         sdkAnalysisPage.waitForVisualizationLoading();
-        assertEquals(sdkAnalysisPage.getWarning(), NO_DATA_MESSAGE);
+        assertEquals(sdkAnalysisPage.getWarning(), isUIsdk8() ? WARNING_NO_DATA : NO_DATA_MESSAGE);
     }
 
     @Test(dependsOnMethods = "login")

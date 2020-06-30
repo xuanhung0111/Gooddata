@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
+import { CatalogHelper } from '@gooddata/sdk-ui-all';
+import { InsightView } from "@gooddata/sdk-ui-ext";
+import { uriRef } from "@gooddata/sdk-model";
 import catalogJson from './catalog.json';
-import { AttributeFilter, CatalogHelper, DateFilter, DateFilterHelpers, Visualization  } from "@gooddata/react-components";
-import "@gooddata/react-components/styles/css/dateFilter.css";
-import '@gooddata/react-components/styles/css/main.css';
+import { DateFilter, DateFilterHelpers } from "@gooddata/sdk-ui-filters";
+import { BackendProvider, WorkspaceProvider } from "@gooddata/sdk-ui";
+import bearFactory, { ContextDeferredAuthProvider } from "@gooddata/sdk-backend-bear";
+import "@gooddata/sdk-ui-charts/styles/css/main.css";
+import "@gooddata/sdk-ui-ext/styles/css/insightView.css";
+import "@gooddata/sdk-ui-filters/styles/css/dateFilter.css";
 
-const C = new CatalogHelper(catalogJson);
 const variables = require('./testing-variable.json');
+const C = new CatalogHelper(catalogJson);
+const backend = bearFactory().withAuthentication(new ContextDeferredAuthProvider());
 const visualizationUri = variables.visualizationUri;
 const dataSet = variables.dataSet;
-const attribute = variables.attribute;
-const attributeUri = variables.attributeUri;
 const projectId = catalogJson.projectId;
-const attributeDisplayFormId = C.attributeDisplayForm(attribute, attribute);
 
 let dateFrom = new Date();
 dateFrom.setMonth(dateFrom.getMonth() - 1);
@@ -168,12 +172,10 @@ class App extends Component {
         this.state = {
             selectedFilterOption: defaultDateFilterOptions.allTime,
             excludeCurrentPeriod: true,
-            attributeFilter: {},
         };
     }
 
     onApply = (dateFilterOption, excludeCurrentPeriod) => {
-
         this.setState({
             selectedFilterOption: dateFilterOption,
             excludeCurrentPeriod,
@@ -187,26 +189,6 @@ class App extends Component {
         );
     };
 
-    onApplyAttributeFilter = (filter) => {
-        console.log('AttributeFilterExample filter', filter);
-
-        const isPositive = !!filter.in;
-        const elementsProp = isPositive ? 'in' : 'notIn';
-
-        const filters = {
-            [isPositive ? 'positiveAttributeFilter' : 'negativeAttributeFilter']: {
-                displayForm: {
-                    identifier: filter.id
-                },
-                [elementsProp]: filter[elementsProp].map(element => (`${attributeUri}/elements?id=${element}`))
-            }
-        };
-
-        this.setState({
-            attributeFilter: filters,
-        });
-    };
-
     render(){
 
         const dateFilter = DateFilterHelpers.mapOptionToAfm(
@@ -216,48 +198,37 @@ class App extends Component {
             },
             this.state.excludeCurrentPeriod,
         );
-        const attributeFilter = this.state.attributeFilter;
 
         return (
-
-            <div className="App ">
-                <header>
-                    <div className={"dash-filters-all"}>
-                        <div className={"dash-filters-date"} style={{ width: 160, height: 50  }}>
-                            <DateFilter
-                                excludeCurrentPeriod={this.state.excludeCurrentPeriod}
-                                selectedFilterOption={this.state.selectedFilterOption}
-                                filterOptions={defaultDateFilterOptions}
-                                availableGranularities={availableGranularities}
-                                customFilterName="Date filter"
-                                dateFilterMode="active"
-                                onApply={this.onApply}
-
-                                //locale="de-DE"
-                            />
-                        </div>
-                        <div className={"s-attribute-filter"} style={{ width: 150, height: 50  }}>
-                            <AttributeFilter
-                                identifier={attributeDisplayFormId}
-                                projectId={projectId}
-                                fullscreenOnMobile={false}
-                                onApply={this.onApplyAttributeFilter}
-                            />
-                        </div>
+            <BackendProvider backend={backend}>
+                <WorkspaceProvider workspace= {projectId}>
+                    <div className="App ">
+                        <header>
+                            <div className={"dash-filters-all"}>
+                                <div style={{ height: 400, width: 600 }}>
+                                    <InsightView
+                                        insight = {uriRef(visualizationUri)}
+                                        filters = {dateFilter ? [dateFilter] : []}
+                                    />
+                                </div>
+                                <div className={"dash-filters-date"} style={{ width: 160, height: 50 }}>
+                                    <DateFilter
+                                        excludeCurrentPeriod={this.state.excludeCurrentPeriod}
+                                        selectedFilterOption={this.state.selectedFilterOption}
+                                        filterOptions={defaultDateFilterOptions}
+                                        availableGranularities={availableGranularities}
+                                        customFilterName="Date filter"
+                                        dateFilterMode="active"
+                                        onApply={this.onApply}
+                                    />
+                                </div>
+                            </div>
+                        </header>
                     </div>
-                    <div style={{ height: 600, width: 600 }}>
-                        <Visualization
-                            projectId={projectId}
-                            uri={visualizationUri}
-                            filters={[attributeFilter, dateFilter]}
-                        />
-                    </div>
-
-                </header>
-            </div>
-
+                </WorkspaceProvider>
+            </BackendProvider>
         );
     }
 }
-export default App;
 
+export default App;

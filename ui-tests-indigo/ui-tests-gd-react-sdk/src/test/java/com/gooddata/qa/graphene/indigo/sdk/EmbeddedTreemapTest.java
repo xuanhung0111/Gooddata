@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.NO_DATA_MESSAGE;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATIONS;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_ABSOLUTE_DATE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_CONFIGURATIONS;
@@ -14,8 +15,15 @@ import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATIO
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_WITH_NEGATIVE_FILTER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_BY_IDENTIFIER;
 import static com.gooddata.qa.graphene.utils.ReactSKDUtils.TEMPLATE_VISUALIZATION_BY_URI;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_CAN_NOT_DISPLAY;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_DATA_TOO_LARGE_TO_COMPUTE;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_DATA_TOO_LARGE_TO_DISPLAY;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_NOT_FOUND;
+import static com.gooddata.qa.graphene.utils.ReactSKDUtils.WARNING_NO_DATA;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -136,8 +144,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
         createCatalogJSON(Pair.of("visualizationName", treemap));
         indigoRestRequest.deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        assertEquals(initSDKAnalysisPage().getWarning(),
-                "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.");
+        assertThat(initSDKAnalysisPage().getWarning(), isUIsdk8() ? containsString(WARNING_NOT_FOUND) : containsString(WARNING_CAN_NOT_DISPLAY));
     }
 
     @Test(dependsOnMethods = "login")
@@ -188,7 +195,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                     singletonList(ATTR_DEPARTMENT));
             createCatalogJSON(Pair.of("visualizationName", treemap));
             replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-            assertEquals(initSDKAnalysisPage().getWarning(), "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.");
+            assertThat(initSDKAnalysisPage().getWarning(), containsString(WARNING_CAN_NOT_DISPLAY));
         } finally {
             factRestRequest.unsetFactRestricted(getFactByTitle(FACT_AMOUNT).getUri());
         }
@@ -201,7 +208,8 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 singletonList(ATTR_OPPORTUNITY));
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        assertEquals(initSDKAnalysisPage().getWarning(), "TOO MANY DATA POINTS TO DISPLAY\nTry applying filters.");
+        assertThat(initSDKAnalysisPage().getWarning(), isUIsdk8() ? containsString(WARNING_DATA_TOO_LARGE_TO_DISPLAY) :
+                containsString("TOO MANY DATA POINTS TO DISPLAY\nTry applying filters."));
     }
 
     @Test(dependsOnMethods = "login")
@@ -211,7 +219,8 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 singletonList(ATTR_ACTIVITY));
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        assertEquals(initSDKAnalysisPage().getWarning(), "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.");
+        assertThat(initSDKAnalysisPage().getWarning(), isUIsdk8() ? containsString(WARNING_DATA_TOO_LARGE_TO_COMPUTE) :
+                containsString(WARNING_CAN_NOT_DISPLAY));
     }
 
     @Test(dependsOnMethods = "login")
@@ -223,7 +232,7 @@ public class EmbeddedTreemapTest extends AbstractReactSdkTest {
                 singletonList(ATTR_DEPARTMENT));
         createCatalogJSON(Pair.of("visualizationName", treemap));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        assertEquals(initSDKAnalysisPage().getWarning(), "NO DATA\nNo data for your filter selection.");
+        assertEquals(initSDKAnalysisPage().getWarning(), isUIsdk8() ? WARNING_NO_DATA : NO_DATA_MESSAGE);
     }
 
     @Test(dependsOnMethods = "login")
