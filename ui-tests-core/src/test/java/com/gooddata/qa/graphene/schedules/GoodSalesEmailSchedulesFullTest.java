@@ -506,15 +506,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyNoDataReport() {
-        String error = format("Report '%s' produced an empty result during conversion to '%s' format",
-                REPORT_NO_DATA, "html");
+        String error = format("Report '%s' is empty and, as a result, is not attached", REPORT_NO_DATA);
         assertTrue(attachments.get(noDataReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
 
     @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyIncomputableReport() {
-        String error = format("Report '%s' you wanted to export to '%s' format is not currently computable",
+        String error = format("Report '%s' cannot be exported to '%s' format as it is not currently computable",
                 REPORT_INCOMPUTABLE, "pdf");
         assertTrue(attachments.get(incomputableReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
@@ -522,7 +521,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyTooLargeReport() {
-        String error = format("Report '%s' cannot be exported to '%s' format as it is too large", REPORT_TOO_LARGE,
+        String error = format("Report '%s' is too large and, as a result, cannot be exported to '%s' format", REPORT_TOO_LARGE,
                 "pdf");
         assertTrue(attachments.get(tooLargeReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
