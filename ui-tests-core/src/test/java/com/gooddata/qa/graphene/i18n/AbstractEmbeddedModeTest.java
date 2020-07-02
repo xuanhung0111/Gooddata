@@ -15,7 +15,7 @@ import org.jboss.arquillian.graphene.Graphene;
 
 public abstract class AbstractEmbeddedModeTest extends AbstractDashboardWidgetTest {
 
-    protected static final String HEROKU_APP_LINK = "https://test-filter-context.herokuapp.com";
+    protected static final String HEROKU_APP_LINK = "https://test-filters-context.herokuapp.com";
     protected String embeddedUri;
     protected String embeddedReportUri;
 
