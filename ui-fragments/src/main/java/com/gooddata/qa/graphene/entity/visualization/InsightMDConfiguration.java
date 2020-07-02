@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.entity.visualization;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 
 import java.util.ArrayList;
 
@@ -14,6 +15,7 @@ public class InsightMDConfiguration {
     private List<CategoryBucket> categoryBuckets = new ArrayList<CategoryBucket>();
     private List<TotalsBucket> totalsBuckets = new ArrayList<TotalsBucket>();
     private List<FilterAttribute> filterAttribute;
+    private FilterDate filterDate;
 
     public InsightMDConfiguration(String title, ReportType type) {
         this.title = title;
@@ -40,6 +42,11 @@ public class InsightMDConfiguration {
         return this;
     }
 
+    public InsightMDConfiguration setDateFilter(FilterDate filterDate) {
+        this.filterDate = filterDate;
+        return this;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -61,4 +68,6 @@ public class InsightMDConfiguration {
     }
 
     public List<FilterAttribute> getFilters() { return filterAttribute; }
+
+    public FilterDate getDateFilter() { return filterDate; }
 }

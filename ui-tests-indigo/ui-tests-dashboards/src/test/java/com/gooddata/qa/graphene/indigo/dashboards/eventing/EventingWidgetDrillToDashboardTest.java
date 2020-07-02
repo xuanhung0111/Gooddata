@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards.eventing;
 
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -7,12 +9,17 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventi
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.sdk.model.md.Restriction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_WEEK_SUN_SAT_SNAPSHOT;
+import static com.gooddata.sdk.model.md.Restriction.title;
+import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
@@ -22,6 +29,7 @@ public class EventingWidgetDrillToDashboardTest extends AbstractDashboardEventin
     private String firstTabIdentifier;
     private String createdDatasetUri;
     private String expectedDrillToUri;
+    private static final String METRIC_CONTAINS_FOR_PREVIOUS_WEEK = "Metric Previous Week";
 
     @Override
     public void prepareProject() throws Throwable {
@@ -352,6 +360,41 @@ public class EventingWidgetDrillToDashboardTest extends AbstractDashboardEventin
         JSONObject filter = executionContext.getJSONArray("filters").getJSONObject(0);
         assertEquals(filter.getJSONObject("relativeDateFilter").getJSONObject("dataSet").getString("uri"),
                 createdDatasetUri);
+        assertEquals(jsonObject.getJSONObject("data").getJSONObject("drillTo").getString("uri"), expectedDrillToUri);
+        waitForFragmentVisible(indigoDashboardsPage);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void drillOnWidgetWithMAQLForPreviousHasAlert() throws Exception {
+        Metric metric = createMetric(METRIC_CONTAINS_FOR_PREVIOUS_WEEK,
+            format("SELECT SUM([%s]) FOR Previous([%s])",
+                getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT)),
+                getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_WEEK_SUN_SAT_SNAPSHOT))),
+            DEFAULT_METRIC_FORMAT);
+
+        final Pair<String, Metric> kpiUris = createKpiHasAlert(metric, oldDashboardUri, firstTabIdentifier);
+        final String metricUri = kpiUris.getRight().getUri();
+        final String dashboardTitle = "eventing_widget_" + generateHashString();
+        final String dashboardUri = createAnalyticalDashboardWithWidget(dashboardTitle, kpiUris.getLeft());
+        final String dashboardId = getObjectIdFromUri(dashboardUri) + "?preventDefault=true";
+        initIndigoDashboardsPageWithWidgets().selectKpiDashboard(dashboardTitle);
+        Kpi kpiWidget = indigoDashboardsPage.getLastWidget(Kpi.class);
+        kpiWidget.openAlertDialog().setThreshold("100000000").setAlert();
+        final String file = createTemplateHtmlFile(dashboardId, buildEventingMesage(metricUri));
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        kpiWidget = indigoDashboardsPage.getLastWidget(Kpi.class);
+
+        cleanUpLogger();
+        kpiWidget.clickKpiValue();
+        JSONObject jsonObject = getLatestPostMessageObj();
+        JSONObject executionContext = jsonObject.getJSONObject("data").getJSONObject("executionContext");
+        assertEquals(executionContext.getJSONArray("measures").length(), 1);
+        JSONObject measure = executionContext.getJSONArray("measures").getJSONObject(0);
+        assertEquals(measure.getJSONObject("definition").getJSONObject("measure").getJSONObject("item").getString("uri"),
+            metricUri);
+        JSONObject filter = executionContext.getJSONArray("filters").getJSONObject(0);
+        assertEquals(filter.getJSONObject("relativeDateFilter").getJSONObject("dataSet").getString("uri"),
+            createdDatasetUri);
         assertEquals(jsonObject.getJSONObject("data").getJSONObject("drillTo").getString("uri"), expectedDrillToUri);
         waitForFragmentVisible(indigoDashboardsPage);
     }

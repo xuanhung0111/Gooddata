@@ -136,11 +136,15 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
         final String ratioExpression = format("SELECT [%s] / [%s]", sumOfNumberMetricUri, sumOfNumberMetricUri);
 
+        final String forPreviousExpression = format("SELECT [%s] FOR Previous([%s])",
+            sumOfNumberMetricUri, yearAttributeUri);
+
         return new Object[][] {
             {createMetric("time-" + uniqueString, timeMacroExpression, "#,##0"), true},
             {createMetric("share-" + uniqueString, shareExpression, "#,##0"), false},
             {createMetric("diff-" + uniqueString, differenceExpression, "#,##0"), false},
-            {createMetric("ratio-" + uniqueString, ratioExpression, "#,##0"), false}
+            {createMetric("ratio-" + uniqueString, ratioExpression, "#,##0"), false},
+            {createMetric("for-previous-" + uniqueString, forPreviousExpression, "#,##0"), true}
         };
     }
 

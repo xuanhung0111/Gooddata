@@ -68,6 +68,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_SNAPSHOT_BOP_YEAR_AGO = METRIC_SNAPSHOT_BOP + SP_YEAR_AGO;
     public static final String METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO = METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO;
     public static final String METRIC_SUM_OF_AMOUNT_YEAR_AGO = METRIC_SUM_OF_AMOUNT + SP_YEAR_AGO;
+    public static final String METRIC_AMOUNT_YEAR_AGO = METRIC_AMOUNT + SP_YEAR_AGO;
 
     // private metrics
     public static final String METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD = "# Opps. [won] in Period";
@@ -107,6 +108,8 @@ public final class GoodSalesUtils {
     public static final String ATTR_YEAR_SNAPSHOT = "Year (Snapshot)";
     public static final String ATTR_QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
     public static final String ATTR_MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
+    public static final String ATTR_WEEK_SUN_SAT_SNAPSHOT = "Week (Sun-Sat) (Snapshot)";
+    public static final String ATTR_WEEK_MON_SUN_SNAPSHOT = "Week (Mon-Sun) (Snapshot)";
 
     public static final String ATTR_DATE_TIMELINE =  "Date (Timeline)";
 

@@ -45,7 +45,8 @@ public enum ProjectFeatureFlags {
     ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD("enableKPIDashboardDrillToDashboard"),
     ENABLE_TABLE_COLUMN_AUTO_RESIZING("enableTableColumnsAutoResizing"),
     AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION("ADMeasureValueFilterNullAsZeroOption"),
-    ENABLE_KPI_DASHBOARD_SAVE_AS_NEW("enableKPIDashboardSaveAsNew");
+    ENABLE_KPI_DASHBOARD_SAVE_AS_NEW("enableKPIDashboardSaveAsNew"),
+    XAE_VERSION("xae_version");
 
     private final String featureFlag;
 
