@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.boilerplate.fragments.LoginBoilerPlateFragment;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -129,8 +130,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void signInFromReact(String username, String password) {
-        openNodeJsUrl(PAGE_LOGIN);
-        LoginFragment.getInstance(browser).login(username, password, true);
+        if (testParams.useBoilerPlate()) {
+            openNodeJsUrl("login");
+            LoginBoilerPlateFragment.getInstance(browser).login(username, password);
+        } else {
+            openNodeJsUrl(PAGE_LOGIN);
+            LoginFragment.getInstance(browser).login(username, password, true);
+        }
         System.out.println(format("Successful login with user: %s to react project", username));
     }
 

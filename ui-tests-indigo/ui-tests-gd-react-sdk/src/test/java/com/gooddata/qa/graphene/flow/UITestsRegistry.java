@@ -27,6 +27,10 @@ public class UITestsRegistry {
                 FilterComponentTest.class
         });
 
+        suites.put("boilerplate", new Object[] {
+                VisualizationTest.class
+        });
+
         suites.put("all", new Object[] {
                 EmbeddedHeadlineTest.class,
                 HeadlineByBucketComponentTest.class,

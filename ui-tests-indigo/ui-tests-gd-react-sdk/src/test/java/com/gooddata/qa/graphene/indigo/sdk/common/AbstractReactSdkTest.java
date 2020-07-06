@@ -13,11 +13,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.testng.annotations.BeforeClass;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +30,18 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AbstractReactSdkTest extends GoodSalesAbstractTest {
+
+    public String storePath = "/src/";
+    public String fileUploadJson = "App.js";
+
+    @BeforeClass
+    public void initDirection() {
+        if (testParams.useBoilerPlate()) {
+            storePath = "/src/routes/";
+            fileUploadJson = "Home.js";
+            replaceContentAppRoute("<Redirect to=\"/welcome\" />", "");
+        }
+    }
 
     /**
      * Using create a catalog.json where contains necessary variables
@@ -45,7 +60,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
     }
 
     public void replaceContentAppJSFrom(String fileName) throws IOException {
-        Path appPath = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/App.js");
+        Path appPath = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + storePath  + fileUploadJson);
         File appFile = appPath.toFile();
         Files.copy(Paths.get(
                 getFilePathFromResource(isUIsdk8() ? "/template-sdk-8/" + fileName : "/" + fileName)),
@@ -63,7 +78,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
                 obj.put(variable.getKey(), variable.getValue());
             }
             List<String> lines = Arrays.asList(obj.toString());
-            Path path = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/testing-variable.json");
+            Path path = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + storePath + "testing-variable.json");
             Files.write(path, lines);
             log.info("Created a new file: " + path.toString());
             log.info("Content:" + new String(Files.readAllBytes(path)));
@@ -73,7 +88,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
     }
 
     public File createCatalogExportConfig(String projectID, String fileName) throws JSONException, IOException {
-        final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + "/src/" + fileName);
+        final File file = new File(testParams.getReactFolder() + testParams.getReactProjectTitle() + storePath + fileName);
         Files.deleteIfExists(file.toPath());
         Graphene.waitGui().until(browser -> !file.exists());
         try {
@@ -94,7 +109,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         commands.add("--hostname");
         commands.add(testParams.getHost());
         commands.add("--output");
-        commands.add("src/" + fileName);
+        commands.add(storePath.substring(1) + fileName);
         try{
             ProcessBuilder processBuilder = new ProcessBuilder(commands);
             processBuilder.directory(new File(testParams.getReactFolder() + testParams.getReactProjectTitle()));
@@ -111,6 +126,20 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
             return file;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("there is an error while creating catalog.json", e);
+        }
+    }
+
+    private void replaceContentAppRoute(String search, String replace) {
+        try {
+            Path path = Paths.get(testParams.getReactFolder() + testParams.getReactProjectTitle() + storePath + "/AppRouter.js");
+            Charset charset = StandardCharsets.UTF_8;
+
+            String content = new String(Files.readAllBytes(path), charset);
+            content = content.replaceAll(search, replace);
+            Files.write(path, content.getBytes(charset));
+        } catch (IOException e) {
+            //Simple exception handling, replace with what's necessary for your use case!
+            throw new RuntimeException("Generating file failed", e);
         }
     }
 }
