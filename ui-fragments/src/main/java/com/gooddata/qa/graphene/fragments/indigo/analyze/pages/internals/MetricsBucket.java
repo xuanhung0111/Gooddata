@@ -18,7 +18,7 @@ public class MetricsBucket extends AbstractBucket {
     @FindBy(className = "adi-bucket-item")
     protected List<MetricConfiguration> metrics;
 
-    @FindBy(className = "s-bucket-add-arithmetic-measure-button-measures")
+    @FindBy(className = "s-bucket-add-arithmetic-measure-button")
     private WebElement addArithmeticMeasureButton;
 
     public MetricsBucket createCalculatedMeasure() {

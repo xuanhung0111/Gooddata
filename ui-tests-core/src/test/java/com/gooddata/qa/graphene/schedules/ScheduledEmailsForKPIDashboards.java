@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.schedules;
 
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
@@ -361,6 +362,40 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
             .dataSet(DATE_DATASET_CREATED)
             .build()).changeDashboardTitle(nameDashboard).saveEditModeWithWidgets();
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+    }
+
+    @Test(dependsOnMethods = "signInImapUser")
+    public void scheduleEmailWithBulletChart() throws IOException, MessagingException{
+        String nameInsight = "Bullet Chart";
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(nameInsight, ReportType.BULLET_CHART)
+                .setMeasureBucket(asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT_BOP)),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_AMOUNT), MeasureBucket.Type.SECONDARY_MEASURES),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_BEST_CASE), MeasureBucket.Type.TERTIARY_MEASURES)))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.VIEW),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.VIEW))));
+
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
+        indigoDashboardsPage.addDashboard().addInsight(nameInsight);
+
+        String nameDashboard = "Dashboard Bullet Chart" + identification;
+
+        indigoDashboardsPage.changeDashboardTitle(nameDashboard).saveEditModeWithWidgets();
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+
+        indigoDashboardsPage.scheduleEmailing().submit();
+
+        updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        List<String > contents = asList(getFirstPdfContentFrom(
+            waitForScheduleMessages(nameDashboard, 1).get(0)).split("\n"));
+
+        log.info("Content Dashboard Bullet Chart: " + contents);
+
+        assertThat(contents, hasItems(METRIC_AMOUNT_BOP, METRIC_AMOUNT, "Direct Sales", "Include", "Exclude",
+            nameInsight));
     }
 
     protected ScheduleEmailRestRequest initScheduleEmailRestRequest() {

@@ -62,6 +62,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGO
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
@@ -77,6 +78,7 @@ import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -97,6 +99,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     private final String EXPORT_VISUALIZED_DATA_INSIGHT = "Export visualized insight" + generateHashString();
     private final String COMBO_CHART_INSIGHT = "Combo Chart insight" + generateHashString();
     private final String TREEMAP_CHART_INSIGHT = "TreeMap Chart Insight" + generateHashString();
+    private final String BULLET_CHART_INSIGHT = "Bullet Chart Insight" + generateHashString();
     private final String HEATMAP_CHART_INSIGHT = "HeatMap Chart Insight" + generateHashString();
     private final String MULTI_METRIC_APPLY_COLOR_PALETTE =
             "Multi_Metric_Apply_Color_Palette Via GreyPage" + generateHashString();
@@ -131,6 +134,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
         getMetricCreator().createAmountMetric();
+        getMetricCreator().createAmountBOPMetric();
         getMetricCreator().createBestCaseMetric();
         getMetricCreator().createAvgAmountMetric();
         
@@ -175,6 +179,18 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                 ReportType.TREE_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE);
         createInsightHasMetricAndAttribute(indigoRestRequest, HEATMAP_CHART_INSIGHT,
                 ReportType.HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE);
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(BULLET_CHART_INSIGHT, ReportType.BULLET_CHART)
+                .setMeasureBucket(asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT_BOP)),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_AMOUNT), MeasureBucket.Type.SECONDARY_MEASURES),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_BEST_CASE), MeasureBucket.Type.TERTIARY_MEASURES)))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.VIEW),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.VIEW))));
+
         devProjectId = testParams.getProjectId();
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
                 testParams.getDomainUser());
@@ -446,6 +462,29 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                 asList(asList("Activity Type", "Web Meeting"), asList("# of Activities", "33,596")));
     }
 
+    @Test (dependsOnMethods = "testSyncLockedFlag")
+    public void testInsightAnalyseWithBulletChart(){
+        ChartReport chartReport = initAnalysePage().openInsight(BULLET_CHART_INSIGHT)
+            .waitForReportComputing().getChartReport();
+        Screenshots.takeScreenshot(browser, "testInsightAnalyseWithBulletChart", getClass());
+
+        assertEquals(chartReport.getXaxisLabels(), asList("Exclude", "Direct Sales", "Include", "Exclude",
+            "Inside Sales", "Include"));
+        assertThat(chartReport.getYaxisLabels(), hasItems("0", "50M"));
+        assertThat(chartReport.getLegends(), hasItems(METRIC_AMOUNT_BOP, METRIC_AMOUNT, METRIC_BEST_CASE));
+
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
+            asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(ATTR_FORECAST_CATEGORY, "Include"),
+                asList(METRIC_AMOUNT_BOP, "$2,402,313.29")));
+
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(2, 1),
+            asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(ATTR_FORECAST_CATEGORY, "Include"),
+                asList(METRIC_BEST_CASE, "20,457,990")));
+
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 5),
+            asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(ATTR_FORECAST_CATEGORY, "Include"),
+                asList(METRIC_AMOUNT, "$46,843,842.45")));
+    }
 
     @Test (dependsOnMethods = "testSyncLockedFlag")
     public void testResizeInsightOnDashBoard(){

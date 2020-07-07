@@ -3,6 +3,7 @@ package com.gooddata.qa.utils.http.attribute;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class AttributeRestRequest extends CommonRestRequest {
     private static final String UNSET_ATTRIBUTE_PROTECT_TEMPLATE = "{\"unsetProtected\": {\"items\": [%s]}}";
 
     private static final String QUOTE_TEMPLATE = "\"%s\"";
+    private static final String OBJ_LINK = "/gdc/md/%s/obj/";
 
     public AttributeRestRequest(RestClient restClient, String projectId) {
         super(restClient, projectId);
@@ -45,6 +47,27 @@ public class AttributeRestRequest extends CommonRestRequest {
                         format(UNSET_PROTECT_API_TEMPLATE, projectId),
                         format(UNSET_ATTRIBUTE_PROTECT_TEMPLATE, quoteUris(attributesUri))),
                 HttpStatus.NO_CONTENT);
+    }
+
+    public void setElementMaskingForAttribute(final String attributeUri, final String maskingMetricUri,
+                                                final MaskNames maskName, final String maskingObjectTitle) {
+        executeRequest(RestRequest.initPostRequest(format(OBJ_LINK, projectId),
+            new JSONObject() {{
+                put("elementMasking", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("attribute", attributeUri);
+                        put("maskingMetric", maskingMetricUri);
+                        put("maskValue", maskName);
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("title", maskingObjectTitle);
+                    }});
+                }});
+            }}.toString()), HttpStatus.OK);
+    }
+
+    public enum MaskNames {
+        HIDDEN, UNDISCLOSED
     }
 
     private static String quoteUris (String... uris) {

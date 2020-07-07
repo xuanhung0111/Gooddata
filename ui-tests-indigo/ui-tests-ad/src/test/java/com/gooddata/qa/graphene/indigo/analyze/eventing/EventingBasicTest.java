@@ -1,7 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
@@ -32,12 +37,23 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class EventingBasicTest extends AbstractEventingTest {
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+
+        Metrics metrics = getMetricCreator();
+        metrics.createAmountBOPMetric();
+        metrics.createBestCaseMetric();
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetric() throws IOException {
@@ -715,6 +731,43 @@ public class EventingBasicTest extends AbstractEventingTest {
         JSONArray intersection = drillContext.getJSONArray("intersection");
         assertEquals(intersection.length(), 3);
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingBulletChartReport() throws IOException {
+        String insightUri = indigoRestRequest.createInsight(
+            new InsightMDConfiguration("primary_target_comparative_metric_bullet_insight", ReportType.BULLET_CHART)
+                .setMeasureBucket(asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT_BOP)),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_AMOUNT), MeasureBucket.Type.SECONDARY_MEASURES),
+                    MeasureBucket.createMeasureBucket(getMetricByTitle(METRIC_BEST_CASE), MeasureBucket.Type.TERTIARY_MEASURES)))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.VIEW),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.VIEW))));
+
+        final String metricAmountUri = getMetricByTitle(METRIC_AMOUNT_BOP).getUri();
+        final JSONArray uris = new JSONArray() {{
+            put(metricAmountUri);
+        }};
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+        EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+        embeddedAnalysisPage.waitForReportComputing();
+
+        cleanUpLogger();
+        embeddedAnalysisPage.getChartReport().clickOnElement(Pair.of(0, 0));
+        JSONObject content = getLatestPostMessageObj();
+
+        JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        assertEquals(drillContext.getString("type"), "bullet");
+        assertEquals(drillContext.getString("element"), "primary");
+        assertFalse(drillContext.isNull("x"), "drill event of bullet chart should show X");
+        assertFalse(drillContext.isNull("y"), "drill event of bullet chart should show Y");
+
+        drillContext = content.getJSONObject("data").getJSONObject("drillContext");
+        JSONArray intersection = drillContext.getJSONArray("intersection");
+        assertEquals(intersection.length(), 3);
+        verifyColumnIntersection(intersection.getJSONObject(0), METRIC_AMOUNT_BOP, metricAmountUri);
     }
 
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
