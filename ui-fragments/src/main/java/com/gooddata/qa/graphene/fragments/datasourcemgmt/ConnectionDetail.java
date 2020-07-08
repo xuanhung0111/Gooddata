@@ -19,10 +19,10 @@ public class ConnectionDetail extends AbstractFragment {
     @FindBy(className = "provider-icon")
     private WebElement provider;
 
-    @FindBy(xpath = "//label[contains(text(),'Schema')]/following-sibling::strong")
+    @FindBy(xpath = "//label[contains(text(),'Schema')]/following-sibling::div")
     private WebElement schema ;
 
-    @FindBy(xpath = "//label[contains(text(),'Table prefix')]/following-sibling::strong")
+    @FindBy(xpath = "//label[contains(text(),'Table prefix')]/following-sibling::div")
     private WebElement prefix ;
 
     @FindBy(className = "labeled-input")
@@ -47,7 +47,7 @@ public class ConnectionDetail extends AbstractFragment {
     protected String getInput(String text) {
         return labeledInput.stream()
                 .filter(labeledInput -> labeledInput.findElement(By.tagName("label")).getText().equals(text))
-                .map(labeledInput -> labeledInput.findElement(By.tagName("strong")))
+                .map(labeledInput -> labeledInput.findElement(By.tagName("div")))
                 .findFirst()
                 .get()
                 .getText();
