@@ -50,7 +50,8 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void allow_metric_properties_to_be_set_in_chart_configuration_buckets() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -86,7 +87,8 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_attributes() {
-        WebElement metric = initAnalysePage().getCatalogPanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+        WebElement metric = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel()
+            .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
         analysisPage.tryToDrag(metric, analysisPage.getStacksBucket().getInvitation());
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
@@ -100,20 +102,23 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_automatically_adds_new_attribute_filter() {
-        assertFalse(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE).getFilterBuckets().isEmpty(),
+        assertFalse(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addStack(ATTR_ACTIVITY_TYPE).getFilterBuckets().isEmpty(),
                 "Filter buckets shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_one_attribute_at_the_time() {
-        WebElement invitation = initAnalysePage().getStacksBucket().getInvitation();
+        WebElement invitation = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getStacksBucket()
+            .getInvitation();
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
         assertFalse(invitation.isDisplayed(), "Invitation shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_prevent_dropping_if_two_metrics_are_active() {
-        StacksBucket stacksBucket = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        StacksBucket stacksBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getStacksBucket();
@@ -122,7 +127,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_drag_item_from_stack_by_to_category() {
-        initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addStack(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
 
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
@@ -132,7 +137,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_drag_item_from_category_to_stack_by() {
-        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
 
         assertFalse(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket shouldn't be empty");
@@ -141,7 +146,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_swap_items_between_category_and_stack_by() {
-        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
 
@@ -156,7 +161,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_not_swap_if_date_dimension_is_present() {
-        initAnalysePage().addDate().addAttribute(ATTR_DEPARTMENT)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addDate().addAttribute(ATTR_DEPARTMENT)
                 .addStack(ATTR_ACTIVITY_TYPE)
                 // Drag date to stack by
                 .tryToDrag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
@@ -190,7 +195,8 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_disable_metric_properties_when_there_are_two_attributes() {
-        MetricConfiguration configuration = initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        MetricConfiguration configuration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -203,7 +209,8 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_disable_stack_bucket_when_trending_recommendation_and_compare_are_applied() {
-        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
@@ -242,7 +249,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_categories() {
-        assertEquals(initAnalysePage()
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_ACCOUNT)
@@ -252,7 +259,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_category_with_date() {
-        assertEquals(initAnalysePage()
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .replaceAttributeWithDate(ATTR_ACTIVITY_TYPE)
@@ -262,7 +269,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_stacks() {
-        assertEquals(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addStack(ATTR_ACTIVITY_TYPE)
             .replaceStack(ATTR_ACCOUNT)
             .getStacksBucket()
             .getAttributeName(), ATTR_ACCOUNT);

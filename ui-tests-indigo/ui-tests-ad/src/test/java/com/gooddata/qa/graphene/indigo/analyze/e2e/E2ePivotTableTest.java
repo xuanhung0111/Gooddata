@@ -231,7 +231,8 @@ public class E2ePivotTableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
-        final AnalysisPage analysisPage = initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        final AnalysisPage analysisPage = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_ACCOUNT)
                 .changeReportType(ReportType.TABLE);
         assertEquals(analysisPage
@@ -246,7 +247,7 @@ public class E2ePivotTableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
-        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .changeReportType(ReportType.TABLE)
             .changeReportType(ReportType.BAR_CHART);

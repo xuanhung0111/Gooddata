@@ -79,7 +79,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
-        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.LINE_CHART)
             .undo()
             .isReportTypeSelected(ReportType.COLUMN_CHART));
@@ -102,7 +102,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_properly_deserialize_auto_generated_filters() {
-        assertTrue(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
             .resetToBlankState()
             .undo()
             .removeAttribute(ATTR_ACTIVITY_TYPE)

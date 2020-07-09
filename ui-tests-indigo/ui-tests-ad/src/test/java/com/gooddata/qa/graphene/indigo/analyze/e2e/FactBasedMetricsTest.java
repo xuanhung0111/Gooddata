@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.Test;
 
@@ -46,7 +47,8 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_change_aggregation_function() {
-        MetricConfiguration configuration = initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
+        MetricConfiguration configuration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(FACT_AMOUNT, FieldType.FACT)
             .waitForReportComputing()
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
@@ -78,7 +80,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
-        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
