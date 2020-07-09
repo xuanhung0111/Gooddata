@@ -8,7 +8,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertFalse;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -33,7 +32,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply_in_percent_recommendation() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 

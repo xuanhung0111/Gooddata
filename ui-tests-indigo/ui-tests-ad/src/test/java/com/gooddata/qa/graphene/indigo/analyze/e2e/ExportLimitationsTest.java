@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static org.testng.Assert.assertFalse;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -29,7 +28,7 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_disable_export_button_if_stacking_and_slicing_by_the_same_attribute() {
-        assertFalse(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertFalse(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             // Drag exactly the same attribute to the category and stack
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACTIVITY_TYPE)

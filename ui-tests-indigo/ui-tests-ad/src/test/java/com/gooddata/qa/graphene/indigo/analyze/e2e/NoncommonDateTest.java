@@ -10,7 +10,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -33,7 +32,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void date_dimension_in_chart_should_reflect_currently_selected_dimension() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
