@@ -273,7 +273,7 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
         openUrl(format("/dashboards/embedded/#/product/%s/client/%s/dashboard/%s?showNavigation=true",
                 ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
         IndigoDashboardsPage indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser).waitForWidgetsLoading();
-        indigoDashboardsPage.addDashboard();
+        indigoDashboardsPage.addDashboard().clickDashboardBody();
         assertEquals(indigoDashboardsPage.getDashboardTitle(), "Untitled");
         indigoDashboardsPage.cancelEditModeWithoutChange();
         indigoDashboardsPage.selectKpiDashboard(analyzeDashboardTitle);
