@@ -14,7 +14,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
@@ -40,7 +39,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply__period_over_period__recommendation() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
@@ -61,7 +60,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_honor_period_change_for__period_over_period() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
@@ -78,7 +77,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_widget_after_apply() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_SNAPSHOT_BOP)
+        initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
@@ -101,7 +100,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_the_recommendation_if_something_in_stack_bucket() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .waitForReportComputing();
@@ -114,7 +113,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_the_recommendation_if_date_in_categories_and_something_in_stack_bucket() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
@@ -127,7 +126,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_recommendations_if_categories_empty_and_something_in_stack_bucket() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 

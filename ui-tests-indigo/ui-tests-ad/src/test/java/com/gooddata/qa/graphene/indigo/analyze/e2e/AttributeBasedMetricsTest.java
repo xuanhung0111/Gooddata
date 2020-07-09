@@ -7,7 +7,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -49,8 +48,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_and_visualize_attribute_based_metrics_with_correct_titles() {
-        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
-            .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(initAnalysePage().addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getChartReport()
@@ -59,8 +57,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_combine_attribute_and_fact_based_metrics() {
-        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
-                .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(initAnalysePage().addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
                 .addMetric(FACT_AMOUNT, FieldType.FACT)
                 .waitForReportComputing()
                 .getChartReport()

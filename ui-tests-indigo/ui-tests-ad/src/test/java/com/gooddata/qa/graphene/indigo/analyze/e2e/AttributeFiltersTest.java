@@ -10,7 +10,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -150,7 +149,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addFilter(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
     }

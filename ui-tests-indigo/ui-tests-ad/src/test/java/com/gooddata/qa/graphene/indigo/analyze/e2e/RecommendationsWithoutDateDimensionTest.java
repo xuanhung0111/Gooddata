@@ -7,7 +7,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -46,7 +45,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser),
