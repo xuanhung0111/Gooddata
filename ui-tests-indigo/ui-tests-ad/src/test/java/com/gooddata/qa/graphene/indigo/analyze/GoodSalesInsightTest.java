@@ -51,7 +51,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         
         getMetricCreator().createNumberOfActivitiesMetric();
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_TEST);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
@@ -343,7 +343,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void openAsReportAfterSaveInsight() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .saveInsight("Open-As-Report-After-Save-Insight");

@@ -132,7 +132,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        List<List<String>> tooltip = initAnalysePage().addMetric(METRIC_PERCENT_OF_GOAL)
+        List<List<String>> tooltip = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_PERCENT_OF_GOAL)
             .addAttribute(ATTR_IS_WON)
             .waitForReportComputing()
             .getChartReport()

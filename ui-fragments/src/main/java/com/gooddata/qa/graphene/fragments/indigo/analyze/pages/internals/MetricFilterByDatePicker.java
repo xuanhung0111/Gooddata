@@ -49,6 +49,12 @@ public class MetricFilterByDatePicker extends AbstractPicker {
     @FindBy(css = "div[aria-disabled='false']")
     private List<WebElement> allDaysInMonth;
 
+    @FindBy(className = "s-no-date-dataset-message")
+    private WebElement noDateDatasetMessage;
+
+    @FindBy(className = "gd-list-footer")
+    private WebElement footer;
+
     public static final String STATIC_PERIOD_DROPDOWN_ITEM = "Static period";
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
 
@@ -64,6 +70,14 @@ public class MetricFilterByDatePicker extends AbstractPicker {
     protected WebElement getElementByName(final String name) {
         //Prevent to same attribute name
         return getElement(".s-" + simplifyText(name) + ":not(.is-selected)");
+    }
+
+    public String getNoDateDatasetMessage() {
+        return waitForElementVisible(noDateDatasetMessage).getText();
+    }
+
+    public String getFooter() {
+        return waitForElementVisible(footer).getText();
     }
 
     public WebElement getFromDateInput() { return waitForElementVisible(fromDateInput); }

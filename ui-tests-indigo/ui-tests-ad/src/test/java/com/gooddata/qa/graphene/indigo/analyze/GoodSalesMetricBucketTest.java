@@ -20,6 +20,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkSeriesStateTransitions() {
-        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
@@ -184,7 +186,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void disablePopCheckboxOnDroppingNonDateAttribute() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getMetricsBucket()
@@ -202,7 +205,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void compareIsStillActiveWhenReplaceAttribute() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate().addAttribute(ATTR_IS_CLOSED);
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
                 "Tracker should display");

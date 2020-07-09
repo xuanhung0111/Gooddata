@@ -7,6 +7,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -38,7 +39,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             description = "Graphene test for bug ONE-1464 Get error when opening viz belong to non-production dataset")
     public void openInsightContainingNonProductionDataset() {
         final String insight = "Open-Insight-Containing-Non-Production-Dataset-Test";
-        final CatalogPanel panel = initAnalysePage().getCatalogPanel();
+        final CatalogPanel panel = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel();
         panel.changeDataset(PAYROLL_DATASET);
         analysisPage.addMetric("Amount", FieldType.FACT)
                 .addAttribute("Education")

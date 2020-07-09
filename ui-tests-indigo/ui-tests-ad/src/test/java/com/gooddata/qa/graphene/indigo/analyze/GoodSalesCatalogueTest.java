@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
@@ -76,7 +77,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testCreateReportWithFieldsInCatalogFilter() {
-        final CatalogPanel catalogPanel = initAnalysePage().getCatalogPanel();
+        final CatalogPanel catalogPanel = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel();
 
         catalogPanel.filterCatalog(CatalogFilterType.MEASURES);
         analysisPage.addMetric(METRIC_AMOUNT);
@@ -127,7 +128,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
                 .findUris(getProject(), Metric.class, title(xssMetric)).isEmpty();
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(renameSuccess);
         try {
-            initAnalysePage();
+            initAnalysePage().changeReportType(ReportType.COLUMN_CHART);
             final CatalogPanel catalogPanel = analysisPage.getCatalogPanel();
 
             catalogPanel.search("<button> test XSS </button>");

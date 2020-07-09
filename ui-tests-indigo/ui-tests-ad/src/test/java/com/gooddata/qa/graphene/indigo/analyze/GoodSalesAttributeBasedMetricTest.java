@@ -11,6 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.stream.Stream;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
@@ -41,7 +42,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromAttribute() {
-        final MetricsBucket metricsBucket = initAnalysePage().getMetricsBucket();
+        final MetricsBucket metricsBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getMetricsBucket();
 
         assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .waitForReportComputing()
@@ -72,7 +73,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void showInPercent() {
-        assertTrue(initAnalysePage().addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
@@ -92,7 +93,8 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dragSameAttributeBasedMetrics() {
-        assertTrue(initAnalysePage().addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()

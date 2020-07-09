@@ -62,13 +62,13 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = "createProject")
     public void prepareInsightsApplyColorsPalette() {
         AnalysisPage analysisPage = initAnalysePage();
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getMetricsBucket();
         analysisPage.saveInsight(SINGLE_METRIC_APPLY_COLOR_PALETTE);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.saveInsight(MULTI_METRIC_APPLY_COLOR_PALETTE);
@@ -76,7 +76,8 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"prepareInsightsApplyColorsPalette"})
     public void testInsightWithSingleMetricApplyColorPalette() {
-        ChartReport chartReport = initAnalysePage().openInsight(SINGLE_METRIC_APPLY_COLOR_PALETTE)
+        ChartReport chartReport = initAnalysePage()
+                .openInsight(SINGLE_METRIC_APPLY_COLOR_PALETTE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
@@ -84,7 +85,8 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"prepareInsightsApplyColorsPalette"})
     public void testInsightWithMultiMetricApplyColorPalette() {
-        ChartReport chartReport = initAnalysePage().openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
+        ChartReport chartReport = initAnalysePage()
+                .openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.GREEN.toString());
@@ -231,7 +233,8 @@ public class ApplyColorPaletteOnAnalyzePageTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = {"checkDeleteInsightApplyColorPalette"})
     public void singleAndMultiInsightNotApplyColorPalette() {
         indigoRestRequest.deleteColorsPalette();
-        ChartReport chartReport = initAnalysePage().openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
+        ChartReport chartReport = initAnalysePage()
+                .openInsight(MULTI_METRIC_APPLY_COLOR_PALETTE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.CYAN.toString());

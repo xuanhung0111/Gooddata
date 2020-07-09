@@ -70,7 +70,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
-        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
@@ -120,7 +120,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
-        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -152,7 +152,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
-        ChartReport report = initAnalysePage()
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
@@ -252,7 +252,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void filterOnDateAttribute() throws ParseException {
-        final FiltersBucket filtersBucket = initAnalysePage().getFilterBuckets();
+        final FiltersBucket filtersBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -270,7 +270,8 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleSamePeriodComparison() throws ParseException {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getFilterBuckets()
             .configDateFilter("01/01/2012", "12/31/2012");
@@ -309,7 +310,8 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 4);
 
         analysisPage.addStack(ATTR_DEPARTMENT);

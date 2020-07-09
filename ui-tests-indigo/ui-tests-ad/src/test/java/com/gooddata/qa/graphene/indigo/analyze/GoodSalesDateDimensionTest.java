@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -49,7 +50,8 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyOnFilter() {
-        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_SNAPSHOT_BOP)
@@ -124,7 +126,8 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
                     "covered by TestCafe")
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
         final String newDateDimension = DATE_DATASET_CREATED;
-        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(FACT_AMOUNT, FieldType.FACT)
+                .addDateFilter().getFilterBuckets()
                 .changeDateDimension(DATE_DATASET_CLOSED, newDateDimension);
 
         assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()

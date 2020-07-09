@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.DataProvider;
@@ -54,7 +55,8 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFact() {
-        final MetricsBucket metricsBucket = initAnalysePage().getMetricsBucket();
+        final MetricsBucket metricsBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .getMetricsBucket();
 
         assertEquals(analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
@@ -85,7 +87,8 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testMetricAggregations() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
             .expandConfiguration();

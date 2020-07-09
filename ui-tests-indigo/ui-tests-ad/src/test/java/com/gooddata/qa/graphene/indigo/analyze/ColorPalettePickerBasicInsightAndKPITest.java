@@ -49,13 +49,13 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
 
     @Test(dependsOnGroups = "createProject")
     public void prepareInsightsApplyColorsPalette() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).saveInsight(INSIGHT_HAS_VIEW_BY);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addStack(ATTR_ACTIVITY_TYPE).saveInsight(INSIGHT_HAS_STACK_BY);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
                 .saveInsight(INSIGHT_FILTER_DATE_BY_SPPY);
     }
@@ -143,7 +143,7 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
 
     @Test(dependsOnMethods = {"prepareInsightsApplyColorsPalette"})
     protected void testSpecialInsightApplyColorPalette() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT);
         assertEquals(analysisPage.checkColorItems(), "There are no colors for this configuration of the insight");
     }
 

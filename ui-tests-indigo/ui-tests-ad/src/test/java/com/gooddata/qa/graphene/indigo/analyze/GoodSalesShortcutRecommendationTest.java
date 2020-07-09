@@ -120,7 +120,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFactUsingShortcut() {
-        WebElement fact = initAnalysePage().getCatalogPanel()
+        WebElement fact = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel()
                 .searchAndGet(FACT_AMOUNT, FieldType.FACT);
 
         Supplier<WebElement> recommendation = () ->

@@ -173,7 +173,8 @@ public class PieChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkLegendPosition() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addMetric(METRIC_AMOUNT_BOP)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+                .addMetric(METRIC_AVG_AMOUNT).addMetric(METRIC_AMOUNT_BOP)
                 .waitForReportComputing();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
                 asList(METRIC_AMOUNT, METRIC_AVG_AMOUNT, METRIC_AMOUNT_BOP));
@@ -216,8 +217,8 @@ public class PieChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkTooltipWhenAddingFilterChartReport() {
-        ChartReport chartReport = initAnalysePage().addMetric(METRIC_AMOUNT).addDate()
-                .waitForReportComputing().getChartReport();
+        ChartReport chartReport = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+                .addDate().waitForReportComputing().getChartReport();
         FiltersBucket filtersBucket = analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "01/01/2019");
         analysisPage.waitForReportComputing();
 

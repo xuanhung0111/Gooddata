@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricFilterByDatePicker;
 import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -28,6 +29,7 @@ import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
@@ -219,12 +222,15 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
     public void exportInsightsIntoXLSXFormatWithAttributeFilterNotRelatedDate() throws IOException {
         String insight = "Insight " + generateHashString();
         try {
-            MetricConfiguration metricConfiguration = initAnalysePage().addMetric(ATTR_DEPARTMENT, FieldType.ATTRIBUTE)
+            MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(ATTR_DEPARTMENT, FieldType.ATTRIBUTE)
                 .waitForReportComputing().setInsightTitle(insight).getMetricsBucket()
                 .getMetricConfiguration("Count of " + ATTR_DEPARTMENT).expandConfiguration();
 
-            assertEquals(metricConfiguration.expandFilterByDate().getRoot().getText(),
-                "No data available\n5 unrelated dates hidden");
+            MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
+            assertEquals(metricFilterByDatePicker.getNoDateDatasetMessage(), "No data available");
+            assertEquals(metricFilterByDatePicker.getFooter(), "5 unrelated dates hidden");
+
             analysisPage.waitForReportComputing().exportTo(OptionalExportMenu.File.XLSX);
             ExportXLSXDialog.getInstance(browser).confirmExport();
 

@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.json.JSONException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -57,7 +58,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
-        initAnalysePage().getCatalogPanel().changeDataset(PRODUCTION_DATASET);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel().changeDataset(PRODUCTION_DATASET);
 
         ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
                 .addDate()
@@ -77,7 +78,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnPayrollData() {
-        initAnalysePage().getCatalogPanel().changeDataset(PAYROLL_DATASET);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel().changeDataset(PAYROLL_DATASET);
 
         ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
@@ -123,7 +124,8 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"},
             description = "CL-9815: Filter for metric is undefined after switching dataset")
     public void addMetricFilterAfterSwitchingDataset() {
-        initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(HIGH_PRICE, FieldType.FACT)
+            .addAttribute(MARKET).waitForReportComputing();
 
         analysisPage.getCatalogPanel().changeDataset(PAYROLL_DATASET);
         analysisPage.removeAttribute(MARKET)
@@ -145,7 +147,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         uploadCSV(getFilePathFromResource(GEO_CHART_CSV_PATH));
         takeScreenshot(browser, "uploaded-geochart", getClass());
 
-        initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(HIGH_PRICE, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
                 .getCatalogPanel()

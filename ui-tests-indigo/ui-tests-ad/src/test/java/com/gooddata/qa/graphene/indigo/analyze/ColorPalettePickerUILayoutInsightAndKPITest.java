@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.AbstractTest;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 
@@ -65,22 +66,27 @@ public class ColorPalettePickerUILayoutInsightAndKPITest extends AbstractAnalyse
 
     @Test(dependsOnGroups = "createProject")
     protected void prepareInsightsApplyColorsPalette() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter().waitForReportComputing().saveInsight(INSIGHT_FILTER_DATE_BY_SPPY);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
                 .addMetric(METRIC_SNAPSHOT_BOP).addMetric(METRIC_SNAPSHOT_EOP1)
                 .addMetric(METRIC_SNAPSHOT_EOP2).addMetric(METRIC_SNAPSHOT_EOP)
                 .addMetric(METRIC_TIMELINE_BOP).addMetric(METRIC_TIMELINE_EOP)
                 .waitForReportComputing().saveInsight(TEST_MULTI_MEASURE_ON_INSIGHT);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter().waitForReportComputing().saveInsight(INSIGHT_FILTER_DATE_BY_SPPY);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_HAS_ATTRIBUTE_ON_VIEW_BY);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addStack(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addStack(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_HAS_ATTRIBUTE_ON_STACK_BY);
     }
 

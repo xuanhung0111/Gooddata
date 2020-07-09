@@ -49,7 +49,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
@@ -94,7 +94,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         assertEquals(browser.findElements(RecommendationContainer.LOCATOR).size(), 0);
 
         analysisPage.resetToBlankState();
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0, "Recommendation should display");

@@ -10,6 +10,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.Test;
@@ -39,14 +40,14 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_add_date_item_with_proper_granularity_to_category_bucket() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply_month_in_trending_widget_and_hide_it() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
@@ -59,13 +60,13 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void ashould_have_quarter_selected_after_resetting_a_widget() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month");
 
-        analysisPage.resetToBlankState()
+        analysisPage.resetToBlankState().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-granularity-switch"), browser))
@@ -74,7 +75,7 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_select_last_4_quarters_on_date_filter_when_trending() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))

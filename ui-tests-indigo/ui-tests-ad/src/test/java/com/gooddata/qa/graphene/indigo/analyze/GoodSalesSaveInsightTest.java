@@ -77,7 +77,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     }
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")
     public void testSaveInsight(String insightName) throws JSONException, IOException {
-        final int expectedTrackerCount = initAnalysePage()
+        final int expectedTrackerCount = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
@@ -229,7 +229,8 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"save-insight-containing-date-dimension"})
     public void testSaveInsightContainingDateClosedDimension() {
-        final int expectedTrackers = initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
+        final int expectedTrackers = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(FACT_AMOUNT, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
@@ -252,7 +253,8 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"save-insight-containing-date-dimension"})
     public void testSaveInsightContainingDateCreatedDimension() {
-        final int expectedTrackers = initAnalysePage().addMetric(METRIC_STAGE_VELOCITY)
+        final int expectedTrackers = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_STAGE_VELOCITY)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
@@ -294,7 +296,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void saveInsightAfterOpenAsReport() {
         String insight = "Save-Insight-After-Open-As-Report";
-        initAnalysePage()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();

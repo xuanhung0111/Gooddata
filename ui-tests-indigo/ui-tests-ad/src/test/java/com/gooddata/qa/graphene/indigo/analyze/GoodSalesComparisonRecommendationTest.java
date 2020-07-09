@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() throws ParseException {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
@@ -85,7 +86,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testComparisonAndAttribute() {
-        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
@@ -138,7 +139,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleSamePeriodComparison() throws ParseException {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter("01/01/2012", "12/31/2012");
@@ -175,7 +176,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAnotherApproachToShowCompare() {
-        ChartReport report = initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -198,7 +199,8 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testRecommendationDisplayingWithDateFilter() throws ParseException {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addDate().waitForReportComputing();
         takeScreenshot(browser, "No-Recommendation-Displaying-With-All-Time-Filter", getClass());
         assertFalse(isElementPresent(RecommendationContainer.LOCATOR, browser),
                 "Compare Recommendation step is displayed");
