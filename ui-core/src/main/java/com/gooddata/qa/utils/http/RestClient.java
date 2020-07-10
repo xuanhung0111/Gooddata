@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.sdk.service.GoodData;
+import com.gooddata.sdk.service.GoodDataSettings;
 import com.gooddata.sdk.service.account.AccountService;
 import com.gooddata.sdk.service.connector.ConnectorService;
 import com.gooddata.sdk.service.dataload.OutputStageService;
@@ -59,8 +60,10 @@ public class RestClient {
         client = getGooddataHttpClient(profile.getUsername(), profile.getPassword(),
                 profile.isUseSST(), handler);
 
+        GoodDataSettings goodDataSettings = new GoodDataSettings();
+        goodDataSettings.setUserAgent("Graphene-Tests");
         goodDataClient = new GoodData(profile.getHost().getHostName(), profile.getUsername(),
-                profile.getPassword(), profile.getHost().getPort());
+                profile.getPassword(), profile.getHost().getPort(), goodDataSettings);
     }
 
     public HttpResponse execute(HttpRequestBase request) {
