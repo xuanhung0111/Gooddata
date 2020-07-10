@@ -52,6 +52,13 @@ public class DataSourceDropdown extends AbstractDropDown {
         return this;
     }
 
+    public Boolean IsDataSourceExist(String dataSourceTitle) {
+        By selector = By.cssSelector(".s-" + simplifyText(dataSourceTitle));
+        ElementUtils.scrollElementIntoView(
+                By.cssSelector(".datasource-selection-dropdown .ember-view.ember-list-view"), selector, browser, 50);
+        return isElementVisible(selector, browser);
+    }
+
     private boolean isCollapsed() {
         return !isElementVisible(By.cssSelector(getDropdownCssSelector()), browser);
     }

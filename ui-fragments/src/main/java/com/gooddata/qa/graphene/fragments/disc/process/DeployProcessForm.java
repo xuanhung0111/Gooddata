@@ -70,6 +70,12 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(className = "process-type-link-to-help")
     private WebElement learnMore;
 
+    @FindBy(className = "s-btn-create_data_source")
+    private WebElement btnCreateDataSource;
+
+    @FindBy(className = "s-btn-edit_data_source")
+    private WebElement btnEditDatasource;
+
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
     }
@@ -227,6 +233,16 @@ public class DeployProcessForm extends AbstractFragment {
     public DeploySDDProcessDialog selectADDProcess() {
         selectProcessType(ProcessType.AUTOMATED_DATA_DISTRIBUTION);
         return DeploySDDProcessDialog.getInstance(browser);
+    }
+
+    public DataSourceDialog addNewDatasource() {
+        waitForElementVisible(btnCreateDataSource).click();
+        return DataSourceDialog.getInstance(browser);
+    }
+
+    public DataSourceDialog editDatasource() {
+        waitForElementVisible(btnEditDatasource).click();
+        return DataSourceDialog.getInstance(browser);
     }
 
     public String getS3ConfigurationPath() {
