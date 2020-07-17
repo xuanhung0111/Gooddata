@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementContainDisabledAttribute;
 import static org.openqa.selenium.By.className;
 
 public class EditDateDimensionDialog extends AbstractFragment {
@@ -17,6 +19,9 @@ public class EditDateDimensionDialog extends AbstractFragment {
 
     @FindBy(className = "gd-input-field")
     WebElement inputField;
+
+    @FindBy(className = "s-cancel")
+    WebElement cancelButton;
 
     @FindBy(className = "s-save_changes")
     WebElement saveChange;
@@ -31,6 +36,15 @@ public class EditDateDimensionDialog extends AbstractFragment {
         driverActions.moveToElement(inputField).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .sendKeys(newURN).build().perform();
         saveChange.click();
+        waitForFragmentNotVisible(this);
+    }
+
+    public boolean isInputFieldDisable() {
+        return isElementContainDisabledAttribute(this.getRoot().findElement(By.cssSelector(".gd-input-field")));
+    }
+
+    public void clickCancel() {
+        cancelButton.click();
         waitForFragmentNotVisible(this);
     }
 }
