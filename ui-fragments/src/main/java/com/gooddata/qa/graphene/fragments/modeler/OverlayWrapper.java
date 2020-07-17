@@ -19,6 +19,9 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "edit-dataset-dialog")
     private EditDatasetDialog editDatasetDialog;
 
+    @FindBy(className = "edit-date-dimension-dialog")
+    private EditDateDimensionDialog editDateDimensionDialog;
+
     @FindBy(className = "gd-confirm")
     private ConfirmDeleteDatasetDialog confirmDeleteDatasetDialog;
 
@@ -41,6 +44,11 @@ public class OverlayWrapper extends AbstractFragment {
     public EditDatasetDialog getEditDatasetDialog() {
         waitForElementVisible(editDatasetDialog.getRoot());
         return editDatasetDialog;
+    }
+
+    public EditDateDimensionDialog getDateDimensionDialog() {
+        waitForElementVisible(editDateDimensionDialog.getRoot());
+        return editDateDimensionDialog;
     }
 
     public ConfirmDeleteDatasetDialog getConfirmDeleteDatasetDialog() {

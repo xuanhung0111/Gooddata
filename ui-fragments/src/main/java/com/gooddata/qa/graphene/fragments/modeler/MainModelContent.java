@@ -65,7 +65,7 @@ public class MainModelContent extends AbstractFragment {
     public void focusOnDateDataset(String modelName) {
         DateModel model = this.getJointLayers().getJointCellsLayer().getDateModel(modelName);
         Actions driverActions = new Actions(browser);
-        driverActions.doubleClick(model.getRoot()).perform();
+        driverActions.doubleClick(model.getRoot()).pause(1000).perform();
     }
 
     public void addAttributeToDataset(String attributeName, String modelName) {
@@ -84,35 +84,4 @@ public class MainModelContent extends AbstractFragment {
         driverActions.moveToElement(textEditor).sendKeys(factName).sendKeys(Keys.ENTER).build().perform();
     }
 
-    public void dragAndDropReference(String modelTo) {
-        Model model2 = this.getJointLayers().getJointCellsLayer().getModel(modelTo);
-        InteractiveAction interactiveAction = this.getInteractiveAction();
-        WebElement link = interactiveAction.getLink();
-        dragAndDropWithCustomBackend(browser, link, model2.getRoot());
-    }
-
-    public void dragAndDropReferenceFromTo(String modelFrom, String modelTo) {
-        Model model = this.getJointLayers().getJointCellsLayer().getModel(modelFrom);
-        Model model2 = this.getJointLayers().getJointCellsLayer().getModel(modelTo);
-
-        Actions driverActions = new Actions(browser);
-        driverActions.click(model.getRoot()).perform();
-        InteractiveAction interactiveAction = this.getInteractiveAction();
-        WebElement link = interactiveAction.getLink();
-
-        dragAndDropWithCustomBackend(browser, link, model2.getRoot());
-    }
-
-    public static void dragAndDropWithCustomBackend(WebDriver driver, WebElement from, WebElement dropZone) {
-        waitForElementVisible(from);
-        Actions driverActions = new Actions(driver);
-        driverActions.clickAndHold(from).perform();
-        try {
-            waitForElementVisible(dropZone);
-            scrollElementIntoView(dropZone, driver);
-            driverActions.moveToElement(dropZone).perform();
-        } finally {
-            driverActions.release().perform();
-        }
-    }
 }
