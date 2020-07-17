@@ -16,9 +16,6 @@ public class DateModel extends AbstractFragment {
     @FindBy(className = "actions")
     private ModelAction modelAction;
 
-    @FindBy(className = "edit-date-dimension-dialog")
-    private EditDateDimensionDialog editDateDimensionDialog;
-
     public static DateModel getInstance(SearchContext searchContext, String id) {
         return Graphene.createPageFragment(
                 DateModel.class, waitForElementVisible(cssSelector((format(ID_MODEL, id))), searchContext));
@@ -32,7 +29,7 @@ public class DateModel extends AbstractFragment {
     public EditDateDimensionDialog openEditDateDimensionDialog() {
         Actions driverActions = new Actions(browser);
         driverActions.click(this.getModelAction().editDate()).perform();
-        return editDateDimensionDialog;
+        return OverlayWrapper.getInstance(browser).getDateDimensionDialog();
     }
 
     public void editURNDate(String newUrn) {
