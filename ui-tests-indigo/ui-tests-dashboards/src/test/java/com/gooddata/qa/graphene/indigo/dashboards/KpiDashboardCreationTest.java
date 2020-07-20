@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
@@ -8,6 +10,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.google.cloud.storage.Acl;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -22,9 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class KpiDashboardCreationTest extends AbstractDashboardTest {
 
@@ -33,7 +34,9 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
     private static final String INSIGHT_LOST = "Insight Lost";
     private static final String DASHBOARD_ACTIVITIES = "Dashboard Activites";
     private static final String DASHBOARD_LOST = "Dashboard Lost";
+    private static final String DASHBOARD_CLONE = "Dashboard Clone";
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectResRequest;
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
@@ -43,6 +46,8 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws IOException, JSONException {
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        projectResRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
         indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()), DASHBOARD_ACTIVITIES);
         indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_LOST);
@@ -126,6 +131,23 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
 
         takeScreenshot(browser, "Try-canceling-edit-mode-by-click-close-button", getClass());
         assertTrue(indigoDashboardsPage.isOnEditMode(), "Should be on View Mode");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void tryDeleteDashboardOnMenuItem() {
+        try {
+        projectResRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SAVE_AS_NEW, true);
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_CLONE);
+        initIndigoDashboardsPageWithWidgets()
+                .selectKpiDashboard(DASHBOARD_CLONE)
+                .switchToEditMode()
+                .addInsight(INSIGHT_LOST)
+                .deleteDashboardOnMenuItem(true);
+            takeScreenshot(browser, "delete-menu-item", getClass());
+            assertNotEquals(indigoDashboardsPage.getDashboardTitle(), DASHBOARD_CLONE);
+        } finally {
+            projectResRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SAVE_AS_NEW, false);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})

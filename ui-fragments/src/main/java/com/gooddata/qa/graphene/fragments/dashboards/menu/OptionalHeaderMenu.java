@@ -20,6 +20,9 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
     @FindBy(className = "s-schedule-email-item")
     private WebElement scheduleEmail;
 
+    @FindBy(className = "s-delete_dashboard")
+    private WebElement deleteDashboardMenuItem;
+
     @Override
     protected String getDropdownCssSelector() {
         throw new UnsupportedOperationException("Unsupported getDropdownCssSelector() method");
@@ -39,6 +42,10 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
         waitForElementVisible(exportToPDF).click();
     }
 
+    public void clickOnDeleteMenuItem() {
+        waitForElementVisible(deleteDashboardMenuItem).click();
+    }
+
     public ScheduleEmailDialog scheduleEmailing() {
         waitForElementVisible(scheduleEmail).click();
         return ScheduleEmailDialog.getInstance(browser);
@@ -46,5 +53,8 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
 
     public Boolean isPDFExportItemVisible() {
         return isElementPresent(By.className("s-pdf-export-item"), browser);
+    }
+    public Boolean isDeleteItemVisible() {
+        return isElementPresent(By.className("s-delete_dashboard"), browser);
     }
 }
