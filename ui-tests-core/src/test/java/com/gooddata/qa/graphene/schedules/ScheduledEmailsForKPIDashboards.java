@@ -356,14 +356,6 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
         }
     }
 
-    public void addKPIToDashboard(IndigoDashboardsPage indigoDashboardsPage, String nameDashboard) {
-        indigoDashboardsPage.addDashboard().addKpi(new KpiConfiguration.Builder()
-            .metric(METRIC_AVG_AMOUNT)
-            .dataSet(DATE_DATASET_CREATED)
-            .build()).changeDashboardTitle(nameDashboard).saveEditModeWithWidgets();
-        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
-    }
-
     @Test(dependsOnMethods = "signInImapUser")
     public void scheduleEmailWithBulletChart() throws IOException, MessagingException{
         String nameInsight = "Bullet Chart";
@@ -410,4 +402,11 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
                     singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))));
     }
 
+    private void addKPIToDashboard(IndigoDashboardsPage indigoDashboardsPage, String nameDashboard) {
+        indigoDashboardsPage.addDashboard().addKpi(new KpiConfiguration.Builder()
+            .metric(METRIC_AVG_AMOUNT)
+            .dataSet(DATE_DATASET_CREATED)
+            .build()).changeDashboardTitle(nameDashboard).saveEditModeWithWidgets();
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+    }
 }
