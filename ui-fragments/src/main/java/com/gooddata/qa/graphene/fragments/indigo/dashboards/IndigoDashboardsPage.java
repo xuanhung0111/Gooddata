@@ -48,6 +48,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import org.openqa.selenium.TimeoutException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -289,6 +290,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementVisible(editButton);
         waitForWidgetsLoading();
 
+        try {
+            waitForElementVisible(ElementUtils.BY_CLOSED_ICON_MESSAGE_BAR, browser, 3).click();
+            waitForElementNotVisible(ElementUtils.BY_CLOSED_ICON_MESSAGE_BAR, browser);
+        } catch (TimeoutException e) {
+            // Success message isn't displayed so WebDriver unable to catch the loading indicator
+        }
         return this;
     }
 
