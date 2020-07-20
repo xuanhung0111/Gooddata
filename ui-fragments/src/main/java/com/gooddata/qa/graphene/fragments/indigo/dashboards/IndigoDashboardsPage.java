@@ -526,6 +526,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage deleteDashboardOnMenuItem(boolean confirm) {
+        openHeaderOptionsButton().clickOnDeleteMenuItem();
+        ConfirmDialog deleteConfirmDialog = ConfirmDialog.getInstance(browser);
+
+        if (confirm) {
+            deleteConfirmDialog.submitClick();
+            waitForFragmentNotVisible(deleteConfirmDialog);
+        } else {
+            deleteConfirmDialog.cancelClick();
+        }
+
+        return this;
+    }
+
     public boolean isDeleteButtonVisible() {
         return isElementPresent(By.className(DELETE_BUTTON_CLASS_NAME), this.getRoot());
     }
