@@ -125,7 +125,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         List<String> listExpectedMeasure = asList("M1\n" + METRIC_SNAPSHOT_BOP,
                 "M2\n" + DERIVED_METRIC_AMOUNT + "\nfrom M3;", "M3\n" + METRIC_AMOUNT);
 
-        initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP).addMetric(METRIC_AMOUNT).addDateFilter();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_SNAPSHOT_BOP)
+            .addMetric(METRIC_AMOUNT).addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
@@ -156,7 +157,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         List<String> listExpectedMeasure = asList("M1\n" + DERIVED_METRIC_WON
                 + "\n" + "from M2;", "M2\n" + METRIC_WON, "M3\n" + DERIVED_METRIC_AMOUNT
                 + "\n" + "from M4;", "M4\n" + METRIC_AMOUNT);
-        initAnalysePage().addMetric(METRIC_WON).addMetric(METRIC_AMOUNT).addDateFilter();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_WON).addMetric(METRIC_AMOUNT)
+            .addDateFilter();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
@@ -196,7 +198,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
 
     @Test(dependsOnGroups = {"createProject"})
     public void applySPPYOnMeasureWhichHasPercent() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+                .addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter()
                 .getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().showPercents();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
@@ -293,7 +296,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
 
     @Test(dependsOnGroups = {"createProject"})
     public void testStackByBucketAfterApplyingSPPY() throws NoSuchFieldException {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addDate();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT).addDate();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
@@ -308,7 +311,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
 
     @Test(dependsOnGroups = {"createProject"})
     public void testStackByBucketAfterApplyingSPPYOnAMeasureAndStackBy() throws NoSuchFieldException {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addDate().addStack(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+            .addDate().addStack(ATTR_DEPARTMENT);
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel

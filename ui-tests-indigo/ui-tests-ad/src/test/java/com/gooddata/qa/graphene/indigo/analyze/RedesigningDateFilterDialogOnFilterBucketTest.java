@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
@@ -101,7 +102,7 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyDateFilterDialog() {
-        FiltersBucket filterBucket = initAnalysePage()
+        FiltersBucket filterBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_TIMELINE_BOP)
                 .addDateFilter()
                 .getFilterBuckets();

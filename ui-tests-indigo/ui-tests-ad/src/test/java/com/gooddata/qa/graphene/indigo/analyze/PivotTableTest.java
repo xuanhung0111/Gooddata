@@ -160,16 +160,6 @@ public class PivotTableTest extends AbstractAnalyseTest {
         assertEquals(attributesBucket.getItemNames(), asList(computedAttribute, DATE));
         assertEquals(attributesColumnsBucket.getItemNames(),
                 asList(ATTR_IS_CLOSED, computedAttribute, DATE, ATTR_DEPARTMENT));
-
-        analysisPage.resetToBlankState().changeReportType(ReportType.TABLE);
-        AnalysisPageHeader analysisPageHeader = analysisPage.getPageHeader();
-        assertTrue(analysisPageHeader.isUndoButtonEnabled(), "Undo button should be enabled");
-        assertTrue(analysisPageHeader.isOpenButtonEnabled(), "Open button should be enabled");
-        assertTrue(analysisPageHeader.isResetButtonEnabled(), "Clear button should be enabled");
-        assertFalse(analysisPageHeader.isRedoButtonEnabled(), "Undo button should be disabled");
-        assertFalse(analysisPageHeader.isSaveButtonEnabled(), "Open button should be disabled");
-        assertFalse(analysisPageHeader.isExportButtonEnabled(), "Open as report should be disabled");
-        assertEquals(getTooltipFromElement(ReportType.TABLE.getLocator(), browser), "Table");
     }
 
     @Test(dependsOnGroups = {"createProject"})

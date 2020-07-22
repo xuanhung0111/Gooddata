@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -87,7 +88,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addAttributeFilterForMultipleMetrics() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -111,7 +112,8 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchOnlyAttributeElement() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -127,7 +129,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
     public void checkReportWhenFilterContainManyCharacters() {
         String unselectedValue = "14 West";
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -140,7 +142,8 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
     }
 
     private void addFilterToMetric() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();

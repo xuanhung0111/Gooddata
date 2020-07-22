@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -53,7 +54,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyWeekGranularityToHideCompareRecommendation() {
-        initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_SNAPSHOT_BOP);
 
         RecommendationContainer container = Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser));

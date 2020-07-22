@@ -133,8 +133,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testTableReportRender() {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .changeReportType(ReportType.TABLE)
+        getEmbeddedAnalysisPage().changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
 
         takeScreenshot(browser, "Test-Table-Report-Render-On-Embedded-Ad", getClass());
@@ -146,7 +145,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testChartRenderUsingDateFilter() throws ParseException {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        getEmbeddedAnalysisPage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter("01/01/2015", "12/31/2015");
@@ -158,7 +157,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testChartRenderUsingAttributeFilter() {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        getEmbeddedAnalysisPage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .getFilterBuckets()
                 .configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
@@ -170,7 +169,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testChartRenderUsingAttributeFilterOnMetricConfiguration() {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        getEmbeddedAnalysisPage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getMetricsBucket()
@@ -185,7 +184,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testChartRenderUsingRecommendation() {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
+        getEmbeddedAnalysisPage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
 
         // use any recommendation
         Graphene.createPageFragment(RecommendationContainer.class,

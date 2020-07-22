@@ -98,7 +98,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyRecommendation() {
-        initAnalysePage().addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -118,7 +118,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testGranularityOfDate() {
-        initAnalysePage().addMetric(NUMBER, FieldType.FACT)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .getAttributesBucket()
                 .changeGranularity(DateGranularity.MONTH);
@@ -136,7 +136,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSamePeriodComparisonAndPercentOnCustomDate() {
-        ChartReport report = initAnalysePage().addMetric(NUMBER, FieldType.FACT)
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();

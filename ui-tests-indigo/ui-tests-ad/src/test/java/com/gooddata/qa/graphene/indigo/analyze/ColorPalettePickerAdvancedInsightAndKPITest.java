@@ -111,7 +111,8 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
     public void testSwitchBetweenTreeMapChartAndHeadMapChartOnInsight() {
         setCustomColorPickerFlag(true);
         try {
-            initAnalysePage().openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing()
+            initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                    .openInsight(INSIGHT_SWITCH_BETWEEN_INSIGHT_TYPES).waitForReportComputing()
                     .changeReportType(ReportType.TREE_MAP).waitForReportComputing();
             analysisPage.openConfigurationPanelBucket().openColorConfiguration()
                     .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
@@ -140,7 +141,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnAttribute() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
                 .openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
                 .selectColor(ColorPalette.PURE_ORANGE.toReportFormatString());
@@ -152,7 +153,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightApplyPaletteColorPickerOnMeasure() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addStack(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         analysisPage.openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
@@ -168,7 +169,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
     public void testSwitchBetweenXAxisMetricAndYAxisMetricOnInsight() {
         setCustomColorPickerFlag(true);
         try {
-            initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addMetric(METRIC_OPP_FIRST_SNAPSHOT).waitForReportComputing();
             analysisPage.changeReportType(ReportType.BUBBLE_CHART).waitForReportComputing();
             analysisPage.openConfigurationPanelBucket().openColorConfiguration()
@@ -263,7 +264,7 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
     public void testOpenAsReportButtonDisabledWhenAppliedPaletteColorOnInsight() {
         createInsightHasAttributeOnViewBy(INSIGHT_TEST, METRIC_NUMBER_OF_ACTIVITIES,
                 ATTR_ACTIVITY_TYPE, ReportType.COLUMN_CHART);
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         analysisPage.openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()

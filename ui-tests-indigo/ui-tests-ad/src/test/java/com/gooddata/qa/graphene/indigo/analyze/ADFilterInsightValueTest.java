@@ -141,7 +141,8 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
             "SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT))),
             DEFAULT_METRIC_FORMAT + "%");
 
-        initAnalysePage().addMetricToRecommendedStepsPanelOnCanvas(METRIC_AMOUNT_PERCENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetricToRecommendedStepsPanelOnCanvas(METRIC_AMOUNT_PERCENT);
 
         analysisPage.addMetric(METRIC_AMOUNT).addMetric(FACT_AMOUNT, FieldType.FACT)
             .addDateFilter().addAttribute(ATTR_DEPARTMENT);
@@ -180,11 +181,10 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
 
         assertThat(analysisPage.getChartReport().getTotalsStackedColumn(),
             hasItems("1,202,226,735,706%", "507,269,274,598%"));
-        analysisPage.clear();
     }
 
     public void cannotAddMeasureIntoFilterBar() {
-        WebElement metric = analysisPage.getCatalogPanel()
+        WebElement metric = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel()
             .searchAndGet(METRIC_AMOUNT, FieldType.METRIC);
 
         analysisPage.tryToDrag(metric, analysisPage.getFilterBuckets().getInvitation());
@@ -192,8 +192,8 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
     }
 
     public void addMeasureValueFilterFromSimpleMeasure() throws NoSuchFieldException {
-        analysisPage.addMetric(METRIC_AMOUNT).addMetric(METRIC_AMOUNT, FieldType.FACT).addDateFilter()
-            .addAttribute(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+            .addMetric(METRIC_AMOUNT, FieldType.FACT).addDateFilter().addAttribute(ATTR_DEPARTMENT);
 
         createDerivedMeasure(METRIC_AMOUNT);
 
@@ -269,7 +269,7 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
             asList("392,701,612,706%", "4,261,300%", "3,927,058,740.06", "9,215,435.46%", "9,215,435.46%"));
 
         analysisPage.clear();
-        analysisPage.addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT);
+        analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT);
         analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration().showPercents();
 
         analysisPage.openFilterBarPicker().checkItem("% " + METRIC_AMOUNT, 1).apply();
@@ -291,8 +291,9 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getDataLabels(), asList("$80,406,324.96"));
 
         analysisPage.clear();
-        analysisPage.addMetric(METRIC_CLOSE_EOP).addAttribute(ATTR_DEPARTMENT).addMetric(METRIC_SNAPSHOT_EOP)
-            .getStacksBucket().checkOption(OptionalStacking.MEASURES).checkOption(OptionalStacking.PERCENT);
+        analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_CLOSE_EOP).addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_SNAPSHOT_EOP).getStacksBucket().checkOption(OptionalStacking.MEASURES)
+            .checkOption(OptionalStacking.PERCENT);
 
         analysisPage.openFilterBarPicker().checkItem(METRIC_CLOSE_EOP, 1).apply();
         analysisPage.openMeasureFilterPanel(METRIC_CLOSE_EOP, 1)
@@ -359,7 +360,8 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
 
         assertEquals(chartReport.getDataLabels(), asList("3,927,016,127.06", "3,927,016,127.06", "7,854,032,254.12"));
 
-        initAnalysePage().addMetric(METRIC_AMOUNT, FieldType.FACT).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT, FieldType.FACT)
+            .addAttribute(ATTR_ACCOUNT).waitForReportComputing();
         assertEquals(analysisPage.getExplorerMessage(), "TOO MANY DATA POINTS TO DISPLAY");
 
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
@@ -411,8 +413,8 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
 
     public void removeMasterMeasureHasDerivedAndCalculated() throws NoSuchFieldException{
         analysisPage.clear();
-        analysisPage.addMetric(METRIC_CLOSE_EOP).addMetric(METRIC_AMOUNT).addAttribute(ATTR_FORECAST_CATEGORY)
-            .addDateFilter();
+        analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_CLOSE_EOP).addMetric(METRIC_AMOUNT)
+            .addAttribute(ATTR_FORECAST_CATEGORY).addDateFilter();
         createDerivedMeasure(METRIC_AMOUNT);
 
         analysisPage.openFilterBarPicker().checkItem(METRIC_AMOUNT + SP_YEAR_AGO, 2).apply();

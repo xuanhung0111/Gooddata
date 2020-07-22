@@ -54,7 +54,8 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddMetric() {
-        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
@@ -75,7 +76,8 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterRemoveMetricAndAttribute() {
-        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES);
         assertThat(analysisPage.getMetricsBucket().getItemNames(), not(hasItem(METRIC_NUMBER_OF_ACTIVITIES)));
@@ -174,19 +176,20 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeReportType() {
-        initAnalysePage().changeReportType(ReportType.TABLE);
-        assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE), "Should be table report");
-
-        analysisPage.undo();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART);
         assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART), "Should be column chart");
 
-        analysisPage.redo();
+        analysisPage.undo();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE), "Should be table report");
+
+        analysisPage.redo();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART), "Should be column chart");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterReset() {
-        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage()
+                .changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE));
         analysisPage.resetToBlankState();
         checkUndoRedoForReport(baseState, true);
@@ -194,7 +197,8 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testUndoNotApplicableOnNonActiveSession() {
-        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
         final CatalogPanel catalogPanel = analysisPage.getCatalogPanel();

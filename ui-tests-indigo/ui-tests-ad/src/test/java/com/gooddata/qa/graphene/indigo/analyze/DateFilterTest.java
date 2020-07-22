@@ -20,6 +20,7 @@ import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
@@ -91,7 +92,8 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void allowFilterByRange() throws ParseException {
-        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addAttribute(ATTR_PERSON)
@@ -128,7 +130,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void testDateInCategoryAndDateInFilter() {
-        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
+        assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
@@ -172,7 +174,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applySamePeriodComparisonAfterConfigDate() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter(DateRange.LAST_90_DAYS.toString());
@@ -197,7 +199,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, description = "CL-9807: Problems with export of date filters")
     public void exportDateFilter() {
         final String dateFilterValue = DateRange.LAST_4_QUARTERS.toString();
-        initAnalysePage().addDateFilter()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter(dateFilterValue);
         analysisPage.exportReport();
@@ -221,7 +223,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                     + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 
         RecommendationContainer recommendationContainer =

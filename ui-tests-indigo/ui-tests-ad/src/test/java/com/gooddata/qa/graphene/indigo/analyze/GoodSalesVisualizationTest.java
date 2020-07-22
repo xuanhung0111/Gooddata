@@ -85,7 +85,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
-        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
@@ -103,7 +103,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testResetFunction() {
-        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -125,7 +125,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void disableExportForUnexportableVisualization() {
-        final AnalysisPageHeader pageHeader = initAnalysePage().getPageHeader();
+        final AnalysisPageHeader pageHeader = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getPageHeader();
         ChartReport report = analysisPage.addMetric(METRIC_AMOUNT)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -145,7 +145,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
     public void resetSpecialReports() {
         initAnalysePage().resetToBlankState();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible(), "Explore message should display");
         assertEquals(analysisPage.getExplorerMessage(), "TOO MANY DATA POINTS TO DISPLAY");
         analysisPage.resetToBlankState();
@@ -188,7 +189,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         dashboardRequest.changeMetricFormat(uri, "<script> alert('test'); </script> #,##0.00");
 
         try {
-            initAnalysePage();
+            initAnalysePage().changeReportType(ReportType.COLUMN_CHART);
             analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
                   .addAttribute(ATTR_IS_WON)
                   .addStack(ATTR_IS_WON)
@@ -206,7 +207,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void exportVisualizationWithOneAttributeInChart() {
-        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "NO MEASURE IN YOUR INSIGHT");
         assertFalse(analysisPage.getPageHeader().isExportButtonEnabled(), "Export button shouldn't be enabled");
     }
@@ -307,7 +308,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addStackByIfMoreThanOneMetricInReport() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_BEST_CASE).addAttribute("Region");
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_BEST_CASE).addAttribute("Region");
 
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         assertTrue(stacksBucket.isDisabled(), "Stacks bucket should display");
@@ -316,13 +318,14 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addSecondMetricIfAttributeInStackBy() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
         assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void createChartReportWithMoreThan3Metrics() {
-        List<String> legends = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS)
+        List<String> legends = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_LOST_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addMetric(METRIC_NUMBER_OF_WON_OPPS)

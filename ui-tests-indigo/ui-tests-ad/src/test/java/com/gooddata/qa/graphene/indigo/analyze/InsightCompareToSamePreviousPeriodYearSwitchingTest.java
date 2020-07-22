@@ -378,7 +378,8 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
 
     @Test(dependsOnGroups = {"createProject"})
     public void placeInsightHasComparesMeasureOnKD() throws NoSuchFieldException {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addDateFilter().waitForReportComputing();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT).addDateFilter()
+            .waitForReportComputing();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel

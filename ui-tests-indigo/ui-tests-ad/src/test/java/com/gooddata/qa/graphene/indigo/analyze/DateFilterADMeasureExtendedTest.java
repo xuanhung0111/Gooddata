@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricFilterByDatePicker;
@@ -133,8 +134,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void setToDateLessThanFromDateByCalendarPicker() {
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate().selectStaticPeriod();
         metricConfiguration.fillFromDateRange("1/1/2011");
         metricConfiguration.fillToDateRange("1/1/2010");
@@ -163,7 +164,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void testValidDateInput() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
@@ -210,7 +212,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
 
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .tryToAddFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
@@ -243,7 +246,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void changeDateDimensionAfterApplyingStaticPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
@@ -257,7 +261,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterAddingDateFilterMeasure() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT);
 
         assertEquals(getListDataChartReportRender(), singletonList("$116,625,456.54"),
@@ -276,7 +281,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterChangingDateDimension() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricFilterByDatePicker metricFilterByDatePicker = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricFilterByDatePicker metricFilterByDatePicker = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate)
                 .expandFilterByDate();
@@ -293,7 +299,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterChangingFloatingPeriod() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
         assertEquals(getListDataChartReportRender(), singletonList("$97,685,666.02"),
@@ -314,7 +321,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterDeletingDateFilter() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
@@ -331,7 +339,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterReAddingDateFilter() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate)
                 .removeFilterByDate().expandConfiguration()
@@ -347,7 +355,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void saveAndSaveAsWithMeasureAndStackBy() {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addDate().addStack(ATTR_DEPARTMENT).waitForReportComputing()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT).addDate()
+                .addStack(ATTR_DEPARTMENT).waitForReportComputing()
                 .saveInsight(TEST_INSIGHT);
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)

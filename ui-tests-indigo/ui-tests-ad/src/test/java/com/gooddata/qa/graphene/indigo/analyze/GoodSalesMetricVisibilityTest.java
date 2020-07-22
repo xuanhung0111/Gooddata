@@ -9,6 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -44,7 +45,7 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
     public void testPrivateMetric() {
-        assertEquals(initAnalysePage().addMetric(RATIO_METRIC)
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(RATIO_METRIC)
                 .addAttribute(ATTR_DEPARTMENT)
                 .waitForReportComputing()
                 .getChartReport()

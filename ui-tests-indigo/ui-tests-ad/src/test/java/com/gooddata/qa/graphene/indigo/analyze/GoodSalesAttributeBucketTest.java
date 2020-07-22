@@ -40,7 +40,8 @@ public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeByNewOne() {
-        final AttributesBucket categoriesBucket = initAnalysePage().getAttributesBucket();
+        final AttributesBucket categoriesBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .getAttributesBucket();
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
@@ -84,7 +85,7 @@ public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchAttributesBetweenAxisAndStackBy() {
-        final AttributesBucket categoriesBucket = initAnalysePage().getAttributesBucket();
+        final AttributesBucket categoriesBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getAttributesBucket();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
         analysisPage.addAttribute(ATTR_STAGE_NAME).addStack(ATTR_DEPARTMENT);

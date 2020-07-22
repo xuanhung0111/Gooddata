@@ -396,7 +396,7 @@ public class AnalysisPage extends AbstractFragment {
         return getFilterBuckets().isEmpty()
                 && getMetricsBucket().isEmpty()
                 && getAttributesBucket().isEmpty()
-                && getStacksBucket().isEmpty()
+                && getAttributesColumnsBucket().isEmpty()
                 && getMainEditor().isEmpty()
                 && getPageHeader().isBlankState();
     }
