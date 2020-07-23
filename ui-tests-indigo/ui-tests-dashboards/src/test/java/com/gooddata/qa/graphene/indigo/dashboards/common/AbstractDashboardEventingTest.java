@@ -501,4 +501,24 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
         String kpiUri = createKpiUsingRest(configuration.build());
         return Pair.of(kpiUri, metric);
     }
+
+    protected Pair<String, Metric> createKpiHasAlert(Metric metric) {
+        return createKpiHasAlert(metric, null, null);
+    }
+
+    protected Pair<String, Metric> createKpiHasAlert(Metric metric, String oldDashBoardUri, String tabIdentifier) {
+        String kpi = "widget_15_" + generateHashString();
+        KpiMDConfiguration.Builder configuration = new KpiMDConfiguration.Builder()
+            .title(kpi)
+            .metric(metric.getUri())
+            .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
+            .comparisonType(ComparisonType.NO_COMPARISON)
+            .comparisonDirection(ComparisonDirection.NONE);
+        if (oldDashBoardUri != null) {
+            configuration.drillToDashboard(oldDashBoardUri);
+            configuration.drillToDashboardTab(tabIdentifier);
+        }
+        String kpiUri = createKpiUsingRest(configuration.build());
+        return Pair.of(kpiUri, metric);
+    }
 }

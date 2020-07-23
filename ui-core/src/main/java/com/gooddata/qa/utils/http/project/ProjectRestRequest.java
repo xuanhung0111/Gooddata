@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;
 import static com.gooddata.qa.utils.http.RestRequest.initPutRequest;
 import static java.lang.String.format;
 
@@ -34,6 +36,7 @@ public final class ProjectRestRequest extends CommonRestRequest {
     private static final String PROJECT_LINK = "/gdc/projects/%s";
     private static final String PROJECT_CONFIGURATION_LINK = "/gdc/projects/%s/config";
     private static final String DOMAIN_CONFIGURATION_LINK = "/gdc/domains/default/config";
+    private static final String UPGRADE_DATE_DIMENSION = "/gdc/md/%s/datedimension/upgrade";
 
     public ProjectRestRequest(final RestClient restClient, final String projectId) {
         super(restClient, projectId);
@@ -57,12 +60,29 @@ public final class ProjectRestRequest extends CommonRestRequest {
         }
     };
 
+    private static final Supplier<String> UPGRADE_DATASET_TEMPLATE = () -> {
+        try {
+            return new JSONObject() {{
+                put("upgrade", new JSONObject() {{
+                    put("dateDatasets", new JSONObject() {{
+                        put("upgrade", "exact");
+                        put("datasets", new JSONArray() {{
+                            put("${identifier}");
+                        }});
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
     public void updateProjectTitle(final String newProjectTitle) {
         final Project project = getProject();
         final String uri = String.format(PROJECT_LINK, project.getId());
         final String content = UPDATE_PROJECT_TITLE_BODY.get()
-                .replace("${title}", newProjectTitle)
-                .replace("${environment}", project.getEnvironment());
+            .replace("${title}", newProjectTitle)
+            .replace("${environment}", project.getEnvironment());
 
         executeRequest(RestRequest.initPostRequest(uri, content), HttpStatus.NO_CONTENT);
     }
@@ -84,7 +104,7 @@ public final class ProjectRestRequest extends CommonRestRequest {
     public void setFeatureFlagInProject(final ProjectFeatureFlags featureFlag, final boolean enabled) {
         final FeatureFlagService service = restClient.getFeatureFlagService();
         service.createProjectFeatureFlag(restClient.getProjectService().getProjectById(projectId),
-                new ProjectFeatureFlag(featureFlag.getFlagName(), enabled));
+            new ProjectFeatureFlag(featureFlag.getFlagName(), enabled));
     }
 
     /**
@@ -97,19 +117,19 @@ public final class ProjectRestRequest extends CommonRestRequest {
      */
     public void setFeatureFlagInProjectAndCheckResult(final ProjectFeatureFlags featureFlag, final boolean enabled) {
         log.info(String.format("Set feature flag %s for project %s %s", featureFlag.getFlagName(), projectId,
-                enabled));
+            enabled));
         final FeatureFlagService service = restClient.getFeatureFlagService();
         final Project project = restClient.getProjectService().getProjectById(projectId);
 
         service.createProjectFeatureFlag(project, new ProjectFeatureFlag(featureFlag.getFlagName(), enabled));
 
         Awaitility.await()
-                .atMost(60, TimeUnit.SECONDS)
-                .pollInterval(IterativePollInterval.iterative(duration -> duration.plus(10, TimeUnit.SECONDS))
-                        .startDuration(Duration.TEN_SECONDS))
-                .conditionEvaluationListener(condition -> service.createProjectFeatureFlag(project,
-                        new ProjectFeatureFlag(featureFlag.getFlagName(), enabled)))
-                .until(() -> service.getProjectFeatureFlag(project, featureFlag.getFlagName()).isEnabled() == enabled);
+            .atMost(60, TimeUnit.SECONDS)
+            .pollInterval(IterativePollInterval.iterative(duration -> duration.plus(10, TimeUnit.SECONDS))
+                .startDuration(Duration.TEN_SECONDS))
+            .conditionEvaluationListener(condition -> service.createProjectFeatureFlag(project,
+                new ProjectFeatureFlag(featureFlag.getFlagName(), enabled)))
+            .until(() -> service.getProjectFeatureFlag(project, featureFlag.getFlagName()).isEnabled() == enabled);
     }
 
     public void updateProjectConfiguration(final String key, final String value) throws IOException {
@@ -133,6 +153,14 @@ public final class ProjectRestRequest extends CommonRestRequest {
         return getValueByKey(items, key);
     }
 
+    public void upgradeCustomV2Date(CommonRestRequest commonRestRequest, String identifiersDataset) throws IOException {
+        final String url = String.format(UPGRADE_DATE_DIMENSION, projectId);
+        final String content = UPGRADE_DATASET_TEMPLATE.get().replace("${identifier}", identifiersDataset);
+
+        executeRequest(initPostRequest(url, content), HttpStatus.CREATED);
+        waitForUpgradeDateDimensionCustomV2(commonRestRequest, identifiersDataset);
+    }
+
     private String getValueByKey(JSONArray items, String key) {
         for (int i = 0; i < items.length(); i++) {
             JSONObject jsonObject = items.getJSONObject(i).getJSONObject("settingItem");
@@ -141,5 +169,15 @@ public final class ProjectRestRequest extends CommonRestRequest {
             }
         }
         return StringUtils.EMPTY;
+    }
+
+    private void waitForUpgradeDateDimensionCustomV2(CommonRestRequest commonRestRequest, String identifiersDataset)
+        throws IOException {
+        int i = 0;
+        while (!commonRestRequest.getJsonObject(getDatasetByIdentifier(identifiersDataset).getUri())
+            .getJSONObject("dataSet").getJSONObject("content").get("urn").equals("urn:custom_v2:date") && i < 10) {
+            sleepTightInSeconds(2);
+            i++;
+        }
     }
 }

@@ -9,12 +9,15 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
+import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.entity.visualization.FilterAttribute;
 import com.gooddata.qa.utils.http.ColorPaletteRequestData;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
-import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ParseException;
@@ -24,11 +27,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
-import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
-import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
-import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
-
-import static com.gooddata.qa.graphene.entity.visualization.FilterAttribute.initFilters;
+import static com.gooddata.qa.graphene.entity.visualization.FilterDate.initDateFilter;
 import static com.gooddata.qa.utils.http.RestRequest.initPutRequest;
 import static java.lang.String.format;
 
@@ -696,18 +695,21 @@ public class IndigoRestRequest extends CommonRestRequest {
                         put("uri", visualizationClassUri);
                     }});
                     put("buckets", initBuckets(insightConfig.getMeasureBuckets(), insightConfig.getCategoryBuckets()));
-
-                    if (Objects.isNull(insightConfig.getFilters())) {
-                        put("filters", new JSONArray());
-                    } else {
-                        put("filters", initFilters(insightConfig.getFilters()));
-                    }
+                    put("filters" , initAttributeAndDateFilters(insightConfig));
                 }});
                 put("meta", new JSONObject() {{
                     put("title", insightConfig.getTitle());
                 }});
             }});
         }};
+    }
+
+    private JSONArray initAttributeAndDateFilters(InsightMDConfiguration insightConfig) {
+        JSONArray jsonArray = FilterAttribute.initFilters(insightConfig.getFilters());
+        if (Objects.isNull(insightConfig.getDateFilter())) {
+            return jsonArray;
+        }
+        return jsonArray.put(initDateFilter(insightConfig.getDateFilter()));
     }
 
     private JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets)
