@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.redshift;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.sdk.common.GoodDataException;
 import com.gooddata.sdk.model.warehouse.Warehouse;
 import org.testng.annotations.Test;
 import java.time.LocalDate;
@@ -18,8 +20,12 @@ public class CleanUpADSInstanceTest extends AbstractTest {
         restClient.getWarehouseService().listWarehouses().allItemsStream()
                 .filter(warehouse -> isOldAdsLCMInstance(warehouse))
                 .forEach(warehouse -> {
-                    restClient.getWarehouseService().removeWarehouse(warehouse);
-                    warehouses.add(warehouse.getTitle());
+                    try {
+                        restClient.getWarehouseService().removeWarehouse(warehouse);
+                        warehouses.add(warehouse.getTitle());
+                    } catch (GoodDataException ignored){
+                        //ADS instance cannot be deleted because projects reference it
+                    }
                 });
         log.info("List of warehouses was removed: " + warehouses);
     }
