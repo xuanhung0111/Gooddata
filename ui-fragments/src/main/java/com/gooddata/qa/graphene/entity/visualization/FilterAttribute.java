@@ -12,6 +12,7 @@ import java.util.Objects;
 import static com.gooddata.qa.graphene.entity.visualization.FilterDate.initDateFilter;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 public class FilterAttribute {
 
@@ -40,7 +41,10 @@ public class FilterAttribute {
     }
 
     public List<Integer> getUriElementsNotIn() {
-        return this.uriElementsNotIn;
+        if (!Objects.isNull(uriElementsNotIn)) {
+            return this.uriElementsNotIn;
+        }
+        return asList();
     }
 
     public static JSONArray initFilters(final List<FilterAttribute> filters) throws JSONException {

@@ -170,8 +170,9 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
                         )
                 ));
         try {
-            initAnalysePage();
+            AnalysisPage analysisPage = initAnalysePage();
             assertTrue(browser.getCurrentUrl().contains("/reportId/edit"), "AD page is not loaded");
+            analysisPage.openInsight(TEST_INSIGHT).changeReportType(ReportType.COLUMN_CHART).saveInsight();
             checkInsightRender(initIndigoDashboardsPageWithWidgets().getLastWidget(Insight.class),
                     TEST_INSIGHT, 4);
         } finally {
