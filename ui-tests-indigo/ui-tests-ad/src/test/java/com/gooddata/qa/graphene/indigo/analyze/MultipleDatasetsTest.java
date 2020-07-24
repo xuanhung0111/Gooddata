@@ -58,6 +58,11 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support upload Payroll Dataset");
+            return;
+        }
+
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel().changeDataset(PRODUCTION_DATASET);
 
         ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
@@ -124,6 +129,11 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"},
             description = "CL-9815: Filter for metric is undefined after switching dataset")
     public void addMetricFilterAfterSwitchingDataset() {
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support upload Payroll Dataset");
+            return;
+        }
+
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(HIGH_PRICE, FieldType.FACT)
             .addAttribute(MARKET).waitForReportComputing();
 
@@ -143,6 +153,10 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"},
             description = "CL-9957: Get error when working on viz containing unrelated date")
     public void showPercentOnInsightContainingUnrelatedDate() {
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support upload Payroll Dataset");
+            return;
+        }
         //need a dataset containing no date
         uploadCSV(getFilePathFromResource(GEO_CHART_CSV_PATH));
         takeScreenshot(browser, "uploaded-geochart", getClass());
