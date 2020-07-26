@@ -243,7 +243,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     }
 
     private void createInsightUsingDateFilter(String insight) throws ParseException {
-        AnalysisPage page = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
+        AnalysisPage page = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
 
         page.getFilterBuckets().changeDateDimension(DATE_DATASET_ACTIVITY, DATE_DATASET_CREATED);
         page.waitForReportComputing().getFilterBuckets()

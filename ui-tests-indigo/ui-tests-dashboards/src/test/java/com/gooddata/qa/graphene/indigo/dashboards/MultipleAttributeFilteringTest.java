@@ -123,7 +123,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void limitMetricsOnMeasure() {
-        analysisPage = initAnalysePage();
+        analysisPage = initAnalysePage().changeReportType(ReportType.COLUMN_CHART);
         for (int i = 0; i < 20; i++) {
             analysisPage.addMetric(METRIC_TIMELINE_BOP);
         }
