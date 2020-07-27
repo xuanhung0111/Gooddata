@@ -8,8 +8,11 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -31,6 +34,12 @@ public class EditDatasetDialog extends AbstractFragment {
 
     @FindBy(className = "add-fact")
     WebElement addFactButton;
+
+    @FindBy(className = "public_fixedDataTableCell_cellContent")
+    List<WebElement> cellTableContent;
+
+    @FindBy(className = "normal-row")
+    List<WebElement> rowsInTableDialog;
 
     public static EditDatasetDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -77,8 +86,21 @@ public class EditDatasetDialog extends AbstractFragment {
 
     public void addAttribute(String attributeName) {
         addAtrButton.click();
+        waitingForNewRowAttributeInput();
         Actions driverActions = new Actions(browser);
         driverActions.sendKeys(attributeName).sendKeys(Keys.ENTER).build().perform();
+    }
+
+    private void waitingForNewRowAttributeInput() {
+        int currentNumFact = cellTableContent.stream().filter(el -> el.getText().equals("Fact"))
+                .collect(Collectors.toList()).size();
+        int currentNumAttr = cellTableContent.stream().filter(el -> el.getText().equals("Attribute")).collect(
+                Collectors.toList()).size();
+        if (currentNumFact == 0 && currentNumAttr == 0) 
+            waitForElementPresent(rowsInTableDialog.stream().filter(el -> el.getAttribute("aria-rowindex")
+                    .equals("2")).findFirst().get());
+        waitForElementPresent(rowsInTableDialog.stream().filter(el -> el.getAttribute("aria-rowindex")
+                .equals(Integer.toString(currentNumAttr * 2 + currentNumFact + 1))).findFirst().get());
     }
 
     public void addFact(String factName) {
