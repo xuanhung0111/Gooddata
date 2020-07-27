@@ -18,6 +18,8 @@ import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.concurrent.TimeUnit;
+
 public class EmbeddedDashboard extends DashboardsPage {
 
     @FindBy(css = ".dashboardTitleEditBox span")
@@ -80,7 +82,10 @@ public class EmbeddedDashboard extends DashboardsPage {
         if (!isElementPresent(BY_DASHBOARD_EDIT_BAR, browser)) {
             openEditExportEmbedMenu().select("Edit");
         }
-
+        Graphene
+            .waitGui()
+            .withTimeout(2, TimeUnit.SECONDS)
+            .until(browser -> waitForElementPresent(By.id("bar"), browser).getAttribute("style").equals("top: 0px;"));
         return getDashboardEditBar();
     }
 
