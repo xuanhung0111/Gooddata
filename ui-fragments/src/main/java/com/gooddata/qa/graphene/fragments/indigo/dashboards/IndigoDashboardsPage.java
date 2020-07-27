@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
-import static com.gooddata.qa.browser.BrowserUtils.tryToDragWithCustomBackend;
 import static com.gooddata.qa.browser.BrowserUtils.moveToBottomOfElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -139,6 +138,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String FLUID_LAYOUT_ROWS_CSS = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
     private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-all";
     private static final String FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME = "gd-fluidlayout-width-resizer";
+    private static final String CONTAINER_WIDTH_RESIZER_CLASS_NAME = "dash-width-resizer-container";
     private static final String HOTSPOT_WIDTH_RESIZER_CLASS_NAME = "dash-width-resizer-hotspot";
     private static final String RESIZE_BULLET_CSS = ".s-resize-bullet-%s";
     private static final String DASHBOARD_TITLE_CLASS_NAME = "dash-title";
@@ -821,46 +821,45 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public void hoverOnResizerWidget() {
-        getActions().moveToElement(waitForElementVisible(By.className(HOTSPOT_WIDTH_RESIZER_CLASS_NAME), getRoot()))
-            .moveByOffset(1, 1).perform();
+        WebElement hotspot = waitForElementPresent(By.className(HOTSPOT_WIDTH_RESIZER_CLASS_NAME), browser);
+
+        //Padding of .dash-width-resizer-hotspot is "0 0 0 5px";
+        //This additional #moveByOffset is a work around to make it work properly.
+        ElementUtils.moveToElementActions(hotspot, 6, hotspot.getSize().getHeight() / 2).perform();
     }
 
     public IndigoDashboardsPage resizeWidthOfWidget(ResizeBullet resizeBullet) {
         String resizeBulletCss = String.format(RESIZE_BULLET_CSS, resizeBullet.getNumber());
-        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
-            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+
+        dragAndDropResizer(resizeBulletCss);
         return this;
     }
 
     public IndigoDashboardsPage resizeMinimumWidget() {
         String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 1);
 
-        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
-            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        dragAndDropResizer(resizeBulletCss);
         return this;
     }
 
     public IndigoDashboardsPage dragToResizeMinimumWidget() {
         String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 1);
 
-        tryToDragWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
-            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        dragAndDropResizer(resizeBulletCss, false);
         return this;
     }
 
     public IndigoDashboardsPage resizeMaximumWidget() {
         String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 12);
 
-        dragAndDropWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
-            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        dragAndDropResizer(resizeBulletCss);
         return this;
     }
 
     public IndigoDashboardsPage dragToResizeMaximumWidget() {
         String resizeBulletCss = String.format(RESIZE_BULLET_CSS, 12);
 
-        tryToDragWithCustomBackend(browser, "." + HOTSPOT_WIDTH_RESIZER_CLASS_NAME,
-            "." + DASHBOARD_TITLE_CLASS_NAME, resizeBulletCss);
+        dragAndDropResizer(resizeBulletCss, false);
         return this;
     }
 
@@ -1091,5 +1090,29 @@ public class IndigoDashboardsPage extends AbstractFragment {
                 element.getCssValue("border-left-color").contains("rgba(0, 0, 0, 0)") &&
                 element.getCssValue("border-bottom-color").contains("rgba(0, 0, 0, 0)") &&
                 element.getCssValue("border-right-color").contains("rgba(0, 0, 0, 0)");
+    }
+
+    private void dragAndDropResizer(String dropSelector) {
+        dragAndDropResizer(dropSelector, true);
+    }
+
+    private void dragAndDropResizer(String resizeBulletDropSelector, Boolean isDrop) {
+        Actions driverActions = new Actions(browser);
+        hoverOnResizerWidget();
+
+        ElementUtils.moveToElementActions(waitForElementPresent(
+            By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME), browser), 1, 1).clickAndHold().perform();
+
+        try {
+            WebElement target = waitForElementPresent(By.className(DASHBOARD_TITLE_CLASS_NAME), browser);
+            driverActions.moveToElement(target).perform();
+
+            WebElement drop = waitForElementPresent(By.cssSelector(resizeBulletDropSelector), browser);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            if (isDrop) {
+                driverActions.release().perform();
+            }
+        }
     }
 }
