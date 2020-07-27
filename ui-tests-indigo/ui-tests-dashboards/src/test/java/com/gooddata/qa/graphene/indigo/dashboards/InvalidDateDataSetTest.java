@@ -11,6 +11,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
@@ -35,7 +36,8 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testPreviouslySelectedDateDataSet() {
         AnalysisPage page =
-                initAnalysePage().addMetric(METRIC_OPP_FIRST_SNAPSHOT).addDateFilter().waitForReportComputing();
+                initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                    .addDateFilter().waitForReportComputing();
         page.getFilterBuckets().changeDateDimension(DATE_DATASET_TIMELINE);
         page.waitForReportComputing().saveInsight(INSIGHT_USING_DATE_FILTER);
 

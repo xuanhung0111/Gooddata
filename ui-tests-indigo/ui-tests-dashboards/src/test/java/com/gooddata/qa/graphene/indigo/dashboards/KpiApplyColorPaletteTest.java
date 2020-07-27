@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -74,13 +75,13 @@ public class KpiApplyColorPaletteTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "createProject")
     public void prepareInsightsApplyColorsPalette() {
         AnalysisPage analysisPage = initAnalysePage();
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getMetricsBucket();
         analysisPage.saveInsight(SINGLE_METRIC_APPLY_COLOR_PALETTE);
 
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.saveInsight(MULTI_METRIC_APPLY_COLOR_PALETTE);

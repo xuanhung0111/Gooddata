@@ -81,8 +81,8 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = "createProject")
     public void prepareInsights() {
-        AnalysisPage analysisPage = initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_BEST_CASE).addDate()
-            .addAttribute(ATTR_DEPARTMENT);
+        AnalysisPage analysisPage = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_AMOUNT).addMetric(METRIC_BEST_CASE).addDate().addAttribute(ATTR_DEPARTMENT);
 
         analysisPage.openFilterBarPicker().checkItem(ATTR_DEPARTMENT).checkItem(DATE).apply();
         analysisPage.setFilterIsValues(ATTR_DEPARTMENT, "Direct Sales");
@@ -96,7 +96,7 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
             .addAttribute(ATTR_FORECAST_CATEGORY).saveInsight(SOURCE_INSIGHT_HAS_PROTECTED_DATA).waitForReportComputing();
 
-        initAnalysePage().addMetric(METRIC_BEST_CASE).addDate().addAttribute(ATTR_DEPARTMENT).addFilter(ATTR_STAGE_NAME).
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_BEST_CASE).addDate().addAttribute(ATTR_DEPARTMENT).addFilter(ATTR_STAGE_NAME).
             openFilterBarPicker().checkItem(DATE).checkItem(ATTR_DEPARTMENT).checkItem(ATTR_STAGE_NAME).apply();
 
         analysisPage.setFilterIsValues(ATTR_DEPARTMENT, "Direct Sales");
