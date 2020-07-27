@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardPostMessageTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExportDataToXLSXAndCSVDashboardsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ExportDataToXLSXAndCSVDashboardsMediumTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExportDataToXLSXAndCSVDashboardsAdvancedTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
@@ -134,6 +135,7 @@ public class UITestsRegistry {
             ReportPageApplyColorPaletteTest.class,
             KpiApplyColorPaletteTest.class,
             ExportDataToXLSXAndCSVDashboardsTest.class,
+            ExportDataToXLSXAndCSVDashboardsMediumTest.class,
             ExportDataToXLSXAndCSVDashboardsAdvancedTest.class,
             KPIDashboardCRUDAndMovingTest.class,
             ResizeWidgetsAndRowsTest.class,
