@@ -84,7 +84,7 @@ public class EmbeddedDashboard extends DashboardsPage {
         }
         Graphene
             .waitGui()
-            .withTimeout(2, TimeUnit.SECONDS)
+            .withTimeout(10, TimeUnit.SECONDS)
             .until(browser -> waitForElementPresent(By.id("bar"), browser).getAttribute("style").equals("top: 0px;"));
         return getDashboardEditBar();
     }
