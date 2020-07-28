@@ -60,8 +60,8 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return Pair.of(row, 0);
     }
 
-    protected String createTemplateHtmlFile(String insightObjectId, String uris, String identifiers) throws IOException {
-        final String content = ResourceUtils.getResourceAsString("/eventing/frame_AD.html");
+    protected String createTemplateHtmlFile(String insightObjectId, String uris, String identifiers, String pathFile) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
         final String replacedContent = content
                 .replace("{host}", testParams.getHost())
                 .replace("{project}", testParams.getProjectId())
@@ -71,12 +71,16 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return ResourceUtils.createTempFileFromString(replacedContent);
     }
 
-    protected String createTemplateHtmlFile(String insightObjectId) throws IOException {
-        return createTemplateHtmlFile(insightObjectId, "[]", "[]");
+    protected String createTemplateHtmlFile(String insightObjectId, String uris, String identifiers) throws IOException {
+        return createTemplateHtmlFile(insightObjectId, uris, identifiers, "/eventing/frame_AD.html");
     }
 
     protected String createTemplateHtmlFile(String insightObjectId, String uris) throws IOException {
-        return createTemplateHtmlFile(insightObjectId, uris, "[]");
+        return createTemplateHtmlFile(insightObjectId, uris, "[]", "/eventing/frame_AD.html");
+    }
+
+    protected String createTemplateHtmlFile(String insightObjectId) throws IOException {
+        return createTemplateHtmlFile(insightObjectId, "[]", "[]", "/eventing/frame_AD.html");
     }
 
     protected EmbeddedAnalysisPage openEmbeddedPage(final String url) {

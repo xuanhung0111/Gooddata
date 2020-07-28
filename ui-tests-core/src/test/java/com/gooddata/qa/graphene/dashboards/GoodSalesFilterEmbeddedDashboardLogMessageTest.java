@@ -7,7 +7,7 @@ import com.gooddata.sdk.model.md.report.MetricElement;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.utils.GoodSales.Variables;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.common.FilterContextHerokuAppPage;
+import com.gooddata.qa.graphene.fragments.postMessage.FilterContextHerokuAppPage;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;

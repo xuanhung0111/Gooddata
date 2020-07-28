@@ -88,6 +88,7 @@ import com.gooddata.qa.graphene.indigo.analyze.ADFilterBarFlowTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterInsightValueTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -199,6 +200,7 @@ public class UITestsRegistry {
             OrganisingMeasureAndAttributeCatalogue.class,
             ADFilterInsightValueTest.class,
             WeekFilterTest.class,
+            ControlFilterEmbeddedADFromExternalApplication.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

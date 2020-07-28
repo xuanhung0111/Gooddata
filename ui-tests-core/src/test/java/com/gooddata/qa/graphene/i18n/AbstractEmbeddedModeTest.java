@@ -4,7 +4,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.fragments.common.FilterContextHerokuAppPage;
+import com.gooddata.qa.graphene.fragments.postMessage.FilterContextHerokuAppPage;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;

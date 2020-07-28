@@ -864,6 +864,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public Boolean isDashboardTitleVisible() {
+        return isElementVisible(className(DASHBOARD_TITLE_CLASS_NAME), getRoot());
+    }
+
     private MobileKpiDashboardSelection getMobileKpiDashboardSelection() {
         return Graphene.createPageFragment(MobileKpiDashboardSelection.class,
                 waitForElementVisible(className("gd-mobile-dropdown-overlay"), browser));

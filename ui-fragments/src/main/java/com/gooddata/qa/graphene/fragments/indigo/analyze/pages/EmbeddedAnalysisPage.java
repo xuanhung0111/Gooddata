@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
@@ -43,5 +45,9 @@ public class EmbeddedAnalysisPage extends AnalysisPage {
 
     public boolean isAddDataButtonPresent() {
         return isElementPresent(className("s-btn-add_data"), getRoot());
+    }
+
+    public boolean isPageHeaderVisible() {
+        return isElementVisible(className("adi-editor-header"), getRoot());
     }
 }

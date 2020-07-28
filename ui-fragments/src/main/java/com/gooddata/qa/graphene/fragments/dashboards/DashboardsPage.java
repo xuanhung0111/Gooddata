@@ -817,7 +817,7 @@ public class DashboardsPage extends AbstractFragment {
         }
     }
 
-    private String waitForExportingXLSX(ExportXLSXDialog exportXLSXDialog) {
+    public String waitForExportingXLSX(ExportXLSXDialog exportXLSXDialog) {
         int exportingTextDisplayedTimeoutInSeconds = 600;
         String dashboardName = getDashboardName();
         String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
