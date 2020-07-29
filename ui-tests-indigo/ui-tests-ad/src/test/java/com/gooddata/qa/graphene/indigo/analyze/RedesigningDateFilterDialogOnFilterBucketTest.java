@@ -23,6 +23,9 @@ import static com.gooddata.qa.graphene.enums.DateRange.LAST_QUARTER;
 import static com.gooddata.qa.graphene.enums.DateRange.LAST_4_QUARTERS;
 import static com.gooddata.qa.graphene.enums.DateRange.LAST_YEAR;
 import static com.gooddata.qa.graphene.enums.DateRange.THIS_YEAR;
+import static com.gooddata.qa.graphene.enums.DateRange.THIS_WEEK;
+import static com.gooddata.qa.graphene.enums.DateRange.LAST_WEEK;
+import static com.gooddata.qa.graphene.enums.DateRange.LAST_2_WEEKS;
 
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
@@ -33,6 +36,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_TIMELIN
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_BOP;
 
 import static java.util.Arrays.asList;
+import com.google.common.collect.Sets;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.Arrays;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -41,6 +49,8 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnalyseTest {
+
+    private static Set<String> listPeriod = new HashSet<>();
 
     @Override
     public void initProperties() {
@@ -55,8 +65,9 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
 
     @Test(dependsOnGroups = {"createProject"})
     public void redesignTheDateFilterDialog() {
-        List<String> datePeriods = asList(ALL_TIME.toString(), STATIC_PERIOD.toString(), LAST_7_DAYS.toString(),
-                LAST_30_DAYS.toString(), LAST_90_DAYS.toString(), THIS_MONTH.toString(), LAST_MONTH.toString(),
+        Set<String> datePeriods = Sets.newHashSet(ALL_TIME.toString(), STATIC_PERIOD.toString(), LAST_7_DAYS.toString(),
+                LAST_30_DAYS.toString(), LAST_90_DAYS.toString(), THIS_WEEK.toString(), LAST_WEEK.toString(),
+                LAST_2_WEEKS.toString(), THIS_MONTH.toString(), LAST_MONTH.toString(),
                 LAST_12_MONTHS.toString(), THIS_QUARTER.toString(), LAST_QUARTER.toString(), LAST_4_QUARTERS.toString(),
                 THIS_YEAR.toString(), LAST_YEAR.toString());
         DateFilterPickerPanel dateFilterPickerPanel = initAnalysePage()
@@ -70,7 +81,9 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
                         "The date dimensions which belong to no group are not correct");
 
         dateDimensionSelect.ensureDropdownClosed();
-        assertEquals(dateFilterPickerPanel.getDatePresetSelect().getValues(), datePeriods);
+        collectListPeriod(dateFilterPickerPanel.getDatePresetSelect().getValues());
+        collectListPeriod(dateFilterPickerPanel.getDatePresetSelect().scrollToViewDateFilter("Last year").getValues());
+        assertEquals(listPeriod, datePeriods);
         assertTrue(dateFilterPickerPanel.isApplyButtonVisible(), "The Apply button should be visible");
         assertTrue(dateFilterPickerPanel.isCancelButtonVisible(), "The Cancel button should be visible");
     }
@@ -102,16 +115,16 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyDateFilterDialog() {
-        FiltersBucket filterBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+        FiltersBucket filterBucket = initAnalysePage()
+                .changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_TIMELINE_BOP)
                 .addDateFilter()
                 .getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket
                 .openDateFilterPickerPanel()
                 .changeDateDimension(DATE_DATASET_CREATED)
-                .changePeriod(LAST_YEAR.toString());
+                .changePeriodWithScrollbar(LAST_YEAR.toString());
         dateFilterPickerPanel.apply();
-
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
@@ -131,5 +144,12 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
         dateFilterPickerPanel = filterBucket.openDateFilterPickerPanel();
         assertEquals(dateFilterPickerPanel.getDateDatasetSelect().getSelection(), DATE_DATASET_CREATED);
         assertEquals(dateFilterPickerPanel.getDatePresetSelect().getSelection(), LAST_YEAR.toString());
+    }
+
+    private void collectListPeriod(Collection<String> currentPeriod) {
+        currentPeriod.removeAll(Arrays.asList("", null));
+        for (String period : currentPeriod){
+            listPeriod.add(period);
+        }
     }
 }

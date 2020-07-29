@@ -5,6 +5,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 
 import java.util.Collection;
 import java.util.List;
@@ -74,6 +76,17 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public DateFilterPickerPanel changePeriod(final String period) {
         getDatePresetSelect().selectByName(period);
+        getDatePresetSelect().ensureDropdownClosed();
+        return this;
+    }
+
+    public DateFilterPickerPanel changePeriodWithScrollbar(final String period) {
+        By selector = period.contains("week") ? By.cssSelector(".s-" + simplifyText(period) + "_us")
+                : By.cssSelector(".s-" + simplifyText(period));
+        if (period.equals("Week (Sun-Sat)")) selector = By.cssSelector(".s-week");
+        getDatePresetSelect().ensureDropdownOpen();
+        ElementUtils.scrollElementIntoView(waitForElementPresent(selector, browser), browser);
+        waitForElementVisible(selector, browser).click();
         getDatePresetSelect().ensureDropdownClosed();
         return this;
     }

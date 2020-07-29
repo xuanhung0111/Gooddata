@@ -152,11 +152,12 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
                 .changeCompareType(CompareType.PREVIOUS_PERIOD)
                 .apply();
         assertEquals(analysisPage.addDate().getAttributesBucket().getAllGranularities(),
-                asList(DateGranularity.DAY.toString(), DateGranularity.MONTH.toString(),
-                        DateGranularity.QUARTER.toString(), DateGranularity.YEAR.toString()));
+                asList(DateGranularity.DAY.toString(), DateGranularity.WEEK_SUN_SAT.toString(),
+                        DateGranularity.MONTH.toString(), DateGranularity.QUARTER.toString(),
+                        DateGranularity.YEAR.toString()));
 
         initAnalysePage().addDate().getAttributesBucket().changeGranularity(DateGranularity.WEEK_SUN_SAT);
-        assertFalse(analysisPage.getFilterBuckets().openDateFilterPickerPanel().selectStaticPeriod()
-                .isCompareTypeEnabled(CompareType.PREVIOUS_PERIOD), "Not apply week filter with previous period compare");
+        assertTrue(analysisPage.getFilterBuckets().openDateFilterPickerPanel().selectStaticPeriod()
+                .isCompareTypeEnabled(CompareType.PREVIOUS_PERIOD), "Apply week filter with previous period compare");
     }
 }
