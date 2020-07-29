@@ -68,9 +68,10 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
         analysisPage.waitForReportComputing().openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
                 .selectColor(ColorPalette.BRIGHT_RED.toReportFormatString());
-        assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.SOFT_RED.toString());
-        assertEquals(analysisPage.getChartReport().checkColorColumn(1, 0), ColorPalette.BRIGHT_RED.toString());
-        assertEquals(analysisPage.getChartReport().getLegendColors(), asList(ColorPalette.SOFT_RED.toString(), ColorPalette.BRIGHT_RED.toString()));
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
+        assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.SOFT_RED.toString());
+        assertEquals(chartReport.checkColorColumn(1, 0), ColorPalette.BRIGHT_RED.toString());
+        assertEquals(chartReport.getLegendColors(), asList(ColorPalette.SOFT_RED.toString(), ColorPalette.BRIGHT_RED.toString()));
         analysisPage.saveInsightAs(INSIGHT_DATE_FILTERING_BY_SPPY_APPLY_COLOR_MAPPING);
     }
 
@@ -131,11 +132,12 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
                     .openColorConfiguration().openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString())
                     .getColorsPaletteDialog().openCustomColorPalette().getCustomColorsPaletteDialog()
                     .setColorCustomPicker(ColorPalette.RED.getHexColor()).apply();
-            assertEquals(analysisPage.getChartReport().checkColorColumn(0, 0), ColorPalette.RED.toString());
-            assertEquals(analysisPage.getChartReport().getLegendColors(),asList(
+            ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
+            assertEquals(chartReport.checkColorColumn(0, 0), ColorPalette.RED.toString());
+            assertEquals(chartReport.getLegendColors(),asList(
                     ColorPalette.RED.toString(), ColorPalette.LIME_GREEN.toString(),
                     ColorPalette.BRIGHT_RED.toString(), ColorPalette.PURE_ORANGE.toString()));
-            analysisPage.saveInsightAs(APPLY_CUSTOM_COLOR_PICKER_WITH_INSIGHT_HAS_STACK_BY);
+            analysisPage.waitForReportComputing().saveInsightAs(APPLY_CUSTOM_COLOR_PICKER_WITH_INSIGHT_HAS_STACK_BY);
         } finally {
             setCustomColorPickerFlag(false);
         }
