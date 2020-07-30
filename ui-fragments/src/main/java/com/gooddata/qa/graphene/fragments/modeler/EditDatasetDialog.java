@@ -53,6 +53,7 @@ public class EditDatasetDialog extends AbstractFragment {
 
     public void addNewLabel(String attribute, String labelName){
         ViewDetailDialog viewDetail = getViewDetailDialog();
+        hoverOnAttributeOrFactInDialog(attribute);
         viewDetail.addNewLabel(attribute, labelName);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
@@ -67,6 +68,7 @@ public class EditDatasetDialog extends AbstractFragment {
 
     public void deleteAttribute(String attribute) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
+        hoverOnAttributeOrFactInDialog(attribute);
         viewDetail.deleteAttribute(attribute);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
@@ -101,6 +103,12 @@ public class EditDatasetDialog extends AbstractFragment {
                     .equals("2")).findFirst().get());
         waitForElementPresent(rowsInTableDialog.stream().filter(el -> el.getAttribute("aria-rowindex")
                 .equals(Integer.toString(currentNumAttr * 2 + currentNumFact + 1))).findFirst().get());
+    }
+
+    private void hoverOnAttributeOrFactInDialog(String item) {
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(rowsInTableDialog.stream().filter(
+                el -> el.getText().contains(item)).findFirst().get()).build().perform();
     }
 
     public void addFact(String factName) {
