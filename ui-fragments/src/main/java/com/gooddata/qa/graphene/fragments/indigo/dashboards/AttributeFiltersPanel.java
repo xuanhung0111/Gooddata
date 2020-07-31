@@ -3,6 +3,9 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 import java.util.List;
 import java.util.Objects;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -20,8 +23,15 @@ public class AttributeFiltersPanel extends AbstractFragment {
     @FindBy(css = ATTRIBUTE_FILTER_SELECTOR)
     private List<AttributeFilter> attributeFilters;
 
+    @FindBy(className = "dash-filters-date")
+    private AttributeFilter dateAttributeFilters;
+
     public List<AttributeFilter> getAttributeFilters() {
         return attributeFilters;
+    }
+
+    public AttributeFilter getDateAttributeFilters() {
+        return dateAttributeFilters;
     }
 
     public AttributeFiltersPanel waitForAttributeFiltersLoaded() {
@@ -39,8 +49,25 @@ public class AttributeFiltersPanel extends AbstractFragment {
         return waitForAttributeFiltersLoaded().attributeFilters.get(attributeFilters.size() -1);
     }
 
+    public AttributeFilter getIndexAttributeFilter(int index) {
+        return waitForAttributeFiltersLoaded().attributeFilters.get(index);
+    }
+
     public boolean isFilterVisible(String title) {
         return waitForAttributeFiltersLoaded().attributeFilters.stream()
                 .anyMatch(e -> title.equals(e.getTitle()));
+    }
+
+    public void dragAndDropAttributeFilter(WebDriver driver, WebElement from, WebElement dropZone) {
+        Actions builder = new Actions(driver);
+        builder.clickAndHold(from).moveToElement(dropZone).release(dropZone).build().perform();
+    }
+
+    public WebElement getIndexWebElementAttributeFilter(int index) {
+        return getIndexAttributeFilter(index).getRoot().findElement(By.className("attribute-filter-button"));
+    }
+
+    public WebElement getLastIndexWebElementAttributeFilter() {
+        return getLastFilter().getRoot().findElement(By.className("attribute-filter-button"));
     }
 }

@@ -124,6 +124,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteInsightItemButton;
 
+    @FindBy(className = "button-filter-bar-show-all")
+    protected WebElement showAllFilterBtn;
+
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
@@ -670,6 +673,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage dragDateAttributeToFilterPlaceholder() {
+        dragAndDropWithCustomBackend(browser, browser.findElement(By.className(DATE_FILTER_SELECTOR)),
+                browser.findElement(By.cssSelector(ADD_ATTRIBUTE_FILTER_DROPZONE)));
+        return this;
+    }
+
     public IndigoDashboardsPage deleteAttributeFilter(String attribute) {
         String targetFilter = convertCSSClassTojQuerySelector(
                 getAttributeFiltersPanel().getAttributeFilter(attribute).getRoot().getAttribute("class"));
@@ -677,6 +686,17 @@ public class IndigoDashboardsPage extends AbstractFragment {
         dragAndDropWithCustomBackend(browser, targetFilter, DASHBOARD_BODY, DELETE_DROPZONE);
 
         return this;
+    }
+
+    public List<String> getListCurrentAttributeFilter(){
+        List<String> listAttribute =  getAttributeFiltersPanel().getAttributeFilters()
+                .stream().map(att -> att.getTitle()).collect(Collectors.toList());
+        log.info("Attribute Filter List Is : " + listAttribute);
+        return listAttribute;
+    }
+
+    public String getFirstAttributeFilter() {
+        return getAttributeFiltersPanel().getDateAttributeFilters().getTitle();
     }
 
     /**
@@ -1070,6 +1090,22 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     private WebElement getDashboardItemContent() {
         return getRoot().findElement(className("dash-item-content"));
+    }
+
+    public WebElement getDropzonePosition() {
+        return getRoot().findElement(cssSelector(ADD_ATTRIBUTE_FILTER_DROPZONE));
+    }
+
+    public IndigoDashboardsPage clickFilterShowAllOnFilterBar() {
+        boolean isShowAllFilter =  showAllFilterBtn.getText().equals("Show all");
+        if (isShowAllFilter) showAllFilterBtn.click();
+        return this;
+    }
+
+    public IndigoDashboardsPage clickFilterShowLessOnFilterBar() {
+        boolean isShowLessFilter =  showAllFilterBtn.getText().equals("Show less");
+        if (isShowLessFilter) showAllFilterBtn.click();
+        return this;
     }
 
     private boolean isDashboardItemContentChangedOnFirefox() {
