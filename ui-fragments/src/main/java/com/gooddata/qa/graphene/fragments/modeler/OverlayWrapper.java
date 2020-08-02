@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
@@ -25,6 +26,18 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "gd-confirm")
     private ConfirmDeleteDatasetDialog confirmDeleteDatasetDialog;
 
+    @FindBy(className = "import-csv")
+    private FileUploadDialog fileUploadDialog;
+
+    @FindBy(className = "preview-csv-dialog")
+    private PreviewCSVDialog previewCSVDialog;
+
+    @FindBy(css = ".gdc-ldm-waiting-dialog .waiting-dialog-content")
+    private WaitingDialog waitingDialog;
+
+    @FindBy(className = "gd-list")
+    private ImportMenu importMenu;
+
     @FindBy(className = "create-output-stage-dialog")
     private OutputStage outputStage;
 
@@ -34,6 +47,26 @@ public class OverlayWrapper extends AbstractFragment {
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 OverlayWrapper.class, waitForElementVisible(className(OVERLAY_WRAPPER), searchContext));
+    }
+
+    public ImportMenu getImportMenu() {
+        waitForFragmentVisible(importMenu);
+        return importMenu;
+    }
+
+    public WaitingDialog getWaitingDialog() {
+        waitForFragmentVisible(waitingDialog);
+        return waitingDialog;
+    }
+
+    public PreviewCSVDialog getPreviewCSVDialog() {
+        waitForFragmentVisible(previewCSVDialog);
+        return previewCSVDialog;
+    }
+
+    public FileUploadDialog getFileUploadDialog() {
+        waitForFragmentVisible(fileUploadDialog);
+        return fileUploadDialog;
     }
 
     public ChangePrimaryKeyDialog getChangePrimaryKeyDialog() {
