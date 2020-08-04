@@ -80,7 +80,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void addAttributesIntoBucket() {
-        FiltersBucket filtersBucket = initAnalysePage().addAttribute(ATTR_DEPARTMENT).getFilterBuckets();
+        FiltersBucket filtersBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addAttribute(ATTR_DEPARTMENT).getFilterBuckets();
         assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT),
             "Attributes should be not automatically added to filter bar");
 
@@ -110,7 +111,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void addAndRenameAttributeIntoBucket() {
-        AttributesBucket attributesBucket = initAnalysePage()
+        AttributesBucket attributesBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT).getAttributesBucket();
         attributesBucket.setTitleItemBucket(ATTR_DEPARTMENT, "Renamed Department");
 
@@ -139,8 +140,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertFalse(analysisPage.openFilterBarPicker().isItemCheck(ATTR_DEPARTMENT),
             "State should be not ticked");
 
-        FilterBarPicker filterBarPicker = initAnalysePage().addAttribute(ATTR_DEPARTMENT).addFilter(ATTR_DEPARTMENT)
-            .openFilterBarPicker();
+        FilterBarPicker filterBarPicker = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addAttribute(ATTR_DEPARTMENT).addFilter(ATTR_DEPARTMENT).openFilterBarPicker();
         assertTrue(filterBarPicker.isItemCheck(ATTR_DEPARTMENT), "Default state should be ticked");
     }
 
@@ -152,7 +153,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void addDateIntoBucket() {
-        FiltersBucket filtersBucket = initAnalysePage().addDate().getFilterBuckets();
+        FiltersBucket filtersBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addDate().getFilterBuckets();
         assertFalse(filtersBucket.isDateFilterVisible(), "Date should be not automatically added to filter bar");
 
         FilterBarPicker filterBarPicker = analysisPage.openFilterBarPicker();
@@ -191,7 +192,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void dragAndDropDateAndAttributeToFilterBar() {
-        initAnalysePage().addDateFilter().addFilter(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addDateFilter().addFilter(ATTR_DEPARTMENT);
         FilterBarPicker filterBarPicker = analysisPage.openFilterBarPicker();
         assertTrue(filterBarPicker.isItemCheck(DATE), "Attribute should be checked");
         assertEquals(filterBarPicker.getValuesText(), asList("Date", ATTR_DEPARTMENT));
@@ -230,7 +231,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void dragAndDropAttributeIntoCanvas() {
-        initAnalysePage().drag(analysisPage.getCatalogPanel().searchAndGet(ATTR_DEPARTMENT, FieldType.ATTRIBUTE),
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .drag(analysisPage.getCatalogPanel().searchAndGet(ATTR_DEPARTMENT, FieldType.ATTRIBUTE),
             () -> waitForElementVisible(cssSelector(".s-recommendation-attribute-canvas"), browser))
             .waitForReportComputing();
 
@@ -239,11 +241,10 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertEquals(attributesBucket.getItemNames(), Collections.singletonList(ATTR_DEPARTMENT));
         assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT),
             "Should be not auto-created them into filter bar.\n ");
-
     }
 
     public void applyCompareBetweenEachAttributePanel() {
-        initAnalysePage().addMetric(METRIC_AMOUNT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT);
 
         RecommendationContainer recommendationContainer =
             Graphene.createPageFragment(RecommendationContainer.class,
@@ -260,7 +261,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void applySeeTrendQuarterPanel() {
-        initAnalysePage().addMetric(METRIC_TIMELINE_EOP);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_TIMELINE_EOP);
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND)
@@ -289,7 +290,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dragMetricIntoTrendingOverTimePanel() {
-        WebElement metric = initAnalysePage().getCatalogPanel().searchAndGet(METRIC_TIMELINE_EOP, FieldType.METRIC);
+        WebElement metric = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel()
+            .searchAndGet(METRIC_TIMELINE_EOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
@@ -306,7 +308,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyCompareToPreviousPeriodTestViaRecommended() {
-        initAnalysePage().addMetric(METRIC_TIMELINE_EOP).addAttribute(ATTR_DEPARTMENT);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_TIMELINE_EOP)
+            .addAttribute(ATTR_DEPARTMENT);
 
         RecommendationContainer recommendationContainer =
             Graphene.createPageFragment(RecommendationContainer.class,
@@ -328,7 +331,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeOrDateFromBucketNotOnFilterBar() {
-        initAnalysePage().addAttribute(ATTR_FORECAST_CATEGORY).addDate();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_FORECAST_CATEGORY).addDate();
         analysisPage.replaceAttribute(DATE, ATTR_IS_CLOSED);
 
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
@@ -480,7 +483,8 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void undoOrRedoViaFilterBarDropdown() {
-        initAnalysePage().addAttribute(ATTR_DEPARTMENT).openFilterBarPicker().checkItem(ATTR_DEPARTMENT).apply();
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_DEPARTMENT)
+            .openFilterBarPicker().checkItem(ATTR_DEPARTMENT).apply();
         FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
         analysisPage.undo();
         assertEquals(filtersBucket.getFiltersCount(), 0);
