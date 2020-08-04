@@ -293,7 +293,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         try {
             waitForElementVisible(ElementUtils.BY_CLOSED_ICON_MESSAGE_BAR, browser, 3).click();
             waitForElementNotVisible(ElementUtils.BY_CLOSED_ICON_MESSAGE_BAR, browser);
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | NoSuchElementException e) {
             // Success message isn't displayed so WebDriver unable to catch the loading indicator
         }
         return this;
@@ -650,9 +650,19 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage dragAddKpiPlaceholder() {
+        dragAddKpiPlaceholder(DropZone.LAST);
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddKpiPlaceholderNext() {
+        dragAddKpiPlaceholder(DropZone.NEXT);
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddKpiPlaceholder(DropZone dropZone) {
         // should fetch dashboard elements to avoid caching in view mode
         waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
-        dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
+        dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, dropZone.getCss());
 
         return this;
     }
