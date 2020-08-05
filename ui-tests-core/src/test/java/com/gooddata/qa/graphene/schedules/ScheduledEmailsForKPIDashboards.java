@@ -187,7 +187,7 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
         createMetric("metricXSSFormat", format(
             "SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT))),
             MetricFormatterDialog.Formatter.XSS.toString());
-        initAnalysePage().addMetric("metricXSSFormat").saveInsight(INSIGHT_HAS_XSS);
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric("metricXSSFormat").saveInsight(INSIGHT_HAS_XSS);
     }
 
     @Test(dependsOnMethods = "prepareDashboardWithSpecialCases")
