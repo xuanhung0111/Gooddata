@@ -385,9 +385,8 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
             waitForScheduleMessages(nameDashboard, 1).get(0)).split("\n"));
 
         log.info("Content Dashboard Bullet Chart: " + contents);
-
-        assertThat(contents, hasItems(METRIC_AMOUNT_BOP, METRIC_AMOUNT, "Direct Sales", "Include", "Exclude",
-            nameInsight));
+        String legendsOfContent = METRIC_AMOUNT_BOP + " " + METRIC_AMOUNT + " " + METRIC_BEST_CASE;
+        assertThat(contents, hasItems(legendsOfContent, "Direct Sales", "Include", "Exclude", nameInsight));
     }
 
     protected ScheduleEmailRestRequest initScheduleEmailRestRequest() {
