@@ -46,7 +46,8 @@ public enum ProjectFeatureFlags {
     ENABLE_TABLE_COLUMN_AUTO_RESIZING("enableTableColumnsAutoResizing"),
     AD_MEASURE_VALUE_FILTER_NULL_AS_ZERO_OPTION("ADMeasureValueFilterNullAsZeroOption"),
     ENABLE_KPI_DASHBOARD_SAVE_AS_NEW("enableKPIDashboardSaveAsNew"),
-    XAE_VERSION("xae_version");
+    XAE_VERSION("xae_version"),
+    ENABLE_TABLE_COLUMNS_GROW_TO_FIT("enableTableColumnsGrowToFit");
 
     private final String featureFlag;
 
