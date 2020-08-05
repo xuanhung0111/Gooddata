@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -59,7 +61,7 @@ public class ScheduleEmailDialog extends AbstractFragment {
             Assert.assertEquals(waitForElementVisible(ElementUtils.BY_SUCCESS_MESSAGE_BAR, browser, 3).getText(),
                 "Success! Your dashboard is scheduled for emailing.");
             waitForElementNotVisible(ElementUtils.BY_SUCCESS_MESSAGE_BAR, browser);
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | NoSuchElementException e) {
             // Success message isn't displayed so WebDriver unable to catch the loading indicator
         }
     }
@@ -84,7 +86,7 @@ public class ScheduleEmailDialog extends AbstractFragment {
     }
 
     public List<String> getRecipientsSuggestion() {
-        return recipientsSuggestion.stream().map(WebElement::getText).collect(toList());
+        return waitForCollectionIsNotEmpty(recipientsSuggestion).stream().map(WebElement::getText).collect(toList());
     }
 
     public ScheduleEmailDialog addRecipientToField(String email) {
