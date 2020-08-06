@@ -68,6 +68,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_TABLE_COLUMNS_GROW_TO_FIT, false);
     }
 
     @Override
