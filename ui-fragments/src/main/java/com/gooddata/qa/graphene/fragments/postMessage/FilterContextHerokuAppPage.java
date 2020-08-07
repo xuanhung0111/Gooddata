@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.common;
+package com.gooddata.qa.graphene.fragments.postMessage;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;

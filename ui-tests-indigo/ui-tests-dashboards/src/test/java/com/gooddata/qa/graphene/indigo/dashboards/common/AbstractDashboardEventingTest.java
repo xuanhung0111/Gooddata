@@ -26,6 +26,7 @@ import org.openqa.selenium.TimeoutException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,23 +145,27 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack), Type.ATTRIBUTE))));
     }
 
-    protected String createTemplateHtmlFile(String kpiId, String uris, String identifiers) throws IOException {
-        final String content = ResourceUtils.getResourceAsString("/eventing/frame_KD.html");
+    protected String createTemplateHtmlFile(String insightObjectId, String uris, String identifiers, String pathFile) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
         final String replacedContent = content
                 .replace("{host}", testParams.getHost())
                 .replace("{project}", testParams.getProjectId())
-                .replace("{reportId}", kpiId)
+                .replace("{reportId}", insightObjectId)
                 .replace("{uris}", uris)
                 .replace("{identifiers}", identifiers);
         return ResourceUtils.createTempFileFromString(replacedContent);
     }
 
     protected String createTemplateHtmlFile(String kpiId) throws IOException {
-        return createTemplateHtmlFile(kpiId, "[]", "[]");
+        return createTemplateHtmlFile(kpiId, "[]", "[]", "/eventing/frame_KD.html");
     }
 
     protected String createTemplateHtmlFile(String kpiId, String uris) throws IOException {
-        return createTemplateHtmlFile(kpiId, uris, "[]");
+        return createTemplateHtmlFile(kpiId, uris, "[]", "/eventing/frame_KD.html");
+    }
+
+    protected String createTemplateHtmlFile(String kpiId, String uris, String identifier) throws IOException {
+        return createTemplateHtmlFile(kpiId, uris, identifier, "/eventing/frame_KD.html");
     }
 
     protected String getObjectIdFromUri(String uri) {
@@ -520,5 +525,9 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
         }
         String kpiUri = createKpiUsingRest(configuration.build());
         return Pair.of(kpiUri, metric);
+    }
+
+    protected String generateAnalyticalDashboardName() {
+        return "Analytical-Dashboard-" + UUID.randomUUID().toString().substring(0, 6);
     }
 }

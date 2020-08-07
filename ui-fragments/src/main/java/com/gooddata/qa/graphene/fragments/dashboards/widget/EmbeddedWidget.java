@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.FilterContextHerokuAppPage;
+import com.gooddata.qa.graphene.fragments.postMessage.FilterContextHerokuAppPage;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import org.jboss.arquillian.graphene.Graphene;
