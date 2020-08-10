@@ -258,7 +258,8 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
     @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightWithColorPaletteViaAPI() {
         AnalysisPage analysisPage = initAnalysePage();
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .saveInsight(MULTI_METRIC_APPLY_COLOR_PALETTE);
