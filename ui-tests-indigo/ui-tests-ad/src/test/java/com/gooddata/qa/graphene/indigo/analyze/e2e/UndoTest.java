@@ -43,7 +43,8 @@ public class UndoTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_one_version_per_user_action() {
         // 1st version
-        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
