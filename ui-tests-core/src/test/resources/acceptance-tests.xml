@@ -1,5 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-acceptance-core-test">
+    <test name="GoodSalesEmbeddedDashboardTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest"/>
+        </classes>
+    </test>
+
     <test name="GoodSalesDashboardTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest"/>

@@ -637,7 +637,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addWebContentToDashboard(embedCode)
                 .getLastEmbeddedWidget()
                 .resizeFromTopLeftButton(-300, 0)
-                .resizeFromBottomRightButton(200, 600);
+                .resizeFromBottomRightButton(200, 400);
 
         dashboardsPage.saveDashboard();
         return embeddedWidget.getEmbeddedDashboard();

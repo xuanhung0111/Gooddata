@@ -445,6 +445,7 @@ public class GoodSalesFilterEmbeddedDashboardLogMessageTest extends AbstractEmbe
         FilterContextHerokuAppPage herokuAppPage = initFilterContextHerokuAppPage();
         herokuAppPage.inputEmbeddedDashboardUrl(embeddedUri);
 
+        waitForReportLoaded(singletonList(DRILLING_REPORT));
         browser.switchTo().frame(waitForElementPresent(BY_IFRAME, browser));
         tableReport.drillOn("Grammar Plus", TableReport.CellType.ATTRIBUTE_VALUE).waitForLoaded();
         BrowserUtils.switchToMainWindow(browser);

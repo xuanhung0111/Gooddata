@@ -18,9 +18,9 @@
         </classes>
     </test>
 
-    <test name="ResizeWidgetsAndRowsTest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest"/>
-        </classes>
-    </test>
+<!--    <test name="ResizeWidgetsAndRowsTest" enabled="true">-->
+<!--        <classes>-->
+<!--            <class name="com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
