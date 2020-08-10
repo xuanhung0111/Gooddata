@@ -9,7 +9,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
@@ -19,7 +18,8 @@ public class Model extends AbstractFragment {
     private static final String ID_MODEL = "g[id = 'dataset.%s']";
     private static final String UNTITLED_ATTRIBUTE = "ds-item-attr%suntitledattribute";
     private static final String UNTITILED_FACT = "ds-item-fact%suntitledfact";
-    private static final By CONNECTION_TOOLTIP = By.className("tooltip-content");
+    private static final By TOOLTIP_CONTENT = By.className("tooltip-content");
+    private static final By WARNING_MESSAGE = By.cssSelector(".ds-title .icon");
 
     @FindBy(css = ".ds-title .text .v-line")
     private WebElement datasetName;
@@ -32,6 +32,9 @@ public class Model extends AbstractFragment {
 
     @FindBy(css = ".ds-title .toggle")
     private WebElement toggleIcon;
+
+    @FindBy(css = ".ds-title .icon")
+    private WebElement warningIcon;
 
     public static Model getInstance(SearchContext searchContext, String id) {
         return Graphene.createPageFragment(
@@ -73,13 +76,22 @@ public class Model extends AbstractFragment {
     }
 
     public Model deleteAttributeOnDataset(String attributeName) {
-        WebElement attribute = getListItems().getAttribute(getDatasetTitle().toLowerCase(), attributeName);
-        Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(attribute).click().build().perform();
-        WebElement moreActionButton = attribute.findElement(By.className("more-action-container"));
-        driverActions.moveToElement(moreActionButton).click().build().perform();
-        PaperScrollerBackground.getInstance(browser).getContextToolbar().deleteElement();
+        WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
+        deleteItemProcess(attribute);
         return this;
+    }
+
+    public Model deleteFactOnDataset(String fact, String  datasetName) {
+        WebElement factEl = getListItems().getFact(datasetName, fact);
+        deleteItemProcess(factEl);
+        return this;
+    }
+
+    public void deleteItemProcess(WebElement attributeEl) {
+        getActions().moveToElement(attributeEl).click().build().perform();
+        WebElement moreActionButton = attributeEl.findElement(By.className("more-action-container"));
+        getActions().moveToElement(moreActionButton).click().build().perform();
+        PaperScrollerBackground.getInstance(browser).getContextToolbar().deleteElement();
     }
 
     public Model moveAttributeOnDataset(String fromDatasetName, String attributeName, String toDatasetName) {
@@ -276,10 +288,29 @@ public class Model extends AbstractFragment {
     }
 
     public String getConnectionStatusOnDataset() {
-        return browser.findElement(CONNECTION_TOOLTIP).getText();
+        return browser.findElement(TOOLTIP_CONTENT).getText();
     }
 
     public boolean isDatasetTooltipDisplayed() {
-        return isElementVisible(CONNECTION_TOOLTIP, browser);
+        return isElementVisible(TOOLTIP_CONTENT, browser);
+    }
+
+    public boolean isWarningMessageDisplayed() {
+        try {
+            String tooltip = waitForElementVisible(WARNING_MESSAGE, browser).getAttribute("data-tooltip-class-name");
+            if (tooltip != null) {
+                return true;
+            }
+        } catch (Exception e) {}
+        return false;
+    }
+
+    public String getWarningMessageContent() {
+        hoverOnWarningMessageIcon();
+        return browser.findElement(TOOLTIP_CONTENT).getText();
+    }
+
+    public void hoverOnWarningMessageIcon() {
+        getActions().moveToElement(warningIcon).build().perform();
     }
 }

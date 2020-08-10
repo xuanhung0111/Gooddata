@@ -25,4 +25,9 @@
             <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>
     </test>
+    <test name="WarningMessageTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.WarningMessageTest" />
+        </classes>
+    </test>
 </suite>
