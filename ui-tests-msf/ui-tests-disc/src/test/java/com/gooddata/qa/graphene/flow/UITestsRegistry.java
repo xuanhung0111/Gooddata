@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
+import com.gooddata.qa.graphene.disc.CleanUpDatasourceTest;
 import com.gooddata.qa.graphene.disc.LongRunTimeTest;
 import com.gooddata.qa.graphene.disc.OverviewPageTest;
 import com.gooddata.qa.graphene.disc.SanityTest;
@@ -43,6 +44,7 @@ public class UITestsRegistry {
             EditEtlProcessScheduleTest.class,
             ScheduleDetailTest.class,
             EtlProcessScheduleDetailTest.class,
+            CleanUpDatasourceTest.class,
             NotificationsTest.class,
             "testng-imap-notification.xml"
         });
