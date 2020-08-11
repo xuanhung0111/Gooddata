@@ -302,7 +302,7 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
         conditions.add(Pair.of(COLUMN_X_DELETED, conditionString2));
         custkeyValues = bigqueryUtils.getRecordsByCondition(dataset, table, column, conditions, null, LIMIT_RECORDS);
         assertThat(executionLog, containsString(
-                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]", projectId, clientId, dataset)));
+                String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full", projectId, clientId, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));

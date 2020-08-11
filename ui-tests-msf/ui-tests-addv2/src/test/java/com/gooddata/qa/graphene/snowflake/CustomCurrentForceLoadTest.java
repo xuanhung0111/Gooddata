@@ -398,7 +398,7 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
             custkeyValues.add(result.getString(column));
         }
 
-        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full",
                 projectId, UPDATE_CLIENT_ID, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
