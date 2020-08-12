@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.sdk.model.md.report.AttributeInGrid;
 import com.gooddata.sdk.model.md.report.Filter;
 import com.gooddata.sdk.model.md.report.GridReportDefinitionContent;
@@ -9,11 +10,8 @@ import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
@@ -34,6 +32,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
@@ -103,6 +102,15 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
             throw new SkipException("There isn't exported feature in client demo environment");
         }
         super.init(windowSize);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_INVITATIONS);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_USER_ADMIN);
+        createAndAddUserToProject(UserRoles.EXPLORER);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     @Override
@@ -469,6 +477,36 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         today = DateRange.getCurrentDate();
         assertEquals(contents, asList("DEPARTMENT" , "All", FIRST_TAB + " " + today, "Page 1/1"));
         takeScreenshot(browser, "Export_Blank_Dashboard", getClass());
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getAllRolesUser")
+    public void exportDashboardWithAllRoles(UserRoles roles) throws IOException{
+        logoutAndLoginAs(true, roles);
+        try {
+            dashboardTitle = generateDashboardName();
+            openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT));
+            dashboardsPage.exportDashboardTabToPDF();
+            today = DateRange.getCurrentDate();
+            List<String> contents = asList(getContentFrom(firstTab).split("\n"));
+            Screenshots.takeScreenshot(browser, "Dashboard_Has_Table_Report_With_All_Roles", getClass());
+            assertEquals(contents, asList(REPORT_AMOUNT_BY_PRODUCT, "Product Amount",
+                "CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid",
+                "$27,222,899.64", "$22,946,895.47", "$38,596,194.86", "$8,042,031.92", "$9,525,857.91", "$10,291,576.74",
+                firstTab + " " + today, "Page 1/1"));
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @DataProvider(name = "getAllRolesUser")
+    public Object[][] getAllRolesUser() {
+        return new Object[][]{
+            {UserRoles.EDITOR},
+            {UserRoles.EDITOR_AND_INVITATIONS},
+            {UserRoles.EDITOR_AND_USER_ADMIN},
+            {UserRoles.EXPLORER},
+            {UserRoles.VIEWER},
+        };
     }
 
     private void tryDeleteDashboard(String name) {
