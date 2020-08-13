@@ -85,7 +85,10 @@ public abstract class AbstractPicker extends AbstractFragment {
     }
 
     protected WebElement getElementByName(final String name) {
-        return getElement(".s-" + simplifyText(name));
+        WebElement element = name.contains("week") ? getElement(".s-" + simplifyText(name) + "_us")
+                : getElement(".s-" + simplifyText(name));
+        if (name.equals("Week (Sun-Sat)")) element = getElement(".s-week");
+        return element;
     }
 
     protected List<WebElement> getElements() {
