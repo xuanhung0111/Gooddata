@@ -6,11 +6,11 @@
         </classes>
     </test>
 
-    <test name="DateFilterADMeasureTest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest"/>
-        </classes>
-    </test>
+<!--    <test name="DateFilterADMeasureTest" enabled="true">-->
+<!--        <classes>-->
+<!--            <class name="com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 
     <test name="AnalyticalDesignerSanityTest" enabled="true">
         <classes>

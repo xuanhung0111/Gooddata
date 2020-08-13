@@ -71,7 +71,7 @@ public class MetricConfiguration extends AbstractFragment {
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
-    public static final By BY_DATE_BY_FILTER_PICKER = By.className("s-metric-date-filter-dropdown");
+    public static final By BY_DATE_BY_FILTER_PICKER = By.cssSelector(".adi-date-filter-picker .adi-date-dropdown");
     public static final By BY_SELECT_ALL_CHECKBOX = By.cssSelector(".adi-attr-filter-picker .s-select-all-checkbox");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");

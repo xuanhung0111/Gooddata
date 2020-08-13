@@ -9,7 +9,7 @@
         <property name="browser">chrome</property>
         <property name="dimensions">${screenResolution}</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
-        <property name="chromeArguments">${chromeDriverArguments}</property>
+        <property name="chromeArguments">${chromeDriverArguments} --ignore-certificate-errors</property>
         <property name="chromePrintOptions">true</property>
         <property name="loggingPrefs">browser=ALL</property>
         <property name="chromeExperimentalOption">
