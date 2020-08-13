@@ -12,6 +12,7 @@ import static org.openqa.selenium.By.id;
 
 import java.util.List;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -71,6 +72,9 @@ public class HamburgerMenu extends AbstractFragment {
                 return;
             case "Load":
                 waitForElementVisible(By.className("s-datasets-list"), browser);
+                return;
+            case "Help":
+                BrowserUtils.switchToFirstTab(browser);
                 return;
         }
     }
