@@ -17,6 +17,7 @@ import static org.openqa.selenium.By.cssSelector;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
@@ -109,11 +110,20 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
     public AbstractReactDropDown selectByName(String name) {
         ensureDropdownOpen();
         searchForText(name);
+        scrollToViewItem(name);
         getElementByName(name).click();
 
         // wait until the selection is made and propagated to the button title
         waitForSelectionIsApplied(name);
 
+        return this;
+    }
+
+    public AbstractReactDropDown scrollToViewItem(String item) {
+        By selector = item.contains("week") ? By.cssSelector(".s-" + simplifyText(item) + "_us")
+                : By.cssSelector(".s-" + simplifyText(item));
+        if (item.equals("Week (Sun-Sat)")) selector = By.cssSelector(".s-week");
+        ElementUtils.scrollElementIntoView(waitForElementPresent(selector, browser), browser);
         return this;
     }
 

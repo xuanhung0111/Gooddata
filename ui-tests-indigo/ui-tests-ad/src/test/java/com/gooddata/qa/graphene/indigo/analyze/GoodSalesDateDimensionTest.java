@@ -53,7 +53,8 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addDateFilter()
                 .waitForReportComputing();
@@ -127,8 +128,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
         final String newDateDimension = DATE_DATASET_CREATED;
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(FACT_AMOUNT, FieldType.FACT)
-                .addDateFilter().getFilterBuckets()
-                .changeDateDimension(DATE_DATASET_CLOSED, newDateDimension);
+                .addDateFilter().getFilterBuckets().changeDateDimension(DATE_DATASET_CLOSED, newDateDimension);
 
         assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()
                 .startsWith(newDateDimension), "Date dimension was not changed to " + newDateDimension);
