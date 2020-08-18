@@ -136,13 +136,13 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void tryDeleteDashboardOnMenuItem() {
         try {
-        projectResRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SAVE_AS_NEW, true);
+        projectResRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SAVE_AS_NEW, false);
         indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_CLONE);
         initIndigoDashboardsPageWithWidgets()
                 .selectKpiDashboard(DASHBOARD_CLONE)
                 .switchToEditMode()
                 .addInsight(INSIGHT_LOST)
-                .deleteDashboardOnMenuItem(true);
+                .deleteDashboard(true);
             takeScreenshot(browser, "delete-menu-item", getClass());
             assertNotEquals(indigoDashboardsPage.getDashboardTitle(), DASHBOARD_CLONE);
         } finally {

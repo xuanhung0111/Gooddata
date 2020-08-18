@@ -277,7 +277,7 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
         assertEquals(indigoDashboardsPage.getDashboardTitle(), "Untitled");
         indigoDashboardsPage.cancelEditModeWithoutChange();
         indigoDashboardsPage.selectKpiDashboard(analyzeDashboardTitle);
-        indigoDashboardsPage.switchToEditMode().deleteDashboard(true);
+        indigoDashboardsPage.switchToEditMode().deleteDashboardOnMenuItem(true);
         assertThat(indigoDashboardsPage.getDashboardTitles(), not(hasItem(analyzeDashboardTitle)));
     }
 
