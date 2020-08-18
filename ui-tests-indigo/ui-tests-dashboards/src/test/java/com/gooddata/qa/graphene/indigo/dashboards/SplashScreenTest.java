@@ -128,7 +128,7 @@ public class SplashScreenTest extends AbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
-                .deleteDashboard(false);
+                .deleteDashboardOnMenuItem(false);
 
         waitForFragmentVisible(indigoDashboardsPage)
                 .waitForEditingControls()
@@ -137,7 +137,7 @@ public class SplashScreenTest extends AbstractDashboardTest {
         takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-cancel", getClass());
 
         waitForFragmentVisible(indigoDashboardsPage)
-                .deleteDashboard(true);
+                .deleteDashboardOnMenuItem(true);
 
         indigoDashboardsPage.getSplashScreen();
 
@@ -167,7 +167,7 @@ public class SplashScreenTest extends AbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
-                .deleteDashboard(true);
+                .deleteDashboardOnMenuItem(true);
 
         indigoDashboardsPage.getSplashScreen();
     }
