@@ -90,8 +90,8 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
 
         analysisPage.waitForReportComputing();
 
-        assertFalse(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
-                .stream().anyMatch(DateGranularity.WEEK_SUN_SAT.toString()::equals), "week granularity is not hidden");
+        assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
+                .stream().anyMatch(DateGranularity.WEEK_SUN_SAT.toString()::equals), "week granularity is hidden");
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()

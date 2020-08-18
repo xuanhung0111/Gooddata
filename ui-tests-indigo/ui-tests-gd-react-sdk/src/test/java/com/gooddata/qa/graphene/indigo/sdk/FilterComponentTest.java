@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.sdk;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_ACTIVITY;
@@ -81,8 +83,9 @@ public class FilterComponentTest extends AbstractReactSdkTest {
         assertEquals(sdkAnalysisPage.getWarning(), isUIsdk8() ? WARNING_NO_DATA : NO_DATA_MESSAGE);
 
         assertThat(openExtendedDateFilterPanel().getDateRangeOptions(),
-                equalTo(Stream.of(DateRange.values()).map(DateRange::toString).collect(toList())));
-
+                equalTo(asList("All time", "Static period", "Floating range", "Last 7 days", "Last 30 days",
+                        "Last 90 days", "This month", "Last month", "Last 12 months", "This quarter", "Last quarter",
+                        "Last 4 quarters", "This year", "Last year")));
         openExtendedDateFilterPanel()
                 .selectFloatingRange(ExtendedDateFilterPanel.DateGranularity.DAYS, "yesterday", "4 days ahead").apply();
         sdkAnalysisPage.waitForVisualizationLoading();

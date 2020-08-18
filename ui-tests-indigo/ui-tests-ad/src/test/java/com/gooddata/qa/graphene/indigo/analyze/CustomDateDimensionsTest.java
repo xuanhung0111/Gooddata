@@ -18,8 +18,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.DateGranularity;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
@@ -76,7 +78,10 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucketReact.configDateFilter(period);
+            analysisPage.getFilterBuckets().getDateFilter().click();
+            DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                    waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+            panel.changePeriodWithScrollbar(period).apply();
             if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
