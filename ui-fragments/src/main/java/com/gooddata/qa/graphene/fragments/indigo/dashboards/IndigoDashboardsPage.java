@@ -46,7 +46,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import java.util.List;
 import java.util.function.Function;
@@ -832,10 +832,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public void hoverOnResizerWidget() {
         WebElement hotspot = waitForElementPresent(By.className(HOTSPOT_WIDTH_RESIZER_CLASS_NAME), browser);
+        String javaScript = "var evObj = document.createEvent('MouseEvents');" +
+            "evObj.initMouseEvent(\"mouseover\",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);" +
+            "arguments[0].dispatchEvent(evObj);";
 
-        //Padding of .dash-width-resizer-hotspot is "0 0 0 5px";
-        //This additional #moveByOffset is a work around to make it work properly.
-        ElementUtils.moveToElementActions(hotspot, 6, hotspot.getSize().getHeight() / 2).perform();
+        ((JavascriptExecutor)browser).executeScript(javaScript, hotspot);
     }
 
     public IndigoDashboardsPage resizeWidthOfWidget(ResizeBullet resizeBullet) {
@@ -1111,7 +1112,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         hoverOnResizerWidget();
 
         ElementUtils.moveToElementActions(waitForElementPresent(
-            By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME), browser), 1, 1).clickAndHold().perform();
+            By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME), browser), 0, 0).clickAndHold().perform();
 
         try {
             WebElement target = waitForElementPresent(By.className(DASHBOARD_TITLE_CLASS_NAME), browser);
