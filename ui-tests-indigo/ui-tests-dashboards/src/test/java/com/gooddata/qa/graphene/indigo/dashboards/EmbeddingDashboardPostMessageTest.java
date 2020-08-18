@@ -87,7 +87,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
                     testParams.getProjectId());
 
         } finally {
-            getEmbeddedDashboard().switchToEditMode().deleteDashboard(true);
+            getEmbeddedDashboard().switchToEditMode().deleteDashboardOnMenuItem(true);
 
             Optional<JSONObject> dashboardDeleted = getPostMessageEvent(PostMessageEvent.DASHBOARD_DELETED);
 
