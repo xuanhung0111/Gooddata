@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.sdk;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -49,6 +50,16 @@ public class AttributeFilter extends AbstractReactDropDown {
     @Override
     protected void waitForSelectionIsApplied(String name) {
         // ignore this in attribute filter
+    }
+
+    @Override
+    protected void waitForPickerLoaded() {
+        try {
+            waitForElementVisible(className("s-dropdown-loading"), getRoot(), 1);
+            waitForElementNotPresent(className("s-dropdown-loading"));
+        } catch(Exception e) {
+            // Do nothing
+        }
     }
 
     public static final AttributeFilter getInstance(SearchContext context) {
