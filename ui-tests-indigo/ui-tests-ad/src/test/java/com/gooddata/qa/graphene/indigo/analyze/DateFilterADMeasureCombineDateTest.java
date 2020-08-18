@@ -4,16 +4,19 @@ import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
@@ -286,7 +289,10 @@ public class DateFilterADMeasureCombineDateTest extends AbstractAnalyseTest {
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT)
                 .addDateFilter().waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration().addFilterByDate(THREE_YEARS_AGO);
-        analysisPage.getFilterBuckets().configDateFilter(periodTime);
+        analysisPage.getFilterBuckets().getDateFilter().click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        panel.changePeriodWithScrollbar(DateRange.THIS_YEAR.toString()).apply();
         analysisPage.waitForReportComputing();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().changeDateDimension(switchDimension);
         analysisPage.waitForReportComputing().saveInsight(insight).waitForReportComputing();
@@ -297,7 +303,10 @@ public class DateFilterADMeasureCombineDateTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_AVG_AMOUNT).addDate().waitForReportComputing().getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(THREE_YEARS_AGO);
-        analysisPage.getFilterBuckets().configDateFilter(periodTime);
+        analysisPage.getFilterBuckets().getDateFilter().click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        panel.changePeriodWithScrollbar(DateRange.THIS_YEAR.toString()).apply();
         analysisPage.waitForReportComputing();
         analysisPage.getAttributesBucket().changeDateDimension(switchDimension);
         analysisPage.waitForReportComputing().saveInsight(insight).waitForReportComputing();
