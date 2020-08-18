@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
@@ -14,7 +13,6 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -137,7 +135,7 @@ public class ResizeWidgetsAndRowsTest extends AbstractDashboardTest {
     public void showBulletsAndWidthResizerWhenMoving() {
         initIndigoDashboardsPage().addDashboard()
             .addInsight(INSIGHT_COLUMN_HAS_SOME_METRICS).addInsightNext(INSIGHT_TABLE_HAS_SOME_METRICS)
-            .waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, INSIGHT_COLUMN_HAS_SOME_METRICS);
+            .waitForWidgetsLoading();
 
         indigoDashboardsPage.dragToResizeMinimumWidget();
 
