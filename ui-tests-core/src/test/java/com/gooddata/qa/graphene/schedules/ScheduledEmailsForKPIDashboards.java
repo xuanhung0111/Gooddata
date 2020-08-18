@@ -274,7 +274,7 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
             ScheduleEmailDialog scheduleEmailDialog = indigoDashboardsPage.scheduleEmailing();
             assertFalse(scheduleEmailDialog.isRecipientsInputPresent(), "Recipipents Input should be not present");
         } finally {
-            initIndigoDashboardsPage().switchToEditMode().deleteDashboard(true);
+            initIndigoDashboardsPage().switchToEditMode().deleteDashboardOnMenuItem(true);
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                 ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_SCHEDULE_RECIPIENTS, true);
         }
@@ -318,7 +318,7 @@ public class ScheduledEmailsForKPIDashboards extends AbstractGoodSalesEmailSched
             assertTrue(emailSchedulePage.getKPIPrivateScheduleTitles().get(0).getAttribute("title")
                 .contains(nameDashboard));
 
-            initIndigoDashboardsPage().switchToEditMode().deleteDashboard(true);
+            initIndigoDashboardsPage().switchToEditMode().deleteDashboardOnMenuItem(true);
 
             initEmailSchedulesPage();
             takeScreenshot(browser, "Delete Schedule Email", getClass());
