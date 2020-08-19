@@ -125,7 +125,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends AbstractEmbeddedModeTest
                 .addWebContentToDashboard(embeddedCode)
                 .getLastEmbeddedWidget()
                 .resizeFromTopLeftButton(-300, 0)
-                .resizeFromBottomRightButton(200, 600);
+                .resizeFromBottomRightButton(200, 400);
 
         dashboardsPage.saveDashboard();
     }
