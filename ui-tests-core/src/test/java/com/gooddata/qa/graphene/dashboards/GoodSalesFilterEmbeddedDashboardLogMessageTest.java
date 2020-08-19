@@ -554,7 +554,7 @@ public class GoodSalesFilterEmbeddedDashboardLogMessageTest extends AbstractEmbe
         EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
         LEFT.moveElementToRightPlace(waitForElementVisible(embeddedWidget.getRoot()));
         PENULTIMATE_BOTTOM.moveElementToRightPlace(waitForElementVisible(embeddedWidget.getRoot()));
-        embeddedWidget.resizeFromBottomRightButton(500, 300);
+        embeddedWidget.resizeFromBottomRightButton(400, 300);
         return embeddedWidget;
     }
 

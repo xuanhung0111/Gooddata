@@ -125,7 +125,7 @@ public class DashboardDateFilterSelectRangeTest extends AbstractDashboardWidgetT
         
         dashboardsPage.getReport(DATE_TYPES_REPORT, TableReport.class)
             .resizeFromTopLeftButton(-300, 0)
-            .resizeFromBottomRightButton(200, 600);
+            .resizeFromBottomRightButton(200, 400);
 
         dashboardsPage.saveDashboard();
 
