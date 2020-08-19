@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel.DrillMeasureDropDown.DrillConfigPanel;
@@ -15,6 +16,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillModalDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.utils.http.ColorPaletteRequestData;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.attribute.AttributeRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -86,6 +88,16 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
 
         analysisPage.openFilterBarPicker().checkItem(ATTR_DEPARTMENT).checkItem(DATE).apply();
         analysisPage.setFilterIsValues(ATTR_DEPARTMENT, "Direct Sales");
+        ConfigurationPanelBucket.ItemConfiguration itemConfiguration = analysisPage.openConfigurationPanelBucket()
+            .openColorConfiguration();
+
+        itemConfiguration.openColorsPaletteDialog(ColorPaletteRequestData.ColorPalette.CYAN.toCssFormatString())
+            .getColorsPaletteDialog().openCustomColorPalette().getCustomColorsPaletteDialog()
+            .setColorCustomPicker(ColorPaletteRequestData.ColorPalette.YELLOW.getHexColor()).apply();
+        itemConfiguration.openColorsPaletteDialog(ColorPaletteRequestData.ColorPalette.LIME_GREEN.toCssFormatString())
+            .getColorsPaletteDialog().openCustomColorPalette().getCustomColorsPaletteDialog()
+            .setColorCustomPicker(ColorPaletteRequestData.ColorPalette.RED.getHexColor()).apply();
+
         analysisPage.saveInsight(SOURCE_INSIGHT_HAS_TWO_MEASURES).waitForReportComputing();
 
         String attributeUri = indigoRestRequest.getAttributeByTitle(ATTR_FORECAST_CATEGORY).getUri();
@@ -137,6 +149,8 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         DrillModalDialog drillModalDialog = DrillModalDialog.getInstance(browser);
         ChartReport drillChartReport = DrillModalDialog.getInstance(browser).getChartReport();
 
+        // This assert is to cover the bug ONE-4587 - Infinite rendering loop of visualisation in KD
+        assertEquals(drillChartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.YELLOW.toString());
         assertEquals(drillChartReport.getXaxisLabels(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("$40,105,983.96", "14,069,855"));
         assertEquals(drillModalDialog.getTitleInsight(), SOURCE_INSIGHT_HAS_TWO_MEASURES);
@@ -144,6 +158,9 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
 
         chartReport.clickOnElement(Pair.of(1, 1));
         indigoDashboardsPage.waitForDrillModalDialogLoading();
+
+        // This assert is to cover the bug ONE-4587 - Infinite rendering loop of visualisation in KD
+        assertEquals(drillChartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.CYAN.toString());
         assertEquals(drillChartReport.getYaxisTitle(), METRIC_BEST_CASE);
         assertEquals(drillChartReport.getXaxisLabels(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("13,273,818"));
