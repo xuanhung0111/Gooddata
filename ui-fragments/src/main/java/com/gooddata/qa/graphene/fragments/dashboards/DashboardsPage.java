@@ -245,6 +245,10 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardEditBar getDashboardEditBar() {
+        Graphene
+                .waitGui()
+                .withTimeout(10, TimeUnit.SECONDS)
+                .until(browser -> waitForElementPresent(By.id("bar"), browser).getAttribute("style").equals("top: 0px;"));
         return Graphene.createPageFragment(DashboardEditBar.class, waitForElementVisible(BY_DASHBOARD_EDIT_BAR, browser));
     }
 
