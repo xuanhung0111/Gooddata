@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.browser.BrowserUtils.isChrome;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
@@ -8,10 +9,9 @@ import static org.testng.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -71,11 +71,8 @@ public class DashboardGeoChart extends AbstractFragment {
         // Verify label (name + metric value) in tool-tip
         int j = 0;
         for (int i : indexList) {
-            Actions action = new Actions(browser);
-            action.moveToElement(svgPathList.get(i)).build().perform();
-            String script = "return document.getElementsByClassName('yui3-bubble-content')[0].getElementsByClassName('content')[0].innerHTML";
-            String actualTooltipValues = (String) ((JavascriptExecutor) browser).executeScript(script);
-            String expectedTooltipValues = "Sum of Amount:&nbsp;<b>" + expectedMetricValuesList.get(j) + "</b><br>" + layerName + ":&nbsp;<b>" + expectedAttrValuesList.get(j) + "</b><br>";            
+            String actualTooltipValues = getTooltipFromRegion(i);
+            String expectedTooltipValues = "Sum of Amount: " + expectedMetricValuesList.get(j) + "\n" + layerName + ": " + expectedAttrValuesList.get(j);
             assertEquals(actualTooltipValues, expectedTooltipValues, "Tooltip values on GEO is not properly.");
             j++;
         }
@@ -86,6 +83,9 @@ public class DashboardGeoChart extends AbstractFragment {
     }
 
     public String getTooltipFromRegion(int regionIndex) {
+        if (isChrome()) {
+            BrowserUtils.moveToCenterOfElement(browser, svgPathList.get(regionIndex));
+        }
         getActions().moveToElement(svgPathList.get(regionIndex)).perform();
         return waitForElementVisible(By.cssSelector(".yui3-bubble-content .content"), browser).getText();
     }
