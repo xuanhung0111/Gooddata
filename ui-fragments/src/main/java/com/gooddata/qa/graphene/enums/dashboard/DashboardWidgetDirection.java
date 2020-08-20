@@ -18,7 +18,7 @@ public enum DashboardWidgetDirection {
     UP("(top): (\\d+)px", 0),
     MIDDLE("(top): (\\d+)px", 60),
     DOWN("(top): (\\d+)px", 120),
-    NEXT_PAGE("(top): (\\d+)px", 1195),
+    NEXT_PAGE("(top): (\\d+)px", 1250),
     PENULTIMATE_BOTTOM("(top): (\\d+)px", 300),
     BOTTOM("(top): (\\d+)px", 500);
 
@@ -41,7 +41,7 @@ public enum DashboardWidgetDirection {
     public void moveElementToRightPlaceOutViewPort(WebElement element) {
         Map<String, Integer> distance = getDistance(element);
         WebDriver browser = BrowserUtils.getBrowserContext();
-        browser.manage().window().setSize(new Dimension(1680, 1500));
+        browser.manage().window().setSize(new Dimension(1680, 1680));
         new Actions(browser).clickAndHold(element)
                 .moveByOffset(distance.get("x"), distance.get("y"))
                 .release()
