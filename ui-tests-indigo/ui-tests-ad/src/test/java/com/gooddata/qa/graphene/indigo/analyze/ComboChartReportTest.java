@@ -588,12 +588,11 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testExportAndImportProjectWithInsight() {
-        final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-            true, true, true, statusPollingCheckIterations);
+            true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             ChartReport chartReport = initAnalysePage().openInsight(INSIGHT_HAS_MEASURE_AS_LINE_COLUMN_AND_ATTRIBUTE)
                 .waitForReportComputing().getChartReport();
 

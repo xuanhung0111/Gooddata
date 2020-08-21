@@ -70,7 +70,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public static final String DEFAULT_METRIC_FORMAT = "#,##0";
     public static final String DEFAULT_CURRENCY_METRIC_FORMAT = "$#,##0.00";
 
-    protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
+    protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 48; // 8 minutes
 
     protected String projectTitle = "simple-project";
     protected ResourceTemplate appliedFixture;

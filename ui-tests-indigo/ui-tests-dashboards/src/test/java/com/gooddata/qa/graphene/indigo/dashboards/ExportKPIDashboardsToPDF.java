@@ -344,14 +344,13 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"prepareInsights"})
     public void exportAndImportProject() {
-        final int statusPollingCheckIterations = 60; // (60*5s)
-        String exportToken = exportProject(true, true, true, statusPollingCheckIterations);
+        String exportToken = exportProject(true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         String workingProjectId = testParams.getProjectId();
         String targetProjectId = createNewEmptyProject("TARGET_PROJECT_TITLE");
 
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             initIndigoDashboardsPageWithWidgets().selectKpiDashboard(KD_HAS_INVALID_DATA).waitForWidgetsLoading()
                 .exportDashboardToPDF();
             List<String> contents = asList(getContentFrom(KD_HAS_INVALID_DATA).split("\n"));

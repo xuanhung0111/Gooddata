@@ -30,7 +30,6 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 
 public class SimpleProjectEtlTest extends AbstractProjectTest {
 
-    protected int statusPollingCheckIterations = 150; // (150*5s)
     private static final boolean exportUsers = true;
     private static final boolean exportData = true;
 
@@ -72,7 +71,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     @Override
     protected void customizeProject() throws Throwable {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
-        postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
+        postMAQL(IOUtils.toString(maqlResource), DEFAULT_PROJECT_CHECK_LIMIT);
 
         URL csvResource = getClass().getResource("/etl/invoice.csv");
         String webdavURL = uploadFileToWebDav(csvResource, null);
@@ -124,12 +123,12 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "testExportCrossDataCenter")
     public void exportImportProject(boolean crossDataCenter) throws Throwable {
-        String exportToken = exportProject(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
+        String exportToken = exportProject(exportUsers, exportData, crossDataCenter, DEFAULT_PROJECT_CHECK_LIMIT);
         String parentProjectId = testParams.getProjectId();
         boolean validationTimeoutOK = true;
         // New projectID is needed here. Load it from export, validate, delete and restore original one
         createProject();
-        importProject(exportToken, statusPollingCheckIterations);
+        importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
         try {
             // this runs validation, but results are ignored
             validateProject();

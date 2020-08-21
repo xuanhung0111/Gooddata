@@ -457,12 +457,11 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
     public void testExportAndImportProjectWithInsight() throws IOException{
         try {
             projectRestRequest.updateProjectConfiguration(TABLE_BODY_FONT_SIZE.getFlagName(), "50");
-            final int statusPollingCheckIterations = 60; // (60*5s)
             String exportToken = exportProject(
-                true, true, true, statusPollingCheckIterations);
+                true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
             testParams.setProjectId(targetProjectId);
             try {
-                importProject(exportToken, statusPollingCheckIterations);
+                importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
                 initDashboardsPage().addReportToDashboard(TABLE_REPORT);
 
                 TableReport report = dashboardsPage.getContent().getReport(TABLE_REPORT, TableReport.class);

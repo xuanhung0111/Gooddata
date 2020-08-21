@@ -144,12 +144,11 @@ public class KpiApplyColorPaletteTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"testKpiChangeNameInsightApplyColorsPalette"})
     public void testExportAndImportProject() {
-        final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-                true, true, true, statusPollingCheckIterations);
+                true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets()
                     .selectKpiDashboard(KPI_DASHBOARD).waitForWidgetsLoading();
             Screenshots.takeScreenshot(browser, "export import project apply color palette in "
