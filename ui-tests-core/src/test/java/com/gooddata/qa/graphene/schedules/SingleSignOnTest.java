@@ -40,7 +40,8 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
     private static final Map<String, String> WEB_TAB_DOMAIN_MAPPINGS
         = ImmutableMap.of("isolated1-staging3.intgdc.com", "ATT_isolated_stg3_AD",
         "isolated1-staging2.intgdc.com", "ATT_isolated_stg2_AD",
-        "isolated1-staging.intgdc.com", "ATT_isolated_stg1_AD"
+        "isolated1-staging.intgdc.com", "ATT_isolated_stg1_AD",
+        "isolated1-staging9.intgdc.com", "ATT_isolated_stg9_AD"
     );
 
     private final String SUBJECT_EMAIL = "Verify your identity in Salesforce";
