@@ -514,8 +514,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(METRIC_AMOUNT).waitForReportComputing()
             .saveInsight(INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER);
 
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).getMetricsBucket()
-            .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT)
+            .addMetric(METRIC_AVG_AMOUNT).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
             .addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight(INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT);
 
@@ -574,6 +574,18 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
         waitForOpeningIndigoDashboard();
         checkRedBar(browser);
+    }
+
+    @Test(dependsOnMethods = {"prepareInsightsNotApplyDateFilter"},
+        description = "SD-1045 Metric name is shown as localIdentifier in KD if insight has local date filter")
+    public void testMetricNameIsShownWithLocalDateFilter() {
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
+        indigoDashboardsPage.addDashboard().addInsight(INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT)
+            .waitForWidgetsLoading();
+        List<String> legends = indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME)
+            .getWidgetByHeadline(Insight.class, INSIGHT_HAS_SOME_MEASURES_ARE_APPLIED_DATE_FILTER_AND_ANOTHER_IS_NOT)
+            .getLegends();
+        assertEquals(legends, asList(METRIC_AMOUNT + ", Closed: Last year", METRIC_AVG_AMOUNT));
     }
 
     private List<String> getListDataChartReportRender() {
