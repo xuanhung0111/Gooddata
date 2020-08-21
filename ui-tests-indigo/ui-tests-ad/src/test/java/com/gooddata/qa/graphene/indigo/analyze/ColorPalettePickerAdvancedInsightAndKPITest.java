@@ -351,12 +351,11 @@ public class ColorPalettePickerAdvancedInsightAndKPITest extends AbstractAnalyse
 
     @Test(dependsOnMethods = {"testApplyColorPalettePickerOnKpi"})
     public void testExportAndImportProjectWithInsight() {
-        final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-                true, true, true, statusPollingCheckIterations);
+                true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets()
                     .selectKpiDashboard(KPI_DASHBOARD).waitForWidgetsLoading();
             Screenshots.takeScreenshot(browser, "export import project apply color picker in "

@@ -127,15 +127,14 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = {"placeTableHasTotalsOnKD"}, groups = "desktop")
-    public void exportAndImportProject() throws Throwable {
-        final int statusPollingCheckIterations = 60; // (60*5s)
-        String exportToken = exportProject(true, true, true, statusPollingCheckIterations);
+    public void exportAndImportProject() {
+        String exportToken = exportProject(true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         String workingProjectId = testParams.getProjectId();
         String targetProjectId = createNewEmptyProject("TARGET_PROJECT_TITLE");
 
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets()
                 .selectKpiDashboard(KPI_DASHBOARD).waitForWidgetsLoading();
             Screenshots.takeScreenshot(browser, "export import project has totals result in " + KPI_DASHBOARD, getClass());

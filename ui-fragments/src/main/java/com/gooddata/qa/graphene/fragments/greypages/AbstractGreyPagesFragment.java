@@ -35,11 +35,11 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
             if (i >= maxIterations) {
                 throw new TimeoutException("Maximum attempts to get " + expectedValidState + " status reached. Exiting.");
             }
-            sleepTightInSeconds(5);
+            sleepTightInSeconds(10);
             browser.navigate().refresh();
             i++;
         }
-        System.out.println("Succeed at +- " + (i * 5) + "seconds");
+        System.out.println("Succeed at +- " + (i * 10) + "seconds");
     }
 
     protected State getPollState() throws JSONException {
