@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

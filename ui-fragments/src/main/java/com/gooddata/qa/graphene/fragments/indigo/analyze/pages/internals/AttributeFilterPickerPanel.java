@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -167,5 +168,9 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     public WebElement getApplyButton() {
         return waitForElementVisible(applyButton);
+    }
+
+    public boolean isApplyButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(applyButton));
     }
 }
