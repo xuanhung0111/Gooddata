@@ -439,7 +439,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
     private Collection<WebElement> getRowElementsFrom(TableReport report) {
         sleepTightInSeconds(1);
-        return report.getRoot().findElements(By.cssSelector(".gridTile div.element.cell.rows span"));
+        return report.waitForLoaded().getRoot().findElements(By.cssSelector(".gridTile div.element.cell.rows span"));
     }
 
     private FilterWidget getFilterWidget(String condition) {
