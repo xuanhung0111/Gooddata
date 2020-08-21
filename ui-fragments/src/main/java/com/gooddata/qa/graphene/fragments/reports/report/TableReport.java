@@ -307,7 +307,8 @@ public class TableReport extends AbstractDashboardReport {
         if (!isDrillable(element)) {
             throw new RuntimeException("Could not drill on undrillable element");
         }
-        ElementUtils.moveToElementActions(element.findElement(By.tagName("span")), 5, 5).click().perform();
+        ElementUtils.moveToElementActions(element
+                .findElement(By.tagName(isElementPresent(By.tagName("img"), element) ? "img" : "span")), 5, 5).click().perform();
         return this;
     }
 
