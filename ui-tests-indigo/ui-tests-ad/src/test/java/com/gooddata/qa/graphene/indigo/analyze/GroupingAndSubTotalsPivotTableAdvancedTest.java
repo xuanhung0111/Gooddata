@@ -360,12 +360,11 @@ public class GroupingAndSubTotalsPivotTableAdvancedTest extends AbstractAnalyseT
             .selectRowsItem("within " + ATTR_DEPARTMENT);
         analysisPage.saveInsight().waitForReportComputing();
 
-        final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-            true, true, true, statusPollingCheckIterations);
+            true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             initAnalysePage().openInsight(INSIGHT_TEST_EXPORT_AND_IMPORT_PROJECT).waitForReportComputing()
                 .getPivotTableReport();
 
