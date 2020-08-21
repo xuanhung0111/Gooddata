@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -7,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.time.LocalTime;
 
+import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.utils.http.RestClient;
 import org.testng.SkipException;
 import org.testng.annotations.DataProvider;
@@ -54,8 +56,9 @@ public class SanityTest extends AbstractProcessTest {
     public void redeployProcessWithDifferentPackage() {
         String processName = generateProcessName();
 
-        initDiscProjectDetailPage()
-                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
+        ProjectDetailPage projectDetailPage =initDiscProjectDetailPage();
+        sleepTightInSeconds(12);
+        projectDetailPage.deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
         assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
 
         ProcessDetail process = projectDetailPage.getProcess(processName);
