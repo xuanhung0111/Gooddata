@@ -80,7 +80,7 @@ public class DynamicImageTest extends AbstractProjectTest {
 
             //image's height is much smaller than cell's, so graphene probably missclick.
             //click on img element to drill instead
-            reportPage.getTableReport().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            reportPage.getTableReport().waitForLoaded().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             reportPage.waitForReportExecutionProgress();
             takeScreenshot(browser, "drill-on-an-image", getClass());
 

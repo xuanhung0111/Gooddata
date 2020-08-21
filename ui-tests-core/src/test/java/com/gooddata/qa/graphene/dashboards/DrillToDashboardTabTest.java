@@ -198,7 +198,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             }
 
             // att to drill to is CompuSci
-            reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
+            reportOnSourceTab.waitForLoaded().drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
 
             final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
