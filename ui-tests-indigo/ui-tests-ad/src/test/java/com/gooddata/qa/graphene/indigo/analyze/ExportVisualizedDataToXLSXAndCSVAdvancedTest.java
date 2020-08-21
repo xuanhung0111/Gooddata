@@ -365,12 +365,11 @@ public class ExportVisualizedDataToXLSXAndCSVAdvancedTest extends AbstractAnalys
 
     @Test(dependsOnMethods = {"exportTableContainTotalValueIntoXLSX"})
     public void testExportAndImportProjectWithInsight() throws IOException {
-        final int statusPollingCheckIterations = 60; // (60*5s)
         String exportToken = exportProject(
-            true, true, true, statusPollingCheckIterations);
+            true, true, true, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
-            importProject(exportToken, statusPollingCheckIterations);
+            importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             initAnalysePage().openInsight(INSIGHT_HAS_TOTAL_VALUE).waitForReportComputing()
                 .exportTo(OptionalExportMenu.File.XLSX);
             ExportXLSXDialog.getInstance(browser).confirmExport();
