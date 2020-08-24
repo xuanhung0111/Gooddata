@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog.Permiss
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -104,8 +105,11 @@ public class CreatedReportDialog extends AbstractFragment {
         //There is an element ".scrollableArea-shadow" overlap object which will be clicked
         //so that it is clicked at top-central instead of central.
         ElementUtils.scrollElementIntoView(infoEditorPermission, browser);
-        getActions().moveToElement(waitForElementVisible(infoEditorPermission)
-                .findElement(cssSelector("a:not(.inlineBubbleHelp)")), 0, 1).click().perform();
+        //Due to over element by shadow
+        String javaScript = "var obj = document.getElementsByClassName('scrollableArea-shadow')[0];" +
+                "obj.remove();";
+        ((JavascriptExecutor)browser).executeScript(javaScript);
+        waitForElementVisible(infoEditorPermission).findElement(cssSelector("a:not(.inlineBubbleHelp)")).click();
         return waitForElementVisible(className("lockedAncestors-list"), browser)
                 .findElements(className("lockedAncestor-link"))
                 .stream().map(WebElement::getText).collect(Collectors.toList());
