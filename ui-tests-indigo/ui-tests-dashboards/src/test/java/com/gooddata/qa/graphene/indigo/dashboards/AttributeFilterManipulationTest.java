@@ -117,7 +117,7 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
             indigoDashboardsPage.switchToEditMode().waitForWidgetsLoading();
             takeScreenshot(browser, "updateValuesOnEditModeAfterMakingChangeOnViewMode", getClass());
             assertEquals(panel.getAttributeFilter(ATTR_STAGE_NAME).getSelectedItems(),
-                    "Risk Assessment, Short List", "The filter value is not correct after switching to edit mode");
+                    "Short List, Risk Assessment", "The filter value is not correct after switching to edit mode");
             assertEquals(
                     indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                     "$8,218,356.06", "The kpi value is not correct after switching to edit mode");
@@ -170,12 +170,11 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
 
         List<String> attributeElements = new ArrayList<>();
 
+        //Attribute sorting
         attributeElements.add(attributeFilterSourceConsulting);
+        attributeElements.add(attributeFilterAgileThought);
         attributeElements.add(attributeFilterVideo);
         attributeElements.add(attributeFilterShoppingCart);
-        attributeElements.add(attributeFilterAgileThought);
-
-        Collections.sort(attributeElements);
 
         assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), join(", ",
                 attributeElements));
