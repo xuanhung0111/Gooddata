@@ -18,6 +18,12 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "gd-actions-menu-section")
     private WebElement btnActionMenu;
 
+    @FindBy(css = ".gdc-ldm-switch-button .right-button")
+    private WebElement tableViewButton;
+
+    @FindBy(css = ".gdc-ldm-switch-button .left-button")
+    private WebElement modelButton;
+
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
     }
@@ -26,8 +32,17 @@ public class ToolBar extends AbstractFragment {
         btnPublishOnToolbar.click();
     }
 
+    public void switchToTableView() {
+        tableViewButton.click();
+    }
+
+    public void switchToModel() {
+        modelButton.click();
+    }
+
     public OutputStage openOutputStagePopUp() {
         btnActionMenu.click();
         return OverlayWrapper.getInstance(browser).openOutputStage();
     }
+
 }
