@@ -121,7 +121,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         uploadDialog.pickCsvFile(csv.getFilePath());
         ErrorContent error = uploadDialog.importInvalidCSV();
         assertEquals(error.getErrorMessage(), errorMessage);
-        assertEquals(error.getErrorTitle(), "Generating model failed");
+        assertEquals(error.getErrorTitle(), "Model generation failed");
         error.cancel();
     }
 
