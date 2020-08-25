@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage.AttributeLa
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -172,13 +173,10 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
         AttributeDetailPage attributeDetailPage = initAttributePage().initAttribute(ATTR_IS_WON);
         assertEquals(attributeDetailPage.getLabelSectionInfo(), LABEL_SECTION_INFO);
 
-        String tooltip = attributeDetailPage.getLabelTypeTooltip();
+        Pair<String, String> tooltip = attributeDetailPage.getLabelTypeTooltip();
         takeScreenshot(browser, "Attribute-label-type-tooltip-shows", getClass());
-        assertEquals(tooltip, LABEL_TYPE_TOOLTIP);
-
-        String link = attributeDetailPage.getLabelTypeInfoLink();
-        takeScreenshot(browser, "More-info-link-shows", getClass());
-        assertEquals(link, MORE_INFO_LINK); // English language is used by default
+        assertEquals(tooltip.getKey(), LABEL_TYPE_TOOLTIP);
+        assertEquals(tooltip.getValue(), MORE_INFO_LINK); // English language is used by default
     }
 
     @DataProvider(name = "filterSelectionTypeProvider")

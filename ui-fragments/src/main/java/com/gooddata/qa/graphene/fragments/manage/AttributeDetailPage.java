@@ -7,13 +7,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.BY_BUBBLE_CONTENT;
-import static com.gooddata.qa.graphene.utils.ElementUtils.makeSureNoPopupVisible;
 import static java.util.Objects.isNull;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.Collection;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -149,15 +150,9 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
         return waitForElementVisible(labelSectionInfo).getText();
     }
 
-    public String getLabelTypeTooltip() {
-        return getTooltipFromElement(waitForElementVisible(labelTypeHelpIcon), browser);
-    }
-
-    public String getLabelTypeInfoLink() {
-        makeSureNoPopupVisible();
-        getActions().moveToElement(waitForElementVisible(labelTypeHelpIcon)).perform();
-
-        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).findElement(BY_LINK).getAttribute("href");
+    public Pair<String, String> getLabelTypeTooltip() {
+        return Pair.of(getTooltipFromElement(waitForElementVisible(labelTypeHelpIcon), browser),
+                waitForElementVisible(BY_BUBBLE_CONTENT, browser).findElement(BY_LINK).getAttribute("href"));
     }
 
     public AttributeDetailPage waitForCreatingComputedAttribute() {
