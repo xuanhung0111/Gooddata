@@ -55,6 +55,7 @@ public class VisualizationsTest extends AbstractDashboardTest {
                 .clickDeleteButton();
 
         indigoDashboardsPage
+                .waitForSaveButtonEnabled()
                 .leaveEditMode();
 
         visualizationsCount = indigoDashboardsPage.getInsightsCount();
@@ -83,6 +84,7 @@ public class VisualizationsTest extends AbstractDashboardTest {
                 .clickDeleteButton();
 
         indigoDashboardsPage
+                .waitForSaveButtonEnabled()
                 .leaveEditMode();
 
         visualizationsCount = indigoDashboardsPage.getInsightsCount();
