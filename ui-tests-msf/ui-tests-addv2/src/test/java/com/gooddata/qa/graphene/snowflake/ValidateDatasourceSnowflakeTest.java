@@ -88,7 +88,6 @@ public class ValidateDatasourceSnowflakeTest extends AbstractADDProcessTest {
         dialog.clickValidateButton();
         assertEquals(dialog.getSuccessMessage(), "Connection validation succeeded.");
         dialog.clickConfirmButton();
-        dialog = DataSourceDialog.getInstance(browser);
         assertEquals(deploySDDProcessDialog.getSelectedDataSourceName(), DATASOURCE_NAME);
     }
 
@@ -116,7 +115,6 @@ public class ValidateDatasourceSnowflakeTest extends AbstractADDProcessTest {
         dialog.clickValidateButton();
         assertEquals(dialog.getSuccessMessage(), "Connection validation succeeded.");
         dialog.clickConfirmButton();
-        dialog = DataSourceDialog.getInstance(browser);
         assertEquals(deploySDDProcessDialog.getSelectedDataSourceName(), DATASOURCE_NAME_CHANGED);
         dialog = deployForm.editDatasource();
         assertEquals(dialog.getTextDataSourceName(),DATASOURCE_NAME_CHANGED);
