@@ -2,55 +2,61 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
-import com.gooddata.qa.graphene.entity.report.Attribute;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.enums.indigo.*;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FilterBarPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.manage.AttributePage;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
-
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
 
 public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST_SWITCHING = "Switching Insight";
+    private static final String INSIGHT_TEST_COMBINING = "Combining Insight";
     private ProjectRestRequest projectRestRequest;
     private IndigoRestRequest indigoRestRequest;
 
@@ -492,6 +498,37 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertEquals(filtersBucket.getFiltersCount(), 1);
         analysisPage.clear();
         assertFalse(analysisPage.isFilterBarButtonEnabled(), "Filter button should be disabled with tooltip");
+    }
+
+    @Test(dependsOnGroups = {"createProject"},
+        description = "BB-2032 AD show blank when open filter bar dropdown and combine Clear, undo button")
+    public void testCombiningOpenFilterBarAndClearButton() throws NoSuchFieldException{
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(INSIGHT_TEST_COMBINING, ReportType.COLUMN_CHART)
+                .setMeasureBucket(asList(MeasureBucket
+                        .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_STAGE_NAME),
+                        CategoryBucket.Type.STACK))));
+
+        initAnalysePage().openInsight(INSIGHT_TEST_COMBINING).waitForReportComputing().openFilterBarPicker();
+        analysisPage.resetToBlankState();
+
+        assertTrue(ElementUtils.isElementVisible(className(AnalysisPage.MAIN_CLASS), browser), "AD should not show blank");
+
+        initAnalysePage().openInsight(INSIGHT_TEST_COMBINING).addDateFilter().waitForReportComputing();
+        FiltersBucket filterBucket = analysisPage.getFilterBuckets();
+        DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
+            .openCompareApplyMeasures().selectAllValues().apply();
+        dateFilterPickerPanel.apply();
+        analysisPage.openFilterBarPicker();
+        analysisPage.resetToBlankState();
+
+        assertTrue(ElementUtils.isElementVisible(className(AnalysisPage.MAIN_CLASS), browser), "AD should not show blank");
     }
 
     private String createComputedAttributeUsing(String attributeTitle) {
