@@ -11,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
@@ -19,6 +20,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.openqa.selenium.By.className;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 
 public class ConfigurationPanelBucket extends AbstractBucket {
@@ -32,6 +34,15 @@ public class ConfigurationPanelBucket extends AbstractBucket {
     @FindBy(className = "s-config-section-colors_section")
     private ItemConfiguration itemColorsSection;
 
+    @FindBy(className = "s-config-section-legend_section")
+    private ItemConfiguration itemLegendSection;
+
+    @FindBy(className = "s-config-section-map_section")
+    private ItemConfiguration itemMapSection;
+
+    @FindBy(className = "s-config-section-points_section")
+    private ItemConfiguration itemPointSection;
+
     public ItemConfiguration getItemConfiguration(final String item) {
         return waitForCollectionIsNotEmpty(itemsConfiguration).stream()
                 .filter(input -> item.equals(input.getHeader()))
@@ -43,6 +54,17 @@ public class ConfigurationPanelBucket extends AbstractBucket {
         return waitForFragmentVisible(itemColorsSection).expandConfiguration();
     }
 
+    public ItemConfiguration openLegendConfiguration() {
+        return waitForFragmentVisible(itemLegendSection).expandConfiguration();
+    }
+
+    public ItemConfiguration openMapConfiguration() {
+        return waitForFragmentVisible(itemMapSection).expandConfiguration();
+    }
+
+    public ItemConfiguration openPointsConfiguration() {
+        return waitForFragmentVisible(itemPointSection).expandConfiguration();
+    }
     public String getPropertiesUnsupported() {
         return waitForElementVisible(propertiesUnsupported).getText();
     }
@@ -110,6 +132,9 @@ public class ConfigurationPanelBucket extends AbstractBucket {
         @FindBy(className = "icon-navigatedown")
         private WebElement navigateDownIcon;
 
+        @FindBy(css = ".input-checkbox-label input")
+        private WebElement groupPointItem;
+
         public boolean isResetButtonVisibled() {
             return isElementVisible(getRoot().findElement(className("s-reset_colors")));
         }
@@ -132,8 +157,20 @@ public class ConfigurationPanelBucket extends AbstractBucket {
             return list.size() > 0;
         }
 
-        private boolean isToggleTurnOn() {
+        public boolean isPointsGroupChecked() {
+            return waitForElementPresent(groupPointItem).isSelected();
+        }
+
+        public boolean isPointsGroupDisabled() {
+            return isElementDisabled(waitForElementPresent(groupPointItem));
+        }
+
+        public boolean isToggleTurnOn() {
             return waitForElementPresent(switchToggle).isSelected();
+        }
+
+        public  boolean isToggleDisabled() {
+            return isElementDisabled(waitForElementPresent(switchToggle));
         }
 
         public String getResetButtonText() {
@@ -201,6 +238,35 @@ public class ConfigurationPanelBucket extends AbstractBucket {
             waitForElementVisible(className("icon-navigatedown"), getRoot()).click();
             return Graphene.createPageFragment(CanvasSelect.class,
                 waitForElementVisible(BY_CANVAS_SELECT, browser));
+        }
+
+        public ConfigurationDialog openItemsSelectedInConfiguration() {
+            waitForElementVisible(className("icon-navigatedown"), getRoot()).click();
+            return ConfigurationDialog.getInstance(browser);
+        }
+
+        public ConfigurationDialog openPointsSizeSelected(int index) {
+            // Index = 0 -> get smallest point
+            // Index = 1 -> get largest point
+            getRoot().findElements(By.className("adi-bucket-inputfield")).get(index).click();
+            return ConfigurationDialog.getInstance(browser);
+        }
+        
+        public ItemConfiguration collapseItemsSelected() {
+            waitForElementVisible(className("icon-navigateup"), getRoot()).click();
+            return this;
+        }
+
+        public String getDefaultValueInDropDownList() {
+            return waitForElementVisible(className("dropdown-button"), getRoot()).getText();
+        }
+
+        public String getDefaultSmallestSize() {
+            return getRoot().findElements(By.className("adi-bucket-inputfield")).get(0).getText();
+        }
+
+        public String getDefaultLargestSize() {
+            return getRoot().findElements(By.className("adi-bucket-inputfield")).get(1).getText();
         }
 
         private void clickItemHeader() {

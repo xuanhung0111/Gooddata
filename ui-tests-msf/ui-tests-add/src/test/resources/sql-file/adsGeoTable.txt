@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS geopushpin;
+CREATE TABLE geopushpin(a__country varchar(512), a__city varchar(512), a__district varchar(512), a__state varchar(512), f__population NUMERIC(12,2), l__city__latlong varchar(512), l__district__id varchar(512), l__state__code varchar(512));
+
+COPY geopushpin(a__country, a__city, a__district, a__state, f__population, l__city__latlong, l__district__id, l__state__code) FROM LOCAL '${DATA_SOURCE_DIR}/geopushpin.csv' DELIMITER ',';

@@ -89,6 +89,7 @@ import com.gooddata.qa.graphene.indigo.analyze.ADFilterInsightValueTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
+import com.gooddata.qa.graphene.indigo.analyze.RenderSpecialCaseGeoPushpinTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -122,7 +123,8 @@ public class UITestsRegistry {
             DateFilterADMeasureTest.class,
             ApplyColorPaletteOnAnalyzePageTest.class,
             ColorPalettePickerBasicInsightAndKPITest.class,
-            ADFilterBarFlowTest.class
+            ADFilterBarFlowTest.class,
+            RenderSpecialCaseGeoPushpinTest.class
         });
 
         suites.put("all", new Object[] {

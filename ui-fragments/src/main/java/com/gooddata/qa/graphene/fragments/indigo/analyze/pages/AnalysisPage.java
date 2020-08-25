@@ -8,7 +8,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CatalogPanel;
@@ -21,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Configu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FilterBarPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel;
+import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -49,6 +49,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForIndigoMessageDisappear;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
@@ -106,12 +107,26 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-filter-bar-button")
     private WebElement filterBarButton;
 
+    @FindBy(className = "s-bucket-title")
+    private List<WebElement> listAttributeBucketTitle;
+
+    @FindBy(className = "s-bucket-location")
+    private AttributesBucket locationBucket;
+
+    @FindBy(className = "s-bucket-size")
+    private AttributesBucket measureSizeBucket;
+
+    @FindBy(className = "s-bucket-color")
+    private AttributesBucket measureColorBucket;
+
+    @FindBy(className = "adi-bucket-invitation-inner")
+    private List<WebElement> bucketInvitationList;
+
     public static final String MAIN_CLASS = "adi-editor";
-
     private static final By BY_TRASH_PANEL = className("s-trash");
-
     private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
     private static final String MEASURES_BUCKET_CLASS_NAME = "s-bucket-measures";
+    private static final By BY_ATTR_BUCKET_HEADER = className("adi-bucket-item-header");
 
     public static AnalysisPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(AnalysisPage.class,
@@ -232,6 +247,36 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage addAttribute(String attribute) {
         WebElement target = getAttributesBucket().getInvitation();
         return addAttribute(target, attribute);
+    }
+
+    public AnalysisPage addMetricToTertiaryBucket(String data, FieldType type) {
+        WebElement target = getMetricsTertiaryBucket().getInvitation();
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        return drag(source, target);
+    }
+
+    public AnalysisPage addAttributeToLocationPushpin(String data, FieldType type) {
+        WebElement target = getLocationBucket().getInvitation();
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        return drag(source, target);
+    }
+
+    public AnalysisPage addAttributeToMeasureSize(String data, FieldType type) {
+        WebElement target = getMeasureSizeBucket().getInvitation();
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        return drag(source, target);
+    }
+
+    public AnalysisPage addAttributeToMeasureColor(String data, FieldType type) {
+        WebElement target = getMeasureColorBucket().getInvitation();
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        return drag(source, target);
+    }
+
+    public AnalysisPage tryToDragAttributeToLocationPushpin(String data, FieldType type) {
+        WebElement source = getCatalogPanel().searchAndGet(data, type);
+        dragAndDropWithCustomBackend(browser, source, getMeasureColorBucket().getRoot());
+        return this;
     }
 
     public AnalysisPage addColumnsAttribute(String attribute) {
@@ -372,7 +417,27 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage removeColumn(String attr) {
-        return drag(getAttributesColumnsBucket().get(attr).findElement(By.className("adi-bucket-item-header")),
+        return drag(getAttributesColumnsBucket().get(attr).findElement(BY_ATTR_BUCKET_HEADER),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeGeoPushpin(String attr) {
+        return drag(getLocationBucket().get(attr).findElement(BY_ATTR_BUCKET_HEADER),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeMetricsSecondaryBucket(String attr) {
+        return drag(getMetricsSecondaryBucket().get(attr).findElement(BY_ATTR_BUCKET_HEADER),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeMeasureSizeBucket(String attr) {
+        return drag(getMeasureSizeBucket().get(attr).findElement(BY_ATTR_BUCKET_HEADER),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeMeasureColorBucket(String attr) {
+        return drag(getMeasureColorBucket().get(attr).findElement(BY_ATTR_BUCKET_HEADER),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
@@ -480,6 +545,18 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(attributesBucket);
     }
 
+    public AttributesBucket getLocationBucket() {
+        return waitForFragmentVisible(locationBucket);
+    }
+
+    public AttributesBucket getMeasureSizeBucket() {
+        return waitForFragmentVisible(measureSizeBucket);
+    }
+
+    public AttributesBucket getMeasureColorBucket() {
+        return waitForFragmentVisible(measureColorBucket);
+    }
+
     //To use this function when applying the pivot table
     public AttributesBucket getAttributesColumnsBucket() {
         return waitForFragmentVisible(attributesColumnsBucket);
@@ -504,6 +581,16 @@ public class AnalysisPage extends AbstractFragment {
     public List<String> getListVisualization() {
         return waitForCollectionIsNotEmpty(visualization).stream()
                 .map(e -> e.getAttribute("class").replaceAll("\\s(.*)",""))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getListAttributeBucketTitle() {
+        return waitForCollectionIsNotEmpty(listAttributeBucketTitle).stream().map(e -> e.getText().toUpperCase())
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getListAttributeBucketInvitation() {
+        return waitForCollectionIsNotEmpty(bucketInvitationList).stream().map(e -> e.getText().toUpperCase())
                 .collect(Collectors.toList());
     }
 

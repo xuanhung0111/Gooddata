@@ -1,8 +1,12 @@
 package com.gooddata.qa.graphene.flow;
 
+import com.gooddata.qa.graphene.add.SqlDiffTest;
 import com.gooddata.qa.graphene.add.DataloadProcessTest;
 import com.gooddata.qa.graphene.add.DataloadResourcesPermissionTest;
-import com.gooddata.qa.graphene.add.SqlDiffTest;
+import com.gooddata.qa.graphene.add.ConfigurationOnGeoPushpinTest;
+import com.gooddata.qa.graphene.add.OnDashboardGeoPushpinTest;
+import com.gooddata.qa.graphene.add.RenderGeoPushpinTest;
+import com.gooddata.qa.graphene.add.SwitchGeoChartToOtherChartGeoPushpinTest;
 import com.gooddata.qa.graphene.add.schedule.CreateScheduleTest;
 import com.gooddata.qa.graphene.add.schedule.execution.dialog.LoadDatasetWithoutTSColumnTest;
 import com.gooddata.qa.graphene.add.schedule.IncrementalLoadTest;
@@ -33,6 +37,10 @@ public class UITestsRegistry {
             DefaultLoadTest.class,
             ForceIncrementalLoadTest.class,
             PresenceOfTimestampColumnTest.class,
+            ConfigurationOnGeoPushpinTest.class,
+            OnDashboardGeoPushpinTest.class,
+            RenderGeoPushpinTest.class,
+            SwitchGeoChartToOtherChartGeoPushpinTest.class,
             "testng-imap-notification.xml"
         });
 
