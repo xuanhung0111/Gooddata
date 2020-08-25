@@ -24,12 +24,8 @@ public class CleanUpDatasourceTest extends AbstractUITest {
     private RestClient restClient;
 
     @Test
-    protected void signIn() throws JSONException {
-        signIn(true, UserRoles.ADMIN);
-    }
-
-    @Test (dependsOnMethods = "signIn")
     public void cleanUpOldDatasource() throws SQLException, IOException {
+        signIn(true, UserRoles.ADMIN);
         restClient = new RestClient(getProfile(ADMIN));
         databaseRetentionDays = testParams.getDatabaseRetentionDays();
         dataSourceRestRequest = new DataSourceRestRequest(restClient, null);
