@@ -30,6 +30,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertEquals;
@@ -101,7 +103,12 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private void loginIsolatedSalesForceDomain() throws IOException, MessagingException {
         browser.get("https://" + testParams.getHost());
-        LoginFragment.getInstance(browser).clickUseLoginOrganisation();
+        LoginFragment loginFragment = LoginFragment.getInstance(browser);
+
+        assertEquals(loginFragment.getTextUseOrganisationLoginButton(), "Use organization login");
+        assertThat(loginFragment.getTextLoginWithIsolatedStagingAccount(), containsString("Isolated1 (staging"));
+
+        loginFragment.clickUseLoginOrganisation();
 
         waitForElementPresent(By.id("username"), browser).sendKeys(testParams.getUser());
         waitForElementPresent(By.id("password"), browser).sendKeys(testParams.getPassword());

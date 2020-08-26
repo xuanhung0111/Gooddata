@@ -3,7 +3,10 @@ package com.gooddata.qa.graphene.fragments.login;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+
 import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -70,6 +73,14 @@ public class LoginFragment extends AbstractFragment {
 
     public void clickUseLoginOrganisation() {
         waitForElementVisible(useOrganisationLoginButton).click();
+    }
+
+    public String getTextUseOrganisationLoginButton() {
+        return waitForElementVisible(useOrganisationLoginButton).getText();
+    }
+
+    public String getTextLoginWithIsolatedStagingAccount() {
+        return waitForElementVisible(cssSelector("button[class*='s-btn-login_with_your_isolated1']"), browser).getText();
     }
 
     public boolean allLoginElementsAvailable() {
