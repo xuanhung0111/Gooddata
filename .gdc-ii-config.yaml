@@ -91,7 +91,7 @@ integratedTests:
       -DfirefoxDriverBinaryPath=/bin/geckodriver
       -pl ui-tests-msf/ui-tests-modeler
       -Dtest.module=ui-tests-msf/ui-tests-modeler
-      -Dtestng.suite.xml=testng-msf-web-modeler.xml
+      -Dtestng.suite.xml=testng-msf-web-modeler-ii.xml
       -DbigqueryClientEmail=gdc-bigquery-pipe@gdc-us-dev.iam.gserviceaccount.com
       -DbigqueryPrivateKey="$BIGQUERY_PRIVATE_KEY"
       -DsnowflakePassword="$SNOWFLAKE_PASSWORD"
