@@ -22,6 +22,7 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
     private List<String> tabs = asList("Outlook", "What's Changed", "Waterfall Analysis",
         "Leaderboards", "Activities", "Sales Velocity", "Quarterly Trends", "Seasonality", "");
     private String selectedTab = "Outlook";
+    private static final String STAGING9 = "staging9.intgdc.com";
     private static final String STAGING3 = "staging3.intgdc.com";
     private static final String STAGING2 = "staging2.intgdc.com";
     private static final String STAGING = "staging.intgdc.com";
@@ -37,6 +38,11 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "createProject")
     public void initPublicDashboard() {
         switch(testParams.getHost()) {
+            case STAGING9:
+                publicDashboardUri = "https://staging9.intgdc.com/dashboard.html#project=" +
+                        "/gdc/projects/rhejp0v1zsw296susurogl5jw4rmk1aw&dashboard=/gdc/md/rhejp0v1zsw296susurogl5jw4rmk1aw/obj/916" +
+                        "&tab=adzD7xEmdhTx&publicAccessCode=WaxYJA_0XnO7Z3cmpCxwWndhEe0U-AAAAAqiRnFeCXUDrdtd09WC3hTbKuwI";
+                return;
             case STAGING3:
                 publicDashboardUri = "https://staging3.intgdc.com/dashboard.html#project=" +
                     "/gdc/projects/lkyocr2gnh6mcnet55rgea1izt1nvena&dashboard=/gdc/md/lkyocr2gnh6mcnet55rgea1izt1nvena/obj/916" +
