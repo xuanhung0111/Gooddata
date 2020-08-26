@@ -20,6 +20,16 @@
             <class name="com.gooddata.qa.graphene.modeler.ValidateImportCSVTest" />
         </classes>
     </test>
+    <test name="E2ECustomMappingTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.E2ECustomMappingTest" />
+        </classes>
+    </test>
+    <test name="E2EAutoMappingTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.E2EAutoMappingTest" />
+        </classes>
+    </test>
     <test name="DialogModelingTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.DialogModelingTest" />

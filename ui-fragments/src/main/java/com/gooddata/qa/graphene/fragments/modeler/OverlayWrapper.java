@@ -5,6 +5,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
@@ -19,6 +21,9 @@ public class OverlayWrapper extends AbstractFragment {
 
     @FindBy(css = ".overlay .indigo-table-dropdown-body")
     private IndigoTableDropDown indigoTableDropDown;
+
+    @FindBy(css = ".gdc-ldm-waiting-dialog .s-dialog-close-button")
+    private WebElement closeWaitingDialog;
 
     @FindBy(className = "dataset-change-primary-key-dialog")
     private ChangePrimaryKeyDialog changePrimaryKeyDialog;
@@ -53,7 +58,7 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(css = ".gd-message .s-message-text-header-value")
     private WebElement successMessage;
 
-    @FindBy(css = ".gd-message .gd-message-dismiss-container")
+    @FindBy(css = ".gd-message .gd-message-dismiss-container .icon-cross")
     private WebElement closeToastMessage;
 
     public static OverlayWrapper getInstance(SearchContext searchContext) {
@@ -75,7 +80,9 @@ public class OverlayWrapper extends AbstractFragment {
     }
 
     public void closePublishSuccess() {
-        closeToastMessage.click();
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(closeToastMessage).click().build().perform();
+        waitForElementNotVisible(closeToastMessage);
     }
 
     public static OverlayWrapper getInstanceByIndex(SearchContext searchContext, int index) {
@@ -97,6 +104,11 @@ public class OverlayWrapper extends AbstractFragment {
     public WaitingDialog getWaitingDialog() {
         waitForFragmentVisible(waitingDialog);
         return waitingDialog;
+    }
+
+    public void waittingDialog() {
+        waitForFragmentVisible(waitingDialog);
+        waitingDialog.waitForLoading();
     }
 
     public PreviewCSVDialog getPreviewCSVDialog() {
@@ -132,6 +144,11 @@ public class OverlayWrapper extends AbstractFragment {
     public OutputStage openOutputStage() {
         waitForElementVisible(dropDownOutputStage).click();
         return outputStage;
+    }
+
+    public OverlayWrapper closeWaitingDialog() {
+        waitForElementVisible(closeWaitingDialog).click();
+        return this;
     }
 
     public void selectOption(String option) {
