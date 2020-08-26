@@ -15,9 +15,9 @@
             <class name="com.gooddata.qa.graphene.modeler.OutputStageRecommendTableTest" />
         </classes>
     </test>
-<!--    <test name="ValidateImportCSVTest" enabled="true">-->
-<!--        <classes>-->
-<!--            <class name="com.gooddata.qa.graphene.modeler.ValidateImportCSVTest" />-->
-<!--        </classes>-->
-<!--    </test>-->
+    <test name="ValidateImportCSVTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ValidateImportCSVTest" />
+        </classes>
+    </test>
 </suite>
