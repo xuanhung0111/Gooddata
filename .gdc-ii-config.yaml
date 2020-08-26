@@ -22,12 +22,21 @@ microservices:
     docker:
       dockerfile: './Dockerfile_firefox'
       customTags:
-        - '69.0-0.25.0-2.3.8'
+        - '80.0-0.27.0-2.3.8'
         - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:
       paths:
       - 'Dockerfile_firefox'
+    tests:
+      isolated:
+        dockerComposePath: './docker-compose-firefox-acceptance-test.yaml'
+        artifacts:
+          - '**/target/screenshots/**'
+          - '**/target/downloads/**'
+          - '**/target/media/video/**/**_failed.mp4'
+        junitArtifacts:
+          - '**/target/surefire-reports/*.xml'
   graphene-chrome-uisdk:
     docker:
       dockerfile: './Dockerfile_chrome_uisdk'

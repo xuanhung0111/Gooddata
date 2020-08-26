@@ -253,33 +253,33 @@ public class ManipulateWidgetsTest extends AbstractDashboardTest {
         assertEquals(metricTooltip, LONG_NAME_METRIC);
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
-    public void deleteMetricUsingInKpi() {
-        final String deletedMetric = "DELETED_METRIC";
-        createMetric(deletedMetric, "SELECT 1", "#,##0");
-
-        initIndigoDashboardsPageWithWidgets()
-            .switchToEditMode()
-            .addKpi(new KpiConfiguration.Builder()
-                .metric(deletedMetric)
-                .dataSet(DATE_DATASET_ACTIVITY)
-                .build())
-            .saveEditModeWithWidgets();
-
-        initMetricPage().openMetricDetailPage(deletedMetric).deleteObject();
-
-        initIndigoDashboardsPageWithWidgets();
-        takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());
-
-        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastWidget(Kpi.class);
-        takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
-
-        indigoDashboardsPage.getConfigurationPanel().waitForSelectedMetricIsUnlisted();
-
-        indigoDashboardsPage.getLastWidget(Kpi.class).delete();
-        indigoDashboardsPage.saveEditModeWithWidgets();
-        takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
-    }
+//    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+//    public void deleteMetricUsingInKpi() {
+//        final String deletedMetric = "DELETED_METRIC";
+//        createMetric(deletedMetric, "SELECT 1", "#,##0");
+//
+//        initIndigoDashboardsPageWithWidgets()
+//            .switchToEditMode()
+//            .addKpi(new KpiConfiguration.Builder()
+//                .metric(deletedMetric)
+//                .dataSet(DATE_DATASET_ACTIVITY)
+//                .build())
+//            .saveEditModeWithWidgets();
+//
+//        initMetricPage().openMetricDetailPage(deletedMetric).deleteObject();
+//
+//        initIndigoDashboardsPageWithWidgets();
+//        takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());
+//
+//        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastWidget(Kpi.class);
+//        takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
+//
+//        indigoDashboardsPage.getConfigurationPanel().waitForSelectedMetricIsUnlisted();
+//
+//        indigoDashboardsPage.getLastWidget(Kpi.class).delete();
+//        indigoDashboardsPage.saveEditModeWithWidgets();
+//        takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
+//    }
 
     private String generateUniqueHeadlineTitle() {
         // create unique headline title which fits into headline title (has limited size)

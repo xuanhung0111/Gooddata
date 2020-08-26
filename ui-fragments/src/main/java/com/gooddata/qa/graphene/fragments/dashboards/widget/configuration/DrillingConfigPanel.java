@@ -1,20 +1,22 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Objects.isNull;
@@ -218,8 +220,9 @@ public class DrillingConfigPanel extends AbstractFragment {
             }
 
             panel.searchAndSelectItem(name).submitPanel();
-            waitForElementNotVisible(drillingSpinner);
-
+//            waitForElementNotVisible(drillingSpinner);
+            Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementVisible((By.className("spinnerDrilling")), browser);
+            Graphene.waitGui().until(itemsLoaded);
             return this;
         }
 

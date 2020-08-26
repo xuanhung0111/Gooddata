@@ -1,0 +1,33 @@
+# (C) 2020 GoodData Corporation
+version: "3.7"
+
+services:
+  acceptance-tests:
+    image: ${IMAGE_ID}
+    environment:
+      HOME: /graphene-tests
+    volumes:
+      - .:/graphene-tests
+      - $HOME/.m2:/tmp/.m2
+    working_dir: /graphene-tests
+    user: '$USER_UID:$USER_GID'
+    build:
+      context: .
+      shm_size: '8gb'
+    shm_size: '8gb'
+    command: |
+      sh -c '
+      ./integration-mvn-test.sh \
+      -DbrowserDownloadFolder=/graphene-tests/ui-tests-core \
+      -Dtest.execution.env=local-firefox \
+      -DfirefoxDriverBinaryPath=/bin/geckodriver \
+      -pl ui-tests-core,ui-tests-indigo/ui-tests-ad,ui-tests-indigo/ui-tests-dashboards \
+      -Dtestng.suite.xml=acceptance-tests.xml \
+      -Dhost=att-graphene.na.intgdc.com \
+      -Duser=bear@gooddata.com \
+      -Dpassword=jindrisska \
+      -Duser.domain=default \
+      -Dproject.authorizationToken=pgroup2 \
+      -Dproject.dwhDriver=pg \
+      -DdeleteMode=delete_if_successful \
+      -DuseDynamicUser=true \'

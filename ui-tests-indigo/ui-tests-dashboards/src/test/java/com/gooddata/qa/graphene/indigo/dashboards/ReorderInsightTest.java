@@ -72,7 +72,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToLastPosition() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
-        indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 1),
+        dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 1),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 2), DropZone.NEXT);
         checkInsightOrder(FIRST_INSIGHT, THIRD_INSIGHT, SECOND_INSIGHT, "Test-Moving-Insight-To-Last-Position");
     }
@@ -80,7 +80,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToMiddlePosition() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
-        indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
+        dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 1), DropZone.NEXT);
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Test-Moving-Insight-To-Middle-Position");
     }
@@ -88,7 +88,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, dependsOnGroups = {"reorder-test"})
     public void testInsightOrderAfterSaving() throws JSONException, IOException {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
-        indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
+        dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 1), DropZone.NEXT);
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Order-Before-Saving");
         indigoDashboardsPage.saveEditModeWithWidgets();
@@ -135,9 +135,14 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
         try {
             WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
-            ElementUtils.moveToElementActions(target, - target.getSize().height / 2 + 1, 1).perform();
-            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
-            driverActions.moveToElement(drop).perform();
+            if (dropSelector.contains(".prev")) {
+                ElementUtils.moveToElementActions(target, - target.getSize().height / 2 + 1, 1).perform();
+                WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+                driverActions.moveToElement(drop).perform();
+            } else {
+                driverActions.moveToElement(target).moveByOffset(1,1).perform();
+            }
+
         } finally {
             driverActions.release().perform();
         }
