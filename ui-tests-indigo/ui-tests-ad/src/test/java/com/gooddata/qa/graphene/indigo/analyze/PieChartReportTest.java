@@ -156,7 +156,11 @@ public class PieChartReportTest extends AbstractAnalyseTest {
 
         analysisPage.reorderMetric(METRIC_AMOUNT, METRIC_AVG_AMOUNT).waitForReportComputing();
         assertEquals(chartReport.checkColorColumn(0, 1), ColorPaletteRequestData.ColorPalette.CYAN.toString());
-        assertEquals(chartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.LIME_GREEN.toString());
+        if (BrowserUtils.isFirefox()) {
+            assertEquals(chartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.LIME_GREEN.toString());
+        } else {
+            assertEquals(chartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.CYAN_LIME_GREEN.toString());
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})

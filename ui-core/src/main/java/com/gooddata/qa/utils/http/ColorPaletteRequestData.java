@@ -89,6 +89,7 @@ public class ColorPaletteRequestData {
         CYAN(20, 178, 226),
         CYAN_DEVIANT(20, 177, 225),
         LIME_GREEN(0, 193, 141),
+        CYAN_LIME_GREEN(1, 194, 142),
         LIGHT_RED(255, 153, 153),
         BRIGHT_RED(229, 77, 66),
         PURE_ORANGE(241, 134, 0),
