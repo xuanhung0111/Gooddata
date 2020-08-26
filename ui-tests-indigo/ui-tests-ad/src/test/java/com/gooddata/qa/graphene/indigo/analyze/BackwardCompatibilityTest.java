@@ -16,6 +16,7 @@ import static org.testng.Assert.assertFalse;
 
 public class BackwardCompatibilityTest extends AbstractProjectTest {
 
+    private static final String STAGING9 = "staging9.intgdc.com";
     private static final String STAGING3 = "staging3.intgdc.com";
     private static final String STAGING2 = "staging2.intgdc.com";
     private static final String STAGING = "staging.intgdc.com";
@@ -26,6 +27,9 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
         log.info("these tests are meaningful when performing testing on created project");
         testParams.setReuseProject(true);
         switch(testParams.getHost()) {
+            case STAGING9:
+                testParams.setProjectId("xady0iep0rjeai11ggkqmt3tgb3hk6y0");
+                return;
             case STAGING3:
                 testParams.setProjectId("kf8tobvrdszda3xocsptnjdjf7xxyexs");
                 return;
@@ -72,7 +76,7 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
     }
 
     private boolean isOnStagingCluster() {
-        if (testParams.getHost().equals(STAGING3) || testParams.getHost().equals(STAGING2) ||
+        if (testParams.getHost().equals(STAGING9) || testParams.getHost().equals(STAGING3) || testParams.getHost().equals(STAGING2) ||
                 testParams.getHost().equals(STAGING)) {
             return true;
         }
