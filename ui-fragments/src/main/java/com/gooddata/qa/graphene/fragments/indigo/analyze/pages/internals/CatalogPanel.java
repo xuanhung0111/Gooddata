@@ -36,7 +36,7 @@ public class CatalogPanel extends AbstractFragment {
     @FindBy(className = "s-catalog-item")
     private List<WebElement> items;
 
-    @FindBy(className = "s-catalogue-loaded")
+    @FindBy(className = CATALOG_LOADED_CLASS_NAME)
     private WebElement catalogLoaded;
 
     @FindBy(className = "s-filter-all")
@@ -56,6 +56,9 @@ public class CatalogPanel extends AbstractFragment {
 
     @FindBy(className = "s-no-objects-found")
     private WebElement noObjectsFound;
+
+    public static final By BY_LOADING_ICON = By.cssSelector(".gd-spinner.small");
+    public static final String CATALOG_LOADED_CLASS_NAME = "s-catalogue-loaded";
 
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
     private static final By BY_NO_ITEMS = By.className("adi-no-items");
@@ -251,8 +254,7 @@ public class CatalogPanel extends AbstractFragment {
     }
 
     public CatalogPanel waitForItemLoaded() {
-        Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
-                browser);
+        Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent((BY_LOADING_ICON), browser);
         waitForElementVisible(catalogLoaded);
         Graphene.waitGui().until(itemsLoaded);
         return this;

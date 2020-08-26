@@ -24,17 +24,19 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.TimeoutException;
 
 import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.AD_CATALOG_GROUPING;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_HISTORY;
@@ -43,16 +45,23 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_BOP;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -78,6 +87,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
     private final String PAYROLL_DATASET = "Payroll";
     private final String VALUE_BY_TAG_NAMING_CONVENTION = "ByTagNamingConvention";
     private final String VALUE_BY_FOLDERS = "ByFolders";
+    private final String DISABLED = "Disabled";
     private DashboardRestRequest dashboardRequest;
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
@@ -438,6 +448,40 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         takeScreenshot(browser, "Include-Objects-With-Tags", getClass());
         cataloguePanel.expandCatalogGroupLabels("SecondFolder").expandCatalogGroupLabels("ThirdFolder");
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(METRIC_AMOUNT_BOP, METRIC_AVG_AMOUNT));
+    }
+
+    @Test(dependsOnMethods = {"combineFilterByTagsByFolder"})
+    public void testDoesNotDisplayLoadingIconWhenSomeActions() throws IOException{
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), VALUE_BY_FOLDERS);
+
+        final CatalogPanel catalogPanel = initAnalysePage().changeReportType(ReportType.COLUMN_CHART).getCatalogPanel();
+
+        catalogPanel.expandCatalogGroupLabels(TAG_NAME_UNGROUPED);
+        assertFalse(isElementVisible(CatalogPanel.BY_LOADING_ICON, browser), "Should not display loading icon");
+
+        catalogPanel.expandCatalogGroupLabels("SecondFolder");
+        assertFalse(isElementVisible(CatalogPanel.BY_LOADING_ICON, browser), "Should not display loading icon");
+
+        analysisPage.addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT).waitForReportComputing();
+        assertFalse(isElementVisible(CatalogPanel.BY_LOADING_ICON, browser), "Should not display loading icon");
+    }
+
+    @Test(dependsOnMethods = {"testDoesNotDisplayLoadingIconWhenSomeActions"})
+    public void testSomeActionsOnPageWithADCatalogGroupingIsDisabled() throws IOException{
+        projectRestRequest.updateProjectConfiguration(AD_CATALOG_GROUPING.getFlagName(), DISABLED);
+        initAnalysePage();
+        WebElement catalogLoaded = waitForElementVisible(className(CatalogPanel.CATALOG_LOADED_CLASS_NAME), browser);
+        analysisPage.addMetric(METRIC_AMOUNT);
+        assertFalse(isCatalogReloaded(catalogLoaded), "Catalog should be not re-loaded");
+    }
+
+    private boolean isCatalogReloaded(WebElement catalogLoaded) {
+        try {
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(ExpectedConditions.stalenessOf(catalogLoaded));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     private String getEmbeddedAdUrl() {
