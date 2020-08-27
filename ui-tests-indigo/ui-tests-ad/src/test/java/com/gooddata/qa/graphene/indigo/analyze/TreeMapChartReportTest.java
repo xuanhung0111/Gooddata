@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -111,7 +112,6 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 asList(asList(ATTR_ACTIVITY_TYPE, "In Person Meeting"), asList("Department", "Direct Sales"),
                         asList(METRIC_NUMBER_OF_ACTIVITIES, "22,088")));
     }
-
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightHasSecondaryMetricAndAttributeOnSegment() {
         initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
@@ -119,10 +119,17 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(analysisPage.getAttributesBucket().getWarningMessage(), ReportType.TREE_MAP.getViewbyByMessage());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT));
-        assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Department", "Direct Sales"), asList("# of Activities", "101,054")));
-        assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
-                asList(asList("Department", "Direct Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        if (BrowserUtils.isFirefox()) {
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
+                    asList(asList("Department", "Direct Sales"), asList("# of Activities", "101,054")));
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
+                    asList(asList("Department", "Direct Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        } else {
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
+                    asList(asList("Department", "Inside Sales"), asList("# of Activities", "53,217")));
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
+                    asList(asList("Department", "Inside Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -132,10 +139,17 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(analysisPage.getAttributesBucket().getWarningMessage(), ReportType.TREE_MAP.getViewbyByMessage());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_OPP_FIRST_SNAPSHOT));
-        assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList("Department", "Direct Sales"), asList("# of Activities", "101,054")));
-        assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
-                asList(asList("Department", "Direct Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        if (BrowserUtils.isFirefox()) {
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
+                    asList(asList("Department", "Direct Sales"), asList("# of Activities", "101,054")));
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
+                    asList(asList("Department", "Direct Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        } else {
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 0),
+                    asList(asList("Department", "Inside Sales"), asList("# of Activities", "53,217")));
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0, 1),
+                    asList(asList("Department", "Inside Sales"), asList("_Opp. First Snapshot", "40,334.00")));
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})
