@@ -14,6 +14,7 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 
@@ -100,6 +101,11 @@ public class DataSourceDialog extends AbstractFragment {
     public DataSourceDialog clickConfirmButton() {
         waitForElementVisible(btnConfirm);
         btnConfirm.click();
+        return this;
+    }
+
+    public DataSourceDialog waitForDropDownProviderDisable() {
+        waitForElementNotVisible(dataSourceProviderButton);
         return this;
     }
 
