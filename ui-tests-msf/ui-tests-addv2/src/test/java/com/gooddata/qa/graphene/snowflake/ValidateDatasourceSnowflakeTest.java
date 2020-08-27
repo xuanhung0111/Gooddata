@@ -87,7 +87,7 @@ public class ValidateDatasourceSnowflakeTest extends AbstractADDProcessTest {
         dialog.addOutputStagePrefix(DATASOURCE_PREFIX);
         dialog.clickValidateButton();
         assertEquals(dialog.getSuccessMessage(), "Connection validation succeeded.");
-        dialog.clickConfirmButton();
+        dialog.clickConfirmButton().waitForDropDownProviderDisable();
         assertEquals(deploySDDProcessDialog.getSelectedDataSourceName(), DATASOURCE_NAME);
     }
 

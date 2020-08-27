@@ -129,7 +129,11 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
         waitForElementVisible(scrollbar).click();
         getActions().sendKeys(Keys.HOME).perform(); //Move to header list
         waitForPickerLoaded();
-        while (!isElementVisible(cssSelector(getListItemsCssSelector() + format("[title='%s']", item)), getPanelRoot())) {
+        long startTime = System.currentTimeMillis();
+        final int timeout = 90000;
+        final String selector = getListItemsCssSelector() + format("[title='%s']", item);
+        while (!isElementVisible(cssSelector(selector), getPanelRoot()) &&
+                (System.currentTimeMillis() - startTime) < timeout) {
             getActions().sendKeys(Keys.PAGE_DOWN).perform();
             waitForPickerLoaded();
         }
