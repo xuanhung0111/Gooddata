@@ -158,46 +158,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         dialog.clickCancelButton();
     }
 
-    @DataProvider(name = "validCSVProvider")
-    public Object[][] validCSVProvider() {
-        final CsvFile usingdateyy = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yy.csv"));
-
-        final CsvFile usingdateyyyy = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"));
-
-        final CsvFile usingnewformat = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/new.format.csv"));
-
-        final CsvFile usingpipe = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.pipe.csv"));
-
-        final CsvFile usingsemicolon = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.semicolon.csv"));
-
-        final CsvFile usingtab = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.tab.csv"));
-
-        return new Object[][]{
-                {usingdateyy, DATASET_USING_DATEYY},
-                {usingdateyyyy, DATASET_USING_DATEYYYY},
-                {usingnewformat, DATASET_USING_NEWFORMAT_DATE},
-                {usingpipe, DATASET_USING_PIPE},
-                {usingsemicolon, DATASET_USING_SEMICOLON},
-                {usingtab, DATASET_USING_TAB}
-        };
-    }
-
-    @Test(dependsOnMethods = "validateDrapDropCSVCasesShowPopUp", dataProvider = "validCSVProvider")
-    public void validateValidCSVFile(CsvFile csv, String datasetName) {
-        FileUploadDialog uploadDialog = sidebar.openCSVDialog();
-        uploadDialog.pickCsvFile(csv.getFilePath());
-        PreviewCSVDialog dialog = uploadDialog.importCSVShowPreview();
-        dialog.clickImportButton();
-        modeler.getLayout().waitForLoading();
-        isElementVisible(mainModelContent.getModel(datasetName).getRoot());
-    }
-
     @DataProvider(name = "errorTableViewProvider")
     public Object[][] errorTableViewProvider() {
         toolbar.switchToTableView();
@@ -215,7 +175,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         };
     }
 
-    @Test(dependsOnMethods = "validateValidCSVFile", dataProvider = "errorTableViewProvider")
+    @Test(dependsOnMethods = "validateDrapDropCSVCasesShowPopUp", dataProvider = "errorTableViewProvider")
     public void validateUploadCSVInTableView(String csvLink, String errorMessage) {
         CsvFile csv = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + csvLink));
