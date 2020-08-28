@@ -86,6 +86,8 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .expandConfiguration()
             .changeAggregation("Maximum");
 
+        analysisPage.waitForReportComputing();
+
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)

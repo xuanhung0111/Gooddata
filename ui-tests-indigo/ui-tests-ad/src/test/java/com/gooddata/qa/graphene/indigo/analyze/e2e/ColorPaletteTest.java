@@ -99,7 +99,9 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_non_stacked_charts() {
         List<String> expectedLegend = asList("# of Activities", "# of Lost Opps.");
-        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()
