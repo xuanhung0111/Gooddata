@@ -160,12 +160,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
 
     @DataProvider(name = "validCSVProvider")
     public Object[][] validCSVProvider() {
-        final CsvFile usingdateyy = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yy.csv"));
-
-        final CsvFile usingdateyyyy = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"));
-
         final CsvFile usingnewformat = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/new.format.csv"));
 
@@ -179,8 +173,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.tab.csv"));
 
         return new Object[][]{
-                {usingdateyy, DATASET_USING_DATEYY},
-                {usingdateyyyy, DATASET_USING_DATEYYYY},
                 {usingnewformat, DATASET_USING_NEWFORMAT_DATE},
                 {usingpipe, DATASET_USING_PIPE},
                 {usingsemicolon, DATASET_USING_SEMICOLON},
