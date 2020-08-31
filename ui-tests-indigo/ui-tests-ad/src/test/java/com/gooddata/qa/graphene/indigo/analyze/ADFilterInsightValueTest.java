@@ -55,6 +55,8 @@ import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.
     .LogicalOperator.LESS_THAN;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
     .LogicalOperator.EQUAL_TO;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel
+    .LogicalOperator.Range.BETWEEN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
@@ -65,6 +67,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_FORECAST_CATEGORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_EOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -583,6 +586,18 @@ public class ADFilterInsightValueTest extends AbstractAnalyseTest {
 
         log.info("PDF: " + contents);
         assertThat(contents, hasItems("HongDao –", "HongNga –", "HungCao –"));
+    }
+
+    @Test(dependsOnGroups = {"createProject"},
+        description = "BB-2071: Can't save insight when range value from > to")
+    public void addMeasureValueFilterWithBetweenOperator() {
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_AMOUNT, FieldType.FACT)
+            .addDate().waitForReportComputing().openFilterBarPicker().checkItem(METRIC_SUM_OF_AMOUNT, 1).apply();
+        analysisPage.getAttributesBucket().changeDateDimension(DATE_DATASET_CLOSED);
+        analysisPage.openMeasureFilterPanel(METRIC_SUM_OF_AMOUNT, 1)
+            .addMeasureValueFilter(BETWEEN, Pair.of(50000000, 0));
+        analysisPage.saveInsight("SAVED_INSIGHT").waitForReportComputing();
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("48,591,716.69", "777,735.40", "61,948.00"));
     }
 
     private void createCalculatedMeasure(

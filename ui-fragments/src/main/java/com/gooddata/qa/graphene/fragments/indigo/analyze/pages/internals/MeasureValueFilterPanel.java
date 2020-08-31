@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -25,6 +26,12 @@ public class MeasureValueFilterPanel extends AbstractFragment {
     @FindBy(className = "s-mvf-warning-message")
     private WebElement warningMessage;
 
+    @FindBy(className = "s-mvf-range-from-input")
+    private WebElement inputRangeFrom;
+
+    @FindBy(className = "s-mvf-range-to-input")
+    private WebElement inputRangeTo;
+
     @FindBy(css = TREAT_NULL_VALUES_AS_ZERO_CHECKBOX)
     private WebElement treatNullValuesAsZeroCheckbox;
 
@@ -42,6 +49,18 @@ public class MeasureValueFilterPanel extends AbstractFragment {
         selectLogicalOperator(logical);
         ElementUtils.clear(waitForElementVisible(inputValue));
         getActions().sendKeys(valueComparison + Keys.ENTER).perform();
+        AnalysisPage.getInstance(browser).waitForReportComputing();
+        return this;
+    }
+
+    public MeasureValueFilterPanel addMeasureValueFilter(LogicalOperator.Range logical, Pair<Integer, Integer> valueComparison) {
+        getOperatorsSelect().selectOperator(logical.toString());
+        ElementUtils.clear(waitForElementVisible(inputRangeFrom));
+        getActions().sendKeys(valueComparison.getKey().toString() + Keys.ENTER).perform();
+
+        ElementUtils.clear(waitForElementVisible(inputRangeTo));
+        getActions().sendKeys(valueComparison.getValue().toString() + Keys.ENTER).perform();
+
         AnalysisPage.getInstance(browser).waitForReportComputing();
         return this;
     }
@@ -88,8 +107,6 @@ public class MeasureValueFilterPanel extends AbstractFragment {
         GREATER_THAN_OR_EQUAL_TO("greater_than_or_equal_to"),
         LESS_THAN("less_than"),
         LESS_THAN_OR_EQUAL_TO("less_than_or_equal_to"),
-        BETWEEN("between"),
-        NOT_BETWEEN("not_between"),
         EQUAL_TO("equal_to"),
         NOT_EQUAL_TO("not_equal_to");
 
@@ -102,6 +119,22 @@ public class MeasureValueFilterPanel extends AbstractFragment {
         @Override
         public String toString() {
             return "mvf-operator-" + operator;
+        }
+
+        public enum Range {
+            BETWEEN("between"),
+            NOT_BETWEEN("not_between");
+
+            private String operator;
+
+            Range(String time) {
+                this.operator = time;
+            }
+
+            @Override
+            public String toString() {
+                return "mvf-operator-" + operator;
+            }
         }
     }
 }
