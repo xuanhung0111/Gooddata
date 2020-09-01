@@ -7,15 +7,20 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -270,7 +275,10 @@ public class PivotTableReport extends AbstractFragment {
         // Selenium 3.8.1 + gecko 0.20.0 has problem with action #moveToElement when working inside docker container.
         // The element hovered by this action will not trigger the event so it's meaningless when need to check a
         // tooltip show from that. This additional #moveByOffset is a work around to make it work properly.
-        getActions().moveToElement(item).moveByOffset(1, 1).perform();
+
+        getActions().moveToElement(getRoot(), 0 ,0).moveToElement(item)
+            .moveByOffset(1, 1).perform();
+        sleepTightInSeconds(1);
         return this;
     }
 
@@ -312,8 +320,15 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     private void expandBurgerMenuColumn(String columnTitle, int columnIndex) {
-        hoverOnBurgerMenuColumn(columnTitle, columnIndex);
-        WebElement webElementBurger = getHeaderElement(columnTitle, 0)
+        Graphene.waitGui().pollingEvery(1, TimeUnit.SECONDS)
+            .withTimeout(5, TimeUnit.SECONDS).until(browser -> {
+            hoverOnBurgerMenuColumn(columnTitle, columnIndex);
+
+            return isElementVisible(getHeaderElement(columnTitle, 0)
+                .findElement(By.className(BURGER_MENU_CLASS_NAME)));
+        });
+
+        WebElement webElementBurger = waitForElementVisible(getHeaderElement(columnTitle, 0))
             .findElement(By.className(BURGER_MENU_CLASS_NAME));
         if (isBurgerMenuCollapsed(webElementBurger)) {
             webElementBurger.click();
