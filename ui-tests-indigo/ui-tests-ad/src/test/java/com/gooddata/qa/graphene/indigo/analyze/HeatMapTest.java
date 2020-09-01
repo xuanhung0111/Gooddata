@@ -126,7 +126,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
         initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing();
-        ChartReport chartReport = analysisPage.getChartReport();
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
         assertEquals(chartReport.getXaxisLabels(), asList("Direct Sales", "Inside Sales"));

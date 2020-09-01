@@ -37,6 +37,7 @@ import static com.gooddata.qa.utils.cloudresources.DatasetUtils.datasetUserUpdat
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.METRIC_AGE;
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.TABLE_PRE_USER;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -64,7 +65,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     private final String INSIGHT_NAME = "Insight Test";
     private final String DATE_DATASET = "joindate";
     private final String DASHBOARD_NAME = "Dashboard Test";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Success! Your model has been published. Visit data load page";
     private String dataSourceId;
     private DataSourceRestRequest dataSourceRestRequest;
     private final String DATA_SOURCE_NAME = "Auto_datasource" + generateHashString();
@@ -128,8 +129,11 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
         publishModelDialog.overwriteData();
-        assertEquals(publishModelDialog.getTextSuccess(), PUBLISH_SUCCESS_MESSAGE);
-        publishModelDialog.clickButtonCancelSuccessPopUp();
+        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
+                testParams.getProjectId()));
+        wrapper.closePublishSuccess();
 
         //use ALTER_TABLE mode for recommend update table
         OutputStage outputStage = toolbar.openOutputStagePopUp();
