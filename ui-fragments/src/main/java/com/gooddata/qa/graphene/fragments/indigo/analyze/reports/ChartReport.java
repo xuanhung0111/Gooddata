@@ -36,7 +36,7 @@ public class ChartReport extends AbstractFragment {
     public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
-    private static final String HEATMAP_LEGEND = ".color-legend .box";
+    private static final String HEATMAP_LEGEND = ".viz-legend .box";
     private static final String TOOLTIP_ITEM = ".gd-viz-tooltip-item";
     private static final String TOOLTIP_TITLE = ".gd-viz-tooltip-title";
     private static final String TOOLTIP_VALUE = ".gd-viz-tooltip-value";
