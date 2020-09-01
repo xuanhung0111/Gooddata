@@ -55,18 +55,18 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddMetric() {
         ReportState baseState = ReportState.getCurrentState(initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
-            .addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing());
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
 
-        analysisPage.addMetric(METRIC_AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT).waitForReportComputing();
         checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddAtribute() {
-        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE);
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
 
         checkUndoRedoForEmptyState(true);
 
@@ -207,7 +207,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
         checkUndoRedoForReport(baseState, true);
         assertEquals(catalogPanel.getFieldNamesInViewPort(), singletonList(ATTR_DEPARTMENT));
 
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).exportReport();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing().exportReport();
         checkUndoRedoForReport(baseState, true);
     }
 
