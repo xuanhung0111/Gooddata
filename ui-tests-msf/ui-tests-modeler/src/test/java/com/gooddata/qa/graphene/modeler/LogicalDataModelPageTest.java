@@ -92,8 +92,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private final String SCHOOL_DATASET = "school";
     private final String SCHOOL_NAME_ATTRIBUTE = "schoolname";
     private final String CITY_DATASET = "city";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published";
-    private final String PUBLISH_MODEL_ALREADY = "Model is already up-to-date";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Success! Your model has been published. Visit data load page";
     private final String PUBLISH_ERROR_MESSAGE = "\"Cannot publish the data model with the “Preserve data” option." +
             " If you really want to publish this model, then select “Overwrite” option (set preserveData=false) to force" +
             " publish the data model (may cause deletion of data).\"";
@@ -237,14 +236,19 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         //second try publish with overwrite data mode
         toolbar.clickPublish();
         publishModelDialog.overwriteData();
-        assertEquals(publishModelDialog.getTextSuccess(), PUBLISH_SUCCESS_MESSAGE);
-        publishModelDialog.clickButtonCancelSuccessPopUp();
+        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
+                testParams.getProjectId()));
+        wrapper.closePublishSuccess();
 
         // try publish already model
         toolbar.clickPublish();
         publishModelDialog.preserveData();
-        assertEquals(publishModelDialog.getTextSuccess(), PUBLISH_MODEL_ALREADY);
-        publishModelDialog.clickButtonCancelSuccessPopUp();
+        assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
+                testParams.getProjectId()));
+        wrapper.closePublishSuccess();
 
         String sql = getResourceAsString("/model_view.txt");
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, testParams.getProjectId());
@@ -263,8 +267,10 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         // publish with preserve mode after update model
         toolbar.clickPublish();
         publishModelDialog.overwriteData();
-        assertEquals(publishModelDialog.getTextSuccess(), PUBLISH_SUCCESS_MESSAGE);
-        publishModelDialog.clickButtonCancelSuccessPopUp();
+        assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
+                testParams.getProjectId()));
+        wrapper.closePublishSuccess();
 
         String sqlUpdate = getResourceAsString("/model_view_update.txt");
         modelViewUpdate = modelRestRequest.getProductionProjectModelView(false);
