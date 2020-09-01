@@ -10,6 +10,7 @@ import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 public class PublishModelDialog extends AbstractFragment {
     private static final By SIDEBAR = By.className("publish-model");
@@ -25,9 +26,6 @@ public class PublishModelDialog extends AbstractFragment {
 
     @FindBy(css = ".gd-dialog-footer .s-cancel-file")
     private WebElement btnCancel;
-
-    @FindBy(css = ".gd-dialog-content .result-success-message")
-    private WebElement textResultSuccess;
 
     @FindBy(css = ".icon-publishing")
     private WebElement publishingIcon;
@@ -53,16 +51,11 @@ public class PublishModelDialog extends AbstractFragment {
     public void overwriteData() {
         btnOverwrite.click();
         btnPublish.click();
+        waitForFragmentNotVisible(this);
     }
 
     public void clickCancel() {
         btnCancel.click();
-    }
-
-    public String getTextSuccess() {
-        waitForElementNotVisible(publishingIcon);
-        waitForElementVisible(textResultSuccess);
-        return textResultSuccess.getText();
     }
 
     public String getTextError() {
@@ -75,7 +68,4 @@ public class PublishModelDialog extends AbstractFragment {
         btnCancelError.click();
     }
 
-    public void clickButtonCancelSuccessPopUp() {
-        btnCancelSuccess.click();
-    }
 }
