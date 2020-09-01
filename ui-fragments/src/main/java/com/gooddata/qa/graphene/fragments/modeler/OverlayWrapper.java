@@ -9,6 +9,7 @@ import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
@@ -44,9 +45,28 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "actions-menu-generate-output-stage-item")
     private WebElement dropDownOutputStage;
 
+    @FindBy(css = ".gd-message .s-message-text-header-value")
+    private WebElement successMessage;
+
+    @FindBy(css = ".gd-message .gd-message-dismiss-container")
+    private WebElement closeToastMessage;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 OverlayWrapper.class, waitForElementVisible(className(OVERLAY_WRAPPER), searchContext));
+    }
+
+    public String getTextPublishSuccess() {
+        waitForFragmentNotVisible(waitingDialog);
+        return waitForElementVisible(successMessage).getText();
+    }
+
+    public String getLinkPublishSuccess() {
+        return waitForElementVisible(successMessage).findElement(By.tagName("a")).getAttribute("href");
+    }
+
+    public void closePublishSuccess() {
+        closeToastMessage.click();
     }
 
     public ImportMenu getImportMenu() {
