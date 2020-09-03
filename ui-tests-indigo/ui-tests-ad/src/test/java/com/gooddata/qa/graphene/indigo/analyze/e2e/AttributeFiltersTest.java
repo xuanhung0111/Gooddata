@@ -2,15 +2,20 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -147,6 +152,49 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "BB-2140 Some problems of search function on attribute filter")
+    public void should_be_possible_to_check_all_checkbox_when_search_number_and_special_character() {
+        FiltersBucket filtersBucket = initAnalysePage().addFilter(ATTR_OPPORTUNITY)
+           .getFilterBuckets();
+        filtersBucket.getFilter(ATTR_OPPORTUNITY).click();
+        AttributeFilterPickerPanel panel = AttributeFilterPickerPanel.getInstance(browser);
+        panel.uncheckAllCheckbox();
+        panel.searchForText("1");
+        panel.checkAllCheckbox();
+
+        assertTrue(isElementVisible(className(AnalysisPage.MAIN_CLASS), browser), "AD should not show blank page");
+
+        filtersBucket = initAnalysePage().addFilter(ATTR_OPPORTUNITY).getFilterBuckets();
+        filtersBucket.getFilter(ATTR_OPPORTUNITY).click();
+        panel = AttributeFilterPickerPanel.getInstance(browser);
+        panel.uncheckAllCheckbox();
+        panel.searchForText("&");
+        panel.checkAllCheckbox();
+
+        assertTrue(isElementVisible(className(AnalysisPage.MAIN_CLASS), browser), "AD should not show blank page");
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "BB-2140 Some problems of search function on attribute filter")
+    public void should_be_possible_to_uncheck_all_checkbox_when_search_number_and_special_character() {
+        FiltersBucket filtersBucket = initAnalysePage().addFilter(ATTR_OPPORTUNITY)
+            .getFilterBuckets();
+        filtersBucket.getFilter(ATTR_OPPORTUNITY).click();
+        AttributeFilterPickerPanel panel = AttributeFilterPickerPanel.getInstance(browser);
+        panel.searchForText("1");
+        panel.uncheckAllCheckbox();
+
+        assertFalse(panel.getApplyButton().getAttribute("class").contains("disabled"));
+
+        filtersBucket = initAnalysePage().addFilter(ATTR_OPPORTUNITY)
+            .getFilterBuckets();
+        filtersBucket.getFilter(ATTR_OPPORTUNITY).click();
+        panel = AttributeFilterPickerPanel.getInstance(browser);
+        panel.searchForText("&");
+        panel.uncheckAllCheckbox();
+
+        assertTrue(panel.isApplyButtonEnabled(), "Apply button should be enabled");
     }
 
     private void beforeEach() {
