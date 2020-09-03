@@ -113,14 +113,12 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
         assertEquals(geoChart.getGeoPopupTooltip(), asList("city", "Sum of population", "Sum of population", "state"));
         assertTrue(geoChart.isZoomInAndZoomOutDisplayed(), "ZoomIn and ZoomOut btn should be displayed");
         geoChart.doubleClickOnZoomInBtn();
-        geoChart.hoverOnGeoPushpin(-250, -70);;
+        geoChart.hoverOnGeoPushpin(-250, -70);
         assertFalse(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be hidden");
         geoChart.doubleClickOnZoomOutBtn();
         sleepTightInSeconds(2);
-        geoChart.hoverOnGeoPushpin(-250, -70);;
-        assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be displayed");
         indigoDashboard.switchToEditMode().waitForWidgetsLoading();
-        geoChart.hoverOnGeoPushpin(-250, -70);;
+        geoChart.hoverOnGeoPushpin(-250, -70);
         assertFalse(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be hidden");
         assertFalse(geoChart.isZoomInAndZoomOutDisplayed(), "ZoomIn and ZoomOut btn should be hidden");
     }
