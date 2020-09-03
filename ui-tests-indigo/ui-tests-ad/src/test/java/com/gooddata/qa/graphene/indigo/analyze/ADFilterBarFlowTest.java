@@ -111,6 +111,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void addAndRenameAttributeIntoBucket() {
+        String insight = "Insight" + generateHashString();
         AttributesBucket attributesBucket = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .addMetric(METRIC_AMOUNT).addAttribute(ATTR_DEPARTMENT).getAttributesBucket();
         attributesBucket.setTitleItemBucket(ATTR_DEPARTMENT, "Renamed Department");
@@ -126,6 +127,11 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertEquals(parseFilterText(filtersBucket.getFilterText(ATTR_DEPARTMENT)), asList(ATTR_DEPARTMENT, "All"));
 
         filtersBucket.configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("$80,406,324.96"));
+
+        analysisPage.waitForReportComputing().saveInsight(insight);
+        initIndigoDashboardsPage();
+        initAnalysePage().openInsight(insight).waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getDataLabels(), asList("$80,406,324.96"));
     }
 
@@ -231,6 +237,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
     }
 
     public void dragAndDropAttributeIntoCanvas() {
+        String insight = "Insight" + generateHashString();
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .drag(analysisPage.getCatalogPanel().searchAndGet(ATTR_DEPARTMENT, FieldType.ATTRIBUTE),
             () -> waitForElementVisible(cssSelector(".s-recommendation-attribute-canvas"), browser))
@@ -241,6 +248,14 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertEquals(attributesBucket.getItemNames(), Collections.singletonList(ATTR_DEPARTMENT));
         assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT),
             "Should be not auto-created them into filter bar.\n ");
+
+        analysisPage.waitForReportComputing().saveInsight(insight);
+        initIndigoDashboardsPage();
+        initAnalysePage().openInsight(insight).waitForReportComputing();
+
+        assertEquals(attributesBucket.getItemNames(), Collections.singletonList(ATTR_DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT),
+                "Should be not auto-created them into filter bar.\n ");
     }
 
     public void applyCompareBetweenEachAttributePanel() {
@@ -308,6 +323,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyCompareToPreviousPeriodTestViaRecommended() {
+        String insight = "Insight" + generateHashString();
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_TIMELINE_EOP)
             .addAttribute(ATTR_DEPARTMENT);
 
@@ -318,7 +334,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
             recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(DateRange.THIS_QUARTER.toString()).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPage.waitForReportComputing().saveInsight(insight);
 
         assertThat(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()).toString(),
             containsString(DateRange.THIS_QUARTER.toString() + "\n" +
@@ -327,13 +343,19 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.openFilterBarPicker().isItemCheck(DATE),
             "Date should be ticked on filter bar dropdown");
         assertEquals(analysisPage.getChartReport().getDataLabels(), asList("44,195", "44,195", "44,195", "44,195"));
+
+        initIndigoDashboardsPage();
+        initAnalysePage().openInsight(insight).waitForReportComputing();
+        assertTrue(analysisPage.openFilterBarPicker().isItemCheck(DATE),
+                "Date should be ticked on filter bar dropdown");
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("44,195", "44,195", "44,195", "44,195"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeOrDateFromBucketNotOnFilterBar() {
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_FORECAST_CATEGORY).addDate();
         analysisPage.replaceAttribute(DATE, ATTR_IS_CLOSED);
-
+        
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
         assertEquals(attributesBucket.getItemNames(), asList(ATTR_FORECAST_CATEGORY, ATTR_IS_CLOSED));
         FilterBarPicker filterBarPicker = analysisPage.openFilterBarPicker();

@@ -61,5 +61,12 @@ public class MeasureAsColumnBucket extends MetricsBucket {
         public Boolean isOptionEnabled(OptionalStacking optional) {
             return waitForElementPresent(By.cssSelector(optional.toString()), getRoot()).isEnabled();
         }
+
+        public DisplayAsSelect checkOption(OptionalStacking optional) {
+            if (!isOptionCheck(optional)) {
+                waitForElementVisible(By.cssSelector(optional.getOptionLabel()), getRoot()).click();
+            }
+            return this;
+        }
     }
 }
