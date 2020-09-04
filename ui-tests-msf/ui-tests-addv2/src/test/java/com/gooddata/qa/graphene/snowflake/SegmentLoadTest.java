@@ -389,7 +389,7 @@ public class SegmentLoadTest extends AbstractADDProcessTest {
         while (result.next()) {
             custkeyValues.add(result.getString(column));
         }
-        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full",
                 clientProjectId1, CLIENT_ID_1, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project1, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
@@ -425,12 +425,12 @@ public class SegmentLoadTest extends AbstractADDProcessTest {
         while (result.next()) {
             custkeyValues.add(result.getString(column));
         }
-        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full",
                 clientProjectId1, CLIENT_ID_1, dataset)));
         Attribute attributeCustkey = getMdService().getObj(project1, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
         assertThat(getAttributeValues(attributeCustkey), containsInAnyOrder(custkeyValues.toArray()));
-        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full}]",
+        assertThat(executionLog, containsString(String.format("Project=\"%s\", client_id=\"%s\"; datasets=[{dataset.%s, full",
                 clientProjectId2, CLIENT_ID_2, dataset)));
         Attribute attributeCustkeyClient2 = getMdService().getObj(project2, Attribute.class,
                 identifier("attr." + dataset + "." + attribute));
