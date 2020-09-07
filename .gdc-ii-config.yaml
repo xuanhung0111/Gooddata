@@ -120,6 +120,7 @@ integratedTests:
       - '**/target/surefire-reports/*.xml'
     microservices:
       - ldm-modeler
+      - msf-load-restapi
   - kind: 'image'
     env: bash
     path: .
