@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
@@ -245,8 +243,8 @@ public class PivotTableReport extends AbstractFragment {
         return isElementPresent(className(TABLE_SORT_ARROW_CLASS_NAME), getRoot());
     }
 
-    public boolean isBurgerMenuVisible() {
-        return waitForElementPresent(className(BURGER_MENU_CLASS_NAME), getRoot())
+    public boolean isBurgerMenuVisible(String header, int columnIndex) {
+        return waitForElementPresent(getHeaderElement(header, columnIndex).findElement(className(BURGER_MENU_CLASS_NAME)))
             .getAttribute("class").contains("gd-pivot-table-header-menu--show");
     }
 
