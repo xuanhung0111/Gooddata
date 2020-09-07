@@ -542,10 +542,10 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         PivotTableReport pivotTableReport = initAnalysePage().openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
                 .waitForReportComputing().getPivotTableReport();
         pivotTableReport.hoverOnBurgerMenuColumn(METRIC_AMOUNT, 0);
-        assertTrue(pivotTableReport.isBurgerMenuVisible(),
+        assertTrue(pivotTableReport.isBurgerMenuVisible(METRIC_AMOUNT, 0),
                 "Burger menu should be appeared when I hover into header column");
         ElementUtils.moveToElementActions(pivotTableReport.getRoot(), 1, 1).perform();
-        assertFalse(pivotTableReport.isBurgerMenuVisible(),
+        assertFalse(pivotTableReport.isBurgerMenuVisible(METRIC_AMOUNT, 0),
                 "Burger menu should be disappeared when I hover out header column");
     }
 
