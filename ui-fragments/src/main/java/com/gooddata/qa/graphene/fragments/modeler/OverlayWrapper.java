@@ -7,6 +7,8 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -14,6 +16,9 @@ import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
     private static final String OVERLAY_WRAPPER = "overlay-wrapper";
+
+    @FindBy(css = ".overlay .indigo-table-dropdown-body")
+    private IndigoTableDropDown indigoTableDropDown;
 
     @FindBy(className = "dataset-change-primary-key-dialog")
     private ChangePrimaryKeyDialog changePrimaryKeyDialog;
@@ -69,9 +74,20 @@ public class OverlayWrapper extends AbstractFragment {
         closeToastMessage.click();
     }
 
+    public static OverlayWrapper getInstanceByIndex(SearchContext searchContext, int index) {
+        List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
+        return Graphene.createPageFragment(
+                OverlayWrapper.class, wrapperList.get(index));
+    }
+
     public ImportMenu getImportMenu() {
         waitForFragmentVisible(importMenu);
         return importMenu;
+    }
+
+    public IndigoTableDropDown getIndigoTableDropDown() {
+        waitForFragmentVisible(indigoTableDropDown);
+        return indigoTableDropDown;
     }
 
     public WaitingDialog getWaitingDialog() {

@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -13,8 +12,8 @@ import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 
 public class EditDatasetDialog extends AbstractFragment {
@@ -41,6 +40,18 @@ public class EditDatasetDialog extends AbstractFragment {
     @FindBy(className = "normal-row")
     List<WebElement> rowsInTableDialog;
 
+    @FindBy(css = ".s-csvmodeling .s-fields")
+    WebElement fieldTab;
+
+    @FindBy(css = ".s-csvmodeling .s-datamapping")
+    WebElement dataMappingTab;
+
+    @FindBy(className = "model-mapping")
+    DataMapping dataMappingContent;
+
+    @FindBy(css =".actions-panel .source-name")
+    WebElement sourceName;
+
     public static EditDatasetDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 EditDatasetDialog.class, waitForElementVisible(className(EDIT_DATASET_DIALOG), searchContext));
@@ -49,6 +60,12 @@ public class EditDatasetDialog extends AbstractFragment {
     public ViewDetailDialog getViewDetailDialog() {
         waitForElementVisible(viewDetailDialog.getRoot());
         return viewDetailDialog;
+    }
+
+    public DataMapping clickOnDataMappingTab() {
+        waitForElementVisible(dataMappingTab).click();
+        waitForFragmentVisible(dataMappingContent);
+        return dataMappingContent.getInstance(browser);
     }
 
     public void addNewLabel(String attribute, String labelName){
@@ -150,6 +167,11 @@ public class EditDatasetDialog extends AbstractFragment {
     public String getTextLabel(String label) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         return viewDetail.getTextLabel(label);
+    }
+
+    public String getTextSourceName() {
+        waitForElementVisible(sourceName);
+        return sourceName.getText();
     }
 
     public String getTextDatatype(String attribute) {

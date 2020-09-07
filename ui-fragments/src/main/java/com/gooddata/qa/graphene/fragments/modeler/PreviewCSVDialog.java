@@ -9,12 +9,11 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static org.openqa.selenium.By.cssSelector;
 
 public class PreviewCSVDialog extends AbstractFragment {
@@ -74,6 +73,11 @@ public class PreviewCSVDialog extends AbstractFragment {
     }
 
     public List<String> getListHeaders () {
-        return listHeader.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> listHeaders = new ArrayList<String>();
+        for(WebElement header: listHeader) {
+            scrollElementIntoView(header, browser);
+            listHeaders.add(header.getText());
+        }
+        return listHeaders;
     }
 }

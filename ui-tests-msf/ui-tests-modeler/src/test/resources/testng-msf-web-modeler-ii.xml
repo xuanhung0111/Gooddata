@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testng-msf-web-modeler">
+    <test name="LogicalDataModelPageTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.LogicalDataModelPageTest" />
+        </classes>
+    </test>
+    <test name="OutputStageRecommendViewTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.OutputStageRecommendViewTest" />
+        </classes>
+    </test>
+    <test name="OutputStageRecommendTableTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.OutputStageRecommendTableTest" />
+        </classes>
+    </test>
+    <test name="ValidateImportCSVTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ValidateImportCSVTest" />
+        </classes>
+    </test>
+</suite>
