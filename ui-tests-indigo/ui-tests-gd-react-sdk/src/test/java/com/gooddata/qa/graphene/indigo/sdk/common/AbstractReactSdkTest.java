@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.sdk.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -122,6 +123,11 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
             }
             Graphene.waitGui().until(browser -> file.isFile() && file.exists() && file.length() > 0);
             log.info(format("Created a new file: %s with size %s", file.getAbsolutePath(), file.length()));
+            //Make sure applying new exported catalog
+            if (browser.getCurrentUrl().contains(testParams.getLocalhostSDK())) {
+                browser.navigate().refresh();
+                waitForElementPresent(By.id("root"), browser);
+            }
             waitForElementNotPresent(By.tagName("iframe"), browser);
             return file;
         } catch (IOException | InterruptedException e) {
