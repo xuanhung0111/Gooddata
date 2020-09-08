@@ -62,16 +62,16 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
         String maql5 = "SELECT {${otherMetricIdentifier}}";
 
         return new Object[][] {
-            {"attrIdentifier", maql1, identifiersMap.get(ATTR_ACCOUNT)}, // Identifier of attribute account
-            {"factIdentifier", maql2, identifiersMap.get(FACT_AMOUNT)}, // Identifier of fact amount
-            {"dateIdentifier", maql3, identifiersMap.get(ATTR_YEAR_SNAPSHOT)}, // Identifier of date Year(snapshot)
-            {"variableIdentifier", maql4, identifiersMap.get(VARIABLE_STATUS)}, // Identifier of variable Status
-            {"metricIdentifier", maql5, identifiersMap.get(METRIC_AMOUNT)} // Identifier of metric amount
+            {"attrIdentifier", maql1, identifiersMap.get(ATTR_ACCOUNT), ATTR_ACCOUNT}, // Identifier of attribute account
+            {"factIdentifier", maql2, identifiersMap.get(FACT_AMOUNT), FACT_AMOUNT}, // Identifier of fact amount
+            {"dateIdentifier", maql3, identifiersMap.get(ATTR_YEAR_SNAPSHOT), ATTR_ACCOUNT}, // Identifier of date Year(snapshot)
+            {"variableIdentifier", maql4, identifiersMap.get(VARIABLE_STATUS), VARIABLE_STATUS}, // Identifier of variable Status
+            {"metricIdentifier", maql5, identifiersMap.get(METRIC_AMOUNT), METRIC_AMOUNT} // Identifier of metric amount
         };
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider")
-    public void testMetricWithIdentifier(String name, String maql, String identifier) {
+    public void testMetricWithIdentifier(String name, String maql, String identifier, String metric) {
         String factAmountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
 
         String accountAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_ACCOUNT));
@@ -88,7 +88,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
         String metricDescription = initAnalysePage().getCatalogPanel().getMetricDescription(name);
 
         takeScreenshot(browser, "Metric with identifier " + name, getClass());
-        assertThat(metricDescription, containsString(identifier));
+        assertThat(metricDescription, containsString(metric));
     }
 
     @Test(dependsOnGroups = {"createProject"})
