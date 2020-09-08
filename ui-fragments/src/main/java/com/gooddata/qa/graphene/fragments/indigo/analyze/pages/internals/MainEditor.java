@@ -14,6 +14,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
 /**
@@ -53,6 +54,17 @@ public class MainEditor extends AbstractFragment {
     }
 
     public PivotTableReport getPivotTableReport() {
+        try {
+            sleepTightInSeconds(1);
+            if (isElementPresent(className("s-loading"), browser)) {
+                WebElement computingElement = browser.findElement(className("s-loading"));
+                waitForElementNotVisible(computingElement);
+            }
+        } catch(Exception e) {
+            // in case report is rendered so fast, loading icon is not shown.
+            // Ignore the exception.
+        }
+
         return Graphene.createPageFragment(PivotTableReport.class,
                 waitForElementVisible(BY_PIVOT_TABLE_REPORT, browser));
     }
