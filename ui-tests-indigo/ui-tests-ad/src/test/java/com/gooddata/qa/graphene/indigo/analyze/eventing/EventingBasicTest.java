@@ -11,7 +11,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisP
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
+import com.gooddata.qa.graphene.indigo.analyze.utils.InsightUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,10 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
-import static com.gooddata.qa.graphene.enums.indigo.ReportType.COMBO_CHART;
-import static com.gooddata.qa.graphene.enums.indigo.ReportType.TABLE;
-import static com.gooddata.qa.graphene.enums.indigo.ReportType.TREE_MAP;
-import static com.gooddata.qa.graphene.enums.indigo.ReportType.HEAT_MAP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
@@ -45,6 +43,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class EventingBasicTest extends AbstractEventingTest {
+    public InsightUtils insightUtils;
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -53,12 +52,13 @@ public class EventingBasicTest extends AbstractEventingTest {
         Metrics metrics = getMetricCreator();
         metrics.createAmountBOPMetric();
         metrics.createBestCaseMetric();
+        insightUtils = new InsightUtils(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetric() throws IOException {
-        String insightUri = createInsight("single_metric_column_insight", COLUMN_CHART,
-            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+        String insightUri = insightUtils.createSimpleColumnInsight("single_metric_column_insight",
+                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList(), "");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final JSONArray uris = new JSONArray() {{
             put(activityUri);
@@ -80,8 +80,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportMultipleMetrics() throws IOException {
-        String insightUri = createInsight("multiple_metrics_column_insight", COLUMN_CHART,
-            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
+        String insightUri = insightUtils.createSimpleColumnInsight("multiple_metrics_column_insight",
+                Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
+                Collections.emptyList(), "");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
         JSONArray uris = new JSONArray() {{
@@ -115,9 +116,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute_single_metric_column_insight", COLUMN_CHART,
-            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-            Arrays.asList(ATTR_REGION));
+        String insightUri = insightUtils.createSimpleColumnInsight("single_attribute_single_metric_column_insight",
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Arrays.asList(ATTR_REGION),"");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
         JSONArray uris = new JSONArray() {{
@@ -144,9 +144,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportHasStackBy() throws IOException {
-        String insightUri = createInsight("test_stackby_column_insight", COLUMN_CHART,
+        String insightUri = insightUtils.createSimpleColumnInsight("test_stackby_column_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-            Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_REGION);
+            Arrays.asList(ATTR_ACTIVITY_TYPE),  ATTR_REGION);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -176,7 +176,7 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportHasStackBySameAsViewBy() throws IOException {
-        String insightUri = createInsight("test_same_attr_column_insight", COLUMN_CHART,
+        String insightUri = insightUtils.createSimpleColumnInsight("test_same_attr_column_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
             Arrays.asList(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE);
 
@@ -207,9 +207,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricViewByDate() throws IOException {
-        String insightUri = createInsight("test_view_date_column_insight", COLUMN_CHART,
+        String insightUri = insightUtils.createSimpleColumnInsight("test_view_date_column_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-            Arrays.asList(ATTR_YEAR_ACTIVITY));
+            Arrays.asList(ATTR_YEAR_ACTIVITY), "");
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
@@ -240,9 +240,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportMultipleMetricsViewByDate() throws IOException {
-        String insightUri = createInsight("test_view_date_multi_metrics_column_insight", COLUMN_CHART,
+        String insightUri = insightUtils.createSimpleColumnInsight("test_view_date_multi_metrics_column_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
-            Arrays.asList(ATTR_YEAR_CREATED));
+            Arrays.asList(ATTR_YEAR_CREATED), "");
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
@@ -289,7 +289,7 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingColumnReportSingleMetricViewByDateHasStack() throws IOException {
-        String insightUri = createInsight("test_view_date_has_stack_column_insight", COLUMN_CHART,
+        String insightUri = insightUtils.createSimpleColumnInsight("test_view_date_has_stack_column_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
             Arrays.asList(ATTR_YEAR_ACTIVITY), ATTR_REGION);
 
@@ -357,8 +357,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleMetric() throws IOException {
-        String insightUri = createInsight("single_metric_pivot_table_insight", TABLE,
-            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+        String insightUri = insightUtils.createSimplePivotTableInsight("single_metric_pivot_table_insight",
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList(), "");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final JSONArray uris = new JSONArray() {{
             put(activityUri);
@@ -375,8 +375,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute_pivot_table_insight", TABLE, Collections.emptyList(),
-            Arrays.asList(ATTR_STAGE_NAME));
+        String insightUri = insightUtils.createSimplePivotTableInsight("single_attribute_pivot_table_insight", Collections.emptyList(),
+            Arrays.asList(ATTR_STAGE_NAME), "");
         final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
         final JSONArray uris = new JSONArray() {{
             put(stageUri);
@@ -393,9 +393,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleMetricViewByDate() throws IOException {
-        String insightUri = createInsight("test_view_date_pivot_table_insight", TABLE,
+        String insightUri = insightUtils.createSimplePivotTableInsight("test_view_date_pivot_table_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-            Arrays.asList(ATTR_YEAR_ACTIVITY));
+            Arrays.asList(ATTR_YEAR_ACTIVITY),"");
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String yearActivity = getAttributeByTitle(ATTR_YEAR_ACTIVITY).getDefaultDisplayForm().getUri();
@@ -421,9 +421,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportSingleMetricSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute_single_metric_pivot_table_insight", TABLE,
+        String insightUri = insightUtils.createSimplePivotTableInsight("single_attribute_single_metric_pivot_table_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES),
-            Arrays.asList(ATTR_REGION));
+            Arrays.asList(ATTR_REGION), "");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
         JSONArray uris = new JSONArray() {{
@@ -447,9 +447,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportMultipleMetricsSingleAttribute() throws IOException {
-        String insightUri = createInsight("single_attribute__multiple_metric_pivot_table_insight", TABLE,
+        String insightUri = insightUtils.createSimplePivotTableInsight("single_attribute__multiple_metric_pivot_table_insight",
             Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
-            Arrays.asList(ATTR_REGION));
+            Arrays.asList(ATTR_REGION), "");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
         final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
@@ -476,8 +476,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportMultipleAttributes() throws IOException {
-        String insightUri = createInsight("multiple_attributes_pivot_table_insight", TABLE, Collections.emptyList(),
-            Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION));
+        String insightUri = insightUtils.createSimplePivotTableInsight("multiple_attributes_pivot_table_insight", Collections.emptyList(),
+            Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION), "");
         final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
         final String regionUri = getAttributeByTitle(ATTR_REGION).getDefaultDisplayForm().getUri();
         JSONArray uris = new JSONArray() {{
@@ -501,8 +501,9 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableReportMultipleMetrics() throws IOException {
-        String insightUri = createInsight("multiple_metrics_pivot_table_insight", TABLE,
-            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), Collections.emptyList());
+        String insightUri = insightUtils.createSimplePivotTableInsight("multiple_metrics_pivot_table_insight",
+            Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
+                Collections.emptyList(),"");
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String opportunityUri = getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri();
         JSONArray uris = new JSONArray() {{
@@ -526,8 +527,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingComboReport() throws IOException {
-        String insightUri = createComboInsight("combo_insight", COMBO_CHART,
-            singletonList(METRIC_AMOUNT), singletonList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_DEPARTMENT);
+        String insightUri = insightUtils.createSimpleComboInsight("combo_insight",
+                singletonList(METRIC_AMOUNT), singletonList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_DEPARTMENT);
 
         final String amountUri = getMetricByTitle(METRIC_AMOUNT).getUri();
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
@@ -562,7 +563,7 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingPivotTableWithGroupingAndSubtotals() throws IOException {
-        String insightUri = createInsight("grouping_and_subtotals_on_pivot", TABLE,
+        String insightUri = insightUtils.createSimplePivotTableInsight("grouping_and_subtotals_on_pivot",
             Collections.singletonList(METRIC_AMOUNT), Arrays.asList(ATTR_DEPARTMENT, ATTR_REGION), ATTR_FORECAST_CATEGORY);
 
         final String departmentUri = getAttributeByTitle(ATTR_DEPARTMENT).getDefaultDisplayForm().getUri();
@@ -593,8 +594,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTreeMapReport() throws IOException {
-        String insightUri = createSimpleInsight("tree_map_insight", TREE_MAP,
-                METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_REGION);
+        String insightUri = insightUtils.createSimpleTreeMapInsight("tree_map_insight",
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_ACTIVITY_TYPE), ATTR_REGION);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -623,8 +624,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingHeatMapReport() throws IOException {
-        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight", HEAT_MAP,
-                METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_REGION);
+        String insightUri = insightUtils.createSimpleHeatMapInsight("heat_map_insight",
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_ACTIVITY_TYPE), ATTR_REGION);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -661,8 +662,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingHeatMapReportWithDateAttributeOnRows() throws IOException {
-        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight_has_date_on_rows",
-                HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE);
+        String insightUri = insightUtils.createSimpleHeatMapInsight("heat_map_insight_has_date_on_rows",
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_YEAR_ACTIVITY), ATTR_ACTIVITY_TYPE);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
@@ -698,8 +699,8 @@ public class EventingBasicTest extends AbstractEventingTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingHeatMapReportHasDateAttributeOnColumns() throws IOException {
-        String insightUri = createSimpleInsightWithAttributeHasColumnBucket("heat_map_insight_has_date_on_columns",
-                HEAT_MAP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE, ATTR_YEAR_ACTIVITY);
+        String insightUri = insightUtils.createSimpleHeatMapInsight("heat_map_insight_has_date_on_columns",
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_ACTIVITY_TYPE), ATTR_YEAR_ACTIVITY);
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         final String activityTypeUri = getAttributeByTitle(ATTR_ACTIVITY_TYPE).getDefaultDisplayForm().getUri();
