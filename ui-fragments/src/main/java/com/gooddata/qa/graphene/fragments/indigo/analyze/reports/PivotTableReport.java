@@ -220,11 +220,12 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     public PivotTableReport sortBaseOnHeader(final String name) {
-        waitForCollectionIsNotEmpty(headers).stream()
+        WebElement webElement = waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
             .collect(toList())
-            .get(0)
-            .click();
+            .get(0);
+
+        waitForElementVisible(webElement).click();
         // Because the mouse pointer hovered the attribute which is sorted, so making unexpected result
         // Move the mouse pointer to the top-left corner of the fragment to avoid this
         ElementUtils.moveToElementActions(waitForElementVisible(getRoot()), 0, 0).perform();
@@ -308,13 +309,13 @@ public class PivotTableReport extends AbstractFragment {
     }
 
     private boolean isHeaderSorted(final String name, final String css, int index) {
-        return waitForCollectionIsNotEmpty(headers).stream()
+         WebElement webElement = waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
             .collect(toList())
-            .get(index)
-            .findElements(tagName("span"))
-            .stream()
-            .anyMatch(e -> e.getAttribute("class").contains(css));
+            .get(index);
+
+        return waitForElementVisible(webElement).findElements(tagName("span"))
+            .stream().anyMatch(e -> e.getAttribute("class").contains(css));
     }
 
     private void expandBurgerMenuColumn(String columnTitle, int columnIndex) {
