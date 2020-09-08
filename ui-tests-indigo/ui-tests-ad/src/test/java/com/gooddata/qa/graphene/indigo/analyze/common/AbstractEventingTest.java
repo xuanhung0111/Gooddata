@@ -140,7 +140,7 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         insightMDConfiguration.setMeasureBucket(measureBuckets);
 
         List<CategoryBucket> categoryBuckets = attributes.stream()
-                .map(attribute -> CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.VIEW))
+                .map(attribute -> CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.ATTRIBUTE))
                 .collect(Collectors.toList());
         if (StringUtils.isNotEmpty(stack)) {
             categoryBuckets.add(CategoryBucket.createCategoryBucket(getAttributeByTitle(stack), Type.STACK));
@@ -149,41 +149,9 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return indigoRestRequest.createInsight(insightMDConfiguration);
     }
 
-    protected String createComboInsight(String title, ReportType reportType,
-                                        List<String> metrics, List<String> secondaryMetrics, String attribute) {
-        InsightMDConfiguration insightMDConfiguration = new InsightMDConfiguration(title, reportType);
-        List<MeasureBucket> measureBuckets = metrics.stream()
-            .map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))
-            .collect(Collectors.toList());
-
-        List<MeasureBucket> secondaryMeasureBuckets = secondaryMetrics.stream()
-            .map(metric -> MeasureBucket.createMeasureBucket(
-                getMetricByTitle(metric), MeasureBucket.Type.SECONDARY_MEASURES))
-            .collect(Collectors.toList());
-        insightMDConfiguration.setMeasureBucket(Stream.concat(measureBuckets.stream(), secondaryMeasureBuckets.stream())
-            .collect(Collectors.toList()));
-
-        CategoryBucket categoryBucket = CategoryBucket.createCategoryBucket(
-            getAttributeByTitle(attribute), Type.ATTRIBUTE);
-        insightMDConfiguration.setCategoryBucket(singletonList(categoryBucket));
-
-        return indigoRestRequest.createInsight(insightMDConfiguration);
-    }
-
     protected String createInsight(String title, ReportType reportType,
                                    List<String> metrics, List<String> attributes) {
         return createInsight(title, reportType, metrics, attributes, "");
-    }
-
-    protected String createSimpleInsight(String title, ReportType reportType, String metric, String attribute,
-                                         String stack) {
-        return indigoRestRequest.createInsight(
-                new InsightMDConfiguration(title, reportType)
-                        .setMeasureBucket(singletonList(MeasureBucket
-                                .createSimpleMeasureBucket(getMetricByTitle(metric))))
-                        .setCategoryBucket(Arrays.asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.ATTRIBUTE),
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(stack), Type.STACK))));
     }
 
     protected String createSimpleInsightWithPercentation(String title, ReportType reportType,
@@ -195,17 +163,6 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
                         .setCategoryBucket(singletonList(
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
                                         Type.VIEW))));
-    }
-
-    protected String createSimpleInsightWithAttributeHasColumnBucket(String title, ReportType reportType,
-                                                         String metric, String attribute, String columns) {
-        return indigoRestRequest.createInsight(
-                new InsightMDConfiguration(title, reportType)
-                        .setMeasureBucket(singletonList(MeasureBucket
-                                .createSimpleMeasureBucket(getMetricByTitle(metric))))
-                        .setCategoryBucket(Arrays.asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.ROWS),
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(columns), Type.COLUMNS))));
     }
 
     protected JSONObject getLatestPostMessageObj() {
