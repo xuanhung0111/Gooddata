@@ -28,12 +28,19 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItem; 
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 
 public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
@@ -46,6 +53,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_ATTRIBUTES = "Attributes";
     private static final String INSIGHT_HAS_A_METRIC = "A metric";
     private static final String INSIGHT_HAS_METRICS = "Metrics";
+    private static final String INSIGHT_PIVOT_SORTING = "Pivot Table Sorting on Measure";
     private static final List<ReportType> REPORT_TYPES =
             asList(ReportType.COLUMN_CHART, ReportType.SCATTER_PLOT, ReportType.PIE_CHART, ReportType.HEAT_MAP);
 
@@ -62,6 +70,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private final String METRIC_LONG = "metricLong";
 
     private IndigoRestRequest indigoRestRequest;
+    private PivotTableReport pivotTableReport;
 
     @Override
     public void initProperties() {
@@ -92,7 +101,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
                 {Formatter.UTF_8.toString(), METRIC_UTF},
                 {Formatter.LONG.toString(), METRIC_LONG}
         };
-    }
+    }    
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider")
     public void prepareMetrics(String formatter, String metric) {
@@ -602,6 +611,39 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertTrue(pivotTableReport.openAggregationPopup("Direct Sales", 0)
                 .isItemChecked(AggregationItem.SUM), "The SUM item should be checked");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void createPiVotTableHasSortOnMeasure() {
+        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT)
+                .addAttribute(ATTR_PRODUCT).addColumnsAttribute(ATTR_DEPARTMENT).waitForReportComputing();
+
+        pivotTableReport = analysisPage.getPivotTableReport();
+        pivotTableReport.sortBaseOnHeader(METRIC_AMOUNT);
+        analysisPage.saveInsight(INSIGHT_PIVOT_SORTING).waitForReportComputing();
+        assertFalse(pivotTableReport.isRowHeaderSortedUp(METRIC_AMOUNT), "Metric Amount should be sorted with DESC");
+
+        List<String> expectedValues = asList("$30,029,658.14", "$16,188,138.24", "$15,582,695.69", "$6,978,618.41", "$5,863,972.18", "$5,763,242.30");
+        assertThat(pivotTableReport.getBodyContentColumn(1).stream().flatMap(List::stream).collect(toList()), equalTo(expectedValues));
+    }
+
+    @Test(dependsOnMethods = "createPiVotTableHasSortOnMeasure")
+    public void removeAttributeOnColumn() {
+        pivotTableReport = analysisPage.openInsight(INSIGHT_PIVOT_SORTING).waitForReportComputing().getPivotTableReport();
+        analysisPage.removeColumn(ATTR_DEPARTMENT).waitForReportComputing();
+        analysisPage.saveInsight().waitForReportComputing();
+        assertFalse(pivotTableReport.isRowHeaderSortedUp(METRIC_AMOUNT), "Metric Amount should be kept sort by DESC");
+        
+        List<String> expectedValues = asList("$38,596,194.86", "$27,222,899.64", "$22,946,895.47", "$10,291,576.74", "$9,525,857.91", "$8,042,031.92");
+        assertThat(pivotTableReport.getBodyContentColumn(1).stream().flatMap(List::stream).collect(toList()), equalTo(expectedValues));
+    }
+    
+    @Test(dependsOnMethods = "removeAttributeOnColumn")
+    public void reOpenPivotTableAfterRemoveColumn() {        
+        assertFalse(pivotTableReport.isRowHeaderSortedUp(METRIC_AMOUNT), "Metric Amount should be kept sort by DESC");
+
+        List<String> expectedValues = asList("$38,596,194.86", "$27,222,899.64", "$22,946,895.47", "$10,291,576.74", "$9,525,857.91", "$8,042,031.92");
+        assertThat(pivotTableReport.getBodyContentColumn(1).stream().flatMap(List::stream).collect(toList()), equalTo(expectedValues));
     }
 
     private void createSimpleInsight(String title, String metric, ReportType reportType) {

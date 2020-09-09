@@ -170,6 +170,10 @@ public class PivotTableReport extends AbstractFragment {
     public List<List<String>> getBodyContent() {
         return getContent(rows);
     }
+    
+    public List<List<String>> getBodyContentColumn(int columnIndex) {
+        return getContentOfColumn(rows, columnIndex);
+    }
 
     private List<List<String>> getContent(List<WebElement> contentElements) {
         waitForElementVisible(attributeValuePresent);
@@ -177,6 +181,22 @@ public class PivotTableReport extends AbstractFragment {
         return waitForCollectionIsNotEmpty(contentElements).stream()
                 .filter(ElementUtils::isElementVisible)
                 .map(row -> row.findElements(className("s-table-cell")))
+                .map(rowCells -> rowCells
+                        .stream()
+                        // because of custom React LoadingRendered, sometimes the first pivot attribute cell is the last in the DOM
+                        // (visually it is always the first as it is absolutely positioned but wrong result is returned by this method if cells are not sorted)
+                        .sorted(Comparator.comparingInt(this::parseColumnIndex))
+                        .map(WebElement::getText)
+                        .collect(toList())
+                )
+                .collect(toList());
+    }
+
+    private List<List<String>> getContentOfColumn(List<WebElement> contentElements, int columnIndex) {
+        waitForElementVisible(attributeValuePresent);   
+        return waitForCollectionIsNotEmpty(contentElements).stream()
+                .filter(ElementUtils::isElementVisible)
+                .map(row -> row.findElements(By.className(format("gd-column-index-%s", columnIndex))))
                 .map(rowCells -> rowCells
                         .stream()
                         // because of custom React LoadingRendered, sometimes the first pivot attribute cell is the last in the DOM
