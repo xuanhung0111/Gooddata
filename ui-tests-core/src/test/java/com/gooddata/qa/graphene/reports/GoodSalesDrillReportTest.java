@@ -342,7 +342,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.openDrillDialogFrom("1", CellType.METRIC_VALUE);
+            tableReport.hoverAndOpenDrillDialogFrom("1", CellType.METRIC_VALUE);
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
             AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_STATUS));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
@@ -385,7 +385,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.openDrillDialogFrom("1", CellType.METRIC_VALUE);
+            tableReport.hoverAndOpenDrillDialogFrom("1", CellType.METRIC_VALUE);
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
             AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_ACCOUNT));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
