@@ -51,7 +51,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
     private static String ADS_WAREHOUSE;
     private static final String INSIGHT_LCM = "Insight-LCM";
     private static final String RELEASE_SCHEDULE_NAME = "Release_Schedule";
-    private static final String CLIENT_NAME = "LcmClient";
+    private final String CLIENT_NAME = "LcmClient" + generateHashString();
     private GeoPushpinChartPicker geoChart;
 
     @Override
