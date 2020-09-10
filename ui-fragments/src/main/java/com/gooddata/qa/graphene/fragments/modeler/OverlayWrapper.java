@@ -66,6 +66,10 @@ public class OverlayWrapper extends AbstractFragment {
         return waitForElementVisible(successMessage).getText();
     }
 
+    public String getTextDeleteSuccess() {
+        return waitForElementVisible(successMessage).getText();
+    }
+
     public String getLinkPublishSuccess() {
         return waitForElementVisible(successMessage).findElement(By.tagName("a")).getAttribute("href");
     }

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -42,6 +43,24 @@ public class Model extends AbstractFragment {
 
     public String getAttributeText(String attribute) {
         return getListItems().getAttribute(getDatasetTitle(), attribute).getText();
+    }
+
+    public boolean isAttributeExistOnModeler(String attribute) {
+        return getListItems().isAttributeExist(getDatasetTitle(), attribute);
+    }
+
+    public WebElement getAttribute(String attribute) {
+        return getListItems().getAttribute(getDatasetTitle(), attribute);
+    }
+
+    public Model deleteAttributeOnDataset(String attributeName) {
+        WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
+        attribute.click();
+        Actions driverActions = new Actions(browser);
+        WebElement moreActionButton = attribute.findElement(By.className("more-action-container"));
+        driverActions.moveToElement(moreActionButton).click().build().perform();
+        PaperScrollerBackground.getInstance(browser).getContextToolbar().deleteElement();
+        return this;
     }
 
     public String getReferenceText(String dataset) {
