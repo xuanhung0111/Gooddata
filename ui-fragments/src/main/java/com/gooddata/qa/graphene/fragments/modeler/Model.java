@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
@@ -55,6 +56,7 @@ public class Model extends AbstractFragment {
 
     public Model deleteAttributeOnDataset(String attributeName) {
         WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
+        scrollElementIntoView(attribute, browser);
         attribute.click();
         Actions driverActions = new Actions(browser);
         WebElement moreActionButton = attribute.findElement(By.className("more-action-container"));
