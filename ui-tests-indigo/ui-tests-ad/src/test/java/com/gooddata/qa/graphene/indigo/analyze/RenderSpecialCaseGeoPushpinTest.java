@@ -7,11 +7,14 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags.XAE_VERSION;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForMainPageLoading;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -33,6 +36,7 @@ public class RenderSpecialCaseGeoPushpinTest extends AbstractProjectTest {
     private static final String ATTR_STATE = "State";
     private static String AD_DATASET_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";
     private AnalysisPage analysisPage;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -41,10 +45,13 @@ public class RenderSpecialCaseGeoPushpinTest extends AbstractProjectTest {
     }
 
     @Override
-    public void customizeProject() {
+    public void customizeProject() throws Throwable {
         if (BrowserUtils.isFirefox()) {
             throw new SkipException("Skip test case on Firefox Browser due to disabled weblg ");
         }
+        projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.updateProjectConfiguration(XAE_VERSION.getFlagName(), "3");
     }
 
     @Test(dependsOnGroups= {"createProject"}, groups = {"rendergeoChart"})
@@ -66,7 +73,7 @@ public class RenderSpecialCaseGeoPushpinTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"renderNoLocationGeoPushpinChart"}, groups = {"rendergeoChart"})
-    public void renderInvalidDataGeoPushpinChart() {
+    public void renderGeoPushpinChartWithAXEVersion3() {
         final String MESSAGE_SYSTEM = "SORRY, WE CAN'T DISPLAY THIS INSIGHT" +
                 "\nTry applying different filters, or using different measures or attributes." +
                 "\nIf this did not help, contact your administrator.";
@@ -75,10 +82,11 @@ public class RenderSpecialCaseGeoPushpinTest extends AbstractProjectTest {
                 .addAttributeToLocationPushpin(ATTR_LATLONG, FieldType.GEO).waitForReportComputing()
                 .addAttributeToMeasureColor(ATTR_STATE, FieldType.ATTRIBUTE).waitForReportComputing();
 
-        assertThat(analysisPage.getMainEditor().getCanvasMessage(), containsString(MESSAGE_SYSTEM));
+        assertFalse(analysisPage.getMainEditor().isExplorerMessageVisible(),
+                "Geo chart cannot render on canvas with AXE version 3");
     }
 
-    @Test(dependsOnMethods = {"renderInvalidDataGeoPushpinChart"}, groups = {"rendergeoChart"})
+    @Test(dependsOnMethods = {"renderGeoPushpinChartWithAXEVersion3"}, groups = {"rendergeoChart"})
     public void renderNoDataGeoPushpinChart() {
         analysisPage.clear();
         DateFilterPickerPanel dateFilter = analysisPage.changeReportType(ReportType.GEO_CHART)
