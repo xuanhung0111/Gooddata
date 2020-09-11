@@ -59,7 +59,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
     private static final String TOO_MANY_COLUMNS_TABLE_VIEW_ERROR_MESSAGE = "Error parsing row=1. The number of columns is " +
             "too high. Maximum values are '250' for the column count.";
     private static final String TOO_MANY_CHARACTERS_TABLE_VIEW_ERROR_MESSAGE = "Error parsing row=2. The cell at column '6' " +
-            "is too long. Maximum values are '255' for the cell length.";
+            "is too long. Maximum values are '10000' for the cell length.";
     private static final String EXCEEDED_PRECISION_TABLE_VIEW_ERROR_MESSAGE = "The values in the 'f__amount' column exceed " +
             "the precision defined by the 'NUMERIC(15,3)' data type.";
     private static final String WRONG_FORMAT_TABLE_VIEW_ERROR_MESSAGE = "The data in the 'f__amount' column cannot be converted " +
