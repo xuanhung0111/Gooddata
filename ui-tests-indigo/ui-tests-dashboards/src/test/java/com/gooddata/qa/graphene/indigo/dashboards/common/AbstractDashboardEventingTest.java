@@ -175,7 +175,7 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
     protected IndigoDashboardsPage openEmbeddedPage(final String url) {
         browser.get("file://" + url);
         browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
-        return IndigoDashboardsPage.getInstance(browser);
+        return IndigoDashboardsPage.getInstance(browser).waitForDashboardLoad().waitForWidgetsLoading();
     }
 
     protected void cleanUpLogger() {
