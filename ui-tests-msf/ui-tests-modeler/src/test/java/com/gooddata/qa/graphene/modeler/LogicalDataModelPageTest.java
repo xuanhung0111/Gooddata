@@ -39,6 +39,7 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
@@ -92,6 +93,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private final String SCHOOL_DATASET = "school";
     private final String SCHOOL_NAME_ATTRIBUTE = "schoolname";
     private final String CITY_DATASET = "city";
+    private final String DELETE_SUCCESS_MESSAGE = "Success! The \"%s\" was deleted.";
     private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published. Visit data load page";
     private final String UP_TO_DATE_MESSAGE = "Model is already up-to-date. Visit data load page";
     private final String PUBLISH_ERROR_MESSAGE = "\"Cannot publish the data model with the “Preserve data” option." +
@@ -218,7 +220,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(CLASS_DATASET);
         modelClass.addNewLabel(CLASSNAME2_ATTRIBUTE, CLASSNAME2_LABEL);
         mainModelContent.focusOnDataset(CLASS_DATASET);
-        modelClass.deleteAttribute(CLASSNAME2_ATTRIBUTE);
+        modelClass.deleteAttributeOnDataset(CLASSNAME2_ATTRIBUTE);
+        assertEquals(OverlayWrapper.getInstance(browser).getTextDeleteSuccess(),format(DELETE_SUCCESS_MESSAGE, CLASSNAME2_ATTRIBUTE) );
+        assertFalse(modelClass.isAttributeExistOnModeler(CLASSNAME2_ATTRIBUTE));
     }
 
     //After all steps above, the user has the model that he wants, he clicks the Publish button publish Model to project,
