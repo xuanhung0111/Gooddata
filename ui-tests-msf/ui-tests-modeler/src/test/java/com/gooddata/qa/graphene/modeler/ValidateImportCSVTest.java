@@ -45,7 +45,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
             "than the header.";
     private static final String ONLY_HEADER_ERROR_MESSAGE = "CSV file contains no data.";
     private static final String TOO_MANY_CHARACTERS_ERROR_MESSAGE = "Error parsing row=2. The cell at column '6' is too long. " +
-            "Maximum values are '255' for the cell length.";
+            "Maximum values are '10000' for the cell length.";
     private static final String TOO_MANY_COLUMNS_ERROR_MESSAGE = "Error parsing row=1. The number of columns is too high. " +
             "Maximum values are '250' for the column count.";
     private static final String DUPLICATE_NAME_ERROR_MESSAGE = "The generated dataset identifier is duplicated, rename CSV " +
