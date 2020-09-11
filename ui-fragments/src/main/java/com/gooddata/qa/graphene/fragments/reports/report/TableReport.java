@@ -143,6 +143,11 @@ public class TableReport extends AbstractDashboardReport {
         return DashboardDrillDialog.getInstance(browser);
     }
 
+    public DashboardDrillDialog hoverAndOpenDrillDialogFrom(String value, CellType type) {
+        getActions().moveToElement(getCellElement(value, type).findElement(By.tagName("span"))).click().perform();
+        return DashboardDrillDialog.getInstance(browser);
+    }
+
     public boolean isDrillable(String value, CellType type) {
         return isDrillable(getCellElement(value, type));
     }
