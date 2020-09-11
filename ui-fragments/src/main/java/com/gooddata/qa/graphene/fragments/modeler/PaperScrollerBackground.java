@@ -14,6 +14,9 @@ public class PaperScrollerBackground extends AbstractFragment {
     @FindBy(className = "joint-paper")
     private MainModelContent mainModelContent;
 
+    @FindBy(className = "joint-context-toolbar")
+    private ContextToolbar contextToolbar;
+
     public static PaperScrollerBackground getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 PaperScrollerBackground.class, waitForElementVisible(className(PAPER_SCROLLER_BACKGROUND), searchContext));
@@ -21,5 +24,9 @@ public class PaperScrollerBackground extends AbstractFragment {
 
     public MainModelContent getMainModelContent() {
         return mainModelContent;
+    }
+
+    public ContextToolbar getContextToolbar() {
+        return contextToolbar;
     }
 }
