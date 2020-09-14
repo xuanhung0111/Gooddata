@@ -9,6 +9,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
@@ -21,10 +24,13 @@ import static org.testng.Assert.assertTrue;
 public class KpiCompareToPreviousPeriodTest extends AbstractDashboardTest {
 
     private static final String INSIGHT_ACTIVITIES = "Insight Activities";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
     }
 
     @Test(dependsOnGroups = "createProject")

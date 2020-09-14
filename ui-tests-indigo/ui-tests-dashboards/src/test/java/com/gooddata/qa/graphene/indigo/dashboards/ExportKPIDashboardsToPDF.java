@@ -69,6 +69,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_TABLE_COLUMNS_GROW_TO_FIT, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXPLORE_INSIGHTS_FROM_KD, false);
     }
 
     @Override

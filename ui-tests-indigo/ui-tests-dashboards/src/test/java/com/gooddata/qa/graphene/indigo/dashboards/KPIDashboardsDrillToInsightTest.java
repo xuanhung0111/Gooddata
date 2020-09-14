@@ -73,6 +73,8 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
             ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_DRILL_TO_INSIGHT, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(
             ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_DRILL_TO_DASHBOARD, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+            ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
     }
 
     @Override

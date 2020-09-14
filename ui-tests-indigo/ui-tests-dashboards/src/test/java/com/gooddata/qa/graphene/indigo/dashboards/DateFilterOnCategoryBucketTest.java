@@ -18,16 +18,22 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 
 public class DateFilterOnCategoryBucketTest extends AbstractDashboardTest {
 
     private static final String INSIGHT_HAVING_ATTRIBUTE_CONFIGURATION = "Insight-Having-Attribute-Configuration";
     private static final String INSIGHT_HAVING_TREND_BY_CONFIGURATION = "Insight-Having-Trend-By-Configuration";
     private static final String INSIGHT_HAVING_VIEW_BY_CONFIGURATION = "Insight-Having-View-By-Configuration";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
     }
 
     @DataProvider

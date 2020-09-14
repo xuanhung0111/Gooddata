@@ -70,6 +70,7 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_TABLE_COLUMN_AUTO_RESIZING, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         Metrics metricCreator = getMetricCreator();
         metricCreator.createNumberOfActivitiesMetric();
         metricCreator.createPercentOfPipelineMetric(METRIC_LONG_NAME, getMetricCreator().createAmountMetric());
