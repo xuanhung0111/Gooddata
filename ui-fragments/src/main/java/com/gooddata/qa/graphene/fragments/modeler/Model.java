@@ -56,9 +56,8 @@ public class Model extends AbstractFragment {
 
     public Model deleteAttributeOnDataset(String attributeName) {
         WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
-        scrollElementIntoView(attribute, browser);
-        attribute.click();
         Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(attribute).click().build().perform();
         WebElement moreActionButton = attribute.findElement(By.className("more-action-container"));
         driverActions.moveToElement(moreActionButton).click().build().perform();
         PaperScrollerBackground.getInstance(browser).getContextToolbar().deleteElement();
