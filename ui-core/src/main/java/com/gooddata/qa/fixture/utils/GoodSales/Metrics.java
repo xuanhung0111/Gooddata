@@ -34,6 +34,14 @@ public class Metrics extends CommonRestRequest{
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
+    //This function use for flexible Metric
+    public Metric createSumCustomMetric(String metricTitle, String metricName ) {
+        return createMetricIfNotExist(metricTitle,
+                format("SELECT SUM([%s])",
+                        getFactByTitle(metricName).getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
     //This function used by Redshift Test
     public Metric createSumAmountMetric() {
         return createMetricIfNotExist(METRIC_AMOUNT,

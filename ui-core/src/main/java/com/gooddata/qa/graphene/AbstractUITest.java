@@ -307,6 +307,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return getContentFrom(pdfExport);
     }
 
+    public String getContentCSVFileFrom(String csvFile) {
+        File csvExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + csvFile + ".csv");
+        return getContentFrom(csvExport);
+    }
+
     public void verifyReportExport(ExportFormat format, String reportName) {
         String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "."
                 + format.getName();
