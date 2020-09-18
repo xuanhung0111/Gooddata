@@ -88,7 +88,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         cleanUpLogger();
 
         PostMessageKPIDashboardPage postMessageApiPage = PostMessageKPIDashboardPage.getInstance(browser);
@@ -118,7 +118,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        openEmbeddedPage(file).waitForWidgetsLoading();
+        openEmbeddedPage(file);
         cleanUpLogger();
 
         PostMessageKPIDashboardPage postMessageApiPage = PostMessageKPIDashboardPage.getInstance(browser);
@@ -141,7 +141,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode();
 
         cleanUpLogger();
@@ -168,7 +168,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode();
 
         cleanUpLogger();
@@ -199,7 +199,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode();
 
         cleanUpLogger();
@@ -226,7 +226,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode();
 
         cleanUpLogger();
@@ -259,7 +259,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode().addInsight(INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS);
 
         cleanUpLogger();
@@ -267,7 +267,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         PostMessageKPIDashboardPage postMessageApiPage = PostMessageKPIDashboardPage.getInstance(browser);
         String dashboardTitleSaved = generateAnalyticalDashboardName();
         postMessageApiPage.saveDashboard(dashboardTitleSaved);
-        indigoDashboardsPage.waitForWidgetsLoading();
+        indigoDashboardsPage.waitForDashboardLoad().waitForWidgetsLoading();
 
         JSONObject content = getLatestPostMessage("dashboardSaved");
         assertEquals(content.getJSONObject("data").getString("project"), testParams.getProjectId());
@@ -292,7 +292,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         cleanUpLogger();
         browser.switchTo().frame("iframe");
         indigoDashboardsPage.switchToEditMode().waitForWidgetsLoading();
@@ -320,7 +320,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         cleanUpLogger();
         browser.switchTo().frame("iframe");
         indigoDashboardsPage.exportDashboardToPDF();
@@ -341,7 +341,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
 
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         indigoDashboardsPage.switchToEditMode().addInsight(INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS);
         cleanUpLogger();
         browser.switchTo().frame("iframe");
@@ -400,7 +400,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri),
             uris.toString(), activityIdentifier, FRAME_KD_POST_MESSAGE_PATH_FILE);
 
-        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
         cleanUpLogger();
 
         PostMessageKPIDashboardPage postMessageKPIDashboardPage = PostMessageKPIDashboardPage.getInstance(browser);
