@@ -8,7 +8,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -105,6 +107,17 @@ public class GeoPushpinChartPicker extends AbstractFragment {
         return waitForElementPresent(geoPopupTooltip)
                 .findElements(By.className("gd-viz-tooltip-value")).stream().map(el -> el.getText())
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, String> getPopupTooltipDetails() {
+        Map<String, String> detailTooltip = new HashMap<>();
+        waitForElementPresent(geoPopupTooltip)
+                .findElements(By.className("gd-viz-tooltip-item")).stream().forEach(el -> {
+            String title = el.findElement(By.className("gd-viz-tooltip-title")).getText();
+            String value = el.findElement(By.className("gd-viz-tooltip-value")).getText();
+            detailTooltip.put(title, value);
+        });
+        return detailTooltip;
     }
 
     public List<String> getListLablesColorPushpinLegend() {
