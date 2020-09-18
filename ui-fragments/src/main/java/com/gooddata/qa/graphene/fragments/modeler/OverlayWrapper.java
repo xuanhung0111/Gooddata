@@ -61,6 +61,9 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(css = ".gd-message .gd-message-dismiss-container .icon-cross")
     private WebElement closeToastMessage;
 
+    @FindBy(className = "add-label-menu")
+    private TextEditorWrapper textEditorWrapper;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 OverlayWrapper.class, waitForElementVisible(className(OVERLAY_WRAPPER), searchContext));
@@ -114,6 +117,11 @@ public class OverlayWrapper extends AbstractFragment {
     public PreviewCSVDialog getPreviewCSVDialog() {
         waitForFragmentVisible(previewCSVDialog);
         return previewCSVDialog;
+    }
+
+    public TextEditorWrapper getTextEditorWrapper() {
+        waitForFragmentVisible(textEditorWrapper);
+        return textEditorWrapper;
     }
 
     public FileUploadDialog getFileUploadDialog() {
