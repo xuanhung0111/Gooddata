@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
@@ -14,14 +15,12 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.gooddata.sdk.model.md.Restriction.title;
-import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
-import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -31,6 +30,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT_BOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.sdk.model.md.Restriction.title;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.utils.http.ColorPaletteRequestData.ColorPalette;
 
 import static java.lang.String.format;
@@ -41,6 +44,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class OptionalStackingTest extends AbstractAnalyseTest {
 
@@ -725,6 +729,63 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
 
         assertEquals(chartReport.getXaxisLabels(), asList("Explorer", "Educationly", "CompuSci", "WonderKid",
             "PhoenixSoft", "Grammar Plus"));
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "listReportChartType")
+    public void savingOptionalStackInsight(ReportType reportType) {
+        String insight = "Insight" + generateHashString();
+        createMetric("Sum of Amount", format("SELECT SUM([%s])", getFactByTitle("Amount").getUri()), "#,##0.00");
+        initAnalysePage().changeReportType(reportType).addMetric(METRIC_AMOUNT).addMetric(METRIC_WON)
+                .addMetric(METRIC_BEST_CASE).addMetric(METRIC_PROBABILITY, FieldType.FACT).addMetric("Sum of Amount")
+                .addAttribute(ATTR_PRODUCT).getStacksBucket().checkOption(OptionalStacking.MEASURES)
+                .checkOption(OptionalStacking.PERCENT);
+        analysisPage.waitForReportComputing().saveInsight(insight);
+        assertTrue(analysisPage.getStacksBucket().isOptionCheck(OptionalStacking.MEASURES),
+                "Should checked in the checkbox: Stack measures");
+        assertTrue(analysisPage.getStacksBucket().isOptionCheck(OptionalStacking.PERCENT),
+                "Should checked in the checkbox: Stack to 100%");
+
+        initIndigoDashboardsPage();
+        initAnalysePage().openInsight(insight).waitForReportComputing();
+        assertTrue(analysisPage.getStacksBucket().isOptionCheck(OptionalStacking.MEASURES),
+                "Should checked in the checkbox: Stack measures - Bug: RAIL-2640");
+
+        assertTrue(analysisPage.getStacksBucket().isOptionCheck(OptionalStacking.PERCENT),
+                "Should checked in the checkbox: Stack to 100% - Bug: RAIL-2640");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void savingOptionalStackInsightWithComboChart() {
+        String insight = "Insight" + generateHashString();
+        createMetric("Sum of Amount", format("SELECT SUM([%s])", getFactByTitle("Amount").getUri()), "#,##0.00");
+        initAnalysePage().changeReportType(ReportType.COMBO_CHART).addMetric(METRIC_AMOUNT).addMetric(METRIC_WON)
+                .addMetric(METRIC_BEST_CASE).addMetric(METRIC_PROBABILITY, FieldType.FACT).addMetric("Sum of Amount")
+                .addAttribute(ATTR_PRODUCT)
+                .getMeasureAsColumnBucketBucket().expandMeasuresDisplayAs().checkOption(OptionalStacking.MEASURES)
+                .checkOption(OptionalStacking.PERCENT);
+        analysisPage.waitForReportComputing().saveInsight(insight);
+
+        assertTrue(analysisPage.getMeasureAsColumnBucketBucket().expandMeasuresDisplayAs()
+                .isOptionCheck(OptionalStacking.MEASURES), "Should checked in the checkbox: Stack measures");
+        assertTrue(analysisPage.getMeasureAsColumnBucketBucket().expandMeasuresDisplayAs()
+                .isOptionCheck(OptionalStacking.PERCENT), "Should checked in the checkbox: Stack to 100%");
+
+        initIndigoDashboardsPage();
+        initAnalysePage().openInsight(insight).waitForReportComputing();
+        assertTrue(analysisPage.getMeasureAsColumnBucketBucket().expandMeasuresDisplayAs()
+                .isOptionCheck(OptionalStacking.MEASURES),"Should checked in the checkbox: Stack measures - Bug: RAIL-2640");
+
+        assertTrue(analysisPage.getMeasureAsColumnBucketBucket().expandMeasuresDisplayAs()
+                .isOptionCheck(OptionalStacking.PERCENT), "Should checked in the checkbox: Stack to 100% - Bug: RAIL-2640");
+    }
+
+    @DataProvider(name = "listReportChartType")
+    public Object[][] listReportChartType() {
+        return new Object[][] {
+                {ReportType.BAR_CHART},
+                {ReportType.STACKED_AREA_CHART},
+                {ReportType.COLUMN_CHART},
+        };
     }
 
     private void createInsightHasAMeasureAndAnAttributeAndAStack(
