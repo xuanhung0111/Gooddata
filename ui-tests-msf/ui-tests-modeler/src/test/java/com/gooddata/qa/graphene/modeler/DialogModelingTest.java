@@ -157,7 +157,7 @@ public class DialogModelingTest extends AbstractLDMPageTest {
         assertTrue(mappingTab.getSourceTypeByName(DATE, DataMapping.SOURCE_TYPE.REFERENCE.getName()).contains("MM-dd-yyyy"));
         assertEquals(mappingTab.getSourceTypeByName(CITY_PRIMARY_KEY, DataMapping.SOURCE_TYPE.REFERENCE.getName()), "text");
         assertEquals(mappingTab.getSourceTypeByName(USER_PRIMARY_KEY, DataMapping.SOURCE_TYPE.REFERENCE.getName()), "text");
-        
+
         assertThat(mappingTab.getDropdownSourceColumnByName(LAST_NAME, DataMapping.SOURCE_TYPE.LABEL.getName()), containsInAnyOrder(DROP_DOWN_APPLY_TEXT.toArray()));
         assertThat(mappingTab.getDropdownSourceColumnByName(AMOUNT, DataMapping.SOURCE_TYPE.FACT.getName()), containsInAnyOrder(DROP_DOWN_APPLY_MEASURE.toArray()));
         assertThat(mappingTab.getDropdownSourceColumnByName(DATE, DataMapping.SOURCE_TYPE.REFERENCE.getName()), containsInAnyOrder(DROP_DOWN_APPLY_DATE.toArray()));

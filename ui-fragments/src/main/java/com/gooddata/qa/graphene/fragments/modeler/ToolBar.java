@@ -7,6 +7,8 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class ToolBar extends AbstractFragment {
@@ -43,6 +45,12 @@ public class ToolBar extends AbstractFragment {
     public OutputStage openOutputStagePopUp() {
         btnActionMenu.click();
         return OverlayWrapper.getInstance(browser).openOutputStage();
+    }
+
+    public static final ToolBar getInstanceInTableView(SearchContext searchContext, int index) {
+        List<WebElement> toolbarList = searchContext.findElements(TOOLBAR);
+        return Graphene.createPageFragment(
+                ToolBar.class, toolbarList.get(index));
     }
 
 }

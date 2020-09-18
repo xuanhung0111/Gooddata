@@ -15,7 +15,6 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import java.util.stream.Collectors;
 
 public class DatasetEdit extends AbstractFragment {
     private static String DATASET_EDIT = "dataset-edit";
@@ -74,6 +73,7 @@ public class DatasetEdit extends AbstractFragment {
         WebElement column = getColumnByName(columnName);
         int index = listColumns.indexOf(column);
         WebElement datatype =  dataTypePickers.get(index);
+        scrollElementIntoView(datatype, browser);
         return datatype.getText();
     }
 
