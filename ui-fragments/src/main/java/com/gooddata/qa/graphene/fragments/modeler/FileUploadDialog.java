@@ -43,6 +43,13 @@ public class FileUploadDialog extends AbstractFragment {
         return OverlayWrapper.getInstance(browser).getWaitingDialog().waitForLoading().getErrorContent();
     }
 
+    public void importValidData() {
+        clickImportButton();
+        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        wrapper.waittingDialog();
+        wrapper.closeWaitingDialog();
+    }
+
     public PreviewCSVDialog importCSVShowPreview() {
         clickImportButton();
         return OverlayWrapper.getInstance(browser).getPreviewCSVDialog();

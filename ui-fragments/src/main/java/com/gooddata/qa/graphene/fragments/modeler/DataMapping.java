@@ -12,7 +12,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 
 public class DataMapping extends AbstractFragment {
     private static final By DATA_MAPPING = By.className("model-mapping");
@@ -26,12 +26,13 @@ public class DataMapping extends AbstractFragment {
     }
 
     public WebElement getRowByName(String labelName, String type) {
-        WebElement row = rows.stream()
-                .filter(input -> input.findElements(By.className(type)).size() > 0)
-                .filter(input -> input.findElement(By.className(type)).getText().equals(labelName))
-                .findFirst()
-                .get();
-        return row;
+        for(WebElement row: rows) {
+            if (row.findElements(By.className(type)).size() > 0 && row.findElement(By.className(type)).getText().equals(labelName)) {
+                scrollElementIntoView(row, browser);
+                return row;
+            }
+        }
+        return null;
     }
 
     public String getSourceColumnByName(String name, String type) {
@@ -51,18 +52,20 @@ public class DataMapping extends AbstractFragment {
 
     public  DataMapping editDateFormatByName(String name, String newFormat) {
         WebElement row = getRowByName(name, SOURCE_TYPE.REFERENCE.getName());
-        WebElement format = row.findElement(By.className(".model-mapping-source-type .s-editable-label"));
+        WebElement format = row.findElement(By.cssSelector(".model-mapping-source-type .s-editable-label"));
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(format).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .sendKeys(newFormat).sendKeys(Keys.ENTER).build().perform();
         return this;
     }
 
-    public DataMapping editSourceColumnByName(String name, String type, String newName) {
+
+    public DataMapping editSourceColumnByName(String name, String type, String newName, boolean isMapping) {
         WebElement row = getRowByName(name, type);
-        WebElement sourceColumn = row.findElement(By.className("s-editable-label"));
+        WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
+                : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(sourceColumn).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
+        driverActions.moveToElement(sourceColumn).click().sendKeys(Keys.DELETE)
                 .sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
         return this;
     }

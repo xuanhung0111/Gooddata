@@ -62,6 +62,11 @@ public class EditDatasetDialog extends AbstractFragment {
         return viewDetailDialog;
     }
 
+    public void saveChanges() {
+        waitForElementVisible(saveChangeButton).click();
+        waitForFragmentNotVisible(this);
+    }
+
     public DataMapping clickOnDataMappingTab() {
         waitForElementVisible(dataMappingTab).click();
         waitForFragmentVisible(dataMappingContent);

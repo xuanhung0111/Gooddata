@@ -10,6 +10,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 
 public class TableViewDataset extends AbstractFragment {
     private static final By TABLE_VIEW_DATASET = By.className("table-view-datasets");
@@ -54,5 +55,20 @@ public class TableViewDataset extends AbstractFragment {
         WebElement row = getRowByName(datasetName);
         List<WebElement> cells = row.findElements(TABLE_CELLS);
         cells.get(3).findElement(By.className("s-csv_template")).click();
+        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        wrapper.waittingDialog();
+        wrapper.closeWaitingDialog();
+    }
+
+    public boolean isButtonUpdateDisable(String datasetName) {
+        WebElement row = getRowByName(datasetName);
+        List<WebElement> cells = row.findElements(TABLE_CELLS);
+        return isElementDisabled(cells.get(3).findElement(By.className("s-update_from_file")));
+    }
+
+    public boolean isButtonDownloadTemplateDisable(String datasetName) {
+        WebElement row = getRowByName(datasetName);
+        List<WebElement> cells = row.findElements(TABLE_CELLS);
+        return isElementDisabled(cells.get(3).findElement(By.className("s-csv_template")));
     }
 }
