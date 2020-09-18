@@ -37,7 +37,7 @@ public class ViewDetailDialog extends AbstractFragment {
     private static final String VIEW_DETAIL_DIALOG = "indigo-table-component";
     private static final String ATTRIBUTE_NAME = "//div[@class='title attribute'][contains(text(),'%s')]";
     private static final String FACT_NAME = "//div[@class='title fact'][contains(text(),'%s')]";
-    private static final String LABEL_NAME = "//div[@class='title label'][contains(text(),'%s')]";
+    private static final String LABEL_NAME = "//div[@class='title label label-text'][contains(text(),'%s')]";
     private static final String DATATYPE_CHANGE = "//div[@class='gd-list-item %s']";
 
     public static ViewDetailDialog getInstance(SearchContext searchContext) {
@@ -84,10 +84,11 @@ public class ViewDetailDialog extends AbstractFragment {
 
     public void addNewLabel(String attribute, String labelName){
         WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
-        Actions driverActions = new Actions(browser);
         hoverOnElementByJS(attributeName);
         waitForElementVisible(addLabelButton);
-        driverActions.moveToElement(addLabelButton).click().sendKeys(labelName).sendKeys(Keys.ENTER).perform();
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(addLabelButton).click().build().perform();
+        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().addLabel(labelName);
     }
 
     public void deleteLabel(String labelName) {
