@@ -127,6 +127,8 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
             if (browser.getCurrentUrl().contains(testParams.getLocalhostSDK())) {
                 browser.navigate().refresh();
                 waitForElementPresent(By.id("root"), browser);
+            } else {
+                initSDKAnalysisPage(); //To avoid some pages contain iframe tag
             }
             waitForElementNotPresent(By.tagName("iframe"), browser);
             return file;
