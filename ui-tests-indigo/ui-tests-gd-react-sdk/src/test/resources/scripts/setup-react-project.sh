@@ -62,7 +62,24 @@ export BROWSER='none'
 yarn start
 echo "Done"
 
+echo "Install nodemon"
+mkdir /tmp/react/.npm-global
+npm config set prefix '/tmp/react/.npm-global'
+npm install nodemon -g --save
+npm config get prefix
+export CATALOG=''
+nohup /tmp/react/.npm-global/bin/nodemon --experimental-modules /tmp/react/ui-tests-gd-react-sdk/src/catalog.json >> $CATALOG.log 2>&1 &
 
+export APP=''
+nohup /tmp/react/.npm-global/bin/nodemon --experimental-modules /tmp/react/ui-tests-gd-react-sdk/src/App.js >> $APP.log 2>&1 &
+
+ps aux|grep nodemon
+echo "Done"
+
+echo "Install pm2"
+npm install pm2@latest -g
+nohup /tmp/react/.npm-global/bin/pm2 start /tmp/react/ui-tests-gd-react-sdk/src/App.js --name 'APP' --watch true
+echo "Done"
 ################################################################################################
 # NOTE: Stand at $REACT_PROJECT_NAME .Use command "yarn start/stop" to start/stop React project#
 ################################################################################################

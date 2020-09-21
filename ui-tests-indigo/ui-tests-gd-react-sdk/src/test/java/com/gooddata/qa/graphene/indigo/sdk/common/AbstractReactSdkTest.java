@@ -6,14 +6,17 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.testng.Assert.assertEquals;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.utils.ProcessBuilderUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 
 import java.io.BufferedReader;
@@ -29,6 +32,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class AbstractReactSdkTest extends GoodSalesAbstractTest {
 
@@ -70,6 +74,20 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(
                 browser -> appFile.isFile() && appFile.exists() && appFile.length() > 0);
         log.info("File updated completely with size " + appFile.length());
+
+        File pm2File = new File("/tmp/react/.npm-global/bin");
+        List<String> commands = new LinkedList<>();
+        commands.add("/tmp/react/.npm-global/bin/pm2");
+        commands.add("reload");
+        commands.add("APP");
+        String inputStream = ProcessBuilderUtils.runCommandLine(commands, pm2File);
+        String expectedInputStream = "Use --update-env to update environment variables\n" +
+            "[PM2] Applying action reloadProcessId on app [APP](ids: 0)\n" +
+            "[PM2] [APP](0) ✓\n";
+        Function<WebDriver, Boolean> isReloaded = context -> inputStream.equals(expectedInputStream);
+        Graphene.waitGui().until(isReloaded);
+
+        assertEquals(inputStream, expectedInputStream);
     }
 
     public void createTestingVariable(Pair<String, String>... variables) {
