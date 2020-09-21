@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel.LogicalOperator.EQUAL_TO;
@@ -38,6 +39,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.*;
@@ -49,6 +51,7 @@ public class RenderGeoPushpinTest extends AbstractGeoPushpinTest {
     private static final String ATTR_GEO_CHART = "city";
     private static final String SEGMENT_FILTER = "Washington";
     private static final String GEO_INSIGHT = "GeoPushpinInsight";
+    private static final String VIEWPORT_INSIGHT = "ViewportInsight";
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     private AnalysisPage analysisPage;
     private GeoPushpinChartPicker geoChart;
@@ -327,6 +330,23 @@ public class RenderGeoPushpinTest extends AbstractGeoPushpinTest {
         exportGeoPushpinChartToXlsxFile("Untitled insight", "/filterGeoPushpin.xlsx");
         waitForIndigoMessageDisappear(browser);
         exportGeoPushpinChartToCsvFile("Untitled insight", "/filterGeoPushpin.csv");
+    }
+
+    @Test(dependsOnMethods = {"checkUiForGeoPushpin"}, groups = {"geopushpinproject"})
+    public void verifyViewportAfterReopenInsight() {
+        addGeoPushpinChart();
+        analysisPage.saveInsight(VIEWPORT_INSIGHT).waitForReportComputing();
+        geoChart.hoverOnGeoPushpin(-445, -120);
+        assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be displayed");
+        assertEquals(geoChart.getGeoPopupTooltip(), asList("city", "Sum of population", "Sum of population", "state"));
+        Map<String, String> expectedTooltip = geoChart.getPopupTooltipDetails();
+        analysisPage.openInsight(VIEWPORT_INSIGHT).waitForReportComputing();
+        sleepTightInSeconds(2);
+        geoChart.hoverOnGeoPushpin(-445, -120);
+        assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be displayed - Bug SD-1070");
+        assertEquals(geoChart.getGeoPopupTooltip(), asList("city", "Sum of population", "Sum of population", "state"));
+        Map<String, String> currentTooltip = geoChart.getPopupTooltipDetails();
+        assertThat(expectedTooltip, equalTo(currentTooltip));
     }
 
     public void exportGeoPushpinChartToXlsxFile(String insightName, String fileCompare) throws IOException {
