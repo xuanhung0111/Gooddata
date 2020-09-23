@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
@@ -25,6 +26,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -157,8 +159,9 @@ public class ResizeWidgetsAndRowsTest extends AbstractDashboardTest {
         indigoDashboardsPage.selectDateFilterByName("This month").selectDateFilterByName("All time")
             .waitForWidgetsLoading();
 
-        assertThat(indigoDashboardsPage.getDashboardBodyText(),
-            containsString("SORRY, WE CAN'T DISPLAY THIS INSIGHT"));
+        PivotTableReport pivotTableReport = indigoDashboardsPage.getLastWidget(Insight.class).getPivotTableReport();
+        List<String> expectedValues = asList("$116,625,456.54", "$20,286.22", "$5,134,397.65");              
+        assertThat(pivotTableReport.getBodyContent(), hasItems(expectedValues));
     }
 
     private String createInsightHasOnlyMetric(String insightTitle, ReportType reportType, List<String> metricsTitle) {
