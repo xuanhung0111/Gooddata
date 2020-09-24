@@ -339,6 +339,7 @@ public class MetricEditorDialog extends AbstractFragment {
     public MetricEditorDialog selectCodeMirrorWidget(String displayedText) {
 
         WebElement codeMirrorEditor = waitForElementVisible(By.className("CodeMirror"), browser);
+        getActions().moveToElement(codeMirrorEditor);
         codeMirrorEditor.click();
 
         if (!codeMirrorEditor.getAttribute("class").contains("focused"))
