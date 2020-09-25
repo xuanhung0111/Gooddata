@@ -35,9 +35,20 @@
             <class name="com.gooddata.qa.graphene.modeler.DialogModelingTest" />
         </classes>
     </test>
+
     <test name="ModelingFollowUpTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.ModelingFollowUpTest" />
+        </classes>
+    </test>
+    <test name="SearchModelTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.SearchModelTest" />
+        </classes>
+    </test>
+    <test name="ImportExportJsonTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>
     </test>
 </suite>

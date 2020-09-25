@@ -15,4 +15,9 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
         openUrl(LogicalDataModelPage.getUri(testParams.getProjectId()));
         return LogicalDataModelPage.getInstance(browser);
     }
+
+    public LogicalDataModelPage initLogicalDataModelPageByPID(String pid) {
+        openUrl(LogicalDataModelPage.getUri(pid));
+        return LogicalDataModelPage.getInstance(browser);
+    }
 }

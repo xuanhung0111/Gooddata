@@ -2,10 +2,11 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
@@ -36,6 +37,9 @@ public class ViewDetailDialog extends AbstractFragment {
 
     @FindBy(className = "s-delete")
     WebElement deleteButton;
+
+    @FindBy(className = "selected-row")
+    WebElement selectedRow;
 
     private static final String VIEW_DETAIL_DIALOG = "indigo-table-component";
     private static final String ATTRIBUTE_NAME = "//div[@class='title attribute'][contains(text(),'%s')]";
@@ -69,8 +73,12 @@ public class ViewDetailDialog extends AbstractFragment {
 
     public boolean isLabelAttributeExist(String attribute) {
         List<WebElement> attributeList = this.getRoot().findElements(xpath(format(LABEL_NAME, attribute)));
-        if(attributeList.isEmpty()) return false;
+        if (attributeList.isEmpty()) return false;
         return true;
+    }
+
+    public boolean isRowSelected(String label) {
+        return selectedRow.findElements(By.xpath(format(LABEL_NAME, label))).size() != 0? true : false;
     }
 
     public void editLabelName(String label, String newName) {

@@ -1,0 +1,1 @@
+DROP {label.people.peopleid};ALTER DATATYPE {f_people.id} BIGINT;SYNCHRONIZE {dataset.people} PRESERVE DATA;
