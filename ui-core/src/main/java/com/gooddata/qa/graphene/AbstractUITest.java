@@ -556,6 +556,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
         tryToInitEmbeddedIndigoDashboardPage();
         browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
+        waitForOpeningIndigoDashboard();
         return IndigoDashboardsPage.getInstance(browser);
     }
 
