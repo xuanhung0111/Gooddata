@@ -6,9 +6,12 @@ import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect.DateDimensionGroup;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
@@ -49,6 +52,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
             ReportType.BULLET_CHART.getFormat(), ReportType.GEO_CHART.getFormat());
     private List<String> listRecommendedDate = Arrays.asList(DATE_DATASET_CLOSED, DATE_DATASET_CREATED,
             DATE_DATASET_ACTIVITY, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
+    private List<String> listRecommendedDateInKD = Arrays.asList(DATE_DATASET_CLOSED, DATE_DATASET_ACTIVITY, 
+            DATE_DATASET_CREATED, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
     private final String INSIGHT_TEST = "INSIGHT TEST" + generateHashString();
     private final String INSIGHT_TEST_SAVE = "INSIGHT TEST SAVE" + generateHashString();
 
@@ -309,6 +314,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT)
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
         analysisPage.waitForReportComputing().saveInsight("TEST RECOMMENDED DATE CLOSED");
+
         initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing();
         analysisPage.addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT)
@@ -319,6 +325,16 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT).expandConfiguration();
         assertEquals(metricConfiguration.getlistRecommended(), listRecommendedDate);
+        
+        initAnalysePage().changeReportType(ReportType.TREE_MAP).waitForReportComputing()
+                .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addDateFilter().waitForReportComputing().saveInsight("TEST RECOMMENDED DATE IN FILTER BAR");
+        FiltersBucket filterBucket = analysisPage.getFilterBuckets();
+        DateDimensionSelect dateDatasetSelect = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).getDateDatasetSelect();
+        DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup("RECOMMENDED");
+        DateDimensionGroup other = dateDatasetSelect.getDateDimensionGroup("OTHER");
+        assertEquals(recommended.getDateDimensions(), asList(DATE_DATASET_CLOSED, DATE_DATASET_CREATED));
+        assertEquals(other.getDateDimensions(), asList(DATE_DATASET_ACTIVITY, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE));
     }
 
     @Test(dependsOnMethods = {"testRecommendedDateDimensionOnAD"})
@@ -326,10 +342,15 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
         ConfigurationPanel configurationPanel;
         configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CLOSED")
                 .waitForWidgetsLoading().getConfigurationPanel();
-        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
+        assertFalse(configurationPanel.isDateFilterCheckboxEnabled(), "Checkbox Date filter should be disabled");
+
         configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CREATED")
                 .waitForWidgetsLoading().getConfigurationPanel();
-        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
+        assertFalse(configurationPanel.isDateFilterCheckboxEnabled(), "Checkbox Date filter should be disabled");
+
+        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE IN FILTER BAR")
+                .waitForWidgetsLoading().getConfigurationPanel();
+        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDateInKD);
     }
 
     @Test(dependsOnGroups = {"createProject"})
