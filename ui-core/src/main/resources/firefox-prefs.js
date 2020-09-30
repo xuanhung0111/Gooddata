@@ -8,6 +8,7 @@
 user_pref("browser.download.manager.showWhenStarting", false);
 user_pref("browser.download.panel.firstSessionCompleted", false);
 user_pref("browser.download.folderList", 2);
+user_pref("browser.download.useDownloadDir", true);
 user_pref("browser.download.dir", "${browserDownloadFolder}");
 user_pref("browser.download.downloadDir", "${browserDownloadFolder}");
 user_pref("browser.download.defaultFolder", "${browserDownloadFolder}");

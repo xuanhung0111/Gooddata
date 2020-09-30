@@ -23,7 +23,7 @@ describe "Dockerfile" do
   end
 
   it "installs Firefox" do
-    expect(command('firefox --version').stdout).to contain("Firefox")
+    expect(command('firefox --version').stdout).to contain("Firefox 80.0")
   end
 
   it "installs Geckodriver" do
