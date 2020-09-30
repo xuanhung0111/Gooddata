@@ -102,7 +102,7 @@ integratedTests:
       -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
       -DredshiftIAMDbUser=redshiftdevunloader
-      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
+      -DredshiftIAMAccessKey=AKIA4JVILUMKHRJ3ZB5W
       -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
       -Dhost=staging.intgdc.com
@@ -157,7 +157,7 @@ integratedTests:
       -DredshiftJdbcUrl=jdbc:redshift://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -DredshiftIAMSecretKey="$REDSHIFT_IAM_SECRET_KEY"
       -DredshiftIAMDbUser=redshiftdevunloader
-      -DredshiftIAMAccessKey=AKIA4JVILUMKEH2Y2CPX
+      -DredshiftIAMAccessKey=AKIA4JVILUMKHRJ3ZB5W
       -DredshiftJdbcIAMLongUrl=jdbc:redshift:iam://explorer.cbrgkmwhlu9v.us-east-2.redshift.amazonaws.com:5439/dev
       -DredshiftJdbcIAMShortUrl=jdbc:redshift:iam://explorer:us-east-2/dev
       -Duser.domain=default
