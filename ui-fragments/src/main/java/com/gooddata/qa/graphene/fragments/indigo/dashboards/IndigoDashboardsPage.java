@@ -50,6 +50,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -510,6 +511,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         } else {
             selectDashboard(title, dashboardsList);
         }
+        waitForOpeningIndigoDashboard();
         waitForDashboardLoad();
         return this;
     }
@@ -1169,5 +1171,17 @@ public class IndigoDashboardsPage extends AbstractFragment {
                 driverActions.release().perform();
             }
         }
+    }
+
+    private void waitForOpeningIndigoDashboard() {
+        final By loadingLabel = className("gd-loading-equalizer");
+        try {
+            Function<WebDriver, Boolean> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
+            Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+
+        waitForElementNotPresent(loadingLabel);
     }
 }
