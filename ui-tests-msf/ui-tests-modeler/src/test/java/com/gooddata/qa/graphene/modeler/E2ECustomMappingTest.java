@@ -247,8 +247,12 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     @Test(dependsOnMethods = "publishModelAndImportData")
     public void verifyDownloadTemplate() throws IOException {
         initModelerPageContent();
+        modeler.getLayout().waitForLoading();
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
+        initModelerPageContent();
+        modeler.getLayout().waitForLoading();
+        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + CLASS_DATASET + "." + ExportFormat.CSV.getName());
         waitForExporting(exportFile);
@@ -300,6 +304,9 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     public void downloadTemplateAfterEditAndLoadData() throws IOException {
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
+        initLogicalDataModelPage();
+        modeler.getLayout().waitForLoading();
+        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + CLASS_DATASET + "." + ExportFormat.CSV.getName());
         waitForExporting(exportFile);
@@ -374,6 +381,9 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
 
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(datasetName);
+        initModelerPageContent();
+        modeler.getLayout().waitForLoading();
+        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + datasetName + "." + ExportFormat.CSV.getName());
         waitForExporting(exportFile);
