@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc.process;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
@@ -31,6 +32,9 @@ public class DeploySDDProcessDialog extends AbstractFragment {
 
     @FindBy(css = ".deploy-sdd-process-distribute-data-segment .ait-dataset-selection-radio-all")
     private List<WebElement> segments;
+
+    @FindBy(className = "datasource-selection-button")
+    private DataSourceDropdown selectionDataSourceDropDown;
 
     public static DeploySDDProcessDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(DeploySDDProcessDialog.class,
@@ -67,6 +71,11 @@ public class DeploySDDProcessDialog extends AbstractFragment {
         return this;
     }
 
+    public DeploySDDProcessDialog selectDataSourceType(String dataSourceTitle) {
+        getSelectionDataSourceDropdown().expand().selectDataSource(dataSourceTitle);
+        return this;
+    }
+
     public Boolean checkExistingDataSource(String dataSourceTitle) {
         return getDataSourceDropdown().expand().IsDataSourceExist(dataSourceTitle);
     }
@@ -77,6 +86,10 @@ public class DeploySDDProcessDialog extends AbstractFragment {
 
     private DataSourceDropdown getDataSourceDropdown() {
         return waitForFragmentVisible(dataSourceDropDown);
+    }
+
+    public DataSourceDropdown getSelectionDataSourceDropdown() {
+        return waitForFragmentVisible(selectionDataSourceDropDown);
     }
 
     public enum Scope {

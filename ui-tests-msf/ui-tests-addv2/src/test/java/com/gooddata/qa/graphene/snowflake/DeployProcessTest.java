@@ -137,7 +137,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
             DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
             DeploySDDProcessDialog deploySDDProcessDialog = deployForm.selectADDProcess()
-                    .selectDataSource(firstDataSource)
+                    .selectDataSourceType(firstDataSource)
                     .selectScope(Scope.SEGMENT)
                     .selectSegment(secondSegmentID)
                     .selectSegment(firstSegmentID);
