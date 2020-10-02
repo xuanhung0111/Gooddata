@@ -66,7 +66,7 @@ public class TableViewDataset extends AbstractFragment {
         cells.get(3).findElement(By.className("s-csv_template")).click();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         wrapper.waittingDialog();
-        wrapper.closeWaitingDialog();
+        //wrapper.closeWaitingDialog();
     }
 
     public boolean isButtonUpdateDisable(String datasetName) {

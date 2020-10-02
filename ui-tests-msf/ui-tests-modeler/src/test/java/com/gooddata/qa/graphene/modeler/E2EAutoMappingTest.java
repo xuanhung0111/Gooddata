@@ -152,6 +152,9 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         tableView = TableView.getInstance(browser);
         tableViewDataset = tableView.getTableViewDataset();
         tableViewDataset.clickButtonDownloadTemplate(SCHOOL_DATASET);
+        initModelerPageContent();
+        modeler.getLayout().waitForLoading();
+        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + SCHOOL_DATASET + "." + ExportFormat.CSV.getName());
         waitForExporting(exportFile);
@@ -211,6 +214,9 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
 
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
+        initModelerPageContent();
+        modeler.getLayout().waitForLoading();
+        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + CLASS_DATASET + "." + ExportFormat.CSV.getName());
         waitForExporting(exportFile);
