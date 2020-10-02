@@ -36,6 +36,7 @@ public class ToolBar extends AbstractFragment {
 
     public void switchToTableView() {
         tableViewButton.click();
+        TableView.getInstance(browser).getTableViewDataset().waitLoadingTableView();
     }
 
     public void switchToModel() {
