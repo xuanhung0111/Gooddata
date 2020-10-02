@@ -157,7 +157,7 @@ public class OverlayWrapper extends AbstractFragment {
     public OverlayWrapper closeWaitingDialog() {
         Actions driverActions = new Actions(browser);
         waitForElementVisible(closeWaitingDialog);
-        driverActions.moveToElement(closeWaitingDialog).click().build().perform();
+        driverActions.moveToElement(closeWaitingDialog).pause(2000).click().build().perform();
         waitForFragmentNotVisible(this);
         return this;
     }

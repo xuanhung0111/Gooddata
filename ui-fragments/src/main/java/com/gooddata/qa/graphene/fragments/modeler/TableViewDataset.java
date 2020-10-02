@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 
 import java.util.List;
 
@@ -19,8 +20,16 @@ public class TableViewDataset extends AbstractFragment {
     @FindBy(className = "fixedDataTableRowLayout_body")
     List<WebElement> rowTable;
 
+    @FindBy(className = "loading-mask")
+    WebElement loading;
+
     public static final TableViewDataset getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(TableViewDataset.class, waitForElementVisible(TABLE_VIEW_DATASET, searchContext));
+    }
+
+    public TableViewDataset waitLoadingTableView() {
+        waitForElementNotVisible(loading);
+        return this;
     }
 
     public WebElement getRowByName(String datasetName) {
