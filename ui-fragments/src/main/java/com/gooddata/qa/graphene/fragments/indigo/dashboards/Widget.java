@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.tagName;
 
@@ -163,6 +164,7 @@ public class Widget extends AbstractFragment {
     }
 
     public OptionalExportMenu openOptionsMenu() {
+        getActions().moveToElement(waitForElementPresent(By.className("s-dash-item-action-placeholder"), browser)).build().perform();
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,
             waitForElementVisible(By.className("s-options-menu-bubble"), browser));
