@@ -287,6 +287,7 @@ public class PivotTableReport extends AbstractFragment {
         if (pivotAggregationPopup.isItemChecked(type)) {
             pivotAggregationPopup.selectItem(type);
         }
+        AnalysisPage.getInstance(browser).waitForReportComputing();
         return this;
     }
 
