@@ -9,9 +9,12 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect.DateDimensionGroup;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
@@ -51,7 +54,6 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 import static java.lang.String.format;
 
-
 public class HeatMapTest extends AbstractAnalyseTest {
     private List<String> listReportType = asList(
             ReportType.TABLE.getFormat(), ReportType.COLUMN_CHART.getFormat(), ReportType.BAR_CHART.getFormat(),
@@ -61,7 +63,8 @@ public class HeatMapTest extends AbstractAnalyseTest {
             ReportType.HEAT_MAP.getFormat(), ReportType.BULLET_CHART.getFormat(), ReportType.GEO_CHART.getFormat());
     private List<String> listRecommendedDate = Arrays.asList(DATE_DATASET_CLOSED, DATE_DATASET_CREATED,
             DATE_DATASET_ACTIVITY, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
-
+    private List<String> listRecommendedDateInKD = Arrays.asList(DATE_DATASET_CLOSED, DATE_DATASET_ACTIVITY, 
+            DATE_DATASET_CREATED, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
     private final String INSIGHT_TEST = "INSIGHT TEST" + generateHashString();
     private final String INSIGHT_TEST_SAVE = "INSIGHT TEST SAVE" + generateHashString();
     private final String INSIGHT_HAS_METRIC_AND_ATTRIBUTE = "Insight Has Metric And Attribute" + generateHashString();
@@ -295,6 +298,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
         analysisPage.waitForReportComputing().saveInsight("TEST RECOMMENDED DATE CLOSED");
         initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing();
+
         analysisPage.addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT)
                 .expandConfiguration().addFilterByDate(DATE_DATASET_CREATED, DateRange.LAST_YEAR.toString());
@@ -304,6 +308,16 @@ public class HeatMapTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_OPP_FIRST_SNAPSHOT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_OPP_FIRST_SNAPSHOT).expandConfiguration();
         assertEquals(metricConfiguration.getlistRecommended(), listRecommendedDate);
+        
+        initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing()
+                .addMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addDateFilter().waitForReportComputing().saveInsight("TEST RECOMMENDED DATE IN FILTER BAR");
+        FiltersBucket filterBucket = analysisPage.getFilterBuckets();
+        DateDimensionSelect dateDatasetSelect = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).getDateDatasetSelect();
+        DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup("RECOMMENDED");
+        DateDimensionGroup other = dateDatasetSelect.getDateDimensionGroup("OTHER");
+        assertEquals(recommended.getDateDimensions(), asList(DATE_DATASET_CLOSED, DATE_DATASET_CREATED));
+        assertEquals(other.getDateDimensions(), asList(DATE_DATASET_ACTIVITY, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE));
     }
 
     @Test(dependsOnMethods = {"testRecommendedDateDimensionOnAD"})
@@ -311,10 +325,15 @@ public class HeatMapTest extends AbstractAnalyseTest {
         ConfigurationPanel configurationPanel;
         configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CLOSED")
                 .waitForWidgetsLoading().getConfigurationPanel();
-        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
+        assertFalse(configurationPanel.isDateFilterCheckboxEnabled(), "Checkbox Date filter should be disabled");
+
         configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE CREATED")
                 .waitForWidgetsLoading().getConfigurationPanel();
-        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDate);
+        assertFalse(configurationPanel.isDateFilterCheckboxEnabled(), "Checkbox Date filter should be disabled");
+        
+        configurationPanel = initIndigoDashboardsPage().addDashboard().addInsight("TEST RECOMMENDED DATE IN FILTER BAR")
+                .waitForWidgetsLoading().getConfigurationPanel();
+        assertEquals(configurationPanel.getListDateDataset(), listRecommendedDateInKD);
     }
 
     @Test(dependsOnGroups = "createProject")
