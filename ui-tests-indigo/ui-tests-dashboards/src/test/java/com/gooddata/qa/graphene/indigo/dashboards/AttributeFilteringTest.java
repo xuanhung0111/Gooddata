@@ -376,18 +376,18 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
             uploadCSV(getFilePathFromResource(WITHOUT_DATE_CSV_PATH));
             takeScreenshot(browser, "uploaded-" + WITHOUT_DATE_DATASET + "-dataset", getClass());
 
-            initIndigoDashboardsPage().getSplashScreen()
-                    .startEditingWidgets()
-                    .addAttributeFilter(attributeName)
-                    .getAttributeFiltersPanel()
-                    .getAttributeFilter(attributeName)
-                    .selectAllValues();
-
             String metric = "Metric-Using-Dataset-Without-Date";
             getMdService().createObj(getProject(), new Metric(metric,
                     MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]",
                             getMdService().getObjUri(getProject(), Fact.class, title("Censusarea")))),
                     "#,##0.00"));
+
+            initIndigoDashboardsPage().getSplashScreen()
+                    .startEditingWidgets()
+                    .addAttributeFilter(attributeName)
+                    .getAttributeFiltersPanel()
+                    .getAttributeFilter(attributeName)
+                    .selectAllValues();            
 
             // can't use addKpi() because Using dataset has no date;
             indigoDashboardsPage.dragAddKpiPlaceholder().getConfigurationPanel().selectMetricByName(metric);
