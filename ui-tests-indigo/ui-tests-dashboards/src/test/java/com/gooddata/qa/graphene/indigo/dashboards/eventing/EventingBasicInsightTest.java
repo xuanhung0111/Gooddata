@@ -54,7 +54,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         final JSONArray uris = new JSONArray() {{
             put(activityUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -73,7 +73,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         final JSONArray uris = new JSONArray() {{
             put(activityUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -99,7 +99,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(activityUri);
             put(opportunityUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -128,7 +128,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(activityUri);
             put(opportunityUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -162,7 +162,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         final JSONArray uris = new JSONArray() {{
             put(stageUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -183,7 +183,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(stageUri);
             put(regionUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -213,7 +213,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -243,7 +243,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(activityUri);
             put(regionUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -272,7 +272,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(activityUri);
             put(regionUri);
         }};
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -306,7 +306,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -338,7 +338,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -372,7 +372,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(yearActivity);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -402,7 +402,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(yearActivity);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -440,7 +440,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(yearCreated);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -483,7 +483,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
@@ -534,7 +534,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(amountUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -570,7 +570,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(departmentUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -618,7 +618,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -666,7 +666,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
             put(regionUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
