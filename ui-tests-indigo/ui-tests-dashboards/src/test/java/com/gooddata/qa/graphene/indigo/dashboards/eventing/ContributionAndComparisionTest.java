@@ -59,7 +59,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(yearActivityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -81,7 +81,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(yearActivityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -105,7 +105,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -127,7 +127,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -156,7 +156,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -189,7 +189,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -221,7 +221,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -255,7 +255,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -293,7 +293,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -325,7 +325,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -357,7 +357,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -393,7 +393,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
@@ -429,7 +429,7 @@ public class ContributionAndComparisionTest extends AbstractDashboardEventingTes
             put(activityTypeUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardUri) + "?preventDefault=true", uris.toString());
         IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file).waitForWidgetsLoading();
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 

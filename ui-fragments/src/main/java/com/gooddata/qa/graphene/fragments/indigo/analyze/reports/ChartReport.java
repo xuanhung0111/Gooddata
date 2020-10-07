@@ -377,7 +377,7 @@ public class ChartReport extends AbstractFragment {
     private void displayTooltipOnTrackerByIndex(int groupIndex, int index) {
         WebElement tracker = getTracker(groupIndex, index);
         checkIndex(index);
-        getActions().moveToElement(tracker).moveByOffset(1, 1).click().perform();
+        getActions().moveToElement(tracker).moveByOffset(1, 1).perform();
         waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
     }
 
