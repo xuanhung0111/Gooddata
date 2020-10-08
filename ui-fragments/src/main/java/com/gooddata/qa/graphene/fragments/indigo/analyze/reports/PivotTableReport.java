@@ -239,6 +239,10 @@ public class PivotTableReport extends AbstractFragment {
         return getCellElement(columnTitle, headerIndex, rowIndex).getText();
     }
 
+    public void clickOnElement(String columnTitle, int headerIndex, int rowIndex) {
+        getCellElement(columnTitle, headerIndex, rowIndex).click();
+    }
+
     public PivotTableReport sortBaseOnHeader(final String name) {
         WebElement webElement = waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))

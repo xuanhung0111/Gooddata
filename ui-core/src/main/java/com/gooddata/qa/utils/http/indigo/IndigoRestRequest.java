@@ -405,6 +405,16 @@ public class IndigoRestRequest extends CommonRestRequest {
         return initWidget(uriWidget, widthWidget);
     }
 
+    private JSONObject initEmptyWidget(Integer widthWidget) throws JSONException {
+        return new JSONObject() {{
+            put("size", new JSONObject() {{
+                put("xl", new JSONObject() {{
+                    put("width", widthWidget);
+                }});
+            }});            
+        }};
+    }
+
     private JSONObject initWidget(String uriWidget, Integer widthWidget) throws JSONException {
         return new JSONObject() {{
             put("size", new JSONObject() {{
@@ -449,6 +459,29 @@ public class IndigoRestRequest extends CommonRestRequest {
         return uri;
     }
 
+    /**
+     * Create new empty analytical dashboard
+     *
+     * @param title
+     *
+     * @return new analytical dashboard uri
+     */
+    public String createEmptyAnalyticalDashboard(final String title, int widthWidget) {
+        final String content = createEmptyAnalyticalDashboardBody(widthWidget).toString()
+                .replace("${title}", title);
+        String uri;
+        try {
+            uri = getJsonObject(
+                    RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                    .getJSONObject("analyticalDashboard")
+                    .getJSONObject("meta")
+                    .getString("uri");
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is error while getting JSON object", e);
+        }
+        return uri;
+    }
+
     private JSONObject initialAnalyticalDashboardBody(final Collection<String> widgetUris) {
         try {
             return new JSONObject() {{
@@ -475,6 +508,34 @@ public class IndigoRestRequest extends CommonRestRequest {
                 }});
             }};
         } catch (JSONException | IOException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    }
+
+    private JSONObject createEmptyAnalyticalDashboardBody(int widthWidget) {
+        try {
+            return new JSONObject() {{
+                put("analyticalDashboard", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                    put("content", new JSONObject() {{
+                        put("layout", new JSONObject() {{
+                            put("fluidLayout", new JSONObject() {{
+                                put("rows", new JSONArray() {{
+                                    JSONObject temp = new JSONObject();
+                                    temp.put("columns", new JSONArray() {{                                        
+                                            put(initEmptyWidget(widthWidget));
+                                    }});
+                                    put(temp);
+                                }});
+                            }});
+                        }});
+                        put("widgets", new JSONArray());
+                    }});
+                }});
+            }};
+        } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
     }
@@ -845,5 +906,70 @@ public class IndigoRestRequest extends CommonRestRequest {
 
     public void setColor(ColorPaletteRequestData colorPaletteRequestData) {
         executeRequest(initPutRequest(format(COLOR_PALETTE_OBJ_LINK, projectId), colorPaletteRequestData.getJson().toString()), HttpStatus.NO_CONTENT);
+    }
+
+    public void addRelativePresetsDashboardLevel(String dashboardTitle, String filterName, String mode, String localIdentifier,
+            String nameOfPreset, String granularity, Boolean visible, Integer from, Integer to) throws IOException {
+                final String dashboardUri = getAnalyticalDashboardUri(dashboardTitle);
+                final JSONObject dashboard = getJsonObject(dashboardUri);
+                dashboard.getJSONObject("analyticalDashboard").getJSONObject("content").put("dateFilterConfig",new JSONObject()
+                    .put("filterName", filterName)
+                    .put("mode", mode)
+                        .put("addPresets", new JSONObject()
+                                .put("relativePresets", new JSONArray()
+                                .put(new JSONObject()
+                                    .put("localIdentifier", localIdentifier)
+                                    .put("name", nameOfPreset)
+                                    .put("granularity", granularity)
+                                    .put("visible", visible)
+                                    .put("from", from)
+                                    .put("to", to)))));
+                executeRequest(RestRequest.initPostRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    public void addAbsolutePresetsDashboardLevel(String dashboardTitle, String filterName, String mode, String localIdentifier,
+            String name, Boolean visible, String from, String to) throws IOException {
+                final String dashboardUri = getAnalyticalDashboardUri(dashboardTitle);
+                final JSONObject dashboard = getJsonObject(dashboardUri);
+                dashboard.getJSONObject("analyticalDashboard")
+                    .getJSONObject("content")
+                        .put("dateFilterConfig", new JSONObject()
+                            .put("filterName", filterName)
+                            .put("mode", mode)
+                            .put("addPresets", new JSONObject()
+                                .put("absolutePresets", new JSONArray()
+                                .put(new JSONObject()
+                                    .put("localIdentifier", localIdentifier)
+                                    .put("name", name)
+                                    .put("visible", visible)
+                                    .put("from", from)
+                                    .put("to", to)))));
+                executeRequest(RestRequest.initPostRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    public void hideFilterOptionsOnDashboardLevel(String dashboardTitle, String filterName, String mode, String localIdentifier)
+            throws IOException {
+                final String dashboardUri = getAnalyticalDashboardUri(dashboardTitle);
+                final JSONObject dashboard = getJsonObject(dashboardUri);
+                dashboard.getJSONObject("analyticalDashboard")
+                    .getJSONObject("content")
+                    .put("dateFilterConfig", new JSONObject()
+                        .put("filterName", filterName)
+                        .put("mode", mode)
+                        .put("hideOptions", new JSONArray()
+                        .put(localIdentifier)));
+                executeRequest(RestRequest.initPostRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
+    }
+
+    public void setModeOfDateFilter(String dashboardTitle, String filterName, String mode)
+            throws IOException {
+                final String dashboardUri = getAnalyticalDashboardUri(dashboardTitle);
+                final JSONObject dashboard = getJsonObject(dashboardUri);
+                dashboard.getJSONObject("analyticalDashboard")
+                    .getJSONObject("content")
+                    .put("dateFilterConfig", new JSONObject()
+                        .put("filterName", filterName)
+                        .put("mode", mode));
+                executeRequest(RestRequest.initPostRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 }
