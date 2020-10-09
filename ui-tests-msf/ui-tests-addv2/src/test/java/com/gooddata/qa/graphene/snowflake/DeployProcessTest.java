@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.snowflake;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.VIEWER;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.cloudresources.DataSourceRestRequest.DATA_SOURCE_REST_URI;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -92,6 +93,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         signInAtUI(testParams.getDomainUser(), testParams.getPassword());
         try {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
+            sleepTightInSeconds(8); // add waiting time to avoid browser crashing
             DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
             assertTrue(projectDetailPage.isDeployProcessFormVisible(), "Deploy Process Form should be displayed");
             assertEquals(deployForm.getRedirectedPageFromLearnMore(), SUPPORT_URI);
@@ -168,6 +170,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         String secondDataSourceID = dataSourceUtils.createDefaultDataSource(secondDataSource, DATA_BASE, DatabaseType.SNOWFLAKE);
         try {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
+            sleepTightInSeconds(8); // add waiting time to avoid browser crashing
             DeployProcessForm deployForm = projectDetailPage.clickDeployButton();
             deployForm.selectADDProcess()
                     .selectDataSource(firstDataSource)
