@@ -50,14 +50,6 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void setSFDCCredentialsTest() throws JSONException {
-        openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
-        waitForElementVisible(sfdc.getRoot());
-        sfdc.setSFDCCredentials(testParams.loadProperty("sfdc.email"),
-                testParams.loadProperty("sfdc.password") + testParams.loadProperty("sfdc.securityToken"));
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
     public void changeAttributeToImageTest() {
         changeAttributeLabel(IMAGE_ATTRIBUTE, AttributeLabelTypes.IMAGE);
         changeAttributeLabel(IMAGE_SFDC_ATTRIBUTE, AttributeLabelTypes.IMAGE);
@@ -65,7 +57,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createTestMetric() {
-        createMetric(SUM_OF_AMOUNT_METRIC, 
+        createMetric(SUM_OF_AMOUNT_METRIC,
                 format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT_FACT))),
                 DEFAULT_METRIC_FORMAT);
     }
@@ -75,12 +67,12 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         createReport(new UiReportDefinition()
                         .withName(IMAGE_REPORT)
                         .withWhats(SUM_OF_AMOUNT_METRIC)
-                        .withHows(IMAGE_ATTRIBUTE), 
+                        .withHows(IMAGE_ATTRIBUTE),
                         IMAGE_REPORT);
         createReport(new UiReportDefinition()
                         .withName(IMAGE_SFDC_REPORT)
                         .withWhats(SUM_OF_AMOUNT_METRIC)
-                        .withHows(IMAGE_SFDC_ATTRIBUTE), 
+                        .withHows(IMAGE_SFDC_ATTRIBUTE),
                         IMAGE_SFDC_REPORT);
     }
 
@@ -91,16 +83,6 @@ public class AttributeLabelsTest extends AbstractProjectTest {
                 ReportWithImage.class,
                 browser.findElement(By.id("gridContainerTab")));
         report.verifyImageOnReport();
-    }
-
-    @Test(dependsOnMethods = {"setSFDCCredentialsTest", "createImageReports"})
-    public void verifyReportWithImageSFDCTest() {
-        initReportsPage().openReport(IMAGE_SFDC_REPORT);
-        ReportWithImage report = Graphene.createPageFragment(
-                ReportWithImage.class,
-                browser.findElement(By.id("gridContainerTab")));
-        report.verifyIfImageSFDCOnReport();
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -118,7 +100,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     public void createReportWithHyperlinkTest() {
         createReport(new UiReportDefinition().withName(HYPERLINK_REPORT)
                                            .withWhats(SUM_OF_AMOUNT_METRIC)
-                                           .withHows(HYPERLINK_ATTRIBUTE), 
+                                           .withHows(HYPERLINK_ATTRIBUTE),
                      "Simple hyperlink report");
     }
 
