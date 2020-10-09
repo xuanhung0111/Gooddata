@@ -209,7 +209,8 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
         if (isMobileRunning) {
             indigoRestRequest.editWidthOfWidget(dashboardUri, 0, 0, 12);
         }
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().selectKpiDashboard("KPI Dashboard Mobile");
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPageWithWidgets().
+                selectKpiDashboard("KPI Dashboard Mobile").waitForWidgetsLoading();
 
         PivotTableReport pivotTableReport = indigoDashboardsPage.waitForAlertsLoaded().getLastWidget(Insight.class).getPivotTableReport();
         Screenshots.takeScreenshot(browser, "check Kpi dashboard has totals results on mobile", getClass());
