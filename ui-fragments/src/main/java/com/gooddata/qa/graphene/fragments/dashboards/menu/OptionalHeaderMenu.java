@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.menu;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ScheduleEmailDialog;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -23,6 +24,9 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
     @FindBy(className = "s-delete_dashboard")
     private WebElement deleteDashboardMenuItem;
 
+    @FindBy(className = "s-save_as_menu_item")
+    private WebElement saveAsButton;
+
     @Override
     protected String getDropdownCssSelector() {
         throw new UnsupportedOperationException("Unsupported getDropdownCssSelector() method");
@@ -40,6 +44,11 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
 
     public void exportToPDF() {
         waitForElementVisible(exportToPDF).click();
+    }
+
+    public void saveAs(String title) {
+        waitForElementVisible(saveAsButton).click();
+        SaveAsDialog.getInstance(browser).enterName(title).clickSubmitButton();
     }
 
     public void clickOnDeleteMenuItem() {

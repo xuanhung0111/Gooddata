@@ -164,7 +164,7 @@ public class Widget extends AbstractFragment {
     }
 
     public OptionalExportMenu openOptionsMenu() {
-        getActions().moveToElement(waitForElementPresent(By.className("s-dash-item-action-placeholder"), browser)).build().perform();
+        getActions().moveToElement(waitForElementPresent(By.className("s-dash-item-action-placeholder"), getRoot())).build().perform();
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,
             waitForElementVisible(By.className("s-options-menu-bubble"), browser));

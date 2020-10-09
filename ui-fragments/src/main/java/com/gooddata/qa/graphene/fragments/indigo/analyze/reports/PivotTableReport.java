@@ -28,6 +28,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 
 public class PivotTableReport extends AbstractFragment {
@@ -241,6 +242,11 @@ public class PivotTableReport extends AbstractFragment {
 
     public void clickOnElement(String columnTitle, int headerIndex, int rowIndex) {
         getCellElement(columnTitle, headerIndex, rowIndex).click();
+    }
+
+    public List<String> getAttributeValuePresent() {
+        waitForElementVisible(attributeValuePresent);
+        return getElementTexts(cssSelector(".ag-body-viewport .s-value"), getRoot());
     }
 
     public PivotTableReport sortBaseOnHeader(final String name) {
