@@ -45,8 +45,8 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
     private static final String ATTR_COUNTRY = "state";
     private static final String ATTR_GEO_CHART = "city";
     private static final String GEO_INSIGHT = "GeoPushpinInsight";
-    private final String GEO_DASHBOARD = "GeoPushpinDashboard_" + generateHashString();
-    private final String GEO_DASHBOARD_WITH_MORE_INSIGHT = "GeoDashboardWithMoreGeoInsight_" + generateHashString();
+    private final String GEO_DASHBOARD = "GeoPushpinDashboardVersion2_" + generateHashString();
+    private final String GEO_DASHBOARD_WITH_MORE_INSIGHT = "GeoDashboardWithMoreGeoInsightVersion2_" + generateHashString();
     private AnalysisPage analysisPage;
     private DashboardRestRequest dashboardRequest;
 
