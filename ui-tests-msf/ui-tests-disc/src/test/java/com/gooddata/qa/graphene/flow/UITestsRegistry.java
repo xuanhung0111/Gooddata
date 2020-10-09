@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.disc.schedule.EditEtlProcessScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.EditScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.EtlProcessScheduleDetailTest;
 import com.gooddata.qa.graphene.disc.schedule.ScheduleDetailTest;
+import com.gooddata.qa.graphene.lib.CreateDataloadProcessAndUploadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -68,7 +69,8 @@ public class UITestsRegistry {
         });
 
         suites.put("sanity", new Object[] {
-            SanityTest.class
+            SanityTest.class,
+            CreateDataloadProcessAndUploadTest.class,
         });
 
         TestsRegistry.getInstance()
