@@ -190,7 +190,7 @@ public class RenderingInsightUsingClientIdTest extends AbstractProjectTest {
         String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(insightTitle))).get(0);
 
         openUrl(format("/analyze/embedded/#/client/%s:%s/%s/edit", ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
-        AnalysisPage analysisPage = AnalysisPage.getInstance(browser).saveInsight().openInsight(otherInsight);
+        AnalysisPage analysisPage = AnalysisPage.getInstance(browser).openInsight(otherInsight);
         assertEquals(analysisPage.getPageHeader().getInsightTitle(), otherInsight);
         ChartReport chartReport = AnalysisPage.getInstance(browser).waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTrackersCount(), 2);
