@@ -333,7 +333,7 @@ public class EventingBasicTest extends AbstractEventingTest {
             put(amountUri);
         }};
 
-        final String file = createTemplateHtmlFile(getObjectIdFromBrowserUrl(), uris.toString());
+        final String file = createTemplateHtmlFile(getObjectIdFromBrowserUrl() + "?preventDefault=true", uris.toString());
         EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
         embeddedAnalysisPage.waitForReportComputing();
 
