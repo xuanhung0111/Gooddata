@@ -608,6 +608,22 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementNotPresent(loadingLabel);
     }
 
+    protected void waitForOpeningPage(By locator, int timeout) {
+        final By loadingLabel = locator;
+        try {
+            Function<WebDriver, Boolean> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
+            Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until(isLoadingLabelPresent);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+
+        waitForElementNotPresent(loadingLabel);
+    }
+
+    protected void waitForOpeningModelPage() {
+        waitForOpeningPage(By.cssSelector(".gd-spinner.large"), 2);
+    }
+
     private void singleDashboardWalkthrough(boolean validation, String[] expectedTabs, String dashboardName) {
         DashboardTabs tabs = dashboardsPage.getTabs();
         int numberOfTabs = tabs.getNumberOfTabs();
