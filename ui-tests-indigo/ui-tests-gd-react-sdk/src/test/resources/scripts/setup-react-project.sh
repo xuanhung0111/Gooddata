@@ -17,7 +17,7 @@ fi
 mkdir /tmp/react
 cd /tmp/react
 if $USE_BOILER_PLATE; then
-   npx @gooddata/create-gooddata-react-app $REACT_PROJECT_NAME --domainUrl $TESTING_HOST
+   npx @gooddata/create-gooddata-react-app $REACT_PROJECT_NAME --hostname $TESTING_HOST
    echo "****Using Boiler Plate****"
 else
    yarn create react-app $REACT_PROJECT_NAME

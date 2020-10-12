@@ -32,7 +32,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_chrome_uisdk'
       customTags:
-        - '8.12.0'
+        - '12.18.3'
         - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:
@@ -42,7 +42,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_firefox_uisdk'
       customTags:
-        - '8.12.0'
+        - '12.18.3'
         - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:
