@@ -32,6 +32,15 @@
 </div>
 
 <div>
+    <strong>Control Filtering:</strong>
+    <input id="setFilter" type="button" value="SET FILTER CONTEXT"/>
+    <input id="removeAllFilter" type="button" value="REMOVE FILTER"/>
+    <input id="setDateFilter" type="button" value="SET DATE FILTER"/>
+    <input id="setGranularityDate" type="button" value="SET GRANULARITY DATE"/>
+    <input id="setCombineFilter" type="button" value="SET COMBINE FILTER"/>
+</div>
+
+<div>
     <form>
         <input id="MuiInput-input" placeholder="Embedded URL (enter to submit)" type="text" class="MuiInputBase-input MuiInput-input"
                value="" style="width: 100%">
@@ -170,6 +179,171 @@
                         }
                     },
                     contextId: `export-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setFilter = document.getElementById('setFilter');
+
+    setFilter.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{identifiers}"
+                                    },
+                                    in: {uris}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setDateFilter = document.getElementById('setDateFilter');
+
+    setDateFilter.onclick = function(){
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                relativeDateFilter: {
+                                    granularity: "{granularity}",
+                                    dataSet: {
+                                        identifier: "created.dataset.dt"
+                                    },
+                                    from: {start_time},
+                                    to: {end_time}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setCombineFilter = document.getElementById('setCombineFilter');
+
+    setCombineFilter.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{identifiers}"
+                                    },
+                                    in: {uris}
+                                }
+                            },
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{computed_identifiers}"
+                                    },
+                                    in: {computed_uris}
+                                }
+                            },
+                            {
+                                relativeDateFilter: {
+                                    dataSet: {
+                                        identifier: "created.dataset.dt",
+                                    },
+                                    from: {start_time},
+                                    to: {end_time}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var removeFilter = document.getElementById('removeAllFilter');
+
+    removeFilter.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "removeFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                displayForm: {
+                                    identifier: "{identifiers}"
+                                },
+                            },
+                            {
+                                dataSet: {
+                                    identifier: "activity.dataset.dt"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setGranularityDate = document.getElementById('setGranularityDate');
+
+     setGranularityDate.onclick = function(){
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                relativeDateFilter: {
+                                    dataSet : {
+                                        identifier: "created.dataset.dt",
+                                    },
+                                    from: -1,
+                                    granularity: "GDC.time.year",
+                                    to: -1
+                                },
+                                relativeDateFilter: {
+                                    dataSet : {
+                                        identifier: "created.dataset.dt",
+                                    },
+                                    from: 0,
+                                    granularity: "GDC.time.year",
+                                    to: 0
+                                },
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
                 }
             }
         };

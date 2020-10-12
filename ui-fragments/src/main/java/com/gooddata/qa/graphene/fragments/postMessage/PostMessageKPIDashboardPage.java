@@ -55,6 +55,18 @@ public class PostMessageKPIDashboardPage extends AbstractFragment {
     @FindBy(id = "uriInsight")
     private WebElement uriInsight;
 
+    @FindBy(id = "setFilter")
+    private WebElement setFilter;
+
+    @FindBy(id = "setDateFilter")
+    private WebElement dateFilter;
+
+    @FindBy(id = "setDuplicatedDateFilter")
+    private WebElement setDuplicatedFilter;
+
+    @FindBy(id = "setCombineFilter")
+    private WebElement setCombineFilter;
+
     private static final String ROOT_CLASS = "root";
 
     public static PostMessageKPIDashboardPage getInstance(SearchContext searchContext) {
@@ -90,6 +102,26 @@ public class PostMessageKPIDashboardPage extends AbstractFragment {
 
     public void cancelDashboard() {
         waitForElementVisible(cancelDashboard).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setFilter() {
+        waitForElementVisible(setFilter).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setDateFilter() {
+        waitForElementVisible(dateFilter).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setDuplicatedDateFilter() {
+        waitForElementVisible(setDuplicatedFilter).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setCombineFilter() {
+        waitForElementVisible(setCombineFilter).click();
         browser.switchTo().frame("iframe");
     }
 

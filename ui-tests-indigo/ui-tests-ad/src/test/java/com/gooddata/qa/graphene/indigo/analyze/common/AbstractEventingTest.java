@@ -83,6 +83,53 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return createTemplateHtmlFile(insightObjectId, "[]", "[]", "/eventing/frame_AD.html");
     }
 
+    protected String createTemplateHtmlFileWithNegativeFilter(String insightObjectId, String uris, String identifiers, String pathFile) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("positiveAttributeFilter", "negativeAttributeFilter")
+                .replace("in: {uris}", "notIn: {uris}")
+                .replace("{uris}", uris)
+                .replace("{identifiers}", identifiers);
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
+    protected String createTemplateHtmlFileWithDateFilter(String insightObjectId, String pathFile, String startTime,
+                                                          String endTime, String granularity, String dateFilterType) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("{granularity}", granularity)
+                .replace("{start_time}", startTime)
+                .replace("{end_time}", endTime)
+                .replace("relativeDateFilter", dateFilterType);
+
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
+    protected String createTemplateHtmlFileCombineFilter(String insightObjectId, String pathFile, String startTime,
+                                                         String endTime, String granularity, String uris, String identifiers,
+                                                         String computed_uris, String computed_identifiers) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("{granularity}", granularity)
+                .replace("{start_time}", startTime)
+                .replace("{end_time}", endTime)
+                .replace("{uris}", uris)
+                .replace("{identifiers}", identifiers)
+                .replace("{computed_uris}", computed_uris)
+                .replace("{computed_identifiers}", computed_identifiers);
+
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
     protected EmbeddedAnalysisPage openEmbeddedPage(final String url) {
         browser.get("file://" + url);
         browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
@@ -169,5 +216,24 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         String contentStr = getLoggerContent();
         log.info(contentStr);
         return new JSONObject(contentStr);
+    }
+
+    public JSONObject getLatestPostMessage(String name) {
+        Function<WebDriver, Boolean> isLoggerDisplayed = browser -> getLoggerContent() != StringUtils.EMPTY;
+
+        Graphene.waitGui()
+                .pollingEvery(1, TimeUnit.SECONDS)
+                .withTimeout(3, TimeUnit.MINUTES)
+                .until(isLoggerDisplayed);
+
+        String contentStr = getLoggerContent();
+        log.info("*---------------*");
+        log.info(contentStr); // show log message
+        log.info("*---------------*");
+        return Stream.of(contentStr.split("\n"))
+                .map(JSONObject::new)
+                .filter(jsonObject -> jsonObject.getString("name").equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }

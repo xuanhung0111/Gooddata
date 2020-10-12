@@ -45,6 +45,21 @@ public class PostMessageAnalysisPage extends AbstractFragment {
     @FindBy(id = "getEmbeddedBtn")
     private WebElement getEmbedded;
 
+    @FindBy(id = "setFilter")
+    private WebElement setFilterContext;
+
+    @FindBy(id = "setDateFilter")
+    private WebElement setDateFilter;
+
+    @FindBy(id = "removeAllFilter")
+    private WebElement removeFilter;
+
+    @FindBy(id = "setCombineFilter")
+    private WebElement setCombineFilter;
+
+    @FindBy(id = "setGranularityDate")
+    private WebElement setGranularityDate;
+
     private static final String ROOT_CLASS = "root";
 
     public static PostMessageAnalysisPage getInstance(SearchContext searchContext) {
@@ -69,6 +84,31 @@ public class PostMessageAnalysisPage extends AbstractFragment {
 
     public void openInsight() {
         waitForElementVisible(openInsight).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setFilter() {
+        waitForElementVisible(setFilterContext).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setDateFilter() {
+        waitForElementVisible(setDateFilter).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setDuplicatedGranularityDateFilter() {
+        waitForElementVisible( setGranularityDate).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void removeFilter() {
+        waitForElementVisible(removeFilter).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    public void setCombineFilter() {
+        waitForElementVisible(setCombineFilter).click();
         browser.switchTo().frame("iframe");
     }
 

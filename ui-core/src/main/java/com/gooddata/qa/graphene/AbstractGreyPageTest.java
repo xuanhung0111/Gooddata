@@ -304,6 +304,9 @@ public abstract class AbstractGreyPageTest extends AbstractTest {
             case EXPLORER:
                 testParams.setExplorerUser(dynamicUser);
                 return dynamicUser;
+            case EXPLORER_EMBEDDED:
+                testParams.setExplorerEmbeddedUser(dynamicUser);
+                return dynamicUser;
             case VIEWER:
                 testParams.setViewerUser(dynamicUser);
                 return dynamicUser;

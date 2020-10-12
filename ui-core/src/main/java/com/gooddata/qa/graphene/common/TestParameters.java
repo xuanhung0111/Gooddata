@@ -42,6 +42,7 @@ public class TestParameters {
     private String editorInvitationsUser;
     private String editorAdminUser;
     private String explorerUser;
+    private String explorerEmbeddedUser;
     private String viewerUser;
     private String viewerDisabledExport;
     private String dashboardOnlyUser;
@@ -289,6 +290,14 @@ public class TestParameters {
         return explorerUser;
     }
 
+    public void setExplorerEmbeddedUser(String explorerEmbeddedUser) {
+        this.explorerEmbeddedUser = explorerEmbeddedUser;
+    }
+
+    public String getExplorerEmbeddedUser() {
+        return explorerEmbeddedUser;
+    }
+
     public void setViewerUser(String viewerUser) {
         this.viewerUser = viewerUser;
     }
@@ -492,6 +501,10 @@ public class TestParameters {
                 break;
             case EXPLORER:
                 user = getExplorerUser();
+                password = getPassword();
+                break;
+            case EXPLORER_EMBEDDED:
+                user = getExplorerEmbeddedUser();
                 password = getPassword();
                 break;
             case VIEWER:
