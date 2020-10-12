@@ -44,4 +44,9 @@ public class AddMorePopUp extends AbstractFragment {
         btnEdit.click();
         return OverlayWrapper.getInstance(browser).getEditDatasetDialog();
     }
+
+    public void searchPrimaryKey(String datasetName, String attributeName) {
+        btnSetPrimaryKey.click();
+        OverlayWrapper.getInstance(browser).getChangePrimaryKeyDialog().searchPrimaryKey(datasetName, attributeName);
+    }
 }

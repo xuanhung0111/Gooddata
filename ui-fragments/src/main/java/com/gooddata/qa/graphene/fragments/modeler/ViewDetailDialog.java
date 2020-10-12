@@ -25,8 +25,11 @@ public class ViewDetailDialog extends AbstractFragment {
     @FindBy(className = "attribute")
     List<WebElement> listAttributes;
 
+    @FindBy(className = "fact")
+    List<WebElement> listFacts;
+
     @FindBy(className= "data-type")
-    List<WebElement>listDatatypes;
+    List<WebElement> listDatatypes;
 
     @FindBy(className = "s-add_label")
     WebElement addLabelButton;
@@ -61,6 +64,12 @@ public class ViewDetailDialog extends AbstractFragment {
     public boolean isFactExist(String fact) {
         List<WebElement> factList = this.getRoot().findElements(xpath(format(FACT_NAME, fact)));
         if(factList.isEmpty()) return false;
+        return true;
+    }
+
+    public boolean isLabelAttributeExist(String attribute) {
+        List<WebElement> attributeList = this.getRoot().findElements(xpath(format(LABEL_NAME, attribute)));
+        if(attributeList.isEmpty()) return false;
         return true;
     }
 
@@ -136,6 +145,10 @@ public class ViewDetailDialog extends AbstractFragment {
 
     public int getNumberOfAttributes() {
         return listAttributes.size();
+    }
+
+    public int getNumberOfFacts() {
+        return listFacts.size();
     }
 
     private void hoverOnElementByJS(WebElement element) {

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -51,6 +53,9 @@ public class EditDatasetDialog extends AbstractFragment {
 
     @FindBy(css =".actions-panel .source-name")
     WebElement sourceName;
+
+    @FindBy(className = "s-more-item")
+    WebElement moreButton;
 
     public static EditDatasetDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -96,6 +101,23 @@ public class EditDatasetDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+
+    public void deleteAttributesOrFactInEditDatasetDialog(String items) {
+        hoverOnAttributeOrFactInDialog(items);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickDeleteItem();
+    }
+
+    public void deleteLabelInDatasetDialog(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickDeleteItem();
+    }
+
+    public boolean isMoreMenuIconVisible() {
+        return isElementVisible(By.className("s-more-item"), this.getRoot());
+    }
+
     public void changeAttributeName(String attribute, String newName) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         viewDetail.editAttributeName(attribute, newName);
@@ -131,6 +153,12 @@ public class EditDatasetDialog extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(rowsInTableDialog.stream().filter(
                 el -> el.getText().contains(item)).findFirst().get()).build().perform();
+    }
+
+    public void hoverOnLabel(String label, String modelName) {
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(rowsInTableDialog.stream().filter(
+                el -> el.getText().contains(modelName + "." + label)).findFirst().get()).build().perform();
     }
 
     public void addFact(String factName) {
@@ -193,4 +221,31 @@ public class EditDatasetDialog extends AbstractFragment {
         cancelButton.click();
         waitForFragmentNotVisible(this);
     }
+
+    public static class MoveDeleteMenu extends AbstractFragment {
+        private static final String MOVE_DELETE_MENU = "move-delete-menu";
+
+        @FindBy(className = "dataset-detail-move-item")
+        WebElement moveButton;
+
+        @FindBy(className = "dataset-detail-delete-item")
+        WebElement deleteButton;
+
+        public static MoveDeleteMenu getInstance(SearchContext searchContext) {
+            return Graphene.createPageFragment(
+                    MoveDeleteMenu.class, waitForElementVisible(className(MOVE_DELETE_MENU), searchContext));
+        }
+
+        public void clickDeleteItem() {
+            waitForElementVisible(deleteButton).click();
+            waitForFragmentNotVisible(this);
+        }
+
+        public void clickMoveItem() {
+            waitForElementVisible(moveButton).click();
+            waitForFragmentNotVisible(this);
+        }
+    }
+
+
 }
