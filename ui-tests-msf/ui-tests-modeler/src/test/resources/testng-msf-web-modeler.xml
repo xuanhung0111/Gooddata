@@ -35,4 +35,9 @@
             <class name="com.gooddata.qa.graphene.modeler.DialogModelingTest" />
         </classes>
     </test>
+    <test name="ModelingFollowUpTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ModelingFollowUpTest" />
+        </classes>
+    </test>
 </suite>

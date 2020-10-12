@@ -92,6 +92,11 @@ public class Model extends AbstractFragment {
         addMore.setPrimaryKey(getDatasetTitle(), attributeName);
     }
 
+    public void searchPrimaryKey(String attributeName) {
+        AddMorePopUp addMore = openMorePopUpOnDataset();
+        addMore.searchPrimaryKey(getDatasetTitle(), attributeName);
+    }
+
     public void deleteDataset() {
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.deleteDataset();
