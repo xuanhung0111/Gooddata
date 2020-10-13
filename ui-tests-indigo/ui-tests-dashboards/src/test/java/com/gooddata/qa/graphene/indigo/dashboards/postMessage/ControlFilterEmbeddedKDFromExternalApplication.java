@@ -7,8 +7,10 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoInsightSelecti
 import com.gooddata.qa.graphene.fragments.postMessage.PostMessageAnalysisPage;
 import com.gooddata.qa.graphene.fragments.postMessage.PostMessageKPIDashboardPage;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
@@ -50,6 +52,7 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
 
     private String activityUri;
     private String activityIdentifier;
+    private ProjectRestRequest projectRestRequest;
 
     @BeforeClass(alwaysRun = true)
     @Override
@@ -68,6 +71,8 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
             createInsight(INSIGHT_TEST_RECEIVE_EVENT_AFTER_ACTION_UI, COLUMN_CHART,
                 asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
 
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(AbstractTest.Profile.ADMIN)),
             testParams.getProjectId());
         activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();

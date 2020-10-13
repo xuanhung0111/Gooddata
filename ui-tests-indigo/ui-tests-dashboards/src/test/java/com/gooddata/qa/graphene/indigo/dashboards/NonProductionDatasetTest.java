@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -32,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 
 public class NonProductionDatasetTest extends AbstractDashboardTest {
 
@@ -54,6 +56,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
 
     private static final String DATASET_PAYDATE = "Paydate";
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -64,6 +67,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 

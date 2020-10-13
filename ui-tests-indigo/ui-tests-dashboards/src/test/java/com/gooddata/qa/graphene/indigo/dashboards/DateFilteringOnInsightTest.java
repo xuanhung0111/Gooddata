@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -30,6 +31,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
@@ -44,6 +46,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     private static String DATE_SNAPSHOT_RENAMED = "Date (Snapshot)_Renamed";
     private final String TEST_INSIGHT = "Test-Insight" + generateHashString();
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -63,6 +66,8 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createNumberOfLostOppsMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest.createInsight(
                 new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));

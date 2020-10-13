@@ -19,6 +19,7 @@ import java.util.List;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -32,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 
 public class InsightOnDashboardTest extends AbstractDashboardTest {
 
@@ -42,6 +44,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     private static final List<String> INSIGHTS_FOR_FILTER_TEST = asList(INSIGHT_CREATED_BY_EDITOR,
             INSIGHT_CREATED_BY_MAIN_USER);
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -52,6 +55,8 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 

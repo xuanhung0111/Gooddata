@@ -22,6 +22,7 @@ import java.util.List;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
@@ -35,12 +36,14 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.google.common.collect.Ordering;
 
 public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     private static String INSIGHT_WITHOUT_DATE_FILTER = "Insight-Without-Date-Filter";
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -53,6 +56,9 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
         getReportCreator().createActiveLevelReport();
+
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 

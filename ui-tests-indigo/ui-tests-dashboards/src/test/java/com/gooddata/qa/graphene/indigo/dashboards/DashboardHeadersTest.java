@@ -58,6 +58,7 @@ public class DashboardHeadersTest extends AbstractDashboardTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_SECTION_HEADERS, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
     }

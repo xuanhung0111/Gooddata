@@ -62,6 +62,7 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
 
     private IndigoRestRequest indigoRestRequest;
     private KpiConfiguration kpi;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -71,6 +72,8 @@ public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
         getMetricCreator().createWonMetric();
         getMetricCreator().createBestCaseMetric();
         getMetricCreator().createWinRateMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
