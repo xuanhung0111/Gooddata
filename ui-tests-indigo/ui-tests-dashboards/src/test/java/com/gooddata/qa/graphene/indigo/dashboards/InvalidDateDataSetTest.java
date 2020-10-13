@@ -19,18 +19,25 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 
 public class InvalidDateDataSetTest extends AbstractDashboardTest {
 
     private static final String INSIGHT_USING_DATE_FILTER = "Insight-Using-Date-Filter";
     private static final String DATE_DIMENSION_ERROR_MESSAGE =
             " can no longer be applied to the insight. Select a different dimension or edit the insight.";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
         getReportCreator().createActiveLevelReport();
+
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})

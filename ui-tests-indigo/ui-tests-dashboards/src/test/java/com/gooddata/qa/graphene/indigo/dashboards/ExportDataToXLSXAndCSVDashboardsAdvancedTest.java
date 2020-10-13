@@ -88,6 +88,7 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
             new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_METRIC_DATE_FILTER, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXPLORE_INSIGHTS_FROM_KD, false);
     }
 
     @Override

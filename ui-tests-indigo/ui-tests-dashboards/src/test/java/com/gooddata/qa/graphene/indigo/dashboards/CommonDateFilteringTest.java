@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 
 public class CommonDateFilteringTest extends AbstractDashboardTest {
 
@@ -40,6 +42,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     private static String THIS_MONTH = "This month";
     private static String INSIGHT_USING_DATE_FILTER = "Insight-Using-Date-Filter";
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -50,6 +53,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createNumberOfActivitiesMetric();
         // create an insight without using date filter

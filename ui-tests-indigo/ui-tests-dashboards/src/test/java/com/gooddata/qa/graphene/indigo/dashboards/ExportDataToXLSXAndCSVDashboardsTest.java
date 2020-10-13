@@ -70,6 +70,7 @@ public class ExportDataToXLSXAndCSVDashboardsTest extends AbstractDashboardTest 
 
         // TODO: BB-1675 enableNewADFilterBar FF should be removed
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXPLORE_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
