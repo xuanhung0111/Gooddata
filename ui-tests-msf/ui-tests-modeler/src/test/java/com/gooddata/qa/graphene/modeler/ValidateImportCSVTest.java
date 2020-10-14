@@ -34,12 +34,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
     private Project project;
 
     private static final String PAYROLL_DATASET = "Payroll";
-    private static final String DATASET_USING_DATEYY = "datesyy";
-    private static final String DATASET_USING_DATEYYYY = "datesyyyy";
-    private static final String DATASET_USING_TAB = "payrolltab";
-    private static final String DATASET_USING_NEWFORMAT_DATE = "newformat";
-    private static final String DATASET_USING_SEMICOLON = "payrollsemicolon";
-    private static final String DATASET_USING_PIPE = "payrollpipe";
     private static final String LESS_COLUMN_ERROR_MESSAGE = "Invalid rows=[97] (1 rows) detected with less columns than header.";
     private static final String MORE_COLUMN_ERROR_MESSAGE = "Invalid rows=[2, 5, 6] (3 rows) detected with more columns " +
             "than the header.";

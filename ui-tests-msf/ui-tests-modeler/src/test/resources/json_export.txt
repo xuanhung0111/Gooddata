@@ -1,0 +1,1285 @@
+{
+    "metaVersion": "1",
+    "project": "sc8x7b7musy65flj6wcdczjkec3ixijw",
+    "time": "2020-09-29 15:13:08",
+    "model": {
+        "projectModel": {
+            "datasets": [
+                {
+                    "dataset": {
+                        "identifier": "dataset.test",
+                        "title": "test",
+                        "description": "test",
+                        "anchor": {
+                            "attribute": {
+                                "identifier": "attr.test.abctest",
+                                "title": "abctest",
+                                "description": "abctest",
+                                "folder": "test",
+                                "labels": [
+                                    {
+                                        "label": {
+                                            "identifier": "label.test.abctest",
+                                            "title": "abctest",
+                                            "type": "GDC.text",
+                                            "dataType": "VARCHAR(128)"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "facts": [
+                            {
+                                "fact": {
+                                    "identifier": "fact.test.facttest",
+                                    "title": "facttest",
+                                    "folder": "test",
+                                    "description": "facttest",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            }
+                        ],
+                        "production": true
+                    }
+                },
+                {
+                    "dataset": {
+                        "identifier": "dataset.validdata",
+                        "title": "validdata",
+                        "anchor": {
+                            "attribute": {
+                                "identifier": "attr.validdata.factsof",
+                                "title": "Records of validdata",
+                                "description": "Records of validdata",
+                                "folder": "validdata",
+                                "grain": []
+                            }
+                        },
+                        "attributes": [
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data1",
+                                    "title": "data1",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data1",
+                                                "title": "data1",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(1)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data10",
+                                    "title": "data10",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data10",
+                                                "title": "data10",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(256)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data11",
+                                    "title": "data11",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data11",
+                                                "title": "data11",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(256)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data12",
+                                    "title": "data12",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data12",
+                                                "title": "data12",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(256)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data2",
+                                    "title": "data2",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data2",
+                                                "title": "data2",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(5)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data3",
+                                    "title": "data3",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data3",
+                                                "title": "data3",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(1)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data35",
+                                    "title": "data35",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data35",
+                                                "title": "data35",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data36",
+                                    "title": "data36",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data36",
+                                                "title": "data36",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data4",
+                                    "title": "data4",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data4",
+                                                "title": "data4",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(5)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data5",
+                                    "title": "data5",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data5",
+                                                "title": "data5",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(1)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data6",
+                                    "title": "data6",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data6",
+                                                "title": "data6",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(256)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data7",
+                                    "title": "data7",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data7",
+                                                "title": "data7",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(5)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data8",
+                                    "title": "data8",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data8",
+                                                "title": "data8",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(256)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.validdata.data9",
+                                    "title": "data9",
+                                    "folder": "validdata",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.validdata.data9",
+                                                "title": "data9",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(5)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "facts": [
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data13",
+                                    "title": "data13",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data14",
+                                    "title": "data14",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data15",
+                                    "title": "data15",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data16",
+                                    "title": "data16",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data17",
+                                    "title": "data17",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data18",
+                                    "title": "data18",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data19",
+                                    "title": "data19",
+                                    "folder": "validdata",
+                                    "dataType": "INT"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data20",
+                                    "title": "data20",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,0)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data21",
+                                    "title": "data21",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(5,5)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data22",
+                                    "title": "data22",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,0)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data23",
+                                    "title": "data23",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(5,0)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data24",
+                                    "title": "data24",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data25",
+                                    "title": "data25",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data26",
+                                    "title": "data26",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data27",
+                                    "title": "data27",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data28",
+                                    "title": "data28",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            },
+                            {
+                                "fact": {
+                                    "identifier": "fact.validdata.data29",
+                                    "title": "data29",
+                                    "folder": "validdata",
+                                    "dataType": "DECIMAL(12,2)"
+                                }
+                            }
+                        ],
+                        "references": [
+                            "data30",
+                            "data31",
+                            "data32",
+                            "data33",
+                            "data34"
+                        ],
+                        "production": true
+                    }
+                },
+                {
+                    "dataset": {
+                        "identifier": "dataset.user",
+                        "title": "USER",
+                        "anchor": {
+                            "attribute": {
+                                "identifier": "attr.user.factsof",
+                                "title": "Records of USER",
+                                "description": "Records of USER",
+                                "folder": "USER",
+                                "grain": []
+                            }
+                        },
+                        "attributes": [
+                            {
+                                "attribute": {
+                                    "identifier": "attr.user.client_id",
+                                    "title": "CLIENT_ID",
+                                    "folder": "user",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.user.client_id",
+                                                "title": "client_id",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.user.deleted",
+                                    "title": "DELETED",
+                                    "folder": "user",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.user.deleted",
+                                                "title": "deleted",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.user.id",
+                                    "title": "ID",
+                                    "folder": "user",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.user.id",
+                                                "title": "id",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "attribute": {
+                                    "identifier": "attr.user.name",
+                                    "title": "NAME",
+                                    "folder": "user",
+                                    "labels": [
+                                        {
+                                            "label": {
+                                                "identifier": "label.user.name",
+                                                "title": "name",
+                                                "type": "GDC.text",
+                                                "dataType": "VARCHAR(128)"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "facts": [
+                            {
+                                "fact": {
+                                    "identifier": "fact.user.age",
+                                    "title": "AGE",
+                                    "folder": "user",
+                                    "dataType": "INT"
+                                }
+                            }
+                        ],
+                        "references": [
+                            "timestamp"
+                        ],
+                        "production": true
+                    }
+                }
+            ],
+            "dateDimensions": [
+                {
+                    "dateDimension": {
+                        "identifier": "data30.dataset.dt",
+                        "identifierPrefix": "data30",
+                        "name": "data30",
+                        "title": "data30",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                },
+                {
+                    "dateDimension": {
+                        "identifier": "data31.dataset.dt",
+                        "identifierPrefix": "data31",
+                        "name": "data31",
+                        "title": "data31",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                },
+                {
+                    "dateDimension": {
+                        "identifier": "data32.dataset.dt",
+                        "identifierPrefix": "data32",
+                        "name": "data32",
+                        "title": "data32",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                },
+                {
+                    "dateDimension": {
+                        "identifier": "data34.dataset.dt",
+                        "identifierPrefix": "data34",
+                        "name": "data34",
+                        "title": "data34",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                },
+                {
+                    "dateDimension": {
+                        "identifier": "data33.dataset.dt",
+                        "identifierPrefix": "data33",
+                        "name": "data33",
+                        "title": "data33",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                },
+                {
+                    "dateDimension": {
+                        "identifier": "timestamp.dataset.dt",
+                        "identifierPrefix": "timestamp",
+                        "name": "timestamp",
+                        "title": "TIMESTAMP",
+                        "urn": "urn:custom_v2:date",
+                        "bridges": [],
+                        "production": true
+                    }
+                }
+            ],
+            "modelMetadata": {
+                "containCA": true
+            }
+        }
+    },
+    "modelMapping": {
+        "datasetMappings": [
+            {
+                "datasetMapping": {
+                    "fields": [
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.test.abctest"
+                                },
+                                "sourceColumn": {
+                                    "name": "abctest",
+                                    "dataType": "text",
+                                    "format": ""
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.test.facttest"
+                                },
+                                "sourceColumn": {
+                                    "name": "factest",
+                                    "dataType": "number",
+                                    "format": ""
+                                }
+                            }
+                        }
+                    ],
+                    "references": [],
+                    "identifier": "dataset.test",
+                    "source": {
+                        "identifier": "Unknown",
+                        "csv": {
+                            "headerRow": 1,
+                            "delimiter": ","
+                        }
+                    }
+                }
+            },
+            {
+                "datasetMapping": {
+                    "fields": [
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data1"
+                                },
+                                "sourceColumn": {
+                                    "name": "data1",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data2"
+                                },
+                                "sourceColumn": {
+                                    "name": "data2",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data3"
+                                },
+                                "sourceColumn": {
+                                    "name": "data3",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data4"
+                                },
+                                "sourceColumn": {
+                                    "name": "data4",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data5"
+                                },
+                                "sourceColumn": {
+                                    "name": "data5",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data6"
+                                },
+                                "sourceColumn": {
+                                    "name": "data6",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data7"
+                                },
+                                "sourceColumn": {
+                                    "name": "data7",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data8"
+                                },
+                                "sourceColumn": {
+                                    "name": "data8",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data9"
+                                },
+                                "sourceColumn": {
+                                    "name": "data9",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data10"
+                                },
+                                "sourceColumn": {
+                                    "name": "data10",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data11"
+                                },
+                                "sourceColumn": {
+                                    "name": "data11",
+                                    "dataType": "bpchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data12"
+                                },
+                                "sourceColumn": {
+                                    "name": "data12",
+                                    "dataType": "varchar"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data35"
+                                },
+                                "sourceColumn": {
+                                    "name": "data35",
+                                    "dataType": "bool"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.validdata.data36"
+                                },
+                                "sourceColumn": {
+                                    "name": "data36",
+                                    "dataType": "bool"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data13"
+                                },
+                                "sourceColumn": {
+                                    "name": "data13",
+                                    "dataType": "int2"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data14"
+                                },
+                                "sourceColumn": {
+                                    "name": "data14",
+                                    "dataType": "int2"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data15"
+                                },
+                                "sourceColumn": {
+                                    "name": "data15",
+                                    "dataType": "int4"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data16"
+                                },
+                                "sourceColumn": {
+                                    "name": "data16",
+                                    "dataType": "int4"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data17"
+                                },
+                                "sourceColumn": {
+                                    "name": "data17",
+                                    "dataType": "int4"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data18"
+                                },
+                                "sourceColumn": {
+                                    "name": "data18",
+                                    "dataType": "int8"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data19"
+                                },
+                                "sourceColumn": {
+                                    "name": "data19",
+                                    "dataType": "int8"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data20"
+                                },
+                                "sourceColumn": {
+                                    "name": "data20",
+                                    "dataType": "numeric"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data21"
+                                },
+                                "sourceColumn": {
+                                    "name": "data21",
+                                    "dataType": "numeric"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data22"
+                                },
+                                "sourceColumn": {
+                                    "name": "data22",
+                                    "dataType": "numeric"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data23"
+                                },
+                                "sourceColumn": {
+                                    "name": "data23",
+                                    "dataType": "numeric"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data24"
+                                },
+                                "sourceColumn": {
+                                    "name": "data24",
+                                    "dataType": "float4"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data25"
+                                },
+                                "sourceColumn": {
+                                    "name": "data25",
+                                    "dataType": "float4"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data26"
+                                },
+                                "sourceColumn": {
+                                    "name": "data26",
+                                    "dataType": "float8"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data27"
+                                },
+                                "sourceColumn": {
+                                    "name": "data27",
+                                    "dataType": "float8"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data28"
+                                },
+                                "sourceColumn": {
+                                    "name": "data28",
+                                    "dataType": "float8"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.validdata.data29"
+                                },
+                                "sourceColumn": {
+                                    "name": "data29",
+                                    "dataType": "float4"
+                                }
+                            }
+                        }
+                    ],
+                    "references": [
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "data30"
+                                },
+                                "sourceColumn": {
+                                    "name": "data30",
+                                    "dataType": "date"
+                                }
+                            }
+                        },
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "data31"
+                                },
+                                "sourceColumn": {
+                                    "name": "data31",
+                                    "dataType": "timestamp"
+                                }
+                            }
+                        },
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "data32"
+                                },
+                                "sourceColumn": {
+                                    "name": "data32",
+                                    "dataType": "timestamptz"
+                                }
+                            }
+                        },
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "data34"
+                                },
+                                "sourceColumn": {
+                                    "name": "data34",
+                                    "dataType": "timestamptz"
+                                }
+                            }
+                        },
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "data33"
+                                },
+                                "sourceColumn": {
+                                    "name": "data33",
+                                    "dataType": "timestamp"
+                                }
+                            }
+                        }
+                    ],
+                    "identifier": "dataset.validdata",
+                    "source": {
+                        "identifier": "validdata",
+                        "schema": {
+                            "dataSource": "5f320d9c92d3ca46af26bc64",
+                            "name": "bich_test"
+                        }
+                    }
+                }
+            },
+            {
+                "datasetMapping": {
+                    "fields": [
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.user.id"
+                                },
+                                "sourceColumn": {
+                                    "name": "ID",
+                                    "dataType": "VARCHAR"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.user.name"
+                                },
+                                "sourceColumn": {
+                                    "name": "NAME",
+                                    "dataType": "VARCHAR"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.user.client_id"
+                                },
+                                "sourceColumn": {
+                                    "name": "CLIENT_ID",
+                                    "dataType": "VARCHAR"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "label",
+                                    "identifier": "label.user.deleted"
+                                },
+                                "sourceColumn": {
+                                    "name": "DELETED",
+                                    "dataType": "BOOLEAN"
+                                }
+                            }
+                        },
+                        {
+                            "fieldMapping": {
+                                "field": {
+                                    "type": "fact",
+                                    "identifier": "fact.user.age"
+                                },
+                                "sourceColumn": {
+                                    "name": "AGE",
+                                    "dataType": "NUMBER"
+                                }
+                            }
+                        }
+                    ],
+                    "references": [
+                        {
+                            "referenceMapping": {
+                                "target": {
+                                    "type": "date",
+                                    "identifier": "timestamp"
+                                },
+                                "sourceColumn": {
+                                    "name": "TIMESTAMP",
+                                    "dataType": "TIMESTAMPNTZ"
+                                }
+                            }
+                        }
+                    ],
+                    "identifier": "dataset.user",
+                    "source": {
+                        "identifier": "USER",
+                        "schema": {
+                            "dataSource": "5ee1222e7f114f0747d60236",
+                            "name": "PUBLIC"
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "layout": {
+        "objects": [
+            {
+                "identifier": {
+                    "type": "dataset",
+                    "id": "dataset.test"
+                },
+                "collapse": false,
+                "x": 100,
+                "y": 1421
+            },
+            {
+                "identifier": {
+                    "type": "dataset",
+                    "id": "dataset.validdata"
+                },
+                "collapse": false,
+                "x": 350,
+                "y": 100
+            },
+            {
+                "identifier": {
+                    "type": "dataset",
+                    "id": "dataset.user"
+                },
+                "collapse": false,
+                "x": 350,
+                "y": 1209
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "data30"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 417
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "data31"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 512
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "data32"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 607
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "data34"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 824
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "data33"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 919
+            },
+            {
+                "identifier": {
+                    "type": "templateDataset",
+                    "id": "timestamp"
+                },
+                "collapse": true,
+                "x": 122.5,
+                "y": 1326
+            }
+        ]
+    }
+}

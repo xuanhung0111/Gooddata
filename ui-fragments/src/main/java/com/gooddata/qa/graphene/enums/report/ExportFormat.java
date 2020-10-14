@@ -7,6 +7,7 @@ public enum ExportFormat {
     PDF_LANDSCAPE("pdf", "PDF (Landscape)"),
     IMAGE_PNG("png", "Image (PNG)"),
     CSV("csv", "CSV (formatted)"),
+    JSON("json", "JSON"),
     RAW_CSV("csv", "CSV (raw data)"),
     SCHEDULES_EMAIL_CSV("csv", "CSV"),
     EXCEL_XLSX("xlsx", "XLSX..."),

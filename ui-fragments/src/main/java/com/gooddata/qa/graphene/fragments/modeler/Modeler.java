@@ -6,6 +6,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,9 @@ public class Modeler extends AbstractFragment {
     @FindBy(className = "gdc-ldm-layout")
     private Layout layout;
 
+    @FindBy(css = ".gdc-modeler #json-file")
+    private WebElement chooseJsonfile;
+
     public static Modeler getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 Modeler.class, waitForElementVisible(className(MODELER), searchContext));
@@ -39,5 +43,13 @@ public class Modeler extends AbstractFragment {
 
     public Layout getLayout() {
         return layout;
+    }
+
+    public Modeler pickJsonFile(String csvFilePath) {
+        log.finest("Json file path: " + csvFilePath);
+        log.finest("Is file exists? " + new File(csvFilePath).exists());
+
+        waitForElementVisible(chooseJsonfile).sendKeys(csvFilePath);
+        return this;
     }
 }
