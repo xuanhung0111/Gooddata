@@ -5,19 +5,18 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ToolBar extends AbstractFragment {
     private static final By TOOLBAR = By.className("gdc-ldm-toolbar");
     private static final By ZOOM_BTN = By.className("gdc-ldm-zoom-button");
-
 
     @FindBy(className = "s-publish")
     private WebElement btnPublishOnToolbar;
@@ -40,6 +39,13 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "zoom-value-button")
     private WebElement zoomValueBtn;
 
+    @FindBy(className = "search-model-input")
+    private WebElement searchModelInput;
+
+    @FindBy(css = ".search-model-input .s-input-clear")
+    private WebElement clearSearchTextIcon;
+
+
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
     }
@@ -60,6 +66,16 @@ public class ToolBar extends AbstractFragment {
     public OutputStage openOutputStagePopUp() {
         btnActionMenu.click();
         return OverlayWrapper.getInstance(browser).openOutputStage();
+    }
+
+    public void exportJson() {
+        btnActionMenu.click();
+        OverlayWrapper.getInstance(browser).exportJson();
+    }
+
+    public void importJson(String jsonFilePath) {
+        btnActionMenu.click();
+        OverlayWrapper.getInstance(browser).importJson(jsonFilePath);
     }
 
     public static final ToolBar getInstanceInTableView(SearchContext searchContext, int index) {
@@ -106,5 +122,16 @@ public class ToolBar extends AbstractFragment {
             items.stream().filter(e -> zoomValue.equals(e.getText())).findFirst().get().click();
             return this;
         }
+    }
+
+    public SearchDropDown searchItem(String text) {
+        getActions().moveToElement(searchModelInput).click().sendKeys(text).build().perform();
+        return SearchDropDown.getInstance(browser);
+    }
+
+    public ToolBar clearSearchText() {
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(clearSearchTextIcon).click().build().perform();
+        return this;
     }
 }

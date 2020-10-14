@@ -61,7 +61,6 @@ public class MainModelContent extends AbstractFragment {
         driverActions.click(model.getRoot()).pause(1000).perform();
     }
 
-
     public void focusOnDateDataset(String modelName) {
         DateModel model = this.getJointLayers().getJointCellsLayer().getDateModel(modelName);
         Actions driverActions = new Actions(browser);

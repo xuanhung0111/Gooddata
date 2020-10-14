@@ -37,6 +37,9 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "gd-confirm")
     private ConfirmDeleteDatasetDialog confirmDeleteDatasetDialog;
 
+    @FindBy(className = "gd-confirm")
+    private ConfirmImportDialog confirmImportDialog;
+
     @FindBy(className = "import-csv")
     private FileUploadDialog fileUploadDialog;
 
@@ -54,6 +57,12 @@ public class OverlayWrapper extends AbstractFragment {
 
     @FindBy(className = "actions-menu-generate-output-stage-item")
     private WebElement dropDownOutputStage;
+
+    @FindBy(css = ".actions-menu-generate-output-stage-item:nth-of-type(2)")
+    private WebElement dropDownExportJson;
+
+    @FindBy(css = ".actions-menu-generate-output-stage-item:nth-of-type(3)")
+    private WebElement dropDowImportJson;
 
     @FindBy(css = ".gd-message .s-message-text-header-value")
     private WebElement successMessage;
@@ -149,9 +158,25 @@ public class OverlayWrapper extends AbstractFragment {
         return confirmDeleteDatasetDialog;
     }
 
+    public ConfirmImportDialog getConfirmImportDialog() {
+        waitForElementVisible(confirmImportDialog.getRoot());
+        return confirmImportDialog;
+    }
+
     public OutputStage openOutputStage() {
         waitForElementVisible(dropDownOutputStage).click();
         return outputStage;
+    }
+
+    public void exportJson() {
+        waitForElementVisible(dropDownExportJson).click();
+    }
+
+    public void importJson(String jsonFilePath) {
+        waitForElementVisible(dropDowImportJson).click();
+        getConfirmImportDialog().proceedImportJson();
+        Modeler.getInstance(browser).pickJsonFile(jsonFilePath);
+        waitForFragmentNotVisible(this);
     }
 
     public OverlayWrapper closeWaitingDialog() {

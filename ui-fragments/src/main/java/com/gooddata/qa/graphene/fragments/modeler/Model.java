@@ -28,6 +28,9 @@ public class Model extends AbstractFragment {
     @FindBy(css = ".ds-items")
     private ModelItems modelItems;
 
+    @FindBy(css = ".ds-title .toggle")
+    private WebElement toggleIcon;
+
     public static Model getInstance(SearchContext searchContext, String id) {
         return Graphene.createPageFragment(
                 Model.class, waitForElementVisible(cssSelector((format(ID_MODEL, id))), searchContext));
@@ -40,6 +43,11 @@ public class Model extends AbstractFragment {
     public ModelItems getListItems() {
         waitForElementVisible(modelItems.getRoot());
         return modelItems;
+    }
+
+    public Model clickCollapseButton() {
+        waitForElementVisible(toggleIcon).click();
+        return this;
     }
 
     public String getAttributeText(String attribute) {
@@ -188,6 +196,10 @@ public class Model extends AbstractFragment {
 
     public WebElement getUntitledFact(String datasetName) {
         return this.getRoot().findElement(className(format(UNTITILED_FACT, datasetName)));
+    }
+
+    public String getModelId() {
+        return this.getRoot().getAttribute("id");
     }
 
     public enum DATA_TYPE {

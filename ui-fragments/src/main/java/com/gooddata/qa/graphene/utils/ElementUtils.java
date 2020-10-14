@@ -65,6 +65,20 @@ public final class ElementUtils {
         BrowserUtils.runScript(browser, "arguments[0].scrollIntoView(true);", element);
     }
 
+    public static boolean scrollBarIconToViewElement(WebElement viewElement, WebDriver browser,
+                                                     int scrollRangeInPixels, int timeout) {
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < timeout) {
+            sleepTight(500);
+            if (isElementVisible(viewElement)) {
+                return true;
+            }
+            Actions actions = new Actions(browser);
+            actions.clickAndHold(browser.findElement(By.className("public_Scrollbar_face"))).moveByOffset(0, scrollRangeInPixels).release().perform();
+        }
+        throw new TimeoutException("Tried for " + timeout + "second(s), doesn't find out element ");
+    }
+
     public static boolean scrollElementIntoView(By viewLocator, By keyLocator, WebDriver browser, int scrollRangeInPixels) {
         return scrollElementIntoViewInTime(viewLocator, keyLocator, browser, scrollRangeInPixels, 60000);
     }
