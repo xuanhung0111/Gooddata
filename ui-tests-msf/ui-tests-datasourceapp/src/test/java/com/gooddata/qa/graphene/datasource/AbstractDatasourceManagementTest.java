@@ -18,13 +18,22 @@ import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.openqa.selenium.By.className;
 
 public class AbstractDatasourceManagementTest extends AbstractDataIntegrationTest {
 
     protected DataSourceManagementPage initDatasourceManagementPage() {
-        openUrl(DataSourceManagementPage.URI);
-        return DataSourceManagementPage.getInstance(browser);
+        try {
+            openUrl(DataSourceManagementPage.URI);
+            return DataSourceManagementPage.getInstance(browser);
+        } catch (TimeoutException timeout) {
+            takeScreenshot(browser, "Datasource timeout", getClass());
+            timeout.printStackTrace();
+            browser.navigate().refresh();
+        } finally {
+            return DataSourceManagementPage.getInstance(browser);
+        }
     }
 
     protected void waitForLoadingMenuBar() {
