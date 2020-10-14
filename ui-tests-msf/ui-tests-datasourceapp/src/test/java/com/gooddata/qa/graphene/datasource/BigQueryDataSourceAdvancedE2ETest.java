@@ -223,7 +223,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         log.info("INSIGHT_NAME :" + INSIGHT_NAME);
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
         indigoDashboardsPage.addDashboard().addInsight(INSIGHT_NAME).selectDateFilterByName("All time").waitForWidgetsLoading()
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
         log.info("DASHBOARD_NAME :" + DASHBOARD_NAME);
