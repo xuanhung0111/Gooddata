@@ -257,7 +257,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         log.info("blankProjectId : " + blankProjectId);
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
-        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage().waitForWidgetsLoading();
+        IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
         indigoDashboardsPage.addDashboard().addInsight(INSIGHT_NAME).selectDateFilterByName("All time").waitForWidgetsLoading()
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
         List<String> listValue = indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
