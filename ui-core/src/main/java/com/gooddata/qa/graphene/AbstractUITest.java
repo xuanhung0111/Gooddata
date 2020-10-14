@@ -489,6 +489,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return initIndigoDashboardsPageSpecificProject(testParams.getProjectId());
     }
 
+    public IndigoDashboardsPage initIndigoDashboardsPage(int timeout) {
+        return initIndigoDashboardsPageSpecificProject(testParams.getProjectId(), timeout);
+    }
+
     public String getIndigoDashboardsPageUriSpecificProject(String projectId) {
         return PAGE_INDIGO_DASHBOARDS + "#/project/" + projectId;
     }
@@ -496,6 +500,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public IndigoDashboardsPage initIndigoDashboardsPageSpecificProject(String projectId) {
         openUrl(getIndigoDashboardsPageUriSpecificProject(projectId));
         waitForOpeningIndigoDashboard();
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    public IndigoDashboardsPage initIndigoDashboardsPageSpecificProject(String projectId, int timeout) {
+        openUrl(getIndigoDashboardsPageUriSpecificProject(projectId));
+        waitOpeningIndigoDashboard(timeout);
         return IndigoDashboardsPage.getInstance(browser);
     }
 
@@ -603,6 +613,18 @@ public class AbstractUITest extends AbstractGreyPageTest {
             Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);
         } catch (TimeoutException e) {
             //do nothing
+        }
+
+        waitForElementNotPresent(loadingLabel);
+    }
+
+    protected void waitOpeningIndigoDashboard(int timeout) {
+        final By loadingLabel = className("gd-loading-equalizer");
+        try {
+            Function<WebDriver, Boolean> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
+            Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until(isLoadingLabelPresent);
+        } catch (TimeoutException e) {
+            browser.navigate().refresh();
         }
 
         waitForElementNotPresent(loadingLabel);
