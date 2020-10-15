@@ -11,10 +11,12 @@ import org.openqa.selenium.support.FindBy;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.openqa.selenium.By.className;
 
+import java.util.List;
+
 public class Drilling extends AbstractFragment {
 
     @FindBy(className = "drill-down")
-    private WebElement drillDownItem;
+    private List<WebElement> drillDownItem;
 
     @FindBy(className = "drill-to-dashboard")
     private WebElement drillToDashboard;
@@ -40,6 +42,12 @@ public class Drilling extends AbstractFragment {
 
     public DrillModalDialog drillToInsight() {
         waitForElementVisible(drillToInsight).click();
+        waitForFragmentNotVisible(this);
+        return DrillModalDialog.getInstance(browser);
+    }
+
+    public DrillModalDialog drillDown(String drillAttribute) {
+        drillDownItem.stream().filter(element -> waitForElementVisible(element).getAttribute("title").equals(drillAttribute)).findFirst().get().click();
         waitForFragmentNotVisible(this);
         return DrillModalDialog.getInstance(browser);
     }

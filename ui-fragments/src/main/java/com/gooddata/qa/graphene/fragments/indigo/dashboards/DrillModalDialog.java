@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -17,11 +19,15 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 public class DrillModalDialog extends AbstractFragment {
 
     @FindBy(className = "s-drill-close-button")
     private WebElement closeButton;
+
+    @FindBy(className = "s-drill-reset-button")
+    private WebElement resetButton;
 
     @FindBy(className = "s-drill-title")
     private WebElement titleInsight;
@@ -53,9 +59,20 @@ public class DrillModalDialog extends AbstractFragment {
     public void close() {
         waitForElementVisible(closeButton).click();
     }
+    public void reset() {
+        waitForElementVisible(resetButton).click();
+    }
+    
+    public boolean isEmptyValue() {
+        return isElementPresent(By.className("info-label-icon-empty"), getRoot());
+    }
 
     public ChartReport getChartReport() {
         return Graphene.createPageFragment(ChartReport.class, waitForElementVisible(BY_CHART_REPORT, getRoot()));
+    }
+
+    public PivotTableReport getPivotTableReport() {
+        return PivotTableReport.getInstance(root);
     }
 
     public List<List<String>> getTooltipTextOnTrackerByIndex(int groupIndex, int index) {

@@ -86,6 +86,8 @@ public class ChartReport extends AbstractFragment {
     private static final By BY_PRIMARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-primary-yaxis");
     private static final By BY_SECONDARY_Y_AXIS = cssSelector(".highcharts-yaxis-labels.s-highcharts-secondary-yaxis");
     private static final By BY_HIGHCHARTS_TOOLTIP = cssSelector(".highcharts-tooltip-container div.highcharts-tooltip");
+    private static final By BY_HIGHCHARTS_TOOLTIP_CONTAINER = className("highcharts-tooltip-container");
+    private static final By BY_TOOLTIP_INTERACTION = className("gd-viz-tooltip-interaction");
 
     public static ChartReport getInstance(SearchContext context) {
         return Graphene.createPageFragment(ChartReport.class,
@@ -218,6 +220,16 @@ public class ChartReport extends AbstractFragment {
     public List<List<String>> getTooltipTextOnTrackerByIndex(int groupIndex, int index) {
         displayTooltipOnTrackerByIndex(groupIndex, index);
         return getTooltipText();
+    }
+
+    public List<List<String>> getLastTooltipTextOnTrackerByIndex(int groupIndex, int index) {
+        displayTooltipOnTrackerByIndex(groupIndex, index);
+        return getLastTooltipText();
+    }
+
+    public String getTooltipInteractionOnTrackerByIndex(int groupIndex, int index) {
+        displayTooltipOnTrackerByIndex(groupIndex, index);
+        return getTooltipContainDrillInteractionText();
     }
 
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
@@ -409,6 +421,18 @@ public class ChartReport extends AbstractFragment {
                 .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
                         item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
                 .collect(Collectors.toList());
+    }
+
+    private List<List<String>> getLastTooltipText() {
+        List<WebElement> tooltip = browser.findElements(BY_HIGHCHARTS_TOOLTIP_CONTAINER);
+        return waitForCollectionIsNotEmpty(tooltip.get(tooltip.size()-1).findElements(cssSelector(TOOLTIP_ITEM))).stream()
+                .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
+                        item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
+                .collect(Collectors.toList());
+    }
+
+    private String getTooltipContainDrillInteractionText() {
+        return browser.findElement(BY_TOOLTIP_INTERACTION).getText();
     }
 
     private void checkIndex(int index) {
