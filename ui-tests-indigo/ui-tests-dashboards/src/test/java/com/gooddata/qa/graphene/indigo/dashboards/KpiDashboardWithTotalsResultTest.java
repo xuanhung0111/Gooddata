@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.fixture.ResourceManagement;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
@@ -61,6 +62,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
     private IndigoRestRequest indigoRestRequest;
     private String dashboardUri;
     private boolean isMobileRunning;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -75,7 +77,9 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         Metrics metrics = getMetricCreator();
         metrics.createNumberOfActivitiesMetric();
     }
