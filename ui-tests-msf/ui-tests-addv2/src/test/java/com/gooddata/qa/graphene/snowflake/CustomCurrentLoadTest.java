@@ -480,7 +480,7 @@ public class CustomCurrentLoadTest extends AbstractADDProcessTest {
         String valueParam = domainProcessUtilsSecond.getDataset(jsonDataset);
         Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                 .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "DEFAULT");
-        String errorMessage = "The output stage has column x__client_id, but data mapping is not specified for the current project";
+        String errorMessage = "The Output Stage has the x__client_id column, but no Client Identifier was provided for the current workspace.";
         String errorReturn = domainProcessUtilsSecond.executeError(parameters);
         assertThat(errorReturn, containsString(errorMessage));
     }
