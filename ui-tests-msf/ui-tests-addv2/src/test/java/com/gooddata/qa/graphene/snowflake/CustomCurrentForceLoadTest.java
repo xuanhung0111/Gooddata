@@ -473,7 +473,7 @@ public class CustomCurrentForceLoadTest extends AbstractADDProcessTest {
             String valueParam = processUtils.getDataset(jsonDataset);
             Parameters parameters = new Parameters().addParameter("GDC_DATALOAD_DATASETS", "[" + valueParam + "]")
                     .addParameter("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", "FULL");
-            String errorMessage = "The output stage has column x__client_id, but data mapping is not specified for the current project";
+            String errorMessage = "The Output Stage has the x__client_id column, but no Client Identifier was provided for the current workspace.";
             assertThat(processUtils.executeError(parameters), containsString(errorMessage));
         } finally {
             // re-create dataMapping for using delete all dataMapping AfterTest
