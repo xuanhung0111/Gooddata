@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -232,11 +231,7 @@ public class GoodSalesPivotTableReportTest extends AbstractAnalyseTest {
 
             WebElement attributeElement = pivotTableReport.getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0);
             String attributeStyle = attributeElement.getAttribute("style");
-            if (BrowserUtils.isFirefox()) {
-                assertEquals(attributeStyle, "width: 107px; left: 0px; color: rgb(255, 0, 0);");
-            } else {
-                assertEquals(attributeStyle, "width: 108px; left: 0px; color: rgb(255, 0, 0);");
-            }
+            assertEquals(attributeStyle.split("color: ")[1], "rgb(255, 0, 0);");
         } finally {
             dashboardRequest.changeMetricFormat(metricUri, oldFormat);
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
