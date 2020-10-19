@@ -4,6 +4,9 @@ import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import org.openqa.selenium.By;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class MetricSelect extends AbstractReactDropDown {
 
@@ -12,6 +15,12 @@ public class MetricSelect extends AbstractReactDropDown {
     @Override
     protected String getDropdownCssSelector() {
         return ".overlay .metrics-list";
+    }
+
+    @Override
+    protected void waitForPickerLoaded() {
+        super.waitForPickerLoaded();
+        waitForElementNotPresent(className("is-loading"));
     }
 
     public boolean isNameShortened(String name) {

@@ -582,7 +582,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         // ensure dots element is present
         sleepTightInSeconds(1);
 
-        Function<WebDriver, Boolean> isDotsElementPresent = browser -> !isElementPresent(className("gd-loading-dots"), browser);
+        Function<WebDriver, Boolean> isDotsElementPresent = browser -> !isElementPresent(cssSelector(".gd-loading-dots,.gd-loading-equalizer"), browser);
         Graphene.waitGui().until(isDotsElementPresent);
 
         return this;
@@ -964,6 +964,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     private boolean isMobileMode() {
+        waitForElementNotPresent(className("is-dashboard-loading"));
         return isElementPresent(By.className("mobile-navigation-button"), browser);
     }
 
