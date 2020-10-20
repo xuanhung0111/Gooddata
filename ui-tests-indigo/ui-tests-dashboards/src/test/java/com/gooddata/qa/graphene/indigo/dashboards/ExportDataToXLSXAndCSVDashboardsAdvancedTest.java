@@ -261,10 +261,10 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
             .saveEditModeWithWidgets().selectDateFilterByName("All time").waitForWidgetsLoading();
         OptionalExportMenu optionalExport = indigoDashboardsPage.selectFirstWidget(Insight.class).openOptionsMenu();
 
-        assertFalse(optionalExport.isExportToButtonEnabled(OptionalExportMenu.File.CSV),
-            "Export to CSV options should be disabled");
-        assertFalse(optionalExport.isExportToButtonEnabled(OptionalExportMenu.File.XLSX),
-            "Export to XLSX options should be disabled");
+        assertFalse(optionalExport.isExportToButtonVisible(OptionalExportMenu.File.CSV),
+            "Export to CSV options should be hidden");
+        assertFalse(optionalExport.isExportToButtonVisible(OptionalExportMenu.File.XLSX),
+            "Export to XLSX options should be hidden");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -339,10 +339,10 @@ public class ExportDataToXLSXAndCSVDashboardsAdvancedTest extends AbstractDashbo
                 .saveEditModeWithWidgets().selectDateFilterByName("All time").waitForWidgetsLoading();
             OptionalExportMenu optionalExport = indigoDashboardsPage.selectFirstWidget(Insight.class).openOptionsMenu();
 
-            assertFalse(optionalExport.isExportToButtonEnabled(OptionalExportMenu.File.XLSX),
-                "Export to XLSX options should be disabled");
-            assertFalse(optionalExport.isExportToButtonEnabled(OptionalExportMenu.File.CSV),
-                "Export to CSV options should be disabled");
+            assertFalse(optionalExport.isExportToButtonVisible(OptionalExportMenu.File.XLSX),
+                "Export to XLSX options should be hidden");
+            assertFalse(optionalExport.isExportToButtonVisible(OptionalExportMenu.File.CSV),
+                "Export to CSV options should be hidden");
         } finally {
             factRestRequest.unsetFactProtected(attributeUri);
             logoutAndLoginAs(true, UserRoles.ADMIN);
