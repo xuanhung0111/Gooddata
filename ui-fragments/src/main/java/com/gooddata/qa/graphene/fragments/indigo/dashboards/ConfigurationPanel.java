@@ -23,7 +23,9 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
+import static java.lang.String.format;
 
 import java.util.List;
 import java.util.function.Function;
@@ -33,6 +35,7 @@ public class ConfigurationPanel extends AbstractFragment {
 
     private static final String CONFIGURATION_PANEL_ROOT = ".s-gd-configuration-bubble .configuration-panel";
     private static final By BY_DRILL_TO_SELECT = By.className("s-drill_to_select");
+    private static final By BY_DRILL_TO_DASHBOARD = By.className("s-dashboards-dropdown-button");
 
     @FindBy(className = "s-metric_select")
     private MetricSelect metricSelect;
@@ -92,6 +95,7 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".gd-message.error");
+    private static final By SUCCESS_MESSAGE_LOCATOR = By.cssSelector(".gd-message.success");
 
     private ConfigurationPanel waitForVisDateDataSetsLoaded() {
         final Function<WebDriver, Boolean> dataSetLoaded =
@@ -217,6 +221,10 @@ public class ConfigurationPanel extends AbstractFragment {
         return waitForElementVisible(ERROR_MESSAGE_LOCATOR, getRoot()).getText();
     }
 
+    public String getSuccessMessage() {
+        return waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, getRoot()).getText();
+    }    
+
     public String getSelectedDataSetColor() {
         return waitForFragmentVisible(dateDataSetSelect).getSelectionColor();
     }
@@ -236,8 +244,23 @@ public class ConfigurationPanel extends AbstractFragment {
         return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoInsight(insight);
     }
 
+    public DrillMeasureDropDown.DrillConfigPanel drillIntoDashboard(String metric, String dashboard) {
+        waitForElementVisible(addInteraction).click();
+        DrillMeasureDropDown.getInstance(browser).selectByName(metric);
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoDashboard(dashboard);
+    }
+
+    public DrillMeasureDropDown.DrillConfigPanel changeTargetDashboard(String metric, String oldDashboard, String newDashboard) {
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).changeTargetDashboard(metric, oldDashboard, newDashboard);
+    }
+
     private DrillToSelect getDrillToSelect() {
         return Graphene.createPageFragment(DrillToSelect.class, waitForElementVisible(BY_DRILL_TO_SELECT, getRoot()));
+    }
+
+    public List<String> getTargetDashboard() {
+        return waitForCollectionIsNotEmpty(browser.findElements(BY_DRILL_TO_DASHBOARD)
+                .stream().map(e->e.getText()).collect(Collectors.toList()));
     }
 
     public static class DrillMeasureDropDown extends AbstractReactDropDown {
@@ -279,6 +302,8 @@ public class ConfigurationPanel extends AbstractFragment {
             public static By ROOT = className("s-drill-config-panel");
             public static By DRILL_TO_INSIGHT = className("s-drilltoinsight");
             public static By CHOOSE_INSIGHT = className("s-choose_insight_");
+            public static By DRILL_TO_DASHBOARD = className("s-drilltodashboard");
+            public static By CHOOSE_DASHBOARD = className("s-choose_dashboard_");
 
             public static DrillConfigPanel getInstance(SearchContext searchContext) {
                 WebElement root = waitForElementVisible(ROOT, searchContext);
@@ -294,6 +319,26 @@ public class ConfigurationPanel extends AbstractFragment {
                 BrowserUtils.runScript(browser, "arguments[0].click();",
                     waitForElementVisible(CHOOSE_INSIGHT, getRoot()));
                 AnalysisInsightSelectionPanel.getInstance(browser).openInsight(insight);
+                return this;
+            }
+
+            public DrillConfigPanel drillIntoDashboard(String dashboard) {
+                waitForElementVisible(chooseAction).click();
+                waitForElementVisible(DRILL_TO_DASHBOARD, browser).click();
+
+                // Click action on element does not affect sometimes, so switch to use java script executor.
+                BrowserUtils.runScript(browser, "arguments[0].click();",
+                    waitForElementVisible(CHOOSE_DASHBOARD, getRoot()));                
+                DashboardSelectionPanel.getInstance(browser).selectByName(dashboard);
+                return this;
+            }
+
+            public DrillConfigPanel changeTargetDashboard(String metric, String oldDashboard, String newDashboard) {     
+                // Click action on element does not affect sometimes, so switch to use java script executor.                
+                BrowserUtils.runScript(browser, "arguments[0].click();",
+                    waitForElementVisible(browser.findElement(By.cssSelector(
+                        ".s-drill-config-item-" + simplifyText(metric) + " .s-" + simplifyText(oldDashboard)))), getRoot());                
+                DashboardSelectionPanel.getInstance(browser).selectByName(newDashboard);
                 return this;
             }
         }
