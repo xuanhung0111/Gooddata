@@ -380,6 +380,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         initDashboardsPage().selectDashboard(DASHBOARD_TEST)
                 .editDashboard()
                 .saveAsDashboard(copiedDashboard, false, PermissionType.USE_EXISTING_PERMISSIONS);
+        waitForDashboardPageLoaded(browser);
         exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
         try {
             checkRedBar(browser);
