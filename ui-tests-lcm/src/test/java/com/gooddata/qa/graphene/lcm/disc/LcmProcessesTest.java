@@ -235,8 +235,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
         scheduleForm.addParameter(LcmDirectoryConfiguration.CLIENT_GDC_HOSTNAME.getParamName(), testParams.getHost())
                 .addParameter(LcmDirectoryConfiguration.GDC_PASSWORD.getParamName(), testParams.getPassword())
                 .addParameter(LcmDirectoryConfiguration.GDC_USERNAME.getParamName(), testParams.getUser())
-                .addParameter(LcmDirectoryConfiguration.ORGANIZATION.getParamName(),
-                        testParams.getHost().split(".intgdc.")[0])
+                .addParameter(LcmDirectoryConfiguration.ORGANIZATION.getParamName(), testParams.getUserDomain())
                 .addParameter(LcmDirectoryConfiguration.ADS_PASSWORD.getParamName(), testParams.getPassword())
                 .addParameter(LcmDirectoryConfiguration.CLIENT_GDC_PROTOCOL.getParamName(),
                         LcmDirectoryConfiguration.CLIENT_GDC_PROTOCOL.getParamValue())
