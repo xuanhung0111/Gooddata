@@ -1,13 +1,13 @@
-FROM harbor.intgdc.com/staging/graphene-chrome:67.0.3396.79-2.39
+FROM harbor.intgdc.com/staging/graphene-chrome:latest
 
 ARG GIT_COMMIT=unspecified
 LABEL image_name="Graphene Chrome Image for UISDK"
 LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
 LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
-LABEL parent_image="harbor.intgdc.com/staging/graphene-chrome:67.0.3396.79-2.39"
+LABEL parent_image="harbor.intgdc.com/staging/graphene-chrome:latest"
 LABEL git_commit=$GIT_COMMIT
 
-ARG NODEJS_VERSION=8.12.0
+ARG NODEJS_VERSION=12.18.3
 ARG REACT_PRORJECT_SETUP_TOOL=~/ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources/scripts
 
 ##################

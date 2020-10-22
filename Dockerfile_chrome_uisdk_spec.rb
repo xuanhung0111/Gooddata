@@ -17,7 +17,7 @@ describe "Dockerfile" do
   end
 
   it "installs nodejs" do
-    expect(command("node --version").stdout).to contain ("v8.12.0")
+    expect(command("node --version").stdout).to contain ("v12.18.3")
   end
 
   it "installs yarn" do
