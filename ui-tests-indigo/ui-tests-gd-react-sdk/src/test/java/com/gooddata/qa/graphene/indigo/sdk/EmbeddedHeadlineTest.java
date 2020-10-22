@@ -100,9 +100,9 @@ public class EmbeddedHeadlineTest extends AbstractReactSdkTest {
     public void changeFormatEmbeddedHeadlineInsight() throws IOException {
         String headline = "Headline " + generateHashString();
         createInsight(headline, ReportType.HEADLINE, METRIC_NUMBER_OF_ACTIVITIES);
+        dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         createCatalogJSON(Pair.of("visualizationName", headline));
         replaceContentAppJSFrom(TEMPLATE_VISUALIZATION_BY_IDENTIFIER);
-        dashboardRestRequest.changeMetricFormat(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri(), Formatter.DEFAULT.toString());
         try {
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMetricFormat(),
                     Formatter.DEFAULT.toString());
