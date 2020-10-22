@@ -416,7 +416,7 @@ public class TestParameters {
     public boolean isWhitelabeledEnvironment() {
         return Stream.of("whitelabeled\\.intgdc\\.com","ponies\\.intgdc\\.com",
                 "zebroids\\.intgdc\\.com","donkeys\\.intgdc\\.com","gdcwltest\\.eu\\.gooddata\\.com",
-                "secure\\.gooddata\\.com","gdcwltest\\.ca\\.gooddata\\.com","gdctestwl-na3\\.na\\.gooddata\\.com")
+                "secure\\.gooddata\\.com","gdcwltest\\.ca\\.gooddata\\.com","gdctestwl-ca2\\.ca\\.gooddata\\.com","gdctestwl-na3\\.na\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
 
