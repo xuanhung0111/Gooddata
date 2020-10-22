@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
@@ -72,6 +74,8 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         metrics.createNumberOfActivitiesMetric();
         metrics.createCloseEOPMetric();
         metrics.createAmountMetric();
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
     }
