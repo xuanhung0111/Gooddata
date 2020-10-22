@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.sdk.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -56,6 +57,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
      * @param variables Pair.of("visualizationName", $titleOfVisualization)
      */
     public File createCatalogJSON(Pair<String, String>... variables) throws IOException {
+        sleepTightInSeconds(3);
         createTestingVariable(variables);
         return createCatalogExportConfig(testParams.getProjectId(), "catalog.json");
     }
