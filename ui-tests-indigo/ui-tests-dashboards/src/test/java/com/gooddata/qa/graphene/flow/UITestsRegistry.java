@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.DateFilterConfigurationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DeleteAttributeFilterTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DependentFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExtendedDateFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
@@ -145,6 +146,7 @@ public class UITestsRegistry {
             KPIDashboardsDrillToInsightTest.class,
             KPIDashboardsDrillToDashboardTest.class,            
             ControlFilterEmbeddedKDFromExternalApplication.class,
+            DependentFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
