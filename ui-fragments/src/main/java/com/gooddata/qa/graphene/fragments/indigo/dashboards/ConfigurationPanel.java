@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 public class ConfigurationPanel extends AbstractFragment {
 
-    private static final String CONFIGURATION_PANEL_ROOT = ".s-gd-configuration-bubble";
+    private static final String CONFIGURATION_PANEL_ROOT = ".s-gd-configuration-bubble .configuration-panel";
     private static final By BY_DRILL_TO_SELECT = By.className("s-drill_to_select");
     private static final By BY_DRILL_TO_DASHBOARD = By.className("s-dashboards-dropdown-button");
 
@@ -73,13 +73,6 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-drill-show-measures")
     private WebElement addInteraction;
 
-    @FindBy(xpath = "//*[@class='insight-configuration']//div[contains(@class, 'is-submenu')]//span[contains(text(), 'Interactions')]")
-    private WebElement insightInteractions;
-
-    @FindBy(xpath = "//*[@class='insight-configuration']//div[contains(@class, 'is-submenu')]//span[contains(text(), 'Configuration')]")
-    private WebElement insightConfig;
-
-
     public static ConfigurationPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConfigurationPanel.class,
                 waitForElementVisible(By.cssSelector(CONFIGURATION_PANEL_ROOT), context));
@@ -98,7 +91,6 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public FilterByItem getFilterByDateFilter() {
-        waitForElementVisible(insightConfig).click();
         return filterByDateFilter;
     }
 
@@ -247,7 +239,6 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public DrillMeasureDropDown.DrillConfigPanel drillIntoInsight(String metric, String insight) {
-        waitForElementVisible(insightInteractions).click();
         waitForElementVisible(addInteraction).click();
         DrillMeasureDropDown.getInstance(browser).selectByName(metric);
         return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoInsight(insight);
