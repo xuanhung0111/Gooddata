@@ -18,6 +18,8 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
     private final String ATTR_GEO_PUSHPIN = "city";
     private final String ATTR_DISTRICT = "district";
     private final String ATTR_TIMEZONE = "timezone";
+    private static final String UNSUPPORTED_ITEM_MESSAGE = "Unsupported item is hidden";
+    private static final String UNSUPPORTED_ITEMS_MESSAGE = "Unsupported items are hidden";
     private AnalysisPage analysisPage;
 
     @Override
@@ -38,8 +40,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_COUNTRY);
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measure is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
         analysisPage.changeReportType(ReportType.GEO_CHART).waitForReportComputing();
         analysisPage.removeMeasureColorBucket("M2\n" + "Count of " + ATTR_DISTRICT);
         analysisPage.changeReportType(type).waitForReportComputing();
@@ -65,8 +66,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), asList());
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported attribute is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
     }
 
     @Test(dependsOnMethods = {"switchGeoChartToColumnBarAreLineChart"}, groups = {"geoPushpinProject"})
@@ -78,8 +78,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getMetricsSecondaryBucket().getItemNames(), asList("Count of " + ATTR_DISTRICT));
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported attributes are hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEMS_MESSAGE);
     }
 
     @Test(dependsOnMethods = {"switchGeoChartToColumnBarAreLineChart"}, groups = {"geoPushpinProject"},
@@ -92,8 +91,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getAttributesBucket().getAttributeName(), ATTR_GEO_PUSHPIN);
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported attribute is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
         if (type.equals(ReportType.BUBBLE_CHART)) {
             assertEquals(analysisPage.getMetricsTertiaryBucket().getItemNames(), asList());
         }
@@ -108,16 +106,14 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getAttributesBucket().getAttributeName(), ATTR_GEO_PUSHPIN);
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported attribute and measure are hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEMS_MESSAGE);
         analysisPage.changeReportType(ReportType.GEO_CHART);
         analysisPage.removeGeoPushpin(ATTR_GEO_PUSHPIN).waitForReportComputing();
         analysisPage.changeReportType(type).waitForReportComputing();
         assertEquals(analysisPage.getAttributesBucket().getAttributeName(), ATTR_COUNTRY);
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measure is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
         analysisPage.changeReportType(ReportType.GEO_CHART).waitForReportComputing();
         analysisPage.removeStack();
         analysisPage.changeReportType(type).waitForReportComputing();
@@ -137,8 +133,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_COUNTRY);
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported measure is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
         analysisPage.changeReportType(ReportType.GEO_CHART);
         analysisPage.removeMeasureSizeBucket("M1\n" + "Sum of " + ATTR_POPULATION);
         analysisPage.changeReportType(type).waitForReportComputing();
@@ -174,8 +169,7 @@ public class SwitchGeoChartToOtherChartGeoPushpinTest extends AbstractGeoPushpin
         assertEquals(analysisPage.getMeasureColorBucket().getAttributeName(), "");
         assertTrue(analysisPage.getMainEditor().isWarningUnsupportedMessageVisible(),
                 "The warning unsupported message should be displayed");
-        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(),
-                "Unsupported attribute is hidden");
+        assertEquals(analysisPage.getMainEditor().getWarningUnsupportedMessage(), UNSUPPORTED_ITEM_MESSAGE);
         analysisPage.changeReportType(type).waitForReportComputing();
         analysisPage.removeStack();
         analysisPage.changeReportType(ReportType.GEO_CHART);
