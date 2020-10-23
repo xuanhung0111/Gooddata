@@ -44,7 +44,7 @@ public class Widget extends AbstractFragment {
     @FindBy(css = ".item-headline .s-editable-label textarea")
     private WebElement headlineTextarea;
 
-    @FindBy(className = "s-dash-item-action-placeholder")
+    @FindBy(className = "s-dash-item-action-options")
     private WebElement optionsButton;
 
     public Widget exportTo(File file) {
@@ -167,6 +167,6 @@ public class Widget extends AbstractFragment {
         getActions().moveToElement(waitForElementPresent(By.className("s-dash-item-action-placeholder"), browser)).build().perform();
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,
-            waitForElementVisible(By.className("insight-configuration"), browser));
+            waitForElementVisible(By.className("s-options-menu-bubble"), browser));
     }
 }

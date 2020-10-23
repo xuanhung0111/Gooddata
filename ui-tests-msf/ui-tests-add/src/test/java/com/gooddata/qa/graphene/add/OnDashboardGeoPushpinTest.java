@@ -86,6 +86,7 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
         indigoDashboard.addDashboard().changeDashboardTitle(GEO_DASHBOARD)
                 .addInsight(GEO_INSIGHT);
         ConfigurationPanel configurationPanel =  indigoDashboard.waitForWidgetsLoading().getConfigurationPanel();
+        configurationPanel.disableDateFilter();
         configurationPanel.drillIntoInsight("Sum of " + ATTR_POPULATION, GEO_INSIGHT);
         indigoDashboard.saveEditModeWithWidgets().waitForWidgetsLoading();
         geoChart = GeoPushpinChartPicker.getInstance(browser);
@@ -212,7 +213,7 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
 
     @Test(dependsOnMethods = {"exportGeoPushpinToXlsxFileWithAttributeFilter"}, groups = {"geoPushpinProject"})
     public void testResizeInsightOnDashBoard(){
-        indigoDashboard.switchToEditMode().resizeWidthOfWidget(ResizeBullet.TWELVE);
+         indigoDashboard.switchToEditMode().resizeWidthOfWidget(ResizeBullet.TWELVE);
         assertEquals(waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, browser).getText(),
                 "The geo chart was automatically resized");
         indigoDashboard.saveEditModeWithWidgets();
