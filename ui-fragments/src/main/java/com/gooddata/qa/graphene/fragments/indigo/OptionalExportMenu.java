@@ -10,6 +10,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class OptionalExportMenu extends AbstractReactDropDown {
@@ -35,6 +36,10 @@ public class OptionalExportMenu extends AbstractReactDropDown {
     public boolean isExportToButtonEnabled(File file) {
         return !isElementDisabled(waitForElementVisible(
             By.cssSelector("[class*='menu-export-" + file.toString().toLowerCase() + "']"), getRoot()));
+    }
+
+    public boolean isExportToButtonVisible(File file) {
+        return isElementVisible(By.cssSelector("[class*='menu-export-" + file.toString().toLowerCase() + "']"), getRoot());
     }
 
     public boolean isOpenAsReportButtonEnabled() {
