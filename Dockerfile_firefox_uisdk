@@ -1,7 +1,7 @@
 FROM harbor.intgdc.com/staging/graphene-firefox:latest
 
 ARG GIT_COMMIT=unspecified
-LABEL image_name="Graphene Firefox Image for UISDK"
+LABEL image_name="Graphene Firefox Image for UI SDK"
 LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
 LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
 LABEL parent_image="harbor.intgdc.com/staging/graphene-firefox:latest"
