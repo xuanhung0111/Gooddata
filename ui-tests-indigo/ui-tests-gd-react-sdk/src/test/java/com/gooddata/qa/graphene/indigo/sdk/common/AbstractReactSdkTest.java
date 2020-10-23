@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.testng.Assert.assertEquals;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.utils.ProcessBuilderUtils;
@@ -82,14 +81,7 @@ public class AbstractReactSdkTest extends GoodSalesAbstractTest {
         commands.add("/tmp/react/.npm-global/bin/pm2");
         commands.add("reload");
         commands.add("APP");
-        String inputStream = ProcessBuilderUtils.runCommandLine(commands, pm2File);
-        String expectedInputStream = "Use --update-env to update environment variables\n" +
-            "[PM2] Applying action reloadProcessId on app [APP](ids: 0)\n" +
-            "[PM2] [APP](0) ✓\n";
-        Function<WebDriver, Boolean> isReloaded = context -> inputStream.equals(expectedInputStream);
-        Graphene.waitGui().until(isReloaded);
-
-        assertEquals(inputStream, expectedInputStream);
+        ProcessBuilderUtils.runCommandLine(commands, pm2File);
     }
 
     public void createTestingVariable(Pair<String, String>... variables) {
