@@ -134,7 +134,7 @@ public class TestParameters {
         brickAppstore = loadProperty("brickAppstore");
         // For staging env, brickAppstore is PRODUCTION_APPSTORE
         // TODO: remove this workaround once testing on NA3 completed, this param should be manipulated at ci-infra
-        if ("gdctest-na3".equals(userDomain)) {
+        if (isProductionEnvironment()) {
             brickAppstore = "PUBLIC_APPSTORE";
         }
         lcmDataloadProcessComponentVersion = loadProperty("lcmDataloadProcessComponentVersion");
@@ -409,7 +409,7 @@ public class TestParameters {
     public boolean isProductionEnvironment() {
         return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com",
                 ".*\\.eu\\.gooddata\\.com", "gdcwltesteu\\.getgooddata\\.com",
-                ".*\\.na\\.prodgdc\\.com", ".*\\.ca\\.gooddata\\.com")
+                ".*\\.na\\.prodgdc\\.com", ".*\\.ca\\.gooddata\\.com", ".*\\.na\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
 
