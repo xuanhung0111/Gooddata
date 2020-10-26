@@ -130,8 +130,7 @@ public class DependentFilterTest extends AbstractDashboardTest {
 
         stageNameFilter.selectByNames("Closed Lost"); //Except Closed Won
         indigoDashboardsPage.waitForWidgetsLoading();
-        assertEquals(stageNameFilter.getSelectedItems(),
-                "Interest, Discovery, Short List, Risk Assessment, Conviction, Negotiation, Closed Won");
+        assertEquals(stageNameFilter.getSelectedItems(), "Risk Assessment");
         assertEquals(accountFilter.getSelectedItems(), "101 Financial, 123 Exteriors, 14 West");
         assertEquals(isWonFilter.getSelectedItems(), "false");
         assertThat(stageNameInsight.getAttributeValuePresent(), hasItems("Interest", "Discovery", "Short List", "Risk Assessment",
