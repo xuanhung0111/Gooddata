@@ -165,7 +165,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
         KpiConfiguration kpiAmount = new KpiConfiguration.Builder().metric(METRIC_AGE).dataSet(DATE_DATASET)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).build();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AGE));
-        initIndigoDashboardsPage().addDashboard().addKpi(kpiAmount).addInsightNext(INSIGHT_NAME)
+        InitDashboardIgnoreAlert().addDashboard().addKpi(kpiAmount).addInsightNext(INSIGHT_NAME)
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
 
         JSONObject jsonDataset = processUtils.setModeDefaultDataset(USER_DATASET);
@@ -220,5 +220,16 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     private String createInsightHasOnlyMetric(String insightTitle, ReportType reportType, List<String> metricsTitle) {
         return indigoRestRequest.createInsight(new InsightMDConfiguration(insightTitle, reportType).setMeasureBucket(metricsTitle
                 .stream().map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))).collect(toList())));
+    }
+
+    private IndigoDashboardsPage InitDashboardIgnoreAlert() {
+        try {
+            return initIndigoDashboardsPage();
+        } catch (Exception handleAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            return initIndigoDashboardsPage();
+        }
     }
 }
