@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -65,7 +66,8 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
         assertEquals(ldmPage.getLinkDISC(), format("https://%s/admin/disc/#/projects", testParams.getHost()));
         assertTrue(ldmPage.getMenuItems().equals(Arrays.asList("Model data", "Load data")));
         initLogicalDataModelPage();
-        waitForOpeningModelPage();
+        waitForFragmentVisible( modeler.getLayout());
+        modeler.getLayout().waitForLoading();
     }
 
     @Test(dependsOnMethods = {"verifyZoomValue"})
