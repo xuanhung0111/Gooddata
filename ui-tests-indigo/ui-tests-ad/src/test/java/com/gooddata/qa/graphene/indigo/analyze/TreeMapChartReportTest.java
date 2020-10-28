@@ -242,8 +242,8 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .saveInsight("INSIGHT HAVE A METRIC AND TWO ATTRIBUTE ON VIEW BY AND SEGMENT BY").getChartReport();
         assertEquals(chartReport.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList(ATTR_ACTIVITY_TYPE, "Email"), asList(ATTR_DEPARTMENT, "Inside Sales"),
-                        asList(METRIC_NUMBER_OF_ACTIVITIES, "12,305")));
+                asList(asList(ATTR_ACTIVITY_TYPE, "Email"), asList(ATTR_DEPARTMENT, "Direct Sales"),
+                        asList(METRIC_NUMBER_OF_ACTIVITIES, "21,615")));
     }
 
     @Test(dependsOnGroups = {"createProject"})
