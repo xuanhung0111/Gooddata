@@ -173,7 +173,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
                 .showPercents();
         analysisPage.waitForReportComputing();
         takeScreenshot(browser, "show-percent-on-insight-containing-unrelated-date", getClass());
-        assertEquals(analysisPage.getChartReport().getDataLabels(), singletonList("100.00%"));
+        assertEquals(analysisPage.getChartReport().getDataLabels(), singletonList("1.00"));
     }
 
     private void setupProductionData() throws JSONException {
