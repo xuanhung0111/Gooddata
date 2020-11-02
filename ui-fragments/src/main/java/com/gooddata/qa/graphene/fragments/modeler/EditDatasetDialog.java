@@ -51,7 +51,7 @@ public class EditDatasetDialog extends AbstractFragment {
     @FindBy(className = "model-mapping")
     DataMapping dataMappingContent;
 
-    @FindBy(css =".actions-panel .source-name")
+    @FindBy(className ="source-name")
     WebElement sourceName;
 
     @FindBy(className = "s-more-item")
@@ -82,6 +82,14 @@ public class EditDatasetDialog extends AbstractFragment {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         hoverOnAttributeOrFactInDialog(attribute);
         viewDetail.addNewLabel(attribute, labelName);
+        saveChangeButton.click();
+        waitForFragmentNotVisible(this);
+    }
+
+    public void addNewLabelForPrimaryKey(String attribute, String labelName){
+        ViewDetailDialog viewDetail = getViewDetailDialog();
+        hoverOnAttributeOrFactInDialog(attribute);
+        viewDetail.addNewLabelForPrimaryKey(attribute, labelName);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
