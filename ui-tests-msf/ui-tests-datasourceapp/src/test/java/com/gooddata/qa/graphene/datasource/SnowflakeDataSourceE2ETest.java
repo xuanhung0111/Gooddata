@@ -56,7 +56,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             initDatasourceManagementPage();
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
-            assertEquals(initialContent.getNumberOfCloudResourceButton(), 3);
+            assertEquals(initialContent.getNumberOfCloudResourceButton(), 4);
             assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
             initialContent.openSnowflakeEdit();
             dataSourceManagementPage = initDatasourceManagementPage();
