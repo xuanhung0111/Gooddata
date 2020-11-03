@@ -58,7 +58,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
-    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "The password must be different from your last 1 passwords.";
+    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "The password must be different from your last password.";
 
     private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
 
