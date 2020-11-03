@@ -166,7 +166,7 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
         mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
         mainModelContent.focusOnDataset(USER_DATASET);
         Model modelUser = mainModelContent.getModel(USER_DATASET);
-        modelUser.addNewLabel(USERID_PRIMARY_KEY, USERID_PRIMARY_KEY_LABEL);
+        modelUser.addNewLabelForPrimaryKey(USERID_PRIMARY_KEY, USERID_PRIMARY_KEY_LABEL);
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.openEditDialog();
 
