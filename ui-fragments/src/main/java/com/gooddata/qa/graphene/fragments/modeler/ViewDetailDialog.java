@@ -43,6 +43,7 @@ public class ViewDetailDialog extends AbstractFragment {
 
     private static final String VIEW_DETAIL_DIALOG = "indigo-table-component";
     private static final String ATTRIBUTE_NAME = "//div[@class='title attribute'][contains(text(),'%s')]";
+    private static final String ATTRIBUTE_PRIMARY = "//div[@class='title primary-key'][contains(text(),'%s')]";
     private static final String FACT_NAME = "//div[@class='title fact'][contains(text(),'%s')]";
     private static final String LABEL_NAME = "//div[@class='title label label-text'][contains(text(),'%s')]";
     private static final String DATATYPE_CHANGE = "//div[@class='gd-list-item %s']";
@@ -101,11 +102,20 @@ public class ViewDetailDialog extends AbstractFragment {
 
     public void addNewLabel(String attribute, String labelName){
         WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
-        hoverOnElementByJS(attributeName);
+        processAddNewLabel(labelName, attributeName);
+    }
+
+    public void processAddNewLabel(String labelName, WebElement attributeElement){
+        hoverOnElementByJS(attributeElement);
         waitForElementVisible(addLabelButton);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(addLabelButton).click().build().perform();
         OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().addLabel(labelName);
+    }
+
+    public void addNewLabelForPrimaryKey(String attribute, String labelName){
+        WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_PRIMARY, attribute)));
+        processAddNewLabel(labelName, attributeName);
     }
 
     public void deleteLabel(String labelName) {
