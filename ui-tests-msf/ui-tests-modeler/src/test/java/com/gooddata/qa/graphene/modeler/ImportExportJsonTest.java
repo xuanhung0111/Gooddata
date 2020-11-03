@@ -122,13 +122,12 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
                     + projectTitle + "." + ExportFormat.JSON.getName());
             waitForExporting(exportFile);
             String json = JsonUtils.getJsonObjectFromFile(exportFile).toString();
-            String resultString = getResourceAsString("/content_mapping_expected.txt");
             assertThat(json, containsString("{\"identifier\":{\"id\":\"dataset.city\",\"type\":\"dataset\"}"));
             assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.people\",\"type\":\"dataset\"}"));
             assertThat(json, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
             assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"createddate\",\"type\":\"templateDataset\"}"));
             assertThat(json, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"birthday\",\"type\":\"templateDataset\"}"));
-            assertThat(json, containsString(resultString.replaceFirst("PROJECTID", testParams.getProjectId())));
+            assertThat(json, containsString(getJsonContentMapping(testParams.getProjectId(), "/content_mapping_expected.txt")));
         } finally {
             File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                     + projectTitle + "." + ExportFormat.JSON.getName());
@@ -153,13 +152,12 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
                    + projectTitle + "." + ExportFormat.JSON.getName());
            waitForExporting(exportFile);
            String json = JsonUtils.getJsonObjectFromFile(exportFile).toString();
-           String resultString = getResourceAsString("/content_mapping_after_publish.txt");
            assertThat(json, containsString("{\"identifier\":{\"id\":\"dataset.city\",\"type\":\"dataset\"}"));
            assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.people\",\"type\":\"dataset\"}"));
            assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
            assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"createddate\",\"type\":\"templateDataset\"}"));
            assertThat(json, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"birthday\",\"type\":\"templateDataset\"}"));
-           assertThat(json, containsString(resultString.replaceFirst("PROJECTID", testParams.getProjectId())));
+           assertThat(json, containsString(getJsonContentMapping(testParams.getProjectId(), "/content_mapping_after_publish.txt")));
 
            ldmPage = initLogicalDataModelPageByPID(projectBlank);
            modeler.getLayout().waitForLoading();
@@ -181,7 +179,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
            assertThat(jsonOnBlankProject, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
            assertThat(jsonOnBlankProject, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"createddate\",\"type\":\"templateDataset\"}"));
            assertThat(jsonOnBlankProject, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"birthday\",\"type\":\"templateDataset\"}"));
-           assertThat(jsonOnBlankProject, containsString(resultString.replaceFirst("PROJECTID", projectBlank)));
+           assertThat(jsonOnBlankProject, containsString(getJsonContentMapping(projectBlank, "/content_mapping_after_publish.txt")));
 
            toolbar.clickPublish();
            publishModelDialog = PublishModelDialog.getInstance(browser);
@@ -203,4 +201,11 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
        }
     }
 
+    public String getJsonContentMapping (String projectId, String fileName) {
+        if (testParams.getHost().contains("client-demo")) {
+            return getResourceAsString(fileName).replaceFirst("PROJECTID", projectId)
+                .replaceFirst("\"dataset.people\",\"references\"", "\"dataset.people\",\"system\":{},\"references\"");
+        }
+        return getResourceAsString(fileName).replaceFirst("PROJECTID", projectId);
+    }
 }

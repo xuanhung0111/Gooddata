@@ -115,6 +115,11 @@ public class Model extends AbstractFragment {
         addMore.editDatasetDialog().addNewLabel(attribute, labelName);
     }
 
+    public void addNewLabelForPrimaryKey(String attribute, String labelName) {
+        AddMorePopUp addMore = openMorePopUpOnDataset();
+        addMore.editDatasetDialog().addNewLabelForPrimaryKey(attribute, labelName);
+    }
+
     public void deleteLabel(String label) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.editDatasetDialog().deleteLabel(label);
