@@ -329,6 +329,7 @@ public class UITestsRegistry {
             "testng-imap-GoodSales-email-schedule-full.xml",
             "testng-imap-GoodSales-email-schedule-dashboard.xml",
             "testng-imap-GoodSales-email-schedule-KPI-dashboard.xml",
+            "testng-imap-GoodSales-email-schedule-KPI-dashboard-extended.xml",
             "testng-imap-GoodSales-email-schedule-embedded-dashboard.xml",
             "testng-imap-GoodSales-email-schedule-embedded-dashboard-has-filter.xml",
             "testng-imap-GoodSales-email-schedule-saved-view-embedded-dashboard.xml",
