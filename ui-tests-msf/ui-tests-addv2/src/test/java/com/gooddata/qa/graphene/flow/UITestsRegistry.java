@@ -40,7 +40,6 @@ public class UITestsRegistry {
         suites.put("all", new Object[] {
                 SegmentForceLoadTest.class,
                 SegmentLoadTest.class,
-                DeployProcessTest.class,
                 SegmentDeleteByLabelTest.class,
                 SegmentDeleteColumnFactTableGrainTest.class,
                 SegmentDeleteColumnForceLoadTest.class,
@@ -56,9 +55,6 @@ public class UITestsRegistry {
                 RedShiftSegmentLoadTest.class,
                 BigQueryCurrentLoadTest.class,
                 BigQuerySegmentLoadTest.class,
-                ValidateDatasourceSnowflakeTest.class,
-                ValidateDatasourceRedshiftTest.class,
-                ValidateDatasourceBigQueryTest.class,
                 CleanUpSnowflakeTest.class,
                 CleanUpBigQueryTest.class,
                 CleanUpRedShiftTest.class,

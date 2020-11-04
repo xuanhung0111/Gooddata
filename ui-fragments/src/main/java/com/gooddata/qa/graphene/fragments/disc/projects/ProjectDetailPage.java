@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
@@ -137,6 +138,7 @@ public class ProjectDetailPage extends AbstractFragment {
                                  String s3SecretKey,
                                  String s3Region,
                                  boolean serverSideEncryption) {
+        sleepTightInSeconds(3); // This case doesn't have any other option for waiting time.
         clickDeployButton().deployEtlProcess(processName, processType, s3ConfigurationPath, s3AccessKey, s3SecretKey,
                 s3Region, serverSideEncryption);
     }

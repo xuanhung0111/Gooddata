@@ -46,7 +46,7 @@ else
 fi
 
 # Install node-saas as https://jira.intgdc.com/browse/ONE-3381
-yarn add node-sass
+yarn add node-sass@4.14.1
 
 if [ -n "$TESTING_HOST" ] && ! $USE_BOILER_PLATE; then
     # Setup proxy to prevent cross-origin issues

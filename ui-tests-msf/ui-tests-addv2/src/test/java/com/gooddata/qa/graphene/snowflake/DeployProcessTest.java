@@ -250,6 +250,7 @@ public class DeployProcessTest extends AbstractADDProcessTest {
         try {
             ProjectDetailPage projectDetailPage = initDiscProjectDetailPage();
             projectDetailPage.getProcess(processName).deleteProcess();
+            sleepTightInSeconds(3); // This case doesn't have any other option for waiting time.
             assertFalse(projectDetailPage.hasProcess(processName), "Process is not delete yet");
 
             dataloadProcess = getProcessService().createProcess(getProject(), new DataDistributionProcess(processName, dataSourceID, "1"));
