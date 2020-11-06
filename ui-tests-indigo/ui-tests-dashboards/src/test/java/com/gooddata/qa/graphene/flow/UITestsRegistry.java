@@ -77,7 +77,6 @@ public class UITestsRegistry {
 
         suites.put("pull-request", new Object[] {
             ManipulateWidgetsTest.class,
-            MetricsDropdownTest.class,
             VisualizationsTest.class,
             InsightOnDashboardTest.class,
             DateFilteringOnInsightTest.class,
