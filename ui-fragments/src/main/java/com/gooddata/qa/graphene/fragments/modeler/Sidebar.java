@@ -16,10 +16,7 @@ public class Sidebar extends AbstractFragment {
     @FindBy(className = "gdc-ldm-add-section")
     private AddSection addSection;
 
-    @FindBy(className = "s-import_datasets")
-    private WebElement importDatasetButton;
-
-    @FindBy(className = "s-import_from_csv")
+    @FindBy(className = "s-import_csv")
     private WebElement importCSVButton;
 
     public static final Sidebar getInstance(SearchContext searchContext) {
@@ -31,9 +28,8 @@ public class Sidebar extends AbstractFragment {
     }
 
     public FileUploadDialog openCSVDialog() {
-        importDatasetButton.click();
-        ImportMenu importMenu = OverlayWrapper.getInstance(browser).getImportMenu();
-        FileUploadDialog dialog  = importMenu.selectImportCSVFile();
+        importCSVButton.click();
+        FileUploadDialog dialog  = OverlayWrapper.getInstance(browser).getFileUploadDialog();
         return dialog;
     }
 }

@@ -11,12 +11,27 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
-import com.gooddata.qa.graphene.fragments.modeler.*;
+import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
+import com.gooddata.qa.graphene.fragments.modeler.Modeler;
+import com.gooddata.qa.graphene.fragments.modeler.Sidebar;
+import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
+import com.gooddata.qa.graphene.fragments.modeler.Canvas;
+import com.gooddata.qa.graphene.fragments.modeler.Model;
+import com.gooddata.qa.graphene.fragments.modeler.DateModel;
+import com.gooddata.qa.graphene.fragments.modeler.MainModelContent;
+import com.gooddata.qa.graphene.fragments.modeler.EditDateDimensionDialog;
+import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
+import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 
-import com.gooddata.qa.utils.cloudresources.*;
+import com.gooddata.qa.utils.cloudresources.DataSourceRestRequest;
+import com.gooddata.qa.utils.cloudresources.SnowflakeUtils;
+import com.gooddata.qa.utils.cloudresources.DataSourceUtils;
+import com.gooddata.qa.utils.cloudresources.ProcessUtils;
+import com.gooddata.qa.utils.cloudresources.ConnectionInfo;
+import com.gooddata.qa.utils.cloudresources.DatabaseType;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.model.ModelRestRequest;
@@ -262,7 +277,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
         //edit model, set grain, add new dataset, try publish again
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "update_new_dataset.txt"));
-        initLogicalDataModelPage();
+        initDashboardIgnoreAlert();
+        toolbar.saveAsDraft();
+        modeler.getLayout().waitForLoading();
         mainModelContent.focusOnDataset(CLASS_DATASET);
         Model modelClass = mainModelContent.getModel(CLASS_DATASET);
         modelClass.setPrimaryKey(CLASSCODE_GRAIN);

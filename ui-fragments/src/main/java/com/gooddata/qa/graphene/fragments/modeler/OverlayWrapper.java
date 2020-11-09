@@ -49,9 +49,6 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(css = ".gdc-ldm-waiting-dialog .waiting-dialog-content")
     private WaitingDialog waitingDialog;
 
-    @FindBy(className = "gd-list")
-    private ImportMenu importMenu;
-
     @FindBy(className = "create-output-stage-dialog")
     private OutputStage outputStage;
 
@@ -72,6 +69,9 @@ public class OverlayWrapper extends AbstractFragment {
 
     @FindBy(className = "add-label-menu")
     private TextEditorWrapper textEditorWrapper;
+
+    @FindBy(className = "timer-detail")
+    private SaveAsDraftDialog saveAsDraftDialog;
 
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -101,11 +101,6 @@ public class OverlayWrapper extends AbstractFragment {
         List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
         return Graphene.createPageFragment(
                 OverlayWrapper.class, wrapperList.get(index));
-    }
-
-    public ImportMenu getImportMenu() {
-        waitForFragmentVisible(importMenu);
-        return importMenu;
     }
 
     public IndigoTableDropDown getIndigoTableDropDown() {
@@ -166,6 +161,10 @@ public class OverlayWrapper extends AbstractFragment {
     public OutputStage openOutputStage() {
         waitForElementVisible(dropDownOutputStage).click();
         return outputStage;
+    }
+
+    public void discardDraft() {
+        waitForFragmentVisible(saveAsDraftDialog).discardDraft();
     }
 
     public void exportJson() {

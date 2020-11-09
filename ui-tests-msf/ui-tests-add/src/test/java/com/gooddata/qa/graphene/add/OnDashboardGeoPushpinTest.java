@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.common.StatusBar;
 import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
@@ -18,6 +19,7 @@ import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 
@@ -53,6 +55,7 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
     private GeoPushpinChartPicker geoChart;
     private IndigoDashboardsPage indigoDashboard;
     private boolean resultComparePDF;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     public void initProperties() {
@@ -68,6 +71,9 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
         ExportDashboardDefinition exportDashboardDefinition = new ExportDashboardDefinition()
                 .setDashboardName(" ").setTabName(" ").setProjectName(" ").setReportName(" ");
         dashboardRequest.exportDashboardSetting(exportDashboardDefinition);
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXPLORE_INSIGHTS_FROM_KD, false);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"geoPushpinProject"})
