@@ -42,6 +42,9 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "search-model-input")
     private WebElement searchModelInput;
 
+    @FindBy(css = ".save-as-draft-timer .title")
+    private WebElement saveAsDraftButton;
+
     @FindBy(css = ".search-model-input .s-input-clear")
     private WebElement clearSearchTextIcon;
 
@@ -52,6 +55,12 @@ public class ToolBar extends AbstractFragment {
 
     public void clickPublish() {
         btnPublishOnToolbar.click();
+    }
+
+    public void saveAsDraft() {
+        waitForElementVisible(saveAsDraftButton);
+        saveAsDraftButton.click();
+        OverlayWrapper.getInstance(browser).discardDraft();
     }
 
     public void switchToTableView() {
