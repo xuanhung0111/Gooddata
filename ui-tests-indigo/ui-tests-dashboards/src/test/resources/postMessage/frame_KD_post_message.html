@@ -34,6 +34,10 @@
     <strong>Your Insight Uri: </strong>
     <input id="uriInsight" rows="2" type="text" value="" placeholder="Your Insight Uri">
     <input id="addInsight" type="button" value="Add Insight"/>
+    <input id="setFilter" type="button" value="SET FILTER CONTEXT"/>
+    <input id="setDateFilter" type="button" value="DATE FILTER"/>
+    <input id="setDuplicatedDateFilter" type="button" value="SET DUPLICATED DATE FILTER"/>
+    <input id="setCombineFilter" type="button" value="SET COMBINE FILTER"/>
     <br>
 </div>
 
@@ -177,6 +181,135 @@
                 event: {
                     name: "addFilter",
                     contextId: `addFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setFilter = document.getElementById('setFilter');
+
+    setFilter.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "dashboard",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{identifiers}"
+                                    },
+                                    in: {uris}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setDateFilter = document.getElementById('setDateFilter');
+
+    setDateFilter.onclick = function(){
+        var postMessageStructure = {
+            gdc: {
+                product: "dashboard",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                relativeDateFilter: {
+                                    granularity: "{granularity}",
+                                    from: {start_time},
+                                    to: {end_time}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+    var setDuplicatedDateFilter = document.getElementById('setDuplicatedDateFilter');
+
+    setDuplicatedDateFilter.onclick = function(){
+        var postMessageStructure = {
+            gdc: {
+                product: "dashboard",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                relativeDateFilter: {
+                                    granularity: "abc",
+                                    from: 0,
+                                    to: 0
+                                },
+                                relativeDateFilter: {
+                                    granularity: "abc",
+                                    from: -1,
+                                    to: -1
+                                },
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
+                }
+            }
+        };
+        postMessage(postMessageStructure);
+    }
+
+
+
+
+    var setCombineFilter = document.getElementById('setCombineFilter');
+
+    setCombineFilter.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "dashboard",
+                event: {
+                    name: "setFilterContext",
+                    data: {
+                        filters: [
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{identifiers}"
+                                    },
+                                    in: {uris}
+                                }
+                            },
+                            {
+                                positiveAttributeFilter: {
+                                    displayForm: {
+                                        identifier: "{computed_identifiers}"
+                                    },
+                                    in: {computed_uris}
+                                }
+                            },
+                            {
+                                relativeDateFilter: {
+                                    granularity: "{granularity}",
+                                    from: {start_time},
+                                    to: {end_time}
+                                }
+                            }
+                        ]
+                    },
+                    contextId: `setFilter-${(new Date()).getTime()}`
                 }
             }
         };

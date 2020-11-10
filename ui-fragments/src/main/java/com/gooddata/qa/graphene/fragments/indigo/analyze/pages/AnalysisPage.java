@@ -337,6 +337,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
+    public AnalysisPage swapAttributeToStack(String attr, String stack) {
+        WebElement source = getAttributesBucket().get(attr);
+        WebElement target = getStacksBucket().get(stack);
+        return drag(source, target);
+    }
+
     public AnalysisPage reorderMetric(String sourceMetric, String targetMetric) {
         WebElement source = getMetricsBucket().get(sourceMetric);
         WebElement target = getMetricsBucket().get(targetMetric);

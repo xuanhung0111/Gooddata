@@ -318,6 +318,10 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public int getNumberOfAttrFilter() {
+        return getRoot().findElements(BY_ATTRIBUTE_FILTER_BUTTON).size();
+    }
+
     public List<String> getAllFilterText() {
         return Stream.of(waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()))
                 .map(filter -> filter.getText().replaceAll("[\\r\\n]+", ""))

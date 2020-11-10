@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
+import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.sdk.model.md.Attribute;
 import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.sdk.model.md.Restriction;
@@ -19,14 +21,18 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -153,6 +159,53 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
                 .replace("{reportId}", insightObjectId)
                 .replace("{uris}", uris)
                 .replace("{identifiers}", identifiers);
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
+    protected String createTemplateHtmlFileWithNegativeFilter(String insightObjectId, String uris, String identifiers, String pathFile) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("positiveAttributeFilter", "negativeAttributeFilter")
+                .replace("in: {uris}", "notIn: {uris}")
+                .replace("{uris}", uris)
+                .replace("{identifiers}", identifiers);
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
+    protected String createTemplateHtmlFileWithDateFilter(String insightObjectId, String pathFile, String startTime,
+                                                          String endTime, String granularity, String dateFilterType) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("{granularity}", granularity)
+                .replace("{start_time}", startTime)
+                .replace("{end_time}", endTime)
+                .replace("relativeDateFilter", dateFilterType);
+
+        return ResourceUtils.createTempFileFromString(replacedContent);
+    }
+
+    protected String createTemplateHtmlFileCombineFilter(String insightObjectId, String pathFile, String startTime,
+                                                         String endTime, String granularity, String uris, String identifiers,
+                                                         String computed_uris, String computed_identifiers) throws IOException {
+        final String content = ResourceUtils.getResourceAsString(pathFile);
+        final String replacedContent = content
+                .replace("{host}", testParams.getHost())
+                .replace("{project}", testParams.getProjectId())
+                .replace("{reportId}", insightObjectId)
+                .replace("{granularity}", granularity)
+                .replace("{start_time}", startTime)
+                .replace("{end_time}", endTime)
+                .replace("{uris}", uris)
+                .replace("{identifiers}", identifiers)
+                .replace("{computed_uris}", computed_uris)
+                .replace("{computed_identifiers}", computed_identifiers);
+
         return ResourceUtils.createTempFileFromString(replacedContent);
     }
 
@@ -529,5 +582,36 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
 
     protected String generateAnalyticalDashboardName() {
         return "Analytical-Dashboard-" + UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    public JSONObject getLatestPostMessage(String name) {
+        Function<WebDriver, Boolean> isLoggerDisplayed = browser -> getLoggerContent() != StringUtils.EMPTY;
+
+        Graphene.waitGui()
+                .pollingEvery(1, TimeUnit.SECONDS)
+                .withTimeout(3, TimeUnit.MINUTES)
+                .until(isLoggerDisplayed);
+
+        String contentStr = getLoggerContent();
+        log.info("*------------------*");
+        log.info(contentStr);
+        log.info("*------------------*");
+        return Stream.of(contentStr.split("\n"))
+                .map(JSONObject::new)
+                .filter(jsonObject -> jsonObject.getString("name").equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void createComputedAttribute(String attribute, String metric, String name) {
+        initAttributePage().moveToCreateAttributePage().createComputedAttribute(
+                new ComputedAttributeDefinition()
+                        .withAttribute(attribute)
+                        .withMetric(metric)
+                        .withName(name));
+        initAttributePage();
+        String titleSelector = ".s-title-" + CssUtils.simplifyText(name);
+        By computedAttributeItem = By.cssSelector(titleSelector + " a");
+        waitForElementVisible(computedAttributeItem, browser).click();
     }
 }

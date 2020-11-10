@@ -90,6 +90,7 @@ import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTes
 import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.analyze.RenderSpecialCaseGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADProgramTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -203,6 +204,7 @@ public class UITestsRegistry {
             ADFilterInsightValueTest.class,
             WeekFilterTest.class,
             ControlFilterEmbeddedADFromExternalApplication.class,
+            ControlFilterEmbeddedADProgramTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

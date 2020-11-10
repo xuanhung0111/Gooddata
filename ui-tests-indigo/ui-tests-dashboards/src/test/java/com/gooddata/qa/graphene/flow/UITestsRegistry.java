@@ -56,6 +56,8 @@ import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToInsightTes
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillDownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.ControlFilterEmbeddedKDFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDEditModeTest;
+import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDViewModeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -147,6 +149,8 @@ public class UITestsRegistry {
             KPIDashboardsDrillToDashboardTest.class,            
             KPIDashboardsDrillDownTest.class,
             ControlFilterEmbeddedKDFromExternalApplication.class,
+            EmbeddedKDEditModeTest.class,
+            EmbeddedKDViewModeTest.class,
             DependentFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",

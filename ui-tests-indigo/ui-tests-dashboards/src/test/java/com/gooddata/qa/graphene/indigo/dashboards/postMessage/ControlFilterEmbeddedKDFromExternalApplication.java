@@ -462,23 +462,6 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
         assertThat(contents, hasItems(expectedResults));
     }
 
-    private JSONObject getLatestPostMessage(String name) {
-        Function<WebDriver, Boolean> isLoggerDisplayed = browser -> getLoggerContent() != StringUtils.EMPTY;
-
-        Graphene.waitGui()
-            .pollingEvery(1, TimeUnit.SECONDS)
-            .withTimeout(3, TimeUnit.MINUTES)
-            .until(isLoggerDisplayed);
-
-        String contentStr = getLoggerContent();
-        log.info(contentStr);
-        return Stream.of(contentStr.split("\n"))
-            .map(JSONObject::new)
-            .filter(jsonObject -> jsonObject.getString("name").equals(name))
-            .findFirst()
-            .orElse(null);
-    }
-
     @Override
     protected void cleanUpLogger() {
         browser.switchTo().defaultContent();

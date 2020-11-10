@@ -150,6 +150,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String HOTSPOT_WIDTH_RESIZER_CLASS_NAME = "dash-width-resizer-hotspot";
     private static final String RESIZE_BULLET_CSS = ".s-resize-bullet-%s";
     private static final String DASHBOARD_TITLE_CLASS_NAME = "dash-title";
+    private static final String DASHBOARD_FILTER_CLASS_NAME = "dash-filters-visible";
     private static final String ROW_CONTAINER = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
@@ -317,6 +318,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         ConfirmDialog.getInstance(browser).submitClick();
         waitForFragmentVisible(splashScreen);
 
+        return this;
+    }
+
+    public IndigoDashboardsPage saveEditMode() {
+        // In case need quickly and don't need to wait for element loading
+        waitForElementVisible(enabledSaveButton).click();
+        waitForElementVisible(editButton);
         return this;
     }
 
@@ -902,6 +910,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Boolean isDashboardTitleVisible() {
         return isElementVisible(className(DASHBOARD_TITLE_CLASS_NAME), getRoot());
+    }
+
+    public Boolean isDashboardFilterVisible() {
+        return isElementVisible(className(DASHBOARD_FILTER_CLASS_NAME), getRoot());
     }
 
     private MobileKpiDashboardSelection getMobileKpiDashboardSelection() {
