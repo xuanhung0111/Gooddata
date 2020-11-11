@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -30,6 +31,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -53,6 +55,7 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
 
     private LcmBrickFlowBuilder lcmBrickFlowBuilder;
     private IndigoRestRequest indigoRestRequest;
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void initProperties() {
@@ -83,6 +86,8 @@ public class RenderingAnalyticalDashboardUsingClientIdTest extends AbstractProje
         getMetricCreator().createAmountMetric();
         indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
     }
 
     @Test(dependsOnGroups = "createProject")
