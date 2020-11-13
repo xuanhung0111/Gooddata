@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.util.Arrays.asList;
@@ -262,6 +263,9 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
+        log.info("Delete cookies..............");
+        browser.manage().deleteAllCookies();
+        sleepTightInSeconds(3);
         indigoDashboardsPage.addDashboard().addInsight(INSIGHT_NAME).selectDateFilterByName("All time").waitForWidgetsLoading()
                 .changeDashboardTitle(DASHBOARD_NAME).saveEditModeWithWidgets();
         List<String> listValue = indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
