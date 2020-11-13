@@ -12,7 +12,7 @@
         </classes>
     </test>
 
-    <test name="ReorderInsightTest" enabled="true">
+    <test name="ReorderInsightTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.ReorderInsightTest"/>
         </classes>
