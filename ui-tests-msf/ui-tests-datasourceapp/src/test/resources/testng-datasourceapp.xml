@@ -15,19 +15,19 @@
             <class name="com.gooddata.qa.graphene.datasource.BigqueryDataSourceE2ETest" />
         </classes>
     </test>
-    <test name="SnowflakeDataSourceAdvancedE2ETest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.datasource.SnowflakeDataSourceAdvancedE2ETest" />
-        </classes>
-    </test>
-    <test name="RedShiftDataSourceAdvancedE2ETest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.datasource.RedShiftDataSourceAdvancedE2ETest" />
-        </classes>
-    </test>
-    <test name="BigQueryDataSourceAdvancedE2ETest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.datasource.BigQueryDataSourceAdvancedE2ETest" />
-        </classes>
+<!--    <test name="SnowflakeDataSourceAdvancedE2ETest" enabled="true">-->
+<!--        <classes>-->
+<!--            <class name="com.gooddata.qa.graphene.datasource.SnowflakeDataSourceAdvancedE2ETest" />-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="RedShiftDataSourceAdvancedE2ETest" enabled="true">-->
+<!--        <classes>-->
+<!--            <class name="com.gooddata.qa.graphene.datasource.RedShiftDataSourceAdvancedE2ETest" />-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="BigQueryDataSourceAdvancedE2ETest" enabled="true">-->
+<!--        <classes>-->
+<!--            <class name="com.gooddata.qa.graphene.datasource.BigQueryDataSourceAdvancedE2ETest" />-->
+<!--        </classes>-->
     </test>
 </suite>
