@@ -25,7 +25,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
-import static java.lang.String.format;
 
 import java.util.List;
 import java.util.function.Function;
@@ -55,6 +54,9 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-button-remove-drill-to")
     private WebElement removeDrillToButton;
 
+    @FindBy(className = "s-drill-config-item-delete")
+    private WebElement removeMetricDrillInteraction;
+
     @FindBy(className = "s-widget-alerts-information-loaded")
     private WebElement widgetAlertsLoaded;
 
@@ -72,6 +74,9 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-drill-show-measures")
     private WebElement addInteraction;
+
+    @FindBy(css = ".s-drill-config-target-warning span:last-child")
+    private WebElement warningText;
 
     public static ConfigurationPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConfigurationPanel.class,
@@ -96,6 +101,7 @@ public class ConfigurationPanel extends AbstractFragment {
 
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".gd-message.error");
     private static final By SUCCESS_MESSAGE_LOCATOR = By.cssSelector(".gd-message.success");
+    private static final By HYPERLINK_URL_TITLE = className("s-drill-to-attribute-url-section-title");
 
     private ConfigurationPanel waitForVisDateDataSetsLoaded() {
         final Function<WebDriver, Boolean> dataSetLoaded =
@@ -142,6 +148,11 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public ConfigurationPanel clickRemoveDrillToButton() {
         waitForElementVisible(removeDrillToButton).click();
+        return this;
+    }
+
+    public ConfigurationPanel clickRemoveMetricDrillInteractions() {
+        waitForElementVisible(removeMetricDrillInteraction).click();
         return this;
     }
 
@@ -205,7 +216,7 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public boolean isDateFilterCheckboxEnabled() {
         return getFilterByDateFilter().isCheckboxEnabled();
-     }
+    }
 
     public DateDimensionSelect openDateDataSet() {
         waitForFragmentVisible(dateDataSetSelect).ensureDropdownOpen();
@@ -238,6 +249,18 @@ public class ConfigurationPanel extends AbstractFragment {
         return isElementVisible(BY_DRILL_TO_SELECT, getRoot());
     }
 
+    public boolean hasHyperlink() {
+        return isElementVisible(HYPERLINK_URL_TITLE, getRoot());
+    }
+
+    public boolean isWainingIcon() {
+        return isElementPresent(By.className("icon-warning"), getRoot());
+    }
+
+    public String getWarningText() {
+        return waitForElementVisible(warningText).getText();
+    }
+
     public DrillMeasureDropDown.DrillConfigPanel drillIntoInsight(String metric, String insight) {
         waitForElementVisible(addInteraction).click();
         DrillMeasureDropDown.getInstance(browser).selectByName(metric);
@@ -248,6 +271,24 @@ public class ConfigurationPanel extends AbstractFragment {
         waitForElementVisible(addInteraction).click();
         DrillMeasureDropDown.getInstance(browser).selectByName(metric);
         return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoDashboard(dashboard);
+    }
+
+    public DrillMeasureDropDown.DrillConfigPanel drillHasNotUrlHyperlink(String metric) {
+        waitForElementVisible(addInteraction).click();
+        DrillMeasureDropDown.getInstance(browser).selectByName(metric);
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillHasNotUrlHyperlink();
+    }
+
+    public DrillMeasureDropDown.DrillConfigPanel drillIntoUrlHyperlink(String metric, String title) {
+        waitForElementVisible(addInteraction).click();
+        DrillMeasureDropDown.getInstance(browser).selectByName(metric);
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoUrlHyperlink(title);
+    }
+
+    public DrillMeasureDropDown.DrillConfigPanel drillIntoCustomUrl(String metric) {
+        waitForElementVisible(addInteraction).click();
+        DrillMeasureDropDown.getInstance(browser).selectByName(metric);
+        return DrillMeasureDropDown.DrillConfigPanel.getInstance(browser).drillIntoCustomUrl();
     }
 
     public DrillMeasureDropDown.DrillConfigPanel changeTargetDashboard(String metric, String oldDashboard, String newDashboard) {
@@ -304,6 +345,8 @@ public class ConfigurationPanel extends AbstractFragment {
             public static By CHOOSE_INSIGHT = className("s-choose_insight_");
             public static By DRILL_TO_DASHBOARD = className("s-drilltodashboard");
             public static By CHOOSE_DASHBOARD = className("s-choose_dashboard_");
+            public static By DRILL_TO_URL = className("s-drilltourl");
+            public static By CHOOSE_URL = className("s-choose_url");
 
             public static DrillConfigPanel getInstance(SearchContext searchContext) {
                 WebElement root = waitForElementVisible(ROOT, searchContext);
@@ -330,6 +373,38 @@ public class ConfigurationPanel extends AbstractFragment {
                 BrowserUtils.runScript(browser, "arguments[0].click();",
                     waitForElementVisible(CHOOSE_DASHBOARD, getRoot()));                
                 DashboardSelectionPanel.getInstance(browser).selectByName(dashboard);
+                return this;
+            }
+
+            public DrillConfigPanel drillHasNotUrlHyperlink() {
+                waitForElementVisible(chooseAction).click();
+                waitForElementVisible(DRILL_TO_URL, browser).click();
+
+                // Click action on element does not affect sometimes, so switch to use java script executor.
+                BrowserUtils.runScript(browser, "arguments[0].click();",
+                    waitForElementVisible(CHOOSE_URL, getRoot()));   
+                return this;
+            }
+
+            public DrillConfigPanel drillIntoUrlHyperlink(String title) {
+                waitForElementVisible(chooseAction).click();
+                waitForElementVisible(DRILL_TO_URL, browser).click();
+
+                // Click action on element does not affect sometimes, so switch to use java script executor.
+                BrowserUtils.runScript(browser, "arguments[0].click();",
+                    waitForElementVisible(CHOOSE_URL, getRoot()));
+                UrlSelectionPanel.getInstance(browser).selectByName(title);
+                return this;
+            }
+
+            public DrillConfigPanel drillIntoCustomUrl() {
+                waitForElementVisible(chooseAction).click();
+                waitForElementVisible(DRILL_TO_URL, browser).click();
+                
+                // Click action on element does not affect sometimes, so switch to use java script executor.
+                BrowserUtils.runScript(browser, "arguments[0].click();",
+                waitForElementVisible(CHOOSE_URL, getRoot()));
+                UrlSelectionPanel.getInstance(browser).addCustomUrl();
                 return this;
             }
 

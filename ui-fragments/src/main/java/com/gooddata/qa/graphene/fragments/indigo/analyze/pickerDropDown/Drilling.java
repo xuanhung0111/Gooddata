@@ -52,7 +52,7 @@ public class Drilling extends AbstractFragment {
         return DrillModalDialog.getInstance(browser);
     }
 
-    public void drillToURL() {
+    public void drillToUrl() {
         waitForElementVisible(drillToURL).click();
         waitForFragmentNotVisible(this);
     }

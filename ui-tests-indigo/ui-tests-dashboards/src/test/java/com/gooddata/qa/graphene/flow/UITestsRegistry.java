@@ -54,6 +54,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExportKPIDashboardsToPDF;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillDownTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToUrlTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.ControlFilterEmbeddedKDFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDEditModeTest;
@@ -148,6 +149,7 @@ public class UITestsRegistry {
             KPIDashboardsDrillToInsightTest.class,
             KPIDashboardsDrillToDashboardTest.class,            
             KPIDashboardsDrillDownTest.class,
+            KPIDashboardsDrillToUrlTest.class,
             ControlFilterEmbeddedKDFromExternalApplication.class,
             EmbeddedKDEditModeTest.class,
             EmbeddedKDViewModeTest.class,
