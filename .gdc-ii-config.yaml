@@ -89,6 +89,7 @@ integratedTests:
       REDSHIFT_USER_PASSWORD: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-user"
       REDSHIFT_USER_PASSWORD_IAM: "$VAULT_SPECIAL_PREFIX/gooddata-stg-graphene-redshift-iam"
     args:
+      - '--shm-size=2g'
       - '-v $HOME/.m2:/tmp/.m2'
       - '-v $(pwd):/graphene-tests'
       - '-w /graphene-tests'
