@@ -6,6 +6,7 @@ import com.gooddata.qa.utils.http.RestRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.springframework.http.HttpStatus;
 
 import java.util.stream.Collectors;
@@ -53,6 +54,29 @@ public class AttributeRestRequest extends CommonRestRequest {
         JSONObject json = getJsonObject(uri);
         JSONObject content = json.getJSONObject("attribute").getJSONObject("content");
         content.put("drillDownStepAttributeDF", attributesDrillToUri);
+        executeRequest(RestRequest.initPutRequest(uri, json.toString()), HttpStatus.OK);
+    }
+
+    public void setAttributeName(String attributeTitle, String attributesName) throws JSONException, IOException {
+        String uri = getAttributeByTitle(attributeTitle).getUri();
+        JSONObject json = getJsonObject(uri);
+        JSONObject content = json.getJSONObject("attribute").getJSONObject("meta");
+        content.put("title", attributesName);
+        executeRequest(RestRequest.initPutRequest(uri, json.toString()), HttpStatus.OK);
+    }
+
+    public void setHyperlinkTypeForAttribute(String attribute, String type)
+            throws IOException {
+        final JSONArray jsonArray = getJsonObject(getAttributeByTitle(attribute).getUri())
+            .getJSONObject("attribute").getJSONObject("content").getJSONArray("displayForms");
+        final JSONObject meta = jsonArray.getJSONObject(0).getJSONObject("meta");
+        final String uri = meta.getString("uri");
+        setHyperlinkType(uri, type);
+    }
+
+    private void setHyperlinkType(String uri, String type) throws IOException {
+        JSONObject json = getJsonObject(uri);
+        json.getJSONObject("attributeDisplayForm").getJSONObject("content").put("type", type);
         executeRequest(RestRequest.initPutRequest(uri, json.toString()), HttpStatus.OK);
     }
 
