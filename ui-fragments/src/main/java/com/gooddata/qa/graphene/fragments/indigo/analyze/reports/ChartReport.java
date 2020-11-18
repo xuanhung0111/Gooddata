@@ -220,6 +220,11 @@ public class ChartReport extends AbstractFragment {
         return getTooltipText();
     }
 
+    public List<List<String>> getTooltipTextOnTrackerByTitle(String title) {
+        displayTooltipOnTrackerByTitle(title);
+        return getTooltipText();
+    }
+
     public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
         displayTooltipOnTrackerByIndex(groupNumber, index);
         WebElement tooltip = browser.findElement(BY_HIGHCHARTS_TOOLTIP);
@@ -381,6 +386,12 @@ public class ChartReport extends AbstractFragment {
         waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
     }
 
+    private void displayTooltipOnTrackerByTitle(String title) {
+        WebElement tracker = getTrackerByTitle(title);
+        getActions().moveToElement(tracker).moveByOffset(1, 1).perform();
+        waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
+    }
+
     public boolean isTooltipContainTwoRowsAndThreeDots(int groupIndex, int index){
         displayTooltipOnTrackerByIndex(groupIndex, index);
         return isTooltipContainThreeDots() && isTooltipContainTwoRows();
@@ -428,6 +439,15 @@ public class ChartReport extends AbstractFragment {
                         ".highcharts-series-%s.highcharts-tracker path," +
                         ".highcharts-series-%s.highcharts-tracker circle", groupIndex, groupIndex, groupIndex))));
         return list.get(index);
+    }
+
+    private WebElement getTrackerByTitle(String title) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
+                .findElements(cssSelector(".highcharts-data-label text")));
+        return list.stream()
+            .filter(element -> element.getText().contains(title))
+            .findFirst()
+            .get();
     }
 
     public static class Tooltip extends AbstractFragment {

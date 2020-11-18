@@ -56,6 +56,7 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
             DATE_DATASET_CREATED, DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE);
     private final String INSIGHT_TEST = "INSIGHT TEST" + generateHashString();
     private final String INSIGHT_TEST_SAVE = "INSIGHT TEST SAVE" + generateHashString();
+    private final String INSIGHT_HAS_GLOBAL_AND_LOCAL_DATE_FILTER = "Insight has global and local date filter";
 
     @Override
     public void initProperties() {
@@ -241,9 +242,9 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT).waitForReportComputing()
                 .saveInsight("INSIGHT HAVE A METRIC AND TWO ATTRIBUTE ON VIEW BY AND SEGMENT BY").getChartReport();
         assertEquals(chartReport.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                asList(asList(ATTR_ACTIVITY_TYPE, "Email"), asList(ATTR_DEPARTMENT, "Direct Sales"),
-                        asList(METRIC_NUMBER_OF_ACTIVITIES, "21,615")));
+        assertEquals(chartReport.getTooltipTextOnTrackerByTitle("Inside Sales (12,305)"),
+                asList(asList(ATTR_ACTIVITY_TYPE, "Email"), asList(ATTR_DEPARTMENT, "Inside Sales"),
+                        asList(METRIC_NUMBER_OF_ACTIVITIES, "12,305")));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -305,8 +306,10 @@ public class TreeMapChartReportTest extends AbstractAnalyseTest {
                 .expandConfiguration().addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         analysisPage.waitForReportComputing().addDateFilter().getFilterBuckets()
                 .configDateFilter("01/01/2019", "01/01/2019").changeDateDimension(DATE_DATASET_CREATED);
-        analysisPage.waitForReportComputing();
-        assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
+        analysisPage.waitForReportComputing().saveInsight(INSIGHT_HAS_GLOBAL_AND_LOCAL_DATE_FILTER);
+        ChartReport chartReport = analysisPage.openInsight(INSIGHT_HAS_GLOBAL_AND_LOCAL_DATE_FILTER)
+                .waitForReportComputing().getChartReport();
+        assertEquals(chartReport.getTrackersCount(), 2);
     }
 
     @Test(dependsOnGroups = {"createProject"})
