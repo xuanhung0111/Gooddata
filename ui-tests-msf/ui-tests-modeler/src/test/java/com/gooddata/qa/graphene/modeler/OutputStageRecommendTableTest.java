@@ -123,7 +123,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(USER_DATASET);
         mainModelContent.addAttributeToDataset(USERNAME_ATTRIBUTE, USER_DATASET);
         mainModelContent.focusOnDataset(USER_DATASET);
-        modelUser.editDatatypeOfMainLabel(SCORE_ATTRIBUTE, Model.DATA_TYPE.TEXT_128.getClassName());
+        modelUser.editDatatypeOfLabel(SCORE_ATTRIBUTE, Model.DATA_TYPE.TEXT_128.getClassName());
 
         //publish with overwrite data mode
         toolbar.clickPublish();
