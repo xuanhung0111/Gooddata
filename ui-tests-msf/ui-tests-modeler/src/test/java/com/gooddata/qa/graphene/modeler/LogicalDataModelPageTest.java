@@ -90,6 +90,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private final String DATE_DATASET = "date";
     private final String USERNAME_ATTRIBUTE = "username";
     private final String AGE_FACT = "age";
+    private final String DEFAULT_STRING = " (default)";
     private final String USERID_PRIMARY_KEY = "userid";
     private final String USERCODE_FIRST_ATTRIBUTE = "usercodefirst";
     private final String USERCODE_FIRST_LABEL = "usercodefirst";
@@ -209,9 +210,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         modelUser.editDatatypeOfMainLabel(USERCODE_ATRIBUTE, Model.DATA_TYPE.BIG_INTEGER.getClassName());
         mainModelContent.focusOnDataset(USER_DATASET);
         modelUser.openEditDialog();
-        assertEquals(USERCODE_LABEL, modelUser.getTextLabel(USERCODE_LABEL));
-        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelUser.getTextDatatype(USERNUMBER_ATTRIBUTE));
-        assertEquals(Model.DATA_TYPE.BIG_INTEGER.getName(), modelUser.getTextDatatype(USERCODE_ATRIBUTE));
+        assertEquals(USERCODE_LABEL + DEFAULT_STRING, modelUser.getTextLabel(USERCODE_LABEL));
+        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelUser.getTextDatatype(USERNUMBER_ATTRIBUTE + DEFAULT_STRING));
+        assertEquals(Model.DATA_TYPE.BIG_INTEGER.getName(), modelUser.getTextDatatype(USERCODE_ATRIBUTE + DEFAULT_STRING));
         //MSF-17631 : [Web Modeler] Should not displayed data type value on attribute row
         assertEquals(modelUser.getSizeOfDataType(), 5);
         //MSF-17077 : Attr/fact with empty name should not be added into the dataset

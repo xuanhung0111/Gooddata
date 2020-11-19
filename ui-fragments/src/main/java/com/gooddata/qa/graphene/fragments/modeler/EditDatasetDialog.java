@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -116,6 +117,12 @@ public class EditDatasetDialog extends AbstractFragment {
         MoveDeleteMenu.getInstance(browser).clickDeleteItem();
     }
 
+    public boolean isDeleteButtonPresentOnLabel(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        return MoveDeleteMenu.getInstance(browser).isDeleteButtonPresent();
+    }
+
     public void deleteLabelInDatasetDialog(String label, String modelName) {
         hoverOnLabel(label, modelName);
         moreButton.click();
@@ -199,11 +206,17 @@ public class EditDatasetDialog extends AbstractFragment {
 
     public void changeDatatypeOfMainLabel(String attribute, String dataTypeClass) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
-        viewDetail.editDatatypeOfLabel(attribute, dataTypeClass);
+        viewDetail.editDatatypeOfLabel(attribute + " (default)", dataTypeClass);
         saveChangeButton.click();
         waitForFragmentNotVisible(this);
     }
 
+    public void changeDatatypeOfLabel(String attribute, String dataTypeClass) {
+        ViewDetailDialog viewDetail = getViewDetailDialog();
+        viewDetail.editDatatypeOfLabel(attribute, dataTypeClass);
+        saveChangeButton.click();
+        waitForFragmentNotVisible(this);
+    }
 
     public String getTextLabel(String label) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
@@ -253,7 +266,9 @@ public class EditDatasetDialog extends AbstractFragment {
             waitForElementVisible(moveButton).click();
             waitForFragmentNotVisible(this);
         }
+
+        public boolean isDeleteButtonPresent() {
+            return isElementPresent(By.className("dataset-detail-delete-item"), this.getRoot());
+        }
     }
-
-
 }
