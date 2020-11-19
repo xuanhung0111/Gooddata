@@ -177,8 +177,7 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
         dialog.deleteLabelInDatasetDialog(USERID_PRIMARY_KEY_LABEL, USERID_PRIMARY_KEY);
         assertFalse(viewDialog.isLabelAttributeExist(USERID_PRIMARY_KEY_LABEL));
-        dialog.hoverOnLabel(USERID_PRIMARY_KEY, "label." + USER_DATASET);
-        assertFalse(dialog.isMoreMenuIconVisible());
+        assertFalse(dialog.isDeleteButtonPresentOnLabel(USERID_PRIMARY_KEY, "label." + USER_DATASET));
         dialog.clickCancel();
     }
 

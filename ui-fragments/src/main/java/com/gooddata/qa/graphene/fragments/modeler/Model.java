@@ -165,6 +165,11 @@ public class Model extends AbstractFragment {
         addMore.editDatasetDialog().changeDatatypeOfMainLabel(attribute, dataTypeClass);
     }
 
+    public void editDatatypeOfLabel(String attribute, String dataTypeClass) {
+        AddMorePopUp addMore = openMorePopUpOnDataset();
+        addMore.editDatasetDialog().changeDatatypeOfLabel(attribute, dataTypeClass);
+    }
+
     public int getSizeOfDataType() {
         EditDatasetDialog edit = EditDatasetDialog.getInstance(browser);
         return edit.getDatatypeSize();
