@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import com.gooddata.sdk.model.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.FilterAttribute;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -19,11 +20,14 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.UrlParserUtils.getObjId;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -35,6 +39,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
+import static org.hamcrest.Matchers.hasItems;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
@@ -54,6 +59,7 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_A_METRIC = "A metric";
     private static final String INSIGHT_HAS_METRICS = "Metrics";
     private static final String INSIGHT_PIVOT_SORTING = "Pivot Table Sorting on Measure";
+    private static final String INSIGHT_WITH_DEFAULT_DISPLAY_FORM = "Pivot Table has default display form";
     private static final List<ReportType> REPORT_TYPES =
             asList(ReportType.COLUMN_CHART, ReportType.SCATTER_PLOT, ReportType.PIE_CHART, ReportType.HEAT_MAP);
 
@@ -68,6 +74,9 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
     private final String METRIC_UTF = "metricUTF";
     private final String METRIC_NULL_VALUE = "metricNullValue";
     private final String METRIC_LONG = "metricLong";
+    private final String STAGE_NAME_IDENTIFIER = "attr.stage.name";
+    private final String STAGE_NAME_DISPLAYFORM_IDENTIFIER = "label.stage.name.order";
+    protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 10;
 
     private IndigoRestRequest indigoRestRequest;
     private PivotTableReport pivotTableReport;
@@ -644,6 +653,36 @@ public class PivotTableAdvancedTest extends AbstractAnalyseTest {
 
         List<String> expectedValues = asList("$38,596,194.86", "$27,222,899.64", "$22,946,895.47", "$10,291,576.74", "$9,525,857.91", "$8,042,031.92");
         assertThat(pivotTableReport.getBodyContentColumn(1).stream().flatMap(List::stream).collect(toList()), equalTo(expectedValues));
+    }
+
+    @Test(dependsOnGroups = "createProject", description = 
+        "This test cover issue: SD-1196 - AD Insights are broken after change of default label")
+    public void changeDefaultAttributeDisplayForm() throws IOException {
+        List<Pair<String, Integer>> objectElementsByID = getObjectElementsByID(Integer.parseInt(getObjId(
+            getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri())));
+
+        indigoRestRequest.createInsight(
+                new InsightMDConfiguration(INSIGHT_WITH_DEFAULT_DISPLAY_FORM, ReportType.TABLE)
+                        .setMeasureBucket(singletonList(
+                                MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
+                        .setCategoryBucket(singletonList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_STAGE_NAME), CategoryBucket.Type.ATTRIBUTE)))
+                        .setFilter(singletonList(FilterAttribute.createFilter(getAttributeByTitle(ATTR_STAGE_NAME), 
+                                asList(objectElementsByID.get(0).getRight())))));
+        
+        String alterAttributeMAQL = "ALTER ATTRIBUTE {" + STAGE_NAME_IDENTIFIER + "} DEFAULT LABEL {" + STAGE_NAME_DISPLAYFORM_IDENTIFIER + "};";
+        postMAQL(alterAttributeMAQL, DEFAULT_PROJECT_CHECK_LIMIT);
+
+        pivotTableReport = initAnalysePage().openInsight(INSIGHT_WITH_DEFAULT_DISPLAY_FORM).waitForReportComputing().getPivotTableReport();
+        assertThat(pivotTableReport.getBodyContent(), hasItems(asList("Discovery", "$4,249,027.88")));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_STAGE_NAME)),
+                asList(ATTR_STAGE_NAME, "All except Interest"));
+
+        analysisPage.clear();
+        analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addAttribute(ATTR_STAGE_NAME)
+                .setFilterIsValues(ATTR_STAGE_NAME, "101", "102").waitForReportComputing();
+        assertThat(pivotTableReport.getBodyContent(), hasItems( asList("101", "$18,447,266.14")));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_STAGE_NAME)), asList(ATTR_STAGE_NAME, "101, 102"));
     }
 
     private void createSimpleInsight(String title, String metric, ReportType reportType) {

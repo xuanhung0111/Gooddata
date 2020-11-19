@@ -4,9 +4,12 @@ import com.gooddata.qa.graphene.enums.indigo.AggregationItem;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.PivotAggregationPopup;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillModalDialog;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -28,6 +31,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 
 public class PivotTableReport extends AbstractFragment {
@@ -40,6 +44,7 @@ public class PivotTableReport extends AbstractFragment {
     private static final String PIVOT_COLUMN_INDEX_CLASS_NAME_PREFIX = "gd-column-index-";
     private static final String CLASS_NAME_SEPARATOR = " ";
     private static final String TABLE_HEADER_VALUE_SELECTOR = ".s-header-cell-label span";
+    private static final By ROOT = By.className("s-pivot-table");
 
     @FindBy(css = TABLE_HEADER_ALL_CSS)
     private List<WebElement> headers;
@@ -69,18 +74,42 @@ public class PivotTableReport extends AbstractFragment {
     private List<WebElement> grandTotalsRows;
 
     @FindBy(css = ".gd-row-attribute-column:not(.gd-cell-hide) .s-value")
+    private List<WebElement> rowAttributeColumnValues;
+
+    @FindBy(css = ".gd-row-attribute-column:not(.gd-cell-hide)")
     private List<WebElement> rowAttributeColumns;
 
     @FindBy(css = ".ag-header-group-cell-with-group:not([col-id='0_0']) .gd-pivot-table-header-label")
     private List<WebElement> columnGroupHeaders;
 
+    public static PivotTableReport getInstance(final SearchContext searchContext) {
+        return Graphene.createPageFragment(PivotTableReport.class,
+            waitForElementVisible(ROOT, searchContext));
+    }
+
     public List<String> getRowAttributeColumns() {
         waitForElementVisible(attributeValuePresent);
 
-        return waitForCollectionIsNotEmpty(rowAttributeColumns).stream()
+        return waitForCollectionIsNotEmpty(rowAttributeColumnValues).stream()
             .filter(ElementUtils::isElementVisible)
             .map(WebElement::getText)
             .collect(toList());
+    }
+
+    public WebElement getFirstCellOfRowAttribute(String title) {
+        waitForElementVisible(attributeValuePresent);
+        return waitForCollectionIsNotEmpty(rowAttributeColumns).stream()
+            .filter(element -> {
+                return waitForElementVisible(element).getText().equals(title);})
+            .findFirst()
+            .get();
+    }
+
+    public DrillModalDialog drillOnCellRowAttributeElement(String title) {
+        WebElement element = getFirstCellOfRowAttribute(title);
+        hoverItem(element);
+        element.click();
+        return DrillModalDialog.getInstance(browser); 
     }
 
     public List<String> getValueMeasuresPresent() {
@@ -243,6 +272,11 @@ public class PivotTableReport extends AbstractFragment {
         getCellElement(columnTitle, headerIndex, rowIndex).click();
     }
 
+    public List<String> getAttributeValuePresent() {
+        waitForElementVisible(attributeValuePresent);
+        return getElementTexts(cssSelector(".ag-body-viewport .s-value"), getRoot());
+    }
+
     public PivotTableReport sortBaseOnHeader(final String name) {
         WebElement webElement = waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
@@ -364,7 +398,7 @@ public class PivotTableReport extends AbstractFragment {
         return !webElementColumn.getAttribute("class").contains("gd-pivot-table-header-menu--open");
     }
 
-    private WebElement getHeaderElement(String columnTitle, int columnIndex) {
+    public WebElement getHeaderElement(String columnTitle, int columnIndex) {
         return waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> columnTitle.equals(e.getText()))
             .collect(toList())
@@ -384,6 +418,12 @@ public class PivotTableReport extends AbstractFragment {
 
     public boolean isCellUnderlined(String columnTitle, int cellIndex) {
         WebElement cell = getCellElement(columnTitle, cellIndex);
+        hoverItem(cell);
+        return cell.getCssValue("text-decoration").contains("underline");
+    }
+
+    public boolean isCellUnderlinedByElement(WebElement element) {
+        WebElement cell = element;
         hoverItem(cell);
         return cell.getCssValue("text-decoration").contains("underline");
     }

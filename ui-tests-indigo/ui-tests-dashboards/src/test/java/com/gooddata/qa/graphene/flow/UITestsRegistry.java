@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.DateFilterConfigurationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DeleteAttributeFilterTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DependentFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExtendedDateFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
@@ -52,6 +53,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardCRUDAndMovingTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ExportKPIDashboardsToPDF;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToInsightTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillDownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.ControlFilterEmbeddedKDFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToDashboardTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
@@ -143,7 +145,9 @@ public class UITestsRegistry {
             ExportKPIDashboardsToPDF.class,
             KPIDashboardsDrillToInsightTest.class,
             KPIDashboardsDrillToDashboardTest.class,            
+            KPIDashboardsDrillDownTest.class,
             ControlFilterEmbeddedKDFromExternalApplication.class,
+            DependentFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

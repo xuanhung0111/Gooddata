@@ -2,7 +2,7 @@
 <suite name="GD_UI_Selenium_Tests">
     <test name="GoodSales-email-schedule-tests">
         <classes>
-            <class name="com.gooddata.qa.graphene.schedules.ScheduledEmailsForKPIDashboardsTest"/>
+            <class name="com.gooddata.qa.graphene.schedules.ScheduledEmailsForKPIDashboardsExtendedTest"/>
         </classes>
     </test>
 
