@@ -163,45 +163,15 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
     }
 
     @Test(dependsOnMethods = "checkEditDatasource")
-    public void createViewTable() {
-        dsMenu.selectDataSource(DATASOURCE_NAME_CHANGED);
-        contentWrapper.waitLoadingManagePage();
-        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
-        DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail bigqueryDetail = container.getConnectionDetail();
-        bigqueryDetail.clickGenerateButton();
-        GenerateOutputStageDialog generateDialog = bigqueryDetail.getGenerateDialog();
-        String sql = getResourceAsString("/sql_bigquery.txt");
-        assertEquals(generateDialog.getMessage(), sql);
-        generateDialog.clickCopy();
-        DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
-        assertEquals(messageBar.waitForSuccessMessageBar().getText(), "SQL copied to clipboard");
-        waitForElementNotVisible(messageBar.getRoot());
-        generateDialog.clickClose();
-        // check generate outputStage in case invalid datasource
-        heading.clickEditButton();
-        contentWrapper.waitLoadingManagePage();
-        container = contentWrapper.getContentDatasourceContainer();
-        container.addConnectionTitle(DATASOURCE_INVALID);
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addBigqueryInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
-        container.clickSavebutton();
-        contentWrapper.waitLoadingManagePage();
-        bigqueryDetail.clickGenerateButton();
-        DatasourceMessageBar ErrormessageBar = DatasourceMessageBar.getInstance(browser);
-        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Invalid BigQuery private key: Invalid PKCS#8 data.");
-    }
-
-    @Test(dependsOnMethods = "createViewTable")
     public void deleteDatasourceTest() {
-        dsMenu.selectDataSource(DATASOURCE_INVALID);
+        dsMenu.selectDataSource(DATASOURCE_NAME_CHANGED);
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
         DeleteDatasourceDialog deleteDialog = heading.clickDeleteButton();
         deleteDialog.clickDelete();
         contentWrapper.waitLoadingManagePage();
-        dsMenu.waitForDatasourceNotVisible(DATASOURCE_INVALID);
+        dsMenu.waitForDatasourceNotVisible(DATASOURCE_NAME_CHANGED);
     }
 
     @AfterClass(alwaysRun = true)
