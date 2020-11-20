@@ -4,19 +4,25 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ToolBar extends AbstractFragment {
     private static final By TOOLBAR = By.className("gdc-ldm-toolbar");
     private static final By ZOOM_BTN = By.className("gdc-ldm-zoom-button");
+    private static final By SAVE_AS_DRAFT = By.cssSelector(".save-as-draft-timer .title");
 
     @FindBy(className = "s-publish")
     private WebElement btnPublishOnToolbar;
@@ -48,6 +54,8 @@ public class ToolBar extends AbstractFragment {
     @FindBy(css = ".search-model-input .s-input-clear")
     private WebElement clearSearchTextIcon;
 
+    @FindBy(className = "desc")
+    private WebElement description;
 
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
@@ -58,9 +66,36 @@ public class ToolBar extends AbstractFragment {
     }
 
     public void saveAsDraft() {
+        clickSaveAsDraftBtn();
+        OverlayWrapper.getInstance(browser).discardDraft();
+    }
+
+    public boolean isSaveAsDraftVisible() {
+        try {
+            waitForSaveAsDraftButtonDisplay();
+            return isElementVisible(saveAsDraftButton);
+        } catch (Exception noElement) {
+            return false;
+        }
+    }
+
+    public void waitForSaveAsDraftButtonDisplay() {
+        Function<WebDriver, Boolean> isLoadingSaveAsDraftBtn = browser -> isElementPresent(SAVE_AS_DRAFT, browser);
+        Graphene.waitGui().withTimeout(20, TimeUnit.SECONDS).until(isLoadingSaveAsDraftBtn);
+    }
+
+    public void waitForSaveAsDraftButtonHidden() {
+        Function<WebDriver, Boolean> isLoadingSaveAsDraftBtn = browser -> !isElementPresent(SAVE_AS_DRAFT, browser);
+        Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until(isLoadingSaveAsDraftBtn);
+    }
+
+    public void clickSaveAsDraftBtn() {
         waitForElementVisible(saveAsDraftButton);
         saveAsDraftButton.click();
-        OverlayWrapper.getInstance(browser).discardDraft();
+    }
+
+    public String getDescriptionSaveButton() {
+        return waitForElementVisible(description).getText();
     }
 
     public void switchToTableView() {

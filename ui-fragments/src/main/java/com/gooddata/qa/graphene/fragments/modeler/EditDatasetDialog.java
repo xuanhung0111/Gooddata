@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.FindBy;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,6 +88,14 @@ public class EditDatasetDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void addNewLabelTypeHyperlink(String attribute, String labelName){
+        ViewDetailDialog viewDetail = getViewDetailDialog();
+        hoverOnAttributeOrFactInDialog(attribute);
+        viewDetail.addNewLabelTypeHyperlink(attribute, labelName);
+        saveChangeButton.click();
+        waitForFragmentNotVisible(this);
+    }
+
     public void addNewLabelForPrimaryKey(String attribute, String labelName){
         ViewDetailDialog viewDetail = getViewDetailDialog();
         hoverOnAttributeOrFactInDialog(attribute);
@@ -110,7 +119,6 @@ public class EditDatasetDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-
     public void deleteAttributesOrFactInEditDatasetDialog(String items) {
         hoverOnAttributeOrFactInDialog(items);
         moreButton.click();
@@ -123,10 +131,56 @@ public class EditDatasetDialog extends AbstractFragment {
         return MoveDeleteMenu.getInstance(browser).isDeleteButtonPresent();
     }
 
+    public boolean isDefaultLabelPresent(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        return MoveDeleteMenu.getInstance(browser).isDefaultLabelOptionPresent();
+    }
+
+    public boolean isSortLabelPresent(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        return MoveDeleteMenu.getInstance(browser).isSortLabelOptionPresent();
+    }
+
+    public void setDefaultLabel(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickSetDefaultLabel();
+        saveChanges();
+    }
+
+    public void clickSortAttributeLabel(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickSortAttributeLabel();
+        saveChanges();
+    }
+
+    public SortOrderMenu setChangeSortOrder(String label, String modelName) {
+        hoverOnLabel(label, modelName);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickChangeSortOrder();
+        return SortOrderMenu.getInstance(browser);
+    }
+
     public void deleteLabelInDatasetDialog(String label, String modelName) {
         hoverOnLabel(label, modelName);
         moreButton.click();
         MoveDeleteMenu.getInstance(browser).clickDeleteItem();
+    }
+
+    public MoveFieldDataset moveLabelToDataset(String label) {
+        hoverOnAttributeOrFactInDialog(label);
+        moreButton.click();
+        MoveDeleteMenu.getInstance(browser).clickMoveItem();
+        return MoveFieldDataset.getInstance(browser);
+    }
+
+    public MoveDeleteMenu getMoveFiledInDataset(String label) {
+        hoverOnAttributeOrFactInDialog(label);
+        moreButton.click();
+        return MoveDeleteMenu.getInstance(browser);
     }
 
     public boolean isMoreMenuIconVisible() {
@@ -171,9 +225,8 @@ public class EditDatasetDialog extends AbstractFragment {
     }
 
     public void hoverOnLabel(String label, String modelName) {
-        Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(rowsInTableDialog.stream().filter(
-                el -> el.getText().contains(modelName + "." + label)).findFirst().get()).build().perform();
+        getActions().moveToElement(rowsInTableDialog.stream().filter(
+            el -> el.getText().contains("label." + modelName + "." + label)).findFirst().get()).build().perform();
     }
 
     public void addFact(String factName) {
@@ -249,8 +302,20 @@ public class EditDatasetDialog extends AbstractFragment {
         @FindBy(className = "dataset-detail-move-item")
         WebElement moveButton;
 
+        @FindBy(className = "btn-move")
+        WebElement moveButtonDataset;
+
         @FindBy(className = "dataset-detail-delete-item")
         WebElement deleteButton;
+
+        @FindBy(className = "dataset-detail-set-default-item")
+        WebElement setDefaultLabel;
+
+        @FindBy(className = "dataset-detail-change-sort-order")
+        WebElement changeSortOrderLabel;
+
+        @FindBy(className = "dataset-detail-sort-label")
+        WebElement sortLabel;
 
         public static MoveDeleteMenu getInstance(SearchContext searchContext) {
             return Graphene.createPageFragment(
@@ -264,11 +329,110 @@ public class EditDatasetDialog extends AbstractFragment {
 
         public void clickMoveItem() {
             waitForElementVisible(moveButton).click();
-            waitForFragmentNotVisible(this);
+        }
+
+        public void clickSetDefaultLabel() {
+            waitForElementVisible(setDefaultLabel).click();
+        }
+
+        public void clickSortAttributeLabel() {
+            waitForElementVisible(sortLabel).click();
+        }
+
+        public void clickChangeSortOrder() {
+            waitForElementVisible(changeSortOrderLabel).click();
         }
 
         public boolean isDeleteButtonPresent() {
             return isElementPresent(By.className("dataset-detail-delete-item"), this.getRoot());
+        }
+
+        public boolean isMoveOptionVisible() {
+            return isElementVisible(By.className("s-move"), getRoot());
+        }
+
+        public boolean isDefaultLabelOptionPresent() {
+            return isElementVisible(By.className("dataset-detail-set-default-item"), getRoot());
+        }
+
+        public boolean isSortLabelOptionPresent() {
+            return isElementVisible(By.className("dataset-detail-sort-label"), getRoot());
+        }
+
+        public void clickMoveButtonOnDataset() {
+            waitForElementVisible(moveButtonDataset).click();
+        }
+    }
+
+    public static class MoveFieldDataset extends AbstractFragment {
+        private static final String MOVE_TO_DATASET = "move-field-to-dataset";
+
+        @FindBy(className = "gd-input-field")
+        private WebElement searchInputField;
+
+        @FindBy(className = "s-move")
+        private WebElement moveBtn;
+
+        @FindBy(className = "s-cancel")
+        private WebElement cancelBtn;
+
+        @FindBy(css = ".initial-page-select-data-source-detail-item .input-radio-label .input-label-text")
+        List<WebElement> listDatasets;
+
+        public static MoveFieldDataset getInstance(SearchContext searchContext) {
+            return Graphene.createPageFragment(
+                    MoveFieldDataset.class, waitForElementVisible(className(MOVE_TO_DATASET), searchContext));
+        }
+
+        public MoveFieldDataset searchDataset(String datasetName) {
+            waitForElementVisible(searchInputField).sendKeys(datasetName);
+            return this;
+        }
+
+        public MoveFieldDataset selectDataset(String datasetName) {
+            WebElement datasetEl = listDatasets.stream().filter(el -> el.getText().equals(datasetName)).findFirst().get();
+            ((JavascriptExecutor) browser).executeScript("arguments[0].click();", datasetEl);
+            moveBtn.click();
+            waitForFragmentNotVisible(this);
+            return this;
+        }
+    }
+
+    public static class SortOrderMenu extends AbstractFragment {
+        private static final String SORT_ORDER_MENU = "change-sort-order-menu";
+
+        @FindBy(className = "s-apply")
+        private WebElement applyBtn;
+
+        @FindBy(className = "s-cancel")
+        private WebElement cancelBtn;
+
+        @FindBy(className = "asc")
+        WebElement ascendingSort;
+
+        @FindBy(className = "desc")
+        WebElement descendingSort;
+
+        public static SortOrderMenu getInstance(SearchContext searchContext) {
+            return Graphene.createPageFragment(
+                    SortOrderMenu.class, waitForElementVisible(className(SORT_ORDER_MENU), searchContext));
+        }
+
+        public void sortAscending() {
+            waitForElementVisible(ascendingSort).click();
+            applyBtn.click();
+            waitForFragmentNotVisible(this);
+        }
+
+        public void sortDescending() {
+            waitForElementVisible(descendingSort).click();
+            applyBtn.click();
+            waitForFragmentNotVisible(this);
+        }
+
+        public void clickCancelButton() {
+            waitForElementVisible(cancelBtn).click();
+            waitForFragmentNotVisible(this);
         }
     }
 }

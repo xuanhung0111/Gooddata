@@ -34,4 +34,11 @@ public class TextEditorWrapper extends AbstractFragment {
             driverActions.moveToElement(addLinkOption).click().sendKeys(labelName).sendKeys(Keys.ENTER).build().perform();
         }
 
+        public void clickAddTextLabel() {
+            waitForElementVisible(addLabelOption).click();
+        }
+
+         public void clickAddLinkLabel() {
+            waitForElementVisible(addLinkOption).click();
+         }
 }
