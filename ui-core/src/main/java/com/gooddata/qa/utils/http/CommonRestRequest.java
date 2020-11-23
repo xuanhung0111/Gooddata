@@ -44,6 +44,10 @@ public class CommonRestRequest {
         this.projectId = projectId;
     }
 
+    public CommonRestRequest(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
     public String getProjectId() {
         return projectId;
     }

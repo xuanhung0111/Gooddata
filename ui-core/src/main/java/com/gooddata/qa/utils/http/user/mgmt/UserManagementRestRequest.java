@@ -34,6 +34,10 @@ public final class UserManagementRestRequest extends CommonRestRequest {
         super(restClient, projectId);
     }
 
+    public UserManagementRestRequest(final RestClient restClient) {
+        super(restClient);
+    }
+
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
     private static final String FEATURE_FLAGS_LINK = "/gdc/internal/account/profile/featureFlags";
@@ -290,6 +294,14 @@ public final class UserManagementRestRequest extends CommonRestRequest {
      */
     public String getCurrentUserProfileUri() throws JSONException, IOException {
         return getCurrentUserProfile().getJSONObject("links").getString("self");
+    }
+
+    public void clearProjectSettings() throws IOException {
+        JSONObject profileSetting = getJsonObject(getCurrentUserProfileUri() + "/settings");
+        JSONObject projectSettings = profileSetting.getJSONObject("profileSetting").getJSONObject("projectSettings");
+        String profileSettingUpdated = profileSetting.toString().replace(projectSettings.toString(), "{}");
+        executeRequest(RestRequest.initPutRequest(getCurrentUserProfileUri() + "/settings",
+            profileSettingUpdated), HttpStatus.NO_CONTENT);
     }
 
     /**
