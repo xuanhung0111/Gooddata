@@ -1,11 +1,19 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.sdk.model.project.Environment;
 import com.gooddata.sdk.model.project.Project;
 import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestClient;
+
+import java.io.IOException;
 import java.time.ZonedDateTime;
+
+import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.threeten.extra.Days;
 
@@ -13,7 +21,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.Boolean.parseBoolean;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsNot.not;
@@ -22,6 +33,12 @@ public class ManyProjectsDeletingTest extends AbstractTest {
     private int retentionDaysNumber;
     private Environment testingEnv = Environment.TESTING;
     private ProjectService service;
+    private UserManagementRestRequest userManagementRestRequest;
+
+    @AfterClass
+    public void takeScreenShot(ITestContext context) {
+        takeScreenshot(browser, "take-screen-shot", getClass());
+    }
 
     @Test
     public void deleteProjects() {
@@ -48,6 +65,12 @@ public class ManyProjectsDeletingTest extends AbstractTest {
                         "This is all projects are not deleted yet : " + getEnabledProjectId(oldTestingProjects));
             }
         });
+    }
+
+    @Test
+    public void clearProjectSettingsOfAccount() throws IOException {
+        userManagementRestRequest = new UserManagementRestRequest(new RestClient(getProfile(ADMIN)));
+        userManagementRestRequest.clearProjectSettings();
     }
 
     /**
