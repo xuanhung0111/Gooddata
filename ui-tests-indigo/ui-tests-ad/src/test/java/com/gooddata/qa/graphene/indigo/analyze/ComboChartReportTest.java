@@ -254,7 +254,7 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
                     CategoryBucket.createCategoryBucket(
                         getAttributeByTitle(ATTR_ACTIVITY), CategoryBucket.Type.ATTRIBUTE))));
 
-        String dateBigRange = "1/1/5000";
+        String dateBigRange = "01/01/5000";
         initAnalysePage().changeReportType(ReportType.COMBO_CHART).addMetric(METRIC_AMOUNT).addDate()
             .waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
             .addFilterByDate(DATE_DATASET_CLOSED, dateBigRange, dateBigRange);
@@ -440,7 +440,7 @@ public class ComboChartReportTest extends AbstractAnalyseTest {
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();
