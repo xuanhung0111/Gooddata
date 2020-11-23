@@ -58,7 +58,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
             "the precision defined by the 'NUMERIC(15,3)' data type.";
     private static final String WRONG_FORMAT_TABLE_VIEW_ERROR_MESSAGE = "The data in the 'f__amount' column cannot be converted " +
             "to 'NUMERIC(15,3)' format.";
-    private static final String MISSING_COLUMN_TABLE_VIEW_ERROR_MESSAGE = "The CSV file is missing column 'd__date'.";
+    private static final String MISSING_COLUMN_TABLE_VIEW_ERROR_MESSAGE = "The CSV file is missing column(s): d__date, f__amount.";
     private static final String ERROR_MESSAGE_PREVIEW_DIALOG = "The header row is missing or contains characters that are not allowed." +
             " Check the header row, and try again. The column names containing only numbers (for example, 111111) are not allowed.";
     private static final String WARNING_MESSAGE_PREVIEW_DIALOG = "The header of some columns incorrect. Please check your file.";
