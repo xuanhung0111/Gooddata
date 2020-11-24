@@ -6,43 +6,43 @@
         </classes>
     </test>
 
-    <test name="GoodSalesDashboardTest" enabled="false">
+    <test name="GoodSalesDashboardTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest"/>
         </classes>
     </test>
 
-    <test name="DashboardDateFilterSelectRangeTest" enabled="false">
+    <test name="DashboardDateFilterSelectRangeTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest"/>
         </classes>
     </test>
 
-    <test name="DrillToDashboardTabTest" enabled="false">
+    <test name="DrillToDashboardTabTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.DrillToDashboardTabTest"/>
         </classes>
     </test>
 
-    <test name="ExportDashboardAndComparePDFBasicTest" enabled="false">
+    <test name="ExportDashboardAndComparePDFBasicTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.ExportDashboardAndComparePDFBasicTest"/>
         </classes>
     </test>
 
-    <test name="DashboardPermissionsTest" enabled="false">
+    <test name="DashboardPermissionsTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest"/>
         </classes>
     </test>
 
-    <test name="GoodSalesReportsTest" enabled="false">
+    <test name="GoodSalesReportsTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.reports.GoodSalesReportsTest"/>
         </classes>
     </test>
 
-    <test name="GoodSalesDashboardAllKindsFiltersTest" enabled="false">
+    <test name="GoodSalesDashboardAllKindsFiltersTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest"/>
         </classes>
@@ -54,7 +54,7 @@
         </classes>
     </test>
 
-    <test name="MetricEditorTest" enabled="false">
+    <test name="MetricEditorTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.manage.MetricEditorTest"/>
         </classes>
