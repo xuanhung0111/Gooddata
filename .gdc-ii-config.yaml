@@ -3,7 +3,7 @@ microservices:
     docker:
       dockerfile: './Dockerfile_chrome'
       customTags:
-        - '84.0.4147.125-84.0.4147.30-2.3.8'
+        - '87.0.4280.66-87.0.4280.20'
         - 'latest'
       cacheFromTag: 'latest'
     buildOnChangeOf:

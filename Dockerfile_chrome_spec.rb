@@ -24,7 +24,7 @@ describe "Dockerfile" do
   end
 
   it "installs Chrome" do
-    expect(command('chrome --version').stdout).to contain("Google Chrome 84.0.4147.125")
+    expect(command('chrome --version').stdout).to contain("Google Chrome 87.0.4280.66")
   end
 
   it "installs Chromedriver" do
