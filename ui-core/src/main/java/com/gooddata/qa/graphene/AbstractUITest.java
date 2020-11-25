@@ -518,12 +518,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 .waitForWidgetsLoading();
     }
 
-    public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByType(EmbeddedType type) {
+    public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByType(EmbeddedType type, boolean... preventDefault) {
         if (type == EmbeddedType.IFRAME) {
             return initEmbeddedIndigoDashboardPageByIframe();
         }
 
-        return initEmbeddedIndigoDashboardPageByUrl();
+        return initEmbeddedIndigoDashboardPageByUrl(preventDefault);
     }
 
     public EmailSchedulePage initEmailSchedulesPage() {
@@ -684,13 +684,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForOpeningIndigoDashboard();
     }
 
-    private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByUrl() {
-        openUrl(getEmbeddedIndigoDashboardPageUri());
+    private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByUrl(boolean... preventDefault) {
+        openUrl(getEmbeddedIndigoDashboardPageUri(preventDefault));
         return IndigoDashboardsPage.getInstance(browser);
     }
 
-    private String getEmbeddedIndigoDashboardPageUri() {
-        return format(EMBEDDED_INDIGO_DASHBOARD_PAGE_URI, testParams.getProjectId());
+    private String getEmbeddedIndigoDashboardPageUri( boolean... preventDefault) {
+        String prevent = "";
+        if (preventDefault.length != 0) {
+            prevent = preventDefault[0] ? "?preventDefault=true" : "?preventDefault=false";
+        }
+        return format(EMBEDDED_INDIGO_DASHBOARD_PAGE_URI, testParams.getProjectId() + prevent);
     }
 
     public enum EmbeddedType {
