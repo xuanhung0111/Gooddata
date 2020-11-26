@@ -65,8 +65,8 @@ public class DataMapping extends AbstractFragment {
         WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
                 : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(sourceColumn).click().sendKeys(Keys.DELETE)
-                .sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
+        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
         return this;
     }
 

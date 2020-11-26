@@ -56,8 +56,8 @@ public class ViewDetailDialog extends AbstractFragment {
     public void editAttributeName(String attribute, String newName) {
         WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(attributeName).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
-                .sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
+        driverActions.moveToElement(attributeName).click().pause(1000).keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
+                .pause(1000).sendKeys(Keys.DELETE).sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
     }
 
     public boolean isAttributeExist(String attribute) {
@@ -85,7 +85,7 @@ public class ViewDetailDialog extends AbstractFragment {
     public void editLabelName(String label, String newName) {
         WebElement labelName = this.getRoot().findElement(xpath(format(LABEL_NAME, label)));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(labelName).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
+        driverActions.moveToElement(labelName).click().pause(1000).keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .sendKeys(newName).sendKeys(Keys.ENTER).build().perform();
     }
 
