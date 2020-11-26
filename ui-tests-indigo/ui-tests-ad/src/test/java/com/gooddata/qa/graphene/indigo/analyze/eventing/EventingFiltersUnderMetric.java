@@ -367,7 +367,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.addFilter(ATTR_REGION);
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
 
@@ -409,7 +409,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.addFilter(ATTR_REGION);
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
 
@@ -452,7 +452,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addAttribute(ATTR_DEPARTMENT);
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.addFilter(ATTR_REGION);
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
 
@@ -493,7 +493,7 @@ public class EventingFiltersUnderMetric extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addAttribute(ATTR_DEPARTMENT);
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.addFilter(ATTR_REGION);
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
 
