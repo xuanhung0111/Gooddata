@@ -112,7 +112,7 @@ public class ScheduledEmailsForKPIDashboardsExtendedTest extends AbstractGoodSal
         analysisPage = initAnalysePage();
         analysisPage.openInsight(REPORT_INCOMPUTABLE).addDate().waitForReportComputing().getMetricsBucket()
             .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-            .addFilterByDate(DATE_DATASET_CLOSED, "1/1/5000", "1/1/5000");
+            .addFilterByDate(DATE_DATASET_CLOSED, "01/01/5000", "01/01/5000");
         analysisPage.saveInsight();
 
         String factUri = factRestRequest.getFactByTitle(METRIC_AMOUNT).getUri();
