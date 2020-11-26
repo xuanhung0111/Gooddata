@@ -1040,8 +1040,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
             if (position.equals(DropZone.PREV)) {
                 ElementUtils.moveToElementActions(drop, 5,drop.getSize().width / 2).perform();
             } else {
-                ElementUtils.moveToElementActions(
-                    drop,  drop.getSize().height / 2, drop.getSize().width / 2).perform();
+                driverActions.moveToElement(drop).perform();
             }
         } finally {
             if (isDrop) driverActions.release().perform();

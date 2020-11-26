@@ -40,9 +40,9 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.hamcrest.Matchers.containsString;
 
 public class KPIDashboardCRUDAndMovingTest extends AbstractDashboardTest {
 
