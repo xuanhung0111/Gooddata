@@ -68,7 +68,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         DateFilterPickerPanel dateFilterPickerPanel =
                 filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
@@ -113,7 +113,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         DateFilterPickerPanel dateFilterPickerPanel =
                 filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
@@ -155,7 +155,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
@@ -184,7 +184,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT, METRIC_WON).apply();
         dateFilterPickerPanel.apply();
@@ -212,7 +212,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
@@ -240,7 +240,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         CompareApplyMeasure compareApplyMeasure = dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(
                     CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_WON);
@@ -269,7 +269,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AVG_AMOUNT).apply();
         dateFilterPickerPanel.apply();
@@ -290,7 +290,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_AMOUNT).apply();
         dateFilterPickerPanel.apply();
@@ -321,7 +321,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectByNames(METRIC_WON).apply();
         dateFilterPickerPanel.apply();
@@ -352,7 +352,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures()
                 .selectAllValues().apply();
         dateFilterPickerPanel.apply();
@@ -383,7 +383,7 @@ public class InsightCompareToSamePreviousPeriodYearSwitchingTest extends Abstrac
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .changeCompareType(
                     CompareType.SAME_PERIOD_PREVIOUS_YEAR).openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();

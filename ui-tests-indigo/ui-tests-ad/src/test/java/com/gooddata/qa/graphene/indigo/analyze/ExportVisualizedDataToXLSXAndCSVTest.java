@@ -121,7 +121,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
         metricsBucket.getMetricConfiguration("New-" + METRIC_AMOUNT).expandConfiguration().showPercents();
 
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
-        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter()).configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
 
         filterBucket.configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");

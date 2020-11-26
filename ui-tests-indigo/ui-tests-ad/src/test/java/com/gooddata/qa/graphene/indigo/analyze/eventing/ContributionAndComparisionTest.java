@@ -121,7 +121,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.TABLE);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_table_report_pop_date_attribute");
@@ -152,7 +152,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_column_report_pop_date_attribute");
@@ -181,7 +181,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
                 applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
@@ -213,7 +213,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
                 applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
@@ -250,7 +250,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
                 applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
@@ -285,7 +285,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_table_combination_pop_contribution");
 
@@ -315,7 +315,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
-        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_column_combination_pop_contribution");
 
@@ -344,7 +344,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
                 applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
@@ -379,7 +379,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
                 applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);

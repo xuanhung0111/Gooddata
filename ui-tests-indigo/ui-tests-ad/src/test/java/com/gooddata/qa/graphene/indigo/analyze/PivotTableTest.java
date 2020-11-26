@@ -269,7 +269,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSpecialPivotTablesIncomputedOrInvalid() {
-        String dateBigRange = "1/1/5000";
+        String dateBigRange = "01/01/5000";
         final String MESSAGE_SYSTEM = "SORRY, WE CAN'T DISPLAY THIS INSIGHT" +
                 "\nTry applying different filters, or using different measures or attributes." +
                 "\nIf this did not help, contact your administrator.";

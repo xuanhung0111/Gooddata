@@ -92,7 +92,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     public void testEventingTableReportHasOneMetricOneDate() throws IOException, ParseException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.waitForReportComputing();
 
         analysisPage.saveInsight("eventing_table_filter_2");
@@ -134,7 +134,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
     public void testEventingColumnReportHasOneMetricOneDate() throws IOException, ParseException {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate()
-                .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+                .getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.waitForReportComputing();
 
         analysisPage.saveInsight("eventing_column_filter_2");
@@ -170,7 +170,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.addFilter(ATTR_REGION).getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
 
         analysisPage.saveInsight("eventing_table_filter_3");
 
@@ -219,7 +219,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE);
         analysisPage.addFilter(ATTR_REGION).getFilterBuckets().configAttributeFilter(ATTR_REGION, "East Coast");
         analysisPage.addDateFilter();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
 
         analysisPage.saveInsight("eventing_column_filter_3");
 
@@ -339,7 +339,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addDate();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_filter_5");
 
@@ -373,7 +373,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addDate();
-        analysisPage.getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_column_filter_5");
 
@@ -490,7 +490,7 @@ public class EventingBasicFiltersTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_REGION);
         analysisPage.addFilter(ATTR_DEPARTMENT).getFilterBuckets().configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
-        analysisPage.addDateFilter().getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
+        analysisPage.addDateFilter().getFilterBuckets().configDateFilter("01/01/2011", "12/31/2011");
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_filter_7");

@@ -215,7 +215,7 @@ public class BulletChartTest extends AbstractAnalyseTest {
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-            .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectByNames(METRIC_AMOUNT_BOP).apply();
         dateFilterPickerPanel.apply();
@@ -243,7 +243,7 @@ public class BulletChartTest extends AbstractAnalyseTest {
 
         FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filtersBucket.openDateFilterPickerPanel()
-            .configTimeFilterByRangeHelper("1/1/2000", "1/1/2020")
+            .configTimeFilterByRangeHelper("01/01/2000", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.PREVIOUS_PERIOD);
         dateFilterPickerPanel.apply();
 
@@ -278,7 +278,7 @@ public class BulletChartTest extends AbstractAnalyseTest {
         FiltersBucket filterBucket = analysisPage.addDateFilter().getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
         dateFilterPickerPanel
-            .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+            .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectByNames("Sum of Amount and Amount").apply();
         dateFilterPickerPanel.apply();

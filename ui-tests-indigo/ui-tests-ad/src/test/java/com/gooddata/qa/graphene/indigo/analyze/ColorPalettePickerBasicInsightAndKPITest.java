@@ -63,7 +63,7 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
     @Test(dependsOnMethods = {"prepareInsightsApplyColorsPalette"})
     protected void testInsightFilterDateBySPPYApplyColorMappingPicker() {
         initAnalysePage().openInsight(INSIGHT_FILTER_DATE_BY_SPPY).waitForReportComputing()
-                .getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.waitForReportComputing().openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()
@@ -80,7 +80,7 @@ public class ColorPalettePickerBasicInsightAndKPITest extends AbstractAnalyseTes
         setCustomColorPickerFlag(true);
         try {
             initAnalysePage().openInsight(INSIGHT_FILTER_DATE_BY_SPPY).waitForReportComputing()
-                    .getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                    .getFilterBuckets().openDateFilterPickerPanel().configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                     .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
             analysisPage.waitForReportComputing().openConfigurationPanelBucket().openColorConfiguration()
                     .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()

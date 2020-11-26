@@ -138,8 +138,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
                 .addMetric(METRIC_AMOUNT).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate().selectStaticPeriod();
-        metricConfiguration.fillFromDateRange("1/1/2011");
-        metricConfiguration.fillToDateRange("1/1/2010");
+        metricConfiguration.fillFromDateRange("01/01/2011");
+        metricConfiguration.fillToDateRange("01/01/2010");
 
         assertEquals(metricFilterByDatePicker.getFromDate(), "01/01/2010");
         assertEquals(metricFilterByDatePicker.getToDate(), "01/01/2010");
@@ -147,7 +147,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testInvalidDateInput() {
-        String invalidDate = "1\1\2011";
+        String invalidDate = "01\01\2011";
         MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate().selectStaticPeriod();
@@ -188,9 +188,9 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testLimitedDateRange() {
-        String fromDateOverLimitClosed = "1/1/1899";
-        String toDateOverLimitClosed = "1/1/2051";
-        String dateBigRange = "1/1/5000";
+        String fromDateOverLimitClosed = "01/01/1899";
+        String toDateOverLimitClosed = "01/01/2051";
+        String dateBigRange = "01/01/5000";
         final String MESSAGE_SYSTEM = "SORRY, WE CAN'T DISPLAY THIS INSIGHT" +
                 "\nTry applying different filters, or using different measures or attributes." +
                 "\nIf this did not help, contact your administrator.";

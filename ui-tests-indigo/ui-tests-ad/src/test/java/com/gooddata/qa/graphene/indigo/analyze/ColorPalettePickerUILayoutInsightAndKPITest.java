@@ -122,7 +122,7 @@ public class ColorPalettePickerUILayoutInsightAndKPITest extends AbstractAnalyse
     @Test(dependsOnMethods = {"prepareInsightsApplyColorsPalette"})
     public void testDerivedMeasuresInheritColorFromItsParent() {
         initAnalysePage().openInsight(INSIGHT_FILTER_DATE_BY_SPPY).getFilterBuckets().openDateFilterPickerPanel()
-                .configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+                .configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
                 .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.waitForReportComputing().openConfigurationPanelBucket().openColorConfiguration()
                 .openColorsPaletteDialog(ColorPalette.CYAN.toCssFormatString()).getColorsPaletteDialog()

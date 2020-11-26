@@ -543,7 +543,7 @@ public class ADFilterBarFlowTest extends AbstractAnalyseTest {
         initAnalysePage().openInsight(INSIGHT_TEST_COMBINING).addDateFilter().waitForReportComputing();
         FiltersBucket filterBucket = analysisPage.getFilterBuckets();
         DateFilterPickerPanel dateFilterPickerPanel = filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter());
-        dateFilterPickerPanel.configTimeFilterByRangeHelper("1/1/2006", "1/1/2020")
+        dateFilterPickerPanel.configTimeFilterByRangeHelper("01/01/2006", "01/01/2020")
             .changeCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR)
             .openCompareApplyMeasures().selectAllValues().apply();
         dateFilterPickerPanel.apply();
