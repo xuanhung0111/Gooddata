@@ -46,9 +46,9 @@
             <class name="com.gooddata.qa.graphene.modeler.SearchModelTest" />
         </classes>
     </test>
-<!--    <test name="ImportExportJsonTest" enabled="true">-->
-<!--        <classes>-->
-<!--            <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />-->
-<!--        </classes>-->
-<!--    </test>-->
+    <test name="ImportExportJsonTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
+        </classes>
+    </test>
 </suite>
