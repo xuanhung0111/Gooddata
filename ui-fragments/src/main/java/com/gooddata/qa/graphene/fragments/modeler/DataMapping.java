@@ -59,7 +59,6 @@ public class DataMapping extends AbstractFragment {
         return this;
     }
 
-
     public DataMapping editSourceColumnByName(String name, String type, String newName, boolean isMapping) {
         WebElement row = getRowByName(name, type);
         WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))

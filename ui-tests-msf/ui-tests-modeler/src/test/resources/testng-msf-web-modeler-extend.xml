@@ -25,4 +25,19 @@
             <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>
     </test>
+    <test name="LDMSnowflakeCurrentTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.LDMSnowflakeCurrentTest" />
+        </classes>
+    </test>
+    <test name="LDMRedshiftSegmentTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.LDMRedshiftSegmentTest" />
+        </classes>
+    </test>
+    <test name="LDMBigQueryCurrentTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.LDMBigQueryCurrentTest" />
+        </classes>
+    </test>
 </suite>
