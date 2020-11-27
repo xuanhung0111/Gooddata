@@ -1,0 +1,6 @@
+PK_ID,A_COLOR,D_YEAR,F_PRICE,X__CLIENT_ID,X__TIMESTAMP,X__DELETED,R_OWNER
+pre_car1,red,2020-02-02,3000,clientcustom1,2020-01-01 02:00:00,0,person1
+pre_car2,blue,2020-02-02,3000,clientcustom1,2020-01-01 02:00:00,0,person2
+pre_car3,yellow,2020-02-02,3000,clientcustom1,2020-01-01 02:00:00,0,person3
+pre_car4,green,2020-02-02,3000,clientcustom1,2020-01-01 02:00:00,0,person4
+pre_car5,black,2020-02-02,3000,clientcustom2,2020-01-01 02:00:00,0,person5

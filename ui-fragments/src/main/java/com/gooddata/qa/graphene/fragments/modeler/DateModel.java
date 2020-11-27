@@ -32,6 +32,11 @@ public class DateModel extends AbstractFragment {
         return OverlayWrapper.getInstance(browser).getDateDimensionDialog();
     }
 
+    public void deleteDateModel() {
+        Actions driverActions = new Actions(browser);
+        driverActions.click(this.getModelAction().deleteDate()).perform();
+    }
+
     public void editURNDate(String newUrn) {
         openEditDateDimensionDialog().changeDateURN(newUrn);
     }

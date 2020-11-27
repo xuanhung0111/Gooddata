@@ -34,6 +34,22 @@ public class Metrics extends CommonRestRequest{
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
+    //This function used by LDM from DWH Test
+    public Metric createSumAgeMetricAdvance() {
+        return createMetricIfNotExist(METRIC_AGE,
+                format("SELECT SUM([%s])",
+                        getFactByTitle("Age").getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
+    //This function used by LDM from DWH Test
+    public Metric createSumPriceMetricAdvance() {
+        return createMetricIfNotExist(METRIC_PRICE,
+                format("SELECT SUM([%s])",
+                        getFactByTitle("Price").getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
     //This function use for flexible Metric
     public Metric createSumCustomMetric(String metricTitle, String metricName ) {
         return createMetricIfNotExist(metricTitle,

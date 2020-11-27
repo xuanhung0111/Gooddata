@@ -70,6 +70,36 @@ public class DataMapping extends AbstractFragment {
         return this;
     }
 
+    public DataMapping editDistributedLoadMapping(String newName, boolean isMapping) {
+        WebElement row = getRowByName("Distributed Load", SOURCE_TYPE.DISTRIBUTED_LOAD.getName());
+        WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
+                : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
+        return this;
+    }
+
+    public DataMapping editIncrementalLoadMapping(String newName, boolean isMapping) {
+        WebElement row = getRowByName("Incremental Load", SOURCE_TYPE.INCREMENTAL_LOAD.getName());
+        WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
+                : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
+        return this;
+    }
+
+    public DataMapping editDeletedRowsMapping(String newName, boolean isMapping) {
+        WebElement row = getRowByName("Deleted rows", SOURCE_TYPE.DELETED_ROWS.getName());
+        WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
+                : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
+        return this;
+    }
+
     public List<String> getDropdownSourceColumnByName(String name, String type) {
         WebElement row = getRowByName(name, type);
         row.findElement(By.className(type)).click();
@@ -91,7 +121,10 @@ public class DataMapping extends AbstractFragment {
         ATTRIBUTE("attribute"),
         LABEL("label"),
         FACT("fact"),
-        REFERENCE("reference");
+        REFERENCE("reference"),
+        DISTRIBUTED_LOAD("distributed-load"),
+        INCREMENTAL_LOAD("incremental-load"),
+        DELETED_ROWS("deleted-rows");
 
         private final String type;
 
