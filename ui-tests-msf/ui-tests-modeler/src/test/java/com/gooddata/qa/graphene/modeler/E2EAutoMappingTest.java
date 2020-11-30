@@ -121,10 +121,11 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         FileUploadDialog uploadDialog = sidebar.openCSVDialog();
         uploadDialog.pickCsvFile(csv.getFilePath());
         PreviewCSVDialog dialog = uploadDialog.importCSVShowPreview();
+        dialog.closeFirstTableDialog();
         //set dataset reference
         GenericList dropdownRecommend = dialog.getEditDatasetZone().clickOnDatatypeByName(SCHOOL_ID);
-        DatasetEdit edit = dropdownRecommend.selectReferenceItem();
-        ChooseReferencePopUp referencePopup = edit.getChooseReferencePopUp(SCHOOL_ID);
+        dropdownRecommend.selectReferenceItem();
+        ChooseReferencePopUp referencePopup = ChooseReferencePopUp.getInstance(browser);
         referencePopup.selectReferenceByName(SCHOOL_DATASET);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(SCHOOL_DATASET));
 
