@@ -17,7 +17,7 @@ import static org.openqa.selenium.By.className;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 
 public class DatasetEdit extends AbstractFragment {
-    private static String DATASET_EDIT = "dataset-edit";
+    private static String DATASET_EDIT = "data-table";
     private static final By BY_DATASET_INPUT= By.cssSelector(".dataset-edit-column-input .input-text");
 
     @FindBy(css = ".dataset-column-wrapper")
@@ -119,10 +119,5 @@ public class DatasetEdit extends AbstractFragment {
     public boolean isColumnDisabled(String columnName) {
         WebElement input = getInputColumnByName(columnName);
         return isElementContainDisabledAttribute(input);
-    }
-
-    public ChooseReferencePopUp getChooseReferencePopUp(String columnName) {
-        WebElement column = getColumnByName(columnName);
-        return ChooseReferencePopUp.getInstance(column);
     }
 }

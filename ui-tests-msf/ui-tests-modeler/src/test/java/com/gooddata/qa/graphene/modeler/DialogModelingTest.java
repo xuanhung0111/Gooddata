@@ -82,6 +82,7 @@ public class DialogModelingTest extends AbstractLDMPageTest {
         uploadDialog.pickCsvFile(csv.getFilePath());
 
         PreviewCSVDialog dialog = uploadDialog.importCSVShowPreview();
+        dialog.closeFirstTableDialog();
         assertEquals(dialog.getListHeaders(), asList(LAST_NAME, FIRST_NAME, DATE, AMOUNT, DATE_2));
         assertTrue(dialog.isShowCorrectRow("51"));
         assertEquals(dialog.getEditDatasetZone().getListColumns(), asList(LAST_NAME, FIRST_NAME, DATE, AMOUNT, DATE_2));
@@ -111,22 +112,22 @@ public class DialogModelingTest extends AbstractLDMPageTest {
         dropdownRecommend.selectBasicItem(GenericList.DATA_TYPE_PICKER.PRIMARY_KEY.getClassName());
 
         GenericList dropdownRecommend2 = dialog.getEditDatasetZone().clickOnDatatypeByName(FIRST_NAME_CHANGED);
-        DatasetEdit edit = dropdownRecommend2.selectReferenceItem();
-        ChooseReferencePopUp referencePopup = edit.getChooseReferencePopUp(FIRST_NAME_CHANGED);
+        dropdownRecommend2.selectReferenceItem();
+        ChooseReferencePopUp referencePopup = ChooseReferencePopUp.getInstance(browser);
         assertEquals(referencePopup.getlistReferenceText(), asList(CITY_DATASET, USER_DATASET));
         referencePopup.selectReferenceByName(USER_DATASET);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(USER_DATASET));
 
         GenericList dropdownRecommendDate1 = dialog.getEditDatasetZone().clickOnDatatypeByName(DATE);
-        DatasetEdit edit_datereference_1 = dropdownRecommendDate1.selectReferenceItem();
-        ChooseReferencePopUp referencePopupDate1 = edit_datereference_1.getChooseReferencePopUp(DATE);
+        dropdownRecommendDate1.selectReferenceItem();
+        ChooseReferencePopUp referencePopupDate1 = ChooseReferencePopUp.getInstance(browser);
         assertEquals(referencePopupDate1.getlistReferenceText(), asList(CITY_DATASET));
         referencePopupDate1.selectReferenceByName(CITY_DATASET);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(CITY_DATASET));
 
         GenericList dropdownRecommendDate = dialog.getEditDatasetZone().clickOnImbigousDateByName(DATE_2);
-        DatasetEdit edit_date_reference = dropdownRecommendDate.selectReferenceItem();
-        ChooseReferencePopUp referencePopupDate2 = edit_date_reference.getChooseReferencePopUp(DATE_2);
+        dropdownRecommendDate.selectReferenceItem();
+        ChooseReferencePopUp referencePopupDate2 = ChooseReferencePopUp.getInstance(browser);
         assertEquals(referencePopupDate2.getlistReferenceText(), asList(DATE));
         referencePopupDate2.selectReferenceByName(DATE);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(DATE));
