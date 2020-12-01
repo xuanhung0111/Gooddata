@@ -144,6 +144,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
 
         //User preview structure
         PreviewCSVDialog dialog = uploadDialog.importCSVShowPreview();
+        dialog.closeFirstTableDialog();
         assertTrue(dialog.isShowCorrectRow("11"));
         assertEquals(dialog.getEditDatasetZone().getListColumns(), asList(CLASS_ID, CLASS_NAME, PRICE, DISCOUNT, CREATE_DATE, SCHOOL_ID));
         assertEquals(dialog.getEditDatasetZone().getTextDatatypeByName(CLASS_ID), "Attribute");
@@ -163,14 +164,14 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         dropdownRecommend.selectBasicItem(GenericList.DATA_TYPE_PICKER.PRIMARY_KEY.getClassName());
         //set date reference
         GenericList dropdownRecommendDate = dialog.getEditDatasetZone().clickOnImbigousDateByName(CREATE_DATE);
-        DatasetEdit edit_date_reference = dropdownRecommendDate.selectReferenceItem();
-        ChooseReferencePopUp referencePopupDate = edit_date_reference.getChooseReferencePopUp(CREATE_DATE);
+        dropdownRecommendDate.selectReferenceItem();
+        ChooseReferencePopUp referencePopupDate = ChooseReferencePopUp.getInstance(browser);
         referencePopupDate.selectReferenceByName(CREATED_DATE_DATASET);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(CREATED_DATE_DATASET));
         //set dataset reference
         GenericList dropdownRecommend2 = dialog.getEditDatasetZone().clickOnDatatypeByName(SCHOOL_ID);
-        DatasetEdit edit = dropdownRecommend2.selectReferenceItem();
-        ChooseReferencePopUp referencePopup = edit.getChooseReferencePopUp(SCHOOL_ID);
+        dropdownRecommend2.selectReferenceItem();
+        ChooseReferencePopUp referencePopup = ChooseReferencePopUp.getInstance(browser);
         referencePopup.selectReferenceByName(SCHOOL_DATASET);
         assertTrue(dialog.getEditDatasetZone().isColumnDisabled(SCHOOL_DATASET));
 
