@@ -26,8 +26,8 @@ public class WaitingDialog extends AbstractFragment {
     }
 
     public WaitingDialog waitForLoading() {
-        waitForElementNotVisible(waitingIcon);
-        waitForElementNotVisible(waitingText);
+        waitForElementNotVisible(waitingIcon, 180);
+        waitForElementNotVisible(waitingText, 180);
         return this;
     }
 

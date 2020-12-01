@@ -10,6 +10,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.ArrayList;
 import java.util.List;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -22,7 +23,7 @@ public class PreviewCSVDialog extends AbstractFragment {
     @FindBy(className = "header")
     private WebElement header;
 
-    @FindBy(className = "dataset-edit")
+    @FindBy(className = "data-table")
     private DatasetEdit datasetEdit;
 
     @FindBy(css = ".data-table .data-table")
@@ -40,8 +41,11 @@ public class PreviewCSVDialog extends AbstractFragment {
     @FindBy(className = "s-import")
     private WebElement importButton;
 
-    @FindBy(css = ".public_fixedDataTable_main div[role='columnheader']")
+    @FindBy(className = "data-preview-header")
     private List<WebElement> listHeader;
+
+    @FindBy(className = "data-type-picker")
+    private List<WebElement> dataTypePicker;
 
     public static PreviewCSVDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -62,6 +66,7 @@ public class PreviewCSVDialog extends AbstractFragment {
 
     public void clickCancelButton() {
         cancelButton.click();
+        waitForFragmentNotVisible(this);
     }
 
     public void clickImportButton() {
@@ -79,5 +84,9 @@ public class PreviewCSVDialog extends AbstractFragment {
             listHeaders.add(header.getText());
         }
         return listHeaders;
+    }
+
+    public void closeFirstTableDialog() {
+        dataTypePicker.stream().findFirst().get().click();
     }
 }
