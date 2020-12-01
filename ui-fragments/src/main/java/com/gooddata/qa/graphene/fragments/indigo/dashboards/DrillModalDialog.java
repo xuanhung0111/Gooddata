@@ -35,6 +35,12 @@ public class DrillModalDialog extends AbstractFragment {
     @FindBy(className = "s-geo-category-legend")
     private WebElement pushpinCategoryLegend;
 
+    @FindBy(css = ".gd-drill-modal-error h2 span")
+    private WebElement cannotDisplayMessage;
+
+    @FindBy(css = ".gd-drill-modal-error p span")
+    private WebElement contactAdminMessage;
+
     private static final By ROOT = className("s-drill-modal-dialog");
     private static final By BY_CHART_REPORT = className("highcharts-container");
     private static final By BY_HIGHCHARTS_TOOLTIP = cssSelector(".highcharts-tooltip-container div.highcharts-tooltip");
@@ -54,6 +60,14 @@ public class DrillModalDialog extends AbstractFragment {
 
     public String getTitleInsight() {
         return waitForElementVisible(titleInsight).getText();
+    }
+
+    public String getCannotDisplayMessage() {
+        return waitForElementVisible(cannotDisplayMessage).getText();
+    }
+
+    public String getContactAdminMessage() {
+        return waitForElementVisible(contactAdminMessage).getText();
     }
 
     public void close() {

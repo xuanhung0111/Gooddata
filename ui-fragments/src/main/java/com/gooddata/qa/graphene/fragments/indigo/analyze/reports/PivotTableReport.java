@@ -117,6 +117,21 @@ public class PivotTableReport extends AbstractFragment {
         return getElementTexts(valueMeasuresPresent);
     }
 
+    public WebElement getFirstValueMeasuresPresent(String title) {
+        waitForElementVisible(attributeValuePresent);
+        return waitForCollectionIsNotEmpty(valueMeasuresPresent).stream()
+                .filter(element -> {
+                    return waitForElementVisible(element).getText().equals(title);})
+                .findFirst()
+                .get();
+    }
+
+    public void drillOnCellMeasure(String title) {
+        WebElement element = getFirstValueMeasuresPresent(title);
+        hoverItem(element);
+        element.click();
+    }
+
     public List<String> getColumnGroupHeaders() {
         waitForElementVisible(attributeValuePresent);
 

@@ -107,12 +107,71 @@ public class ChartReport extends AbstractFragment {
         return Drilling.getInstance(browser);
     }
 
+    public Drilling openDrillingPickerByTitle(String title) {
+        clickOnElementByTitle(title);
+        return Drilling.getInstance(browser);
+    }
+
     public void clickOnElement(Pair<Integer, Integer> position) {
         WebElement element = getTracker(position.getLeft(), position.getRight());
         // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
         // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
         ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
                 .moveByOffset(1, 1).click().perform();
+    }
+
+    public void clickOnElementByTitle(String title) {
+        WebElement element = getTrackerByTitle(title);
+        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
+        // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
+        ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
+                .moveByOffset(1, 1).click().perform();
+    }
+
+    public void hoverOnElement(Pair<Integer, Integer> position) {
+        WebElement element = getTracker(position.getLeft(), position.getRight());
+        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
+        // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
+        ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
+                .moveByOffset(1, 1).perform();
+    }
+
+    public List<List<String>> getCurrentHighChartsTooltip( Pair<Integer, Integer> position) {
+        hoverOnElement(position);
+        WebElement currentTooltip =  waitForCollectionIsNotEmpty(browser.findElements(BY_HIGHCHARTS_TOOLTIP))
+                .stream()
+                .filter(e -> e.getAttribute("style")
+                        .contains("opacity: 1"))
+                .findFirst()
+                .get();
+
+        return waitForCollectionIsNotEmpty(currentTooltip.findElements(cssSelector(TOOLTIP_ITEM))).stream()
+                .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
+                        item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
+                .collect(Collectors.toList());
+    }
+
+    public void hoverOnElementByTitle(String title) {
+        WebElement element = getTrackerByTitle(title);
+        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
+        // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
+        ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
+                .moveByOffset(1, 1).perform();
+    }
+
+    public List<List<String>> getCurrentHighChartsTooltipByTitle( String title) {
+        hoverOnElementByTitle(title);
+        WebElement currentTooltip =  waitForCollectionIsNotEmpty(browser.findElements(BY_HIGHCHARTS_TOOLTIP))
+                .stream()
+                .filter(e -> e.getAttribute("style")
+                        .contains("opacity: 1"))
+                .findFirst()
+                .get();
+
+        return waitForCollectionIsNotEmpty(currentTooltip.findElements(cssSelector(TOOLTIP_ITEM))).stream()
+                .map(item -> asList(item.findElement(cssSelector(TOOLTIP_TITLE)).getText(),
+                        item.findElement(cssSelector(TOOLTIP_VALUE)).getText()))
+                .collect(Collectors.toList());
     }
 
     public void clickOnDataLabel(Pair<Integer, Integer> position) {
@@ -234,6 +293,11 @@ public class ChartReport extends AbstractFragment {
 
     public String getTooltipInteractionOnTrackerByIndex(int groupIndex, int index) {
         displayTooltipOnTrackerByIndex(groupIndex, index);
+        return getTooltipContainDrillInteractionText();
+    }
+
+    public String getTooltipInteractionOnTrackerByTitle(String title) {
+        displayTooltipOnTrackerByTitle(title);
         return getTooltipContainDrillInteractionText();
     }
 
