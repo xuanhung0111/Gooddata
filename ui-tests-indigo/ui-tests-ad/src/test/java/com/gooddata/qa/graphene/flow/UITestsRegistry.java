@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.indigo.analyze.RenamingMeasuresAndAttributesTest
 import com.gooddata.qa.graphene.indigo.analyze.RedesigningDateFilterDialogOnFilterBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableAdvancedTest;
+import com.gooddata.qa.graphene.indigo.analyze.ResizingColumnTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.HeatMapTest;
@@ -205,6 +206,7 @@ public class UITestsRegistry {
             WeekFilterTest.class,
             ControlFilterEmbeddedADFromExternalApplication.class,
             ControlFilterEmbeddedADProgramTest.class,
+            ResizingColumnTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
