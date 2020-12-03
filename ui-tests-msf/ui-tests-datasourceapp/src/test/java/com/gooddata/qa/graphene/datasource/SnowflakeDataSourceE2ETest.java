@@ -172,8 +172,37 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     }
 
     @Test(dependsOnMethods = "checkEditDatasource")
-    public void deleteDatasourceTest() {
+    public void createViewTable() {
         dsMenu.selectDataSource(DATASOURCE_NAME_CHANGED);
+        contentWrapper.waitLoadingManagePage();
+        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+        DatasourceHeading heading = container.getDatasourceHeading();
+        GenerateOutputStageDialog generateDialog = heading.getGenerateDialog();
+        String sql = getResourceAsString("/sql.txt");
+        assertEquals(generateDialog.getMessage(), sql);
+        generateDialog.clickCopy();
+        DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
+        assertEquals(messageBar.waitForSuccessMessageBar().getText(), "SQL copied to clipboard");
+        waitForElementNotVisible(messageBar.getRoot());
+        generateDialog.clickClose();
+        // check generate outputStage in case invalid datasource
+        heading.clickEditButton();
+        contentWrapper.waitLoadingManagePage();
+        container = contentWrapper.getContentDatasourceContainer();
+        container.addConnectionTitle(DATASOURCE_INVALID);
+        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        configuration.addSnowflakeInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE,
+                INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
+        container.clickSavebutton();
+        contentWrapper.waitLoadingManagePage();
+        DatasourceMessageBar ErrormessageBar = heading.getErrorMessageDialog();
+        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Failed to obtain JDBC Connection: " +
+                "Connection factory returned null from createConnection");
+    }
+
+    @Test(dependsOnMethods = "createViewTable")
+    public void deleteDatasourceTest() {
+        dsMenu.selectDataSource(DATASOURCE_INVALID);
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();

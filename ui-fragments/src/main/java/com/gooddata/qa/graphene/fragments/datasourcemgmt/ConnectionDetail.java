@@ -53,34 +53,12 @@ public class ConnectionDetail extends AbstractFragment {
                 .getText();
     }
 
-    public GenerateOutputStageDialog getGenerateDialog () {
-        return GenerateOutputStageDialog.getInstance(browser);
-    }
-
-    public void clickGenerateButton() {
-        waitForElementVisible(btnGenerate);
-        btnGenerate.click();
-    }
-
-    public PublishWorkspaceDialog openPublishIntoWorkSpaceDialog() {
-        waitForElementVisible(openPublishIntoWorkspace).click();
-        return PublishWorkspaceDialog.getInstance(browser);
-    }
-
-    public PublishWorkspaceDialog getPublishWorkspaceDialog() {
-        return PublishWorkspaceDialog.getInstance(browser);
-    }
-
     public PublishModeDialog getPublishModeDialog() {
         return PublishModeDialog.getInstance(browser);
     }
 
     public PublishResult getPublishResultDialog() {
         return PublishResult.getInstance(browser);
-    }
-
-    public void openDataIntegrationConsole() {
-        waitForElementVisible(openDiscLink).click();
     }
 
     public ConnectionDetail waitLoadingModelPage() {
