@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class ResizingColumnTest extends AbstractAnalyseTest {
+public class AutoResizingColumnTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TWO_COLUMNS = "Resize follow lowest header";
     private static final String INSIGHT_HAS_SUM = "Resize follow by the longest data";

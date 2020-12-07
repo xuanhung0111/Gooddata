@@ -7,10 +7,13 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillModalDialog;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 
+import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Arrays;
@@ -184,6 +187,46 @@ public class PivotTableReport extends AbstractFragment {
             .filter(ElementUtils::isElementVisible)
             .map(WebElement::getText)
             .collect(toList());
+    }
+
+    public PivotTableReport resizeColumn(String titleColumn, int columnIndex, int xOffset) {
+        return resizeColumn(titleColumn, columnIndex, xOffset, null);
+    }
+
+    public PivotTableReport resizeColumn(String titleColumn, int columnIndex, int xOffset, Keys pressedKey) {
+        Actions actions = new Actions(browser);
+        WebElement headerElement = getHeaderElement(titleColumn, columnIndex);
+        actions.moveToElement(headerElement).perform();
+        if (pressedKey != null) {
+            actions.keyDown(pressedKey);
+        }
+        actions.clickAndHold(waitForElementVisible(className("ag-header-cell-resize"), headerElement))
+                .moveByOffset(headerElement.getSize().getWidth() + xOffset, 0).release()
+                .perform();
+        if (pressedKey != null) {
+            actions.keyUp(pressedKey).release().perform();
+        }
+        Sleeper.sleepTightInSeconds(1);
+        return this;
+    }
+
+    public PivotTableReport revertSizeColumn(String titleColumn, int columnIndex, Keys pressedKey) {
+        Actions actions = new Actions(browser);
+        WebElement headerElement = getHeaderElement(titleColumn, columnIndex);
+        actions.moveToElement(headerElement).perform();
+        if (pressedKey != null) {
+            actions.keyDown(pressedKey);
+        }
+        actions.doubleClick(waitForElementVisible(className("ag-header-cell-resize"), headerElement)).release().perform();
+        if (pressedKey != null) {
+            actions.keyUp(pressedKey).perform();
+        }
+        Sleeper.sleepTightInSeconds(1); //Due to resize table without event
+        return this;
+    }
+
+    public PivotTableReport revertSizeColumn(String titleColumn, int columnIndex) {
+        return revertSizeColumn(titleColumn, columnIndex, null);
     }
 
     public boolean hasSubTotals() {
