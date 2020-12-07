@@ -50,6 +50,14 @@ public class Metrics extends CommonRestRequest{
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
+    //This function used by RedshiftAdvance Test
+    public Metric createSumAmountMetricAdvance() {
+        return createMetricIfNotExist(METRIC_AMOUNT,
+                format("SELECT SUM([%s])",
+                        getFactByTitle("Amount").getUri()),
+                DEFAULT_CURRENCY_METRIC_FORMAT);
+    }
+
     //This function used by Modeler E2ETest
     public Metric createSumAgeMetric() {
         return createMetricIfNotExist(METRIC_AGE,
