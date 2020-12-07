@@ -15,11 +15,8 @@ public class DatasourceHeading extends AbstractFragment {
     @FindBy(className = "datasource-heading-name")
     private WebElement datasourceName;
 
-    @FindBy(className =  "s-edit-datasource-button")
-    private WebElement btnEdit;
-
-    @FindBy(className =  "delete-button")
-    private WebElement btnDelete;
+    @FindBy(className = "s-more-button")
+    private WebElement moreButton;
 
     public static final DatasourceHeading getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DatasourceHeading.class, waitForElementVisible(className(DATASOURCE_HEADING_CLASS), searchContext));
@@ -31,13 +28,27 @@ public class DatasourceHeading extends AbstractFragment {
     }
 
     public void clickEditButton() {
-        waitForElementVisible(btnEdit);
-        btnEdit.click();
+        waitForElementVisible(moreButton).click();
+        MoreContentDialog.getInstance(browser).clickEditButton();
     }
 
     public DeleteDatasourceDialog clickDeleteButton() {
-        waitForElementVisible(btnDelete);
-        btnDelete.click();
-        return DeleteDatasourceDialog.getInstance(browser);
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).clickDeleteButton();
+    }
+
+    public PublishWorkspaceDialog openPublishIntoWorkSpaceDialog() {
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).openPublishIntoWorkSpaceDialog();
+    }
+
+    public GenerateOutputStageDialog getGenerateDialog () {
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).getGenerateDialog();
+    }
+
+    public DatasourceMessageBar getErrorMessageDialog () {
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).getErrorMessageDialog();
     }
 }
