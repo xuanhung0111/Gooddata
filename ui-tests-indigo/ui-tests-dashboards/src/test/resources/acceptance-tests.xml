@@ -1,12 +1,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-acceptance-kd-test">
-    <test name="ManipulateWidgetsTest" enabled="true">
+    <test name="ManipulateWidgetsTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest"/>
         </classes>
     </test>
 
-    <test name="EventingBasicInsightTest" enabled="true">
+    <test name="EventingBasicInsightTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingBasicInsightTest"/>
         </classes>
@@ -18,7 +18,7 @@
         </classes>
     </test>
 
-<!--    <test name="ResizeWidgetsAndRowsTest" enabled="true">-->
+<!--    <test name="ResizeWidgetsAndRowsTest" enabled="false">-->
 <!--        <classes>-->
 <!--            <class name="com.gooddata.qa.graphene.indigo.dashboards.ResizeWidgetsAndRowsTest"/>-->
 <!--        </classes>-->
