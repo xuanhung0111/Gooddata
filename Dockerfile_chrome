@@ -7,8 +7,8 @@ LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
 LABEL parent_image="harbor.intgdc.com/tools/ruby-2.3:0dec94a"
 LABEL git_commit=$GIT_COMMIT
 
-ARG BROWSER_VERSION=87.0.4280.66
-ARG DRIVER_VERSION=87.0.4280.20
+ARG BROWSER_VERSION=87.0.4280.88
+ARG DRIVER_VERSION=87.0.4280.88
 
 #===============
 # Google Chrome
