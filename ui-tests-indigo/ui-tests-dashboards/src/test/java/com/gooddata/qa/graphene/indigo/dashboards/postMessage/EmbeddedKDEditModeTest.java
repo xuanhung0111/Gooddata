@@ -352,7 +352,7 @@ public class EmbeddedKDEditModeTest extends AbstractDashboardEventingTest {
             assertThat(indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_ACCOUNT).getSelection(),
                     containsString("101 Financial, 14 West"));
             assertThat(indigoDashboardsPage.getDashboardBodyText(),
-                    containsString("YOU ARE NOT AUTHORIZED TO SEE THIS REPORT\n" + "Contact your administrator."));
+                    containsString("YOU ARE NOT AUTHORIZED TO SEE THIS REPORT\n" + "CONTACT YOUR ADMINISTRATOR."));
             Screenshots.takeScreenshot(browser, "embeddedAppliedProtectedAttribute", getClass());
         } finally {
             attributeRestRequest.unsetAttributeProtected(attributeUri);
