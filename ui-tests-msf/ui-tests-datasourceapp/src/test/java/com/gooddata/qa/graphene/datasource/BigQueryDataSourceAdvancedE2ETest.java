@@ -50,8 +50,8 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     private final String DATASOURCE_PROJECT = "gdc-us-dev";
     private final String DATASOURCE_DATASET = "att_database";
     private final String DATASOURCE_DATASET_UPDATE = "att_database_update";
-    private final String DATASOURCE_TABLE = "Orders";
-    private final String DATASOURCE_TABLE_UPDATE = "Shippers";
+    private final String DATASOURCE_TABLE = "orders";
+    private final String DATASOURCE_TABLE_UPDATE = "shippers";
     private final String DATASOURCE_PREFIX = "PRE_";
     private static final String blankProject = "BigQuery-Blank-Project-Test";
     private final String INSIGHT_NAME = "BigQuery Insight Test";
@@ -215,7 +215,7 @@ public class BigQueryDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         oldProjectId = testParams.getProjectId();
         testParams.setProjectId(blankProjectId);
 
-        getMetricCreator().createSumAmountMetricAdvance();
+        getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         log.info("INSIGHT_NAME :" + INSIGHT_NAME);
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
