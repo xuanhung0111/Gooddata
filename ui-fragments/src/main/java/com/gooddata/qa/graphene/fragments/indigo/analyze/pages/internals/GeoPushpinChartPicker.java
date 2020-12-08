@@ -142,9 +142,10 @@ public class GeoPushpinChartPicker extends AbstractFragment {
     }
 
     public String getColorFilterSegmentOnPushpinLegend(String segment) {
-        WebElement element = getSegmentFilterOnCategoryLegend().stream().filter(el -> el.getText().equals(segment))
+        WebElement element = getSegmentFilterOnCategoryLegendByColor().stream().filter(el -> el.getText().equals(segment))
                 .findFirst().get();
-        return element.getAttribute("style").replace(";", "");
+        return element.findElement(By.className("series-icon")).getAttribute("style")
+            .replace("border-radius: 0px; background-color: ", "" ).replace(";", "");
     }
 
     public List<String> getListIconPushpinSizeLegend() {
@@ -160,6 +161,10 @@ public class GeoPushpinChartPicker extends AbstractFragment {
     public List<WebElement> getSegmentFilterOnCategoryLegend() {
         return waitForElementPresent(pushpinCategoryLegend)
                 .findElements(By.cssSelector(".series .series-name"));
+    }
+
+    public List<WebElement> getSegmentFilterOnCategoryLegendByColor() {
+        return waitForElementPresent(pushpinCategoryLegend).findElements(By.className("series-item"));
     }
 
     public boolean isGeoPopupTooltipDisplayed() {
