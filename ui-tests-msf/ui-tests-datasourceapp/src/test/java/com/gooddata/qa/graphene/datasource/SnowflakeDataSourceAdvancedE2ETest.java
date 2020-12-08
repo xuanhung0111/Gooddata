@@ -62,8 +62,8 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
     private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
     private final String DATASOURCE_DATABASE_UPDATE = "ATT_TEST_DATABASE_UPDATE";
     private final String DATASOURCE_DATABASE = "ATT_TEST_DATABASE";
-    private final String DATASOURCE_DATASET = "Orders";
-    private final String DATASOURCE_DATASET_UPDATE = "Shippers";
+    private final String DATASOURCE_DATASET = "orders";
+    private final String DATASOURCE_DATASET_UPDATE = "shippers";
     private final String DATASET_UPDATE = "shippers";
     private final String DATASOURCE_PREFIX = "PRE_";
     private final String DATASOURCE_SCHEMA = "PUBLIC";
@@ -251,7 +251,7 @@ public class SnowflakeDataSourceAdvancedE2ETest extends AbstractDatasourceManage
         oldProjectId = testParams.getProjectId();
         testParams.setProjectId(blankProjectId);
         log.info("blankProjectId : " + blankProjectId);
-        getMetricCreator().createSumAmountMetricAdvance();
+        getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
         log.info("Delete cookies..............");
