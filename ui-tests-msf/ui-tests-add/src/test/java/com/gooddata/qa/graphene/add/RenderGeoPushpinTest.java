@@ -94,11 +94,11 @@ public class RenderGeoPushpinTest extends AbstractGeoPushpinTest {
         geoChart.hoverOnGeoPushpin(-445, -120);
         assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be displayed");
         geoChart.clickFilterSegmentOnPushpinLegend(SEGMENT_FILTER);
-        assertEquals(geoChart.getColorFilterSegmentOnPushpinLegend(SEGMENT_FILTER), "color: rgb(204, 204, 204)");
+        assertEquals(geoChart.getColorFilterSegmentOnPushpinLegend(SEGMENT_FILTER), "rgb(204, 204, 204)");
         geoChart.hoverOnGeoPushpin(-445, -120);
         assertFalse(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be hidden");
         geoChart.clickFilterSegmentOnPushpinLegend(SEGMENT_FILTER);
-        assertEquals(geoChart.getColorFilterSegmentOnPushpinLegend(SEGMENT_FILTER), "color: rgb(109, 118, 128)");
+        assertEquals(geoChart.getColorFilterSegmentOnPushpinLegend(SEGMENT_FILTER), "rgb(229, 77, 66)");
         geoChart.hoverOnGeoPushpin(-445, -120);
         assertTrue(geoChart.isGeoPopupTooltipDisplayed(), "Tooltip on Geo pushpin should be display");
     }
