@@ -50,8 +50,8 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
     private final String DATASOURCE_NAME_UPDATE = "Auto_datasource_update" + generateHashString();
     private final String PROCESS_NAME = "AutoProcess Test" + generateHashString();
     private final String DATASOURCE_DATABASE = "dev";
-    private final String DATASOURCE_DATASET = "Orders";
-    private final String DATASOURCE_DATASET_UPDATE = "Shippers";
+    private final String DATASOURCE_DATASET = "orders";
+    private final String DATASOURCE_DATASET_UPDATE = "shippers";
     private final String DATASET_UPDATE = "shippers";
     private final String DATASOURCE_PREFIX = "pre_";
     private final String DATASOURCE_SCHEMA = "att_database";
@@ -255,7 +255,7 @@ public class RedShiftDataSourceAdvancedE2ETest extends AbstractDatasourceManagem
         log.info("oldProjectId : " + oldProjectId);
         testParams.setProjectId(blankProjectId);
         log.info("Current ProjectID : " + testParams.getProjectId());
-        getMetricCreator().createSumAmountMetricAdvance();
+        getMetricCreator().createSumAmountMetric();
         createInsightHasOnlyMetric(INSIGHT_NAME, ReportType.COLUMN_CHART, asList(METRIC_AMOUNT));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage(10).waitForWidgetsLoading();
         log.info("Delete cookies..............");
