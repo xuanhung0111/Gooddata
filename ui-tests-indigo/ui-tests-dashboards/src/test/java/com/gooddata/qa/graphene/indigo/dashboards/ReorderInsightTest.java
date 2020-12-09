@@ -140,7 +140,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
                 WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
                 driverActions.moveToElement(drop).perform();
             } else {
-                driverActions.moveToElement(target).moveByOffset(1,1).perform();
+                driverActions.moveToElement(target).moveByOffset(-1, -1).perform();
             }
 
         } finally {
