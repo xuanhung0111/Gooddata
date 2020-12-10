@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExportingIgnoreAlert;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
@@ -158,7 +159,7 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + SCHOOL_DATASET + "." + ExportFormat.CSV.getName());
-        waitForExporting(exportFile);
+        waitForExportingIgnoreAlert(exportFile, browser);
         List<String> downloadContent = CSVUtils.readCsvFile(exportFile).stream()
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());

@@ -403,8 +403,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         FileUploadDialog uploadDialog = tableViewDataset.clickButtonUpdateFromFile(datasetName);
         uploadDialog.pickCsvFile(csv.getFilePath());
         uploadDialog.importValidData();
-
-        initIndigoDashboardsPage().selectDateFilterByName("All time");
+        InitDashboardIgnoreAlert().selectDateFilterByName("All time");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, fact).getValue(),
                 expectResult, "Unconnected filter make impact to kpi");
     }
@@ -440,5 +439,16 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         toolbar = modeler.getLayout().getToolbar();
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
+    }
+
+    private IndigoDashboardsPage InitDashboardIgnoreAlert() {
+        try {
+            return initIndigoDashboardsPage();
+        } catch (Exception handleAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            return initIndigoDashboardsPage();
+        }
     }
 }
