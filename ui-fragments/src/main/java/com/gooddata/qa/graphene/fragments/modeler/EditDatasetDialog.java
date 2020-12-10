@@ -178,6 +178,7 @@ public class EditDatasetDialog extends AbstractFragment {
 
     public void addFact(String factName) {
         addFactButton.click();
+        waitingForNewRowAttributeInput();
         Actions driverActions = new Actions(browser);
         driverActions.sendKeys(factName).sendKeys(Keys.ENTER).build().perform();
     }

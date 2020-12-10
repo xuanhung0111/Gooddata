@@ -265,6 +265,22 @@ public final class WaitUtils {
         System.out.print("File size: " + destination.length());
     }
 
+    public static void waitForExportingIgnoreAlert(final File destination, WebDriver driver) {
+        System.out.println("waiting for export " + destination.getName());
+
+        Function<WebDriver, Boolean> isExportCompleted = browser -> destination.exists() && destination.length() != 0;
+        try {
+            Graphene.waitGui().pollingEvery(1, TimeUnit.SECONDS).withTimeout(5, TimeUnit.MINUTES).until(isExportCompleted);
+            System.out.print("File size: " + destination.length());
+        } catch(Exception e) {
+            driver.navigate().refresh();
+            driver.switchTo().alert().dismiss();
+            driver.switchTo().defaultContent();
+            Graphene.waitGui().pollingEvery(1, TimeUnit.SECONDS).withTimeout(5, TimeUnit.MINUTES).until(isExportCompleted);
+            System.out.print("File size: " + destination.length());
+        }
+    }
+
     public static void waitForIndigoMessageDisappear(SearchContext context) {
         WebElement message = waitForElementVisible(By.className("gd-messages"), context);
 
