@@ -115,6 +115,10 @@ public abstract class AbstractTest extends Arquillian {
         return UUID.randomUUID().toString().substring(0, 5);
     }
 
+    public String generate8HashString() {
+        return UUID.randomUUID().toString().substring(0, 8);
+    }
+
     public ProjectValidationResults validateProject() {
         final int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
                 testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
