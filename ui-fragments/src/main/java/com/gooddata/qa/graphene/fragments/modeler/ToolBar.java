@@ -30,6 +30,15 @@ public class ToolBar extends AbstractFragment {
     @FindBy(css = ".gdc-ldm-switch-button .left-button")
     private WebElement modelButton;
 
+    @FindBy(className = "zoom-in-button")
+    private WebElement zoomInBtn;
+
+    @FindBy(className = "zoom-out-button")
+    private WebElement zoomOutBtn;
+
+    @FindBy(className = "zoom-value-button")
+    private WebElement zoomValueBtn;
+
     @FindBy(className = "search-model-input")
     private WebElement searchModelInput;
 
@@ -82,6 +91,46 @@ public class ToolBar extends AbstractFragment {
         List<WebElement> toolbarList = searchContext.findElements(TOOLBAR);
         return Graphene.createPageFragment(
                 ToolBar.class, toolbarList.get(index));
+    }
+
+    public String getCurrentZoomValue() {
+        return zoomValueBtn.getText();
+    }
+
+    public void clickZoomInBtn() {
+        waitForElementVisible(zoomInBtn).click();
+    }
+
+    public void clickZoomOutBtn() {
+        waitForElementVisible(zoomOutBtn).click();
+    }
+
+    public SelectZoomValue clickZoomValueBtn() {
+        waitForElementVisible(zoomValueBtn).click();
+        return SelectZoomValue.getInstance(browser);
+    }
+
+    public static class SelectZoomValue extends AbstractFragment {
+
+        private static final By ZOOM_POPUP_MENU = By.className("zoom-popup-menu");
+
+        @FindBy(className = "gd-menu-item")
+        private List<WebElement> items;
+        
+        public static SelectZoomValue getInstance(SearchContext searchContext) {
+            return Graphene.createPageFragment(SelectZoomValue.class,
+                    waitForElementVisible(ZOOM_POPUP_MENU, searchContext));
+        }
+
+        public List<String> getZoomValueList() {
+            waitForElementVisible(ZOOM_POPUP_MENU, browser);
+            return items.stream().map(el -> el.getText()).collect(Collectors.toList());
+        }
+
+        public SelectZoomValue selectZoomValue(String zoomValue) {
+            items.stream().filter(e -> zoomValue.equals(e.getText())).findFirst().get().click();
+            return this;
+        }
     }
 
     public SearchDropDown searchItem(String text) {
