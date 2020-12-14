@@ -30,6 +30,7 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
     private ToolBar toolbar;
     private Canvas canvas;
     private MainModelContent mainModelContent;
+    private ZoomMenu zoomMenu;
     private RestClient restClient;
 
     private final String USER_DATASET = "user";
@@ -68,38 +69,39 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
         initLogicalDataModelPage();
         waitForFragmentVisible( modeler.getLayout());
         modeler.getLayout().waitForLoading();
+        zoomMenu = ZoomMenu.getInstance(browser);
     }
 
     @Test(dependsOnMethods = {"verifyZoomValue"})
     public void verifyZoomInAndZoomOut(){
         JointLayers modelerLayers = JointLayers.getInstance(browser);
-        toolbar.clickZoomOutBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "125%");
+        zoomMenu.clickZoomOutBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "125%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.ONR_HUNDRED_TWENTY_FIVE.getTransformLayer());
-        toolbar.clickZoomOutBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "125%");
+        zoomMenu.clickZoomOutBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "125%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.ONR_HUNDRED_TWENTY_FIVE.getTransformLayer());
-        toolbar.clickZoomInBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "100%");
+        zoomMenu.clickZoomInBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "100%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.ONE_HUNDRED.getTransformLayer());
-        toolbar.clickZoomInBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "75%");
+        zoomMenu.clickZoomInBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "75%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.SEVENTY_FIVE.getTransformLayer());
-        toolbar.clickZoomInBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "50%");
+        zoomMenu.clickZoomInBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "50%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.FIFTY.getTransformLayer());
-        toolbar.clickZoomInBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "25%");
+        zoomMenu.clickZoomInBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "25%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.TWENTY_FIVE.getTransformLayer());
-        toolbar.clickZoomInBtn();
-        assertEquals(toolbar.getCurrentZoomValue(), "25%");
+        zoomMenu.clickZoomInBtn();
+        assertEquals(zoomMenu.getCurrentZoomValue(), "25%");
         assertEquals(modelerLayers.getTransformLayer(), ZoomValue.TWENTY_FIVE.getTransformLayer());
-        toolbar.clickZoomValueBtn().selectZoomValue("100%");
+        zoomMenu.clickZoomValueBtn().selectZoomValue("100%");
     }
 
     @Test(dependsOnMethods = {"initialPageTest"})
     public void checkDefaultZoomValue(){
-        assertEquals(toolbar.getCurrentZoomValue(), "100%");
+        assertEquals(zoomMenu.getCurrentZoomValue(), "100%");
     }
 
     @DataProvider(name = "listZoomValue")
@@ -116,10 +118,10 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
     @Test(dependsOnMethods = {"checkDefaultZoomValue"}, dataProvider = "listZoomValue")
     public void verifyZoomValue(ZoomValue zoomValue){
         JointLayers modelerLayers = JointLayers.getInstance(browser);
-        assertEquals(toolbar.clickZoomValueBtn().getZoomValueList(), LIST_ZOOM_VALUE);
-        toolbar.clickZoomValueBtn();
-        toolbar.clickZoomValueBtn().selectZoomValue(zoomValue.getZoomValue());
-        assertEquals(toolbar.getCurrentZoomValue(), zoomValue.getZoomValue());
+        assertEquals(zoomMenu.clickZoomValueBtn().getZoomValueList(), LIST_ZOOM_VALUE);
+        zoomMenu.clickZoomValueBtn();
+        zoomMenu.clickZoomValueBtn().selectZoomValue(zoomValue.getZoomValue());
+        assertEquals(zoomMenu.getCurrentZoomValue(), zoomValue.getZoomValue());
         assertEquals(modelerLayers.getTransformLayer(), zoomValue.getTransformLayer());
     }
 
