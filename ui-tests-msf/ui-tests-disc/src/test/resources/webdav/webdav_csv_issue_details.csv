@@ -1,0 +1,6 @@
+attr.issue.key,attr.issue.link,issue_labels,issue_summary,earliest_affected_version,latest_fix_version,issue_resolution,issue_priority,issue_type,issue_status,reporter_key,assignee_key,fact.issue.resolve_duration,attr.issue.epic_key,attr.issue.epic_summary,attr.issue.epic_link,created_on,resolved_on,updated_on,dataset.project
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2020-01-01,2020-01-01,2020-01-01,1
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2020-01-01,2020-01-01,2020-01-01,2
+5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,2020-01-01,2020-01-01,2020-01-01,5
+3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2020-01-01,2020-01-01,2020-01-01,3
+4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,2020-01-01,2020-01-01,2020-01-01,4
