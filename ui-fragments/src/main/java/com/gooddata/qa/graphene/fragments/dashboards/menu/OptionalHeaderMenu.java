@@ -10,7 +10,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class OptionalHeaderMenu extends AbstractReactDropDown {
@@ -39,7 +38,7 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
 
     public static OptionalHeaderMenu getInstance(SearchContext context) {
         return Graphene.createPageFragment(OptionalHeaderMenu.class,
-            waitForElementVisible(By.className("gd-header-menu-overlay"), context));
+                waitForElementVisible(By.className("gd-header-menu-overlay"), context));
     }
 
     public void exportToPDF() {
@@ -60,10 +59,20 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
         return ScheduleEmailDialog.getInstance(browser);
     }
 
+    public SaveAsDialog saveAsNew() {
+        waitForElementVisible(saveAsButton).click();
+        return SaveAsDialog.getInstance(browser);
+    }
+
     public Boolean isPDFExportItemVisible() {
         return isElementPresent(By.className("s-pdf-export-item"), browser);
     }
+
     public Boolean isDeleteItemVisible() {
         return isElementPresent(By.className("s-delete_dashboard"), browser);
+    }
+
+    public Boolean isSaveAsNewItemVisible() {
+        return isElementPresent(By.className("s-save_as_menu_item"), browser);
     }
 }
