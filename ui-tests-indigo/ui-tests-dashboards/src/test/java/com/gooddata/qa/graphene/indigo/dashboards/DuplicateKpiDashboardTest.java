@@ -19,7 +19,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class DuplicateKpiDashboard extends AbstractDashboardTest {
+public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
     private IndigoRestRequest indigoRestRequest;
     private static final String INSIGHT_ACTIVITIES = "Insight Activities";
     private static final String DASHBOARD_ACTIVITIES = "Dashboard Activities";
