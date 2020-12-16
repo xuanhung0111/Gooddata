@@ -132,6 +132,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-dash-item-action-placeholder")
     private WebElement exportCsvAndXlsxIcon;
 
+    @FindBy(xpath = "//span[text()='Save as new']")
+    private WebElement saveAsNewButton;
+
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
@@ -1201,4 +1204,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
         waitForElementNotPresent(loadingLabel);
     }
+
+    public SaveAsDialog saveAsNewOnLockMode() {
+        waitForElementVisible(saveAsNewButton).click();
+        return SaveAsDialog.getInstance(browser);
+    }
+
 }
