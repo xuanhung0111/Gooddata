@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Configu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureAsColumnBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FilterBarPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MeasureValueFilterPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.RankingFilterPanel;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
@@ -32,6 +33,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 
@@ -684,6 +686,11 @@ public class AnalysisPage extends AbstractFragment {
     private AttributeFilterPickerPanel openFilterPanel(String filter) {
         getFilterBuckets().getFilter(filter).click();
         return AttributeFilterPickerPanel.getInstance(browser);
+    }
+
+    public RankingFilterPanel openRankingFilterPanel(String filter) {
+        getFilterBuckets().getFilter(filter).click();
+        return RankingFilterPanel.getInstance(browser);
     }
 
     private void moveToBottomDropLineOfElement(WebElement target) {

@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel.STATIC_PERIOD_DROPDOWN_ITEM;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -169,6 +170,10 @@ public class FiltersBucket extends AbstractBucket {
         } catch (NoSuchElementException e) {
             return false;
         }
+    }
+
+    public boolean isRankingFilterVisible() {
+        return isElementVisible(By.className("adi-ranking-filter-button"), root);
     }
 
     @Override

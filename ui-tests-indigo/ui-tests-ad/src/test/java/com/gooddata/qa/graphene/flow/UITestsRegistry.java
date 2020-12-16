@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesComparisonRecommendation
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesContributionRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.RankingFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDescriptionTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
@@ -141,6 +142,7 @@ public class UITestsRegistry {
             CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
             DateFilterTest.class,
+            RankingFilterTest.class,
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,
