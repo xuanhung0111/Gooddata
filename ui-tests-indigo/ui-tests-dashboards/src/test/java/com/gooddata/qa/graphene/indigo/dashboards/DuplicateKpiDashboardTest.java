@@ -12,10 +12,16 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.*;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
-import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.fragments.postMessage.PostMessageKPIDashboardPage;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.sdk.model.md.Metric;
+import org.json.JSONArray;
+import org.openqa.selenium.By;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
@@ -27,11 +33,12 @@ import java.io.IOException;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
 
-public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
+public class DuplicateKpiDashboardTest extends AbstractDashboardEventingTest {
     private IndigoRestRequest indigoRestRequest;
     private static final String INSIGHT_ACTIVITIES = "Insight Activities";
     private static final String DASHBOARD_ACTIVITIES = "Dashboard Activities";
@@ -39,6 +46,11 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
     private static final String KPI_ALERT_THRESHOLD = "200";
     private static final String DASHBOARD_CHANGE = "Change Dashboard Activities";
     private static final String DASHBOARD_DUPLICATE_LOCK_MODE = "Duplicate Dashboard On Lock Mode";
+    private static final String DASHBOARD_EMBEDDED = "Embedded Dashboard Activities";
+    private static final String FRAME_KD_POST_MESSAGE_PATH_FILE = "/postMessage/frame_KD_post_message.html";
+    private String uriActivities;
+    private String identifierActivities;
+    private String dashboardActivities;
 
     @Override
     protected void customizeProject() {
@@ -48,13 +60,15 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
         String insightWidget = createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_AMOUNT))))));
-        indigoRestRequest.createAnalyticalDashboard(singletonList(insightWidget), DASHBOARD_ACTIVITIES);
+        dashboardActivities = indigoRestRequest.createAnalyticalDashboard(singletonList(insightWidget), DASHBOARD_ACTIVITIES);
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .addKpi(new KpiConfiguration.Builder().metric(METRIC_AMOUNT).dataSet(DATE_DATASET_CREATED).build())
                 .saveEditModeWithWidgets();
         setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
         initIndigoDashboardsPage().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT).saveEditModeWithWidgets();
         initIndigoDashboardsPage().scheduleEmailing().submit();
+        uriActivities = getMetricByTitle(METRIC_AMOUNT).getUri();
+        identifierActivities = getMetricByTitle(METRIC_AMOUNT).getIdentifier();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"Administrator user"})
@@ -97,9 +111,9 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"Editor user"})
     public void setLockAnalyticalDashboard() throws IOException{
-            indigoRestRequest.setLockedAttribute(DASHBOARD_ACTIVITIES, 1);
-            int lockedValue = indigoRestRequest.getLockedAttribute(DASHBOARD_ACTIVITIES);
-            assertEquals(lockedValue, 1, DASHBOARD_ACTIVITIES + " should be locked");
+        indigoRestRequest.setLockedAttribute(DASHBOARD_ACTIVITIES, 1);
+        int lockedValue = indigoRestRequest.getLockedAttribute(DASHBOARD_ACTIVITIES);
+        assertEquals(lockedValue, 1, DASHBOARD_ACTIVITIES + " should be locked");
     }
 
     @Override
@@ -144,5 +158,35 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Test(dependsOnGroups = "createProject", groups = {"Embedded"})
+    public void verifyDuplicatedKpiDashboardOnEmbeddedPage() throws IOException {
+        logout();
+        signInAtUI(testParams.getDomainUser(), testParams.getPassword());
+        try {
+            final JSONArray uris = new JSONArray() {{
+                put(uriActivities);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(dashboardActivities),
+                    uris.toString(), identifierActivities, FRAME_KD_POST_MESSAGE_PATH_FILE);
+            log.info(file);
+            IndigoDashboardsPage indigoDashboardsPage = openEmbeddedPage(file);
+            cleanUpLogger();
+            PostMessageKPIDashboardPage postMessageApiPage = PostMessageKPIDashboardPage.getInstance(browser);
+            postMessageApiPage.saveAsNew(DASHBOARD_EMBEDDED);
+            indigoDashboardsPage.waitForWidgetsLoading();
+            log.info(indigoDashboardsPage.getDashboardTitle());
+            assertTrue(indigoDashboardsPage.getDashboardTitle().equals(DASHBOARD_EMBEDDED));
+            assertFalse(indigoDashboardsPage.getLastWidget(Kpi.class).hasSetAlert());
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
+    @Override
+    protected void cleanUpLogger() {
+        browser.switchTo().defaultContent();
+        waitForElementVisible(By.id("loggerBtn"), browser).click();
     }
 }

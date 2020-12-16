@@ -67,11 +67,14 @@ public class PostMessageKPIDashboardPage extends AbstractFragment {
     @FindBy(id = "setCombineFilter")
     private WebElement setCombineFilter;
 
+    @FindBy(id = "saveAsNew")
+    private WebElement saveAsNew;
+
     private static final String ROOT_CLASS = "root";
 
     public static PostMessageKPIDashboardPage getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PostMessageKPIDashboardPage.class,
-            waitForElementVisible(By.id(ROOT_CLASS), searchContext));
+                waitForElementVisible(By.id(ROOT_CLASS), searchContext));
     }
 
     public void editDashboard() {
@@ -139,5 +142,11 @@ public class PostMessageKPIDashboardPage extends AbstractFragment {
 
         browser.switchTo().frame("iframe");
         waitForFragmentVisible(IndigoDashboardsPage.getInstance(browser));
+    }
+
+    public void saveAsNew(String title) {
+        waitForElementVisible(nameDashboard).sendKeys(title);
+        waitForElementVisible(saveAsNew).click();
+        browser.switchTo().frame("iframe");
     }
 }
