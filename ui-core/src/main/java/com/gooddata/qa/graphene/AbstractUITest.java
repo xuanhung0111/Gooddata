@@ -83,8 +83,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     private static final String LOCALIZATION_PAGE = "localization.html";
     private static final String USER_PROFILE_PAGE = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
-
-    private static final String EMBEDDED_INDIGO_DASHBOARD_PAGE_URI = "dashboards/embedded/#/p/%s";
+    private static final String EMBEDDED_INDIGO_DASHBOARD_PAGE_URI = "dashboards/embedded/#/project/%s";
     private static final String EMBEDDED_ANALYZE_PAGE_URI = "analyze/embedded/#/%s/reportId/edit";
     private static final String EMBEDDED_IFRAME_WRAPPER_URL = "https://s3.amazonaws.com/gdc-testing-public/embedding-wrapper.html";
     /**
