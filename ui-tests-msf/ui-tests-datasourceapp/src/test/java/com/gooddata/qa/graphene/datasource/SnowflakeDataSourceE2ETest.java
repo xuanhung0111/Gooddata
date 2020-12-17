@@ -75,7 +75,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 7);
+        assertEquals(configuration.getNumberOfRequiredMessage(), 6);
     }
 
     @DataProvider
