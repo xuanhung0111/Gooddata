@@ -74,7 +74,7 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 5);
+        assertEquals(configuration.getNumberOfRequiredMessage(), 4);
     }
 
     @DataProvider

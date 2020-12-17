@@ -84,7 +84,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
         ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 6);
+        assertEquals(configuration.getNumberOfRequiredMessage(), 5);
     }
 
     @DataProvider

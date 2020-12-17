@@ -37,6 +37,9 @@ public class ConnectionConfiguration extends AbstractFragment {
     @FindBy(css = ".s-redshift-iam-radio .input-radio")
     private WebElement iam;
 
+    @FindBy(className = "output-stage-section")
+    private WebElement outputStageSection;
+
     public static final ConnectionConfiguration getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConnectionConfiguration.class, waitForElementVisible(className(CONNECTION_CONFIGURATION_CLASS), context));
     }
@@ -108,6 +111,7 @@ public class ConnectionConfiguration extends AbstractFragment {
     }
 
     public void addPrefix(String value) {
+        outputStageSection.click();
         addInput("outputStagePrefix", value);
     }
 
