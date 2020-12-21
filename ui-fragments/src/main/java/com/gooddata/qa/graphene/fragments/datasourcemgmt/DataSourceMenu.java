@@ -21,18 +21,6 @@ public class DataSourceMenu extends AbstractFragment {
     @FindBy(className = "navigation-add-datasource")
     private WebElement addButton;
 
-    @FindBy(className = "create-datasource-dialog")
-    private WebElement popupResource;
-
-    @FindBy(className = "s-create-datasource-dialog-item-snowflake")
-    private WebElement resource1;
-
-    @FindBy(className = "s-create-datasource-dialog-item-redshift")
-    private WebElement resource2;
-
-    @FindBy(className = "s-create-datasource-dialog-item-bigquery")
-    private WebElement resource3;
-
     @FindBy(className = "navigation-list-item")
     private List<WebElement> datasources;
 
@@ -47,23 +35,17 @@ public class DataSourceMenu extends AbstractFragment {
 
     public void selectSnowflakeResource() {
         waitForElementVisible(addButton).click();
-        waitForElementVisible(popupResource);
-        Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(resource1).click().build().perform();
+        OverlayWrapper.getInstance(browser).selectSnowflakeItem();
     }
 
     public void selectRedshiftResource() {
         waitForElementVisible(addButton).click();
-        waitForElementVisible(popupResource);
-        Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(resource2).click().build().perform();
+        OverlayWrapper.getInstance(browser).selectRedshiftItem();
     }
 
     public void selectBigQueryResource() {
         waitForElementVisible(addButton).click();
-        waitForElementVisible(popupResource);
-        Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(resource3).click().build().perform();
+        OverlayWrapper.getInstance(browser).selectBigqueryItem();
     }
 
     public List<String> getListDataSources() {
