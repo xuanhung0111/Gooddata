@@ -89,6 +89,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTes
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterBarFlowTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterInsightValueTest;
+import com.gooddata.qa.graphene.indigo.analyze.ADMeasureFormatTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
@@ -212,6 +213,7 @@ public class UITestsRegistry {
             ControlFilterEmbeddedADProgramTest.class,
             AutoResizingColumnTest.class,
             ManualResizingColumnTest.class,
+            ADMeasureFormatTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
