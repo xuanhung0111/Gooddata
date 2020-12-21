@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -164,13 +165,10 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     public void loginEmbeddedWithEmptyDashboardByViewPermission(UserRoles role, EmbeddedType type)
             throws JSONException {
         logoutAndLoginAs(role);
-
         try {
             initEmbeddedIndigoDashboardPageByType(type);
-
             takeScreenshot(browser, "Error-shows-when-" + role + "-login-embedded-with-empty-dashboard-by-" + type, getClass());
             assertEquals(getEmbeddedErrorMessage(), EMBEDDED_ERROR_MESSAGE);
-
         } finally {
             logoutAndLoginAs(UserRoles.ADMIN);
         }
@@ -387,6 +385,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     }
 
     private String getEmbeddedErrorMessage() {
-        return waitForElementVisible(By.className("embedded-error"), browser).getText();
+        waitForElementVisible(By.className("app-dashboards"), browser);
+        return waitForElementPresent(By.className("embedded-error"), browser).getText();
     }
 }
