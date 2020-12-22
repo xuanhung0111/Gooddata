@@ -176,7 +176,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage addDashboard() {
-        waitForElementVisible(addDashboard).click();
+        if (isSplashScreenPresent()) {
+            getSplashScreen().startEditingWidgets();
+        } else {
+            waitForElementVisible(addDashboard).click();
+        }
         waitForElementVisible(cancelButton);
         getInsightSelectionPanel().waitForLoading();
         return this;
