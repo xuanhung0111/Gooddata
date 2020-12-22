@@ -91,6 +91,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
     private DashboardRestRequest dashboardRequest;
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
+    private static final String EXPECTED_NO_OBJECT_FOUND = "The workspace contains no data.";
 
     @Override
     public void initProperties() {
@@ -304,7 +305,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
         Assert.notEmpty(cataloguePanel.expandCatalogGroupLabels("Opp. Snapshot").getFieldNamesInViewPort());
 
         openAnalyzePage("includeObjectsWithTags", tagNameForFolder);
-        assertEquals(cataloguePanel.getNoObjectsFound(), "No objects found.");
+        assertEquals(cataloguePanel.getNoObjectsFound(), EXPECTED_NO_OBJECT_FOUND);
 
         initAnalysePage();
         openAnalyzeEmbeddedPage("excludeObjectsWithTags", tagNameForFolder);
@@ -313,7 +314,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
 
         initAnalysePage();
         openAnalyzeEmbeddedPage("includeObjectsWithTags", tagNameForFolder);
-        assertEquals(catalogueEmbeddedPanel.getNoObjectsFound(), "No objects found.");
+        assertEquals(catalogueEmbeddedPanel.getNoObjectsFound(), EXPECTED_NO_OBJECT_FOUND);
     }
 
     @Test(dependsOnMethods = {"checkAllObjectsAreGroupedByFolderCorrectly"})
