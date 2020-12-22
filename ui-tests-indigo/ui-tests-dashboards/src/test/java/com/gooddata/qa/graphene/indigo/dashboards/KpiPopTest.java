@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ExtendedDateFilterPanel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.DataProvider;
