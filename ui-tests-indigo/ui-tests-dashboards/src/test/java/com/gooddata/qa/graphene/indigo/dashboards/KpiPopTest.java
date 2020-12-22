@@ -170,10 +170,15 @@ public class KpiPopTest extends AbstractDashboardTest {
                 .selectLastWidget(Kpi.class);
         indigoDashboardsPage.openExtendedDateFilterPanel().selectFloatingRange(ExtendedDateFilterPanel.DateGranularity.YEARS,"9 years ago","2 years ago").apply();
         takeScreenshot(browser, "addFloatingRange", getClass());
+
         indigoDashboardsPage.saveEditModeWithWidgets().waitForWidgetsLoading();
         takeScreenshot(browser, "checkSaveKDWithFloatingDate", getClass());
+
         Kpi lastKpi = indigoDashboardsPage.getLastWidget(Kpi.class);
         assertTrue(lastKpi.hasPopSection(), "Newly added KPI should have pop section");
         assertEquals(indigoDashboardsPage.getDateFilter().getSelection(), "From 9 to 2 years ago");
+
+        indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
+        indigoDashboardsPage.saveEditModeWithWidgets();
     }
 }
