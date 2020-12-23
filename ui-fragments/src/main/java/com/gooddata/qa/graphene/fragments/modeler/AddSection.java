@@ -31,7 +31,7 @@ public class AddSection extends AbstractFragment {
         return isElementVisible(addDate);
     }
 
-    public WebElement getbuttonDataset() {
+    public WebElement getButtonDataset() {
         return addDataset;
     }
 
