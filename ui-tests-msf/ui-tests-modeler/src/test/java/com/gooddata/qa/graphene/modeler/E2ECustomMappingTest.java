@@ -30,6 +30,10 @@ import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
 import com.gooddata.qa.graphene.fragments.modeler.Model;
 import com.gooddata.qa.graphene.fragments.modeler.EditDatasetDialog;
 import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
+import com.gooddata.qa.graphene.fragments.modeler.DateModel;
+import com.gooddata.qa.graphene.fragments.modeler.EditDateDimensionDialog;
+
+
 import com.gooddata.qa.utils.CSVUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -241,6 +245,13 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
                 "$10,000.00", "Unconnected filter make impact to kpi");
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Insight.class, INSIGHT_NAME)
                 .getChartReport().getDataLabels(), singletonList("$10,000.00"), "Unconnected filter make impact to insight");
+
+        initLogicalDataModelPage();
+        DateModel modelDate = mainModelContent.getDateModel(CREATED_DATE_DATASET);
+        mainModelContent.focusOnDateDataset(CREATED_DATE_DATASET);
+        EditDateDimensionDialog dateModelDialog = modelDate.openEditDateDimensionDialog();
+        assertEquals(dateModelDialog.getDefaultDateValue(), "custom_v2:date");
+        dateModelDialog.clickCancel();
     }
 
     //STEP 6: User goes to Table View and Download template , check that template CSV follow custom mapping,
