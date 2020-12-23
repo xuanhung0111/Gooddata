@@ -39,6 +39,10 @@ public class EditDateDimensionDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public String getDefaultDateValue() {
+        return waitForElementVisible(inputField).getAttribute("value");
+    }
+
     public boolean isInputFieldDisable() {
         return isElementContainDisabledAttribute(this.getRoot().findElement(By.cssSelector(".gd-input-field")));
     }
