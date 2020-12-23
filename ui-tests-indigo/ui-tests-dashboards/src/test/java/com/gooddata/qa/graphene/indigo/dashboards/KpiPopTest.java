@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ExtendedDateFilterPanel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.DataProvider;
@@ -154,6 +155,26 @@ public class KpiPopTest extends AbstractDashboardTest {
         assertEquals(kpi.getPopSection().getPeriodTitle(), expectedPeriodTitle);
 
         indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
+        indigoDashboardsPage.saveEditModeWithWidgets();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void checkKpiPopSectionWhenFilteringByFloatingRange() {
+        Kpi kpi = initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .addKpi(new KpiConfiguration.Builder()
+                        .metric(METRIC_AMOUNT)
+                        .dataSet(DATE_DATASET_CREATED)
+                        .comparison(ComparisonType.LAST_YEAR.toString())
+                        .build())
+                .selectLastWidget(Kpi.class);
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectFloatingRange(ExtendedDateFilterPanel.DateGranularity.YEARS,"9 years ago","2 years ago").apply();
+        indigoDashboardsPage.saveEditModeWithWidgets().waitForWidgetsLoading();
+        assertTrue(kpi.hasPopSection(), "Newly added KPI should have pop section");
+        assertEquals(indigoDashboardsPage.getDateFilter().getSelection(), "From 9 to 2 years ago");
+
+        indigoDashboardsPage.switchToEditMode();
+        kpi.delete();
         indigoDashboardsPage.saveEditModeWithWidgets();
     }
 }
