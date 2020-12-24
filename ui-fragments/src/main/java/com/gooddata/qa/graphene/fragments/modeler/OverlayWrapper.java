@@ -55,10 +55,10 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "actions-menu-generate-output-stage-item")
     private WebElement dropDownOutputStage;
 
-    @FindBy(css = ".actions-menu-generate-output-stage-item:nth-of-type(2)")
+    @FindBy(className = "actions-menu-export-model-item")
     private WebElement dropDownExportJson;
 
-    @FindBy(css = ".actions-menu-generate-output-stage-item:nth-of-type(3)")
+    @FindBy(className = "actions-menu-generate-import-model-item")
     private WebElement dropDowImportJson;
 
     @FindBy(css = ".gd-message .s-message-text-header-value")
