@@ -11,10 +11,7 @@ services:
       - $HOME/.m2:/tmp/.m2
     working_dir: /graphene-tests
     user: '$USER_UID:$USER_GID'
-    build:
-      context: .
-      shm_size: '8gb'
-    shm_size: '8gb'
+    shm_size: '4gb'
     command: |
       sh -c '
       ./integration-mvn-test.sh \

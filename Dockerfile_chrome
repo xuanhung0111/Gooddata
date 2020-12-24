@@ -15,8 +15,8 @@ ARG DRIVER_VERSION=87.0.4280.88
 #===============
 RUN set -x && \
     yum clean all && \
-    yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit \
-                dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts maven-bin unzip && \
+    yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit maven-bin unzip && \
+    yum groupinstall --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit Fonts && \
     curl https://dl.google.com/linux/linux_signing_key.pub > /tmp/linux_signing_key.pub && \
     rpm --import /tmp/linux_signing_key.pub && \
     rm -f /tmp/linux_signing_key.pub
