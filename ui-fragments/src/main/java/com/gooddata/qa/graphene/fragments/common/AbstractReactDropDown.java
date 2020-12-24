@@ -16,12 +16,16 @@ import static org.openqa.selenium.By.cssSelector;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public abstract class AbstractReactDropDown extends AbstractDropDown {
@@ -115,6 +119,27 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
         // wait until the selection is made and propagated to the button title
         waitForSelectionIsApplied(name);
 
+        return this;
+    }
+
+    public AbstractReactDropDown waitForLoadingIconHidden() {
+        final By loadingIcon = className("s-isLoading");
+        try {
+            Function<WebDriver, Boolean> isLoadingIconPresent = browser -> isElementPresent(loadingIcon, browser);
+            Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(isLoadingIconPresent);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+        waitForElementNotPresent(loadingIcon);
+        return this;
+    }
+
+    public AbstractReactDropDown selectAttributeByName(String name) {
+        ensureDropdownOpen();
+        waitForLoadingIconHidden();
+        searchForText(name);
+        getElementByName(name).click();
+        waitForSelectionIsApplied(name);
         return this;
     }
 

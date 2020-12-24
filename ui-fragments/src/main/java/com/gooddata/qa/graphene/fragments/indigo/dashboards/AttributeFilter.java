@@ -125,7 +125,7 @@ public class AttributeFilter extends AbstractReactDropDown {
 
     public AttributeFilter setDependentFilter(String attribute, String... connectingAttribute) {
         AttributeFilterConfiguration attributeFilterConfiguration = getAttributeFilterConfiguration();
-        attributeFilterConfiguration.selectByName(attribute);
+        attributeFilterConfiguration.selectAttributeByName(attribute);
         if (connectingAttribute.length != 0) {
             attributeFilterConfiguration.getConnectingAttribute().selectByName(connectingAttribute[0]);
         }
