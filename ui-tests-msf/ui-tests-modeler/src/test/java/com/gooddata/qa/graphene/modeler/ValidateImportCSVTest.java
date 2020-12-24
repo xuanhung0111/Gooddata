@@ -42,8 +42,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
             "Maximum values are '10000' for the cell length.";
     private static final String TOO_MANY_COLUMNS_ERROR_MESSAGE = "Error parsing row=1. The number of columns is too high. " +
             "Maximum values are '250' for the column count.";
-    private static final String DUPLICATE_NAME_ERROR_MESSAGE = "The generated dataset identifier is duplicated, rename CSV " +
-            "file and upload again if you want to create new dataset.";
     private static final String LESS_COLUMN_TABLE_VIEW_ERROR_MESSAGE = "The number of columns in row [97] does not match " +
             "the number of columns defined in the file header.";
     private static final String MORE_COLUMN_TABLE_VIEW_ERROR_MESSAGE = "The number of columns in row [2, 5, 6] does not " +
@@ -97,16 +95,12 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         final CsvFile tooManyColumns = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/too.many.columns.csv"));
 
-        final CsvFile duplicateName = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.csv"));
-
         return new Object[][]{
                 {lessColumn, LESS_COLUMN_ERROR_MESSAGE},
                 {moreColumn, MORE_COLUMN_ERROR_MESSAGE},
                 {onlyHeader, ONLY_HEADER_ERROR_MESSAGE},
                 {tooManyCharacters, TOO_MANY_CHARACTERS_ERROR_MESSAGE},
-                {tooManyColumns, TOO_MANY_COLUMNS_ERROR_MESSAGE},
-                {duplicateName, DUPLICATE_NAME_ERROR_MESSAGE}
+                {tooManyColumns, TOO_MANY_COLUMNS_ERROR_MESSAGE}
         };
     }
 
