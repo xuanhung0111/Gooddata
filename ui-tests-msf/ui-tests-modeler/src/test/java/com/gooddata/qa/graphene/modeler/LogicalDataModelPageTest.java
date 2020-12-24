@@ -121,7 +121,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         ldmPage = initLogicalDataModelPage();
         modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
-        toolbar = modeler.getLayout().getToolbar();
+        toolbar = modeler.getToolbar();
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
         restClient = new RestClient(getProfile(ADMIN));
