@@ -68,7 +68,9 @@ public class PieChartReportTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void switchToPieChartForEmptyADPage() {
         assertThat(initAnalysePage().changeReportType(ReportType.PIE_CHART).getMainEditor().getReportEmpty(),
-                containsString("Get started"));
+            containsString("Drag or here\n" +
+                "They are located in the panel\n" +
+                "on the left."));
         assertTrue(analysisPage.getMetricsBucket().isEmpty(), "Measure Bucket should be empty");
         assertTrue(analysisPage.getAttributesBucket().isEmpty(), "ViewBy Bucket should be empty");
     }
