@@ -28,6 +28,9 @@ public class Modeler extends AbstractFragment {
     @FindBy(css = ".gdc-modeler #json-file")
     private WebElement chooseJsonfile;
 
+    @FindBy(className = "gdc-ldm-toolbar")
+    private ToolBar toolBar;
+
     public static Modeler getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 Modeler.class, waitForElementVisible(className(MODELER), searchContext));
@@ -43,6 +46,11 @@ public class Modeler extends AbstractFragment {
 
     public Layout getLayout() {
         return layout;
+    }
+
+    public ToolBar getToolbar() {
+        this.getLayout().waitForLoading();
+        return toolBar;
     }
 
     public Modeler pickJsonFile(String csvFilePath) {

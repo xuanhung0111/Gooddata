@@ -97,7 +97,7 @@ public class OutputStageRecommendViewTest extends AbstractLDMPageTest {
         LogicalDataModelPage ldmPage = initLogicalDataModelPage();
         Modeler modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
-        toolbar = modeler.getLayout().waitForLoading().getToolbar();
+        toolbar = modeler.getToolbar();
         OutputStage outputStage = toolbar.openOutputStagePopUp();
         outputStage.selectDatasource(DATA_SOURCE_NAME);
         OverlayWrapper.getInstance(browser).selectOption(OverlayWrapper.PROPERTIES_OPTION.CREATE_VIEW.getName());

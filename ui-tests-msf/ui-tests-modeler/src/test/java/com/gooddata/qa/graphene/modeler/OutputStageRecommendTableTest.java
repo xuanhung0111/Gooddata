@@ -96,7 +96,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     public void createTableMode(){
         LogicalDataModelPage ldmPage = initLogicalDataModelPage();
         Modeler modeler = initLogicalDataModelPage().getDataContent().getModeler();
-        toolbar = modeler.getLayout().waitForLoading().getToolbar();
+        toolbar = modeler.getToolbar();
         sidebar = modeler.getSidebar();
         canvas = modeler.getLayout().getCanvas();
         OutputStage outputStage = toolbar.openOutputStagePopUp();
