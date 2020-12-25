@@ -15,6 +15,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -39,13 +41,14 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
 
     private static final String DASH_PIPELINE_ANALYSIS_URI = "/gdc/md/%s/obj/916";
     private static final String TAB_OUTLOOK_IDENTIFIER = "adzD7xEmdhTx";
-
     private static final String EMBEDDED_ERROR_MESSAGE = "Sorry, you do not have access to this page."
             + "\nAsk your administrator to grant you permissions.";
 
@@ -366,6 +369,57 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
         sleepTightInSeconds(1);
         dragAndDropWithCustomBackend(browser, filterPanel.getIndexWebElementAttributeFilter(0),
                 filterPanel.getLastIndexWebElementAttributeFilter());
+    }
+
+    @DataProvider(name = "embeddedUrlProvider")
+    public Object[][] getEmbeddedUrlProvider() {
+        return new Object[][] {
+            {UserRoles.ADMIN},
+            {UserRoles.EDITOR}
+        };
+    }
+
+    @Test(dependsOnGroups = { "createProject" }, dataProvider = "embeddedUrlProvider")
+    public void embeddedDashboardWithoutLoggedInByUrl(UserRoles userRole) throws JSONException, IOException {
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
+        IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL)
+            .waitForDashboardLoad().waitForWidgetsLoading();
+        String currentUrl = browser.getCurrentUrl();
+        try {
+            logout();
+            LoginFragment.waitForPageLoaded(browser);
+            openUrl(currentUrl);
+            LoginFragment.waitForPageLoaded(browser);
+            takeScreenshot(browser, "Show-login-page-when-embedded-dashboard-without-logged-in-by-url", getClass());
+            signIn(false, userRole);
+            indigoDashboardsPage.waitForDashboardLoad().waitForWidgetsLoading();
+            takeScreenshot(browser, "Open-embedded-dashboard-after-logged-in-by-url", getClass());
+            assertEquals(indigoDashboardsPage.getKpisCount(), 1);
+            assertEquals(indigoDashboardsPage.getLastWidget(Kpi.class).getHeadline(), METRIC_AMOUNT);
+        } 
+        finally {
+            if (userRole != UserRoles.ADMIN) {
+                logoutAndLoginAs(UserRoles.ADMIN);
+            }
+            getMdService().removeObjByUri(dashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = { "createProject" })
+    public void embeddedDashboardWithoutLoggedInByIframe() throws JSONException, IOException {
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
+        initEmbeddedIndigoDashboardPageByIframe().waitForDashboardLoad().waitForWidgetsLoading();
+        logout();
+        try {
+            LoginFragment.waitForPageLoaded(browser);
+            initEmbeddedIndigoDashboardPageByIframe(false);
+            takeScreenshot(browser, "Show-error-message-when-embedded-dashboard-without-logged-in-by-iframe", getClass());
+            assertThat(LoginFragment.getInstance(browser).getContainerLoginForm(), containsString("Login to GoodData"));
+        } 
+        finally {
+            signIn(true, UserRoles.ADMIN);
+            getMdService().removeObjByUri(dashboardUri);
+        }
     }
 
     @Override
