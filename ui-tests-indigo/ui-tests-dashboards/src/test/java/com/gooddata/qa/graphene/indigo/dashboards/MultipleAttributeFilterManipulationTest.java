@@ -231,7 +231,7 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
                 "Measure Name should be shorten by too long");
     }
 
-    //@Test(dependsOnGroups = {"createProject"}) will be reverted after QA-12299 completed
+    @Test(dependsOnGroups = {"createProject"})
     public void checkShortenMeasureNameOnKpiDashboard() {
         String insightName = "Insight" + generateHashString();
         analysisPage = initAnalysePage();
