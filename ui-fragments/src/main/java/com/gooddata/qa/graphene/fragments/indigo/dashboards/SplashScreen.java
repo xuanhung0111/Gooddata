@@ -32,8 +32,6 @@ public class SplashScreen extends AbstractFragment {
         sleepTightInSeconds(1);
         waitForElementVisible(createKpiDashboardButton).click();
         waitForElementNotVisible(createKpiDashboardButton);
-        //Splash screen is fading, not disappear immediately
-        waitForElementNotPresent(By.className("splashscreen-text"), getRoot());
         return IndigoDashboardsPage.getInstance(browser);
     }
 

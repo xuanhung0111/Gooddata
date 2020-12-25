@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.Collection;
@@ -18,11 +17,13 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
 
@@ -78,6 +79,9 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(css = ".s-drill-config-target-warning span:last-child")
     private WebElement warningText;
 
+    @FindBy(css = ".s-drill-to-url-button .gd-button-text")
+    private WebElement attributeDrillUrl;
+
     public static ConfigurationPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConfigurationPanel.class,
                 waitForElementVisible(By.cssSelector(CONFIGURATION_PANEL_ROOT), context));
@@ -102,6 +106,7 @@ public class ConfigurationPanel extends AbstractFragment {
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".gd-message.error");
     private static final By SUCCESS_MESSAGE_LOCATOR = By.cssSelector(".gd-message.success");
     private static final By HYPERLINK_URL_TITLE = className("s-drill-to-attribute-url-section-title");
+    private static final By HYPERLINK_LOADING = className("s-drill-to-attribute-url-section-loading");
 
     private ConfigurationPanel waitForVisDateDataSetsLoaded() {
         final Function<WebDriver, Boolean> dataSetLoaded =
@@ -200,6 +205,10 @@ public class ConfigurationPanel extends AbstractFragment {
         return waitForElementVisible(alertEditWarning).getText();
     }
 
+    public String getAttributeDrillUrl() {
+        return waitForElementVisible(attributeDrillUrl).getText();
+    }
+
     public ConfigurationPanel enableDateFilter() {
         getFilterByDateFilter().setChecked(true);
         return this;
@@ -251,6 +260,10 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public boolean hasHyperlink() {
         return isElementVisible(HYPERLINK_URL_TITLE, getRoot());
+    }
+
+    public boolean hasHyperlinkLoading() {
+        return isElementVisible(HYPERLINK_LOADING, getRoot());
     }
 
     public boolean isWainingIcon() {
@@ -382,7 +395,7 @@ public class ConfigurationPanel extends AbstractFragment {
 
                 // Click action on element does not affect sometimes, so switch to use java script executor.
                 BrowserUtils.runScript(browser, "arguments[0].click();",
-                    waitForElementVisible(CHOOSE_URL, getRoot()));   
+                    waitForElementVisible(CHOOSE_URL, getRoot()));
                 return this;
             }
 
@@ -393,6 +406,9 @@ public class ConfigurationPanel extends AbstractFragment {
                 // Click action on element does not affect sometimes, so switch to use java script executor.
                 BrowserUtils.runScript(browser, "arguments[0].click();",
                     waitForElementVisible(CHOOSE_URL, getRoot()));
+                String getUrlSelectionItem = UrlSelectionPanel.getInstance(browser).getUrlSelectionCssSelector();
+                waitForElementPresent(By.cssSelector(getUrlSelectionItem), browser);
+                waitForElementNotPresent(HYPERLINK_LOADING, browser);
                 UrlSelectionPanel.getInstance(browser).selectByName(title);
                 return this;
             }
