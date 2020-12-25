@@ -27,7 +27,7 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("all", new Object[] {
+        suites.put("extended", new Object[] {
             DatasetDetailTest.class,
             DataPreviewAfterUploadTest.class,
             DeleteDatasetTest.class,
@@ -49,6 +49,11 @@ public class UITestsRegistry {
 
         suites.put("sanity", new Object[] {
             CsvUploaderSanityTest.class
+        });
+
+        suites.put("all", new Object[] {
+                suites.get("sanity"),
+                suites.get("extended")
         });
 
         TestsRegistry.getInstance()
