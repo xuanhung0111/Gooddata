@@ -85,11 +85,11 @@ public class UITestsRegistry {
         suites.put("pull-request", new Object[] {
             ManipulateWidgetsTest.class,
             VisualizationsTest.class,
-            //InsightOnDashboardTest.class, will be reverted after QA-12299 completed
-            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
+            InsightOnDashboardTest.class,
+            DateFilteringOnInsightTest.class,
             EmbeddingDashboardPostMessageTest.class,
             MultipleAttributeFilterManipulationTest.class,
-            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
+            "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-imap-KpiAlert.xml",
             "testng-desktop-KpiDashboardWithTotalsResult.xml",
             "testng-mobile-KpiDrillTo.xml",
@@ -108,9 +108,9 @@ public class UITestsRegistry {
             ReorderInsightTest.class,
             DashboardHeadersTest.class,
             NonProductionDatasetTest.class,
-            //InsightOnDashboardTest.class, will be reverted after QA-12299 completed
+            InsightOnDashboardTest.class,
             RoutingTest.class,
-            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
+            DateFilteringOnInsightTest.class,
             CommonDateFilteringTest.class,
             DateDatasetRecommendationTest.class,
             FilteringWidgetsTest.class,
@@ -156,7 +156,7 @@ public class UITestsRegistry {
             DuplicateKpiDashboardTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
-            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
+            "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-KpiPop.xml",
             "testng-desktop-MetricFormatting.xml",
             "testng-desktop-ResponsiveNavigation.xml",
@@ -215,7 +215,7 @@ public class UITestsRegistry {
         });
 
         suites.put("filters", new Object[] {
-            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
+            DateFilteringOnInsightTest.class,
             CommonDateFilteringTest.class,
             FilteringWidgetsTest.class,
             DateFilterOnCategoryBucketTest.class,
@@ -234,7 +234,7 @@ public class UITestsRegistry {
         });
 
         suites.put("drilling", new Object[] {
-            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
+            "testng-desktop-KpiDrillTo.xml",
             "testng-mobile-KpiDrillTo.xml"
         });
 
