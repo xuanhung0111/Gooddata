@@ -166,6 +166,6 @@ public class DashboardHeadersTest extends AbstractDashboardTest {
         assertEquals(rowheader.hasHeader(), false);
         indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT).clickDeleteButton();
         indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT).clickDeleteButton();
-        assertTrue(indigoDashboardsPage.getDashboardBodyText().contains("Get Started"), "Dashboard does not empty!!!");
+        assertTrue(indigoDashboardsPage.getDashboardBodyText().contains("Drag insight here"), "Dashboard does not empty!!!");
     }
 }

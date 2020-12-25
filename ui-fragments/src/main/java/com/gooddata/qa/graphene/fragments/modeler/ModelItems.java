@@ -30,6 +30,11 @@ public class ModelItems extends AbstractFragment {
         return attributes.size() == 0 ? false : true;
     }
 
+    public boolean isFactExist(String dataset, String name) {
+        List<WebElement> facts = this.getRoot().findElements(By.cssSelector(format(".ds-item-fact%s%s", dataset, name)));
+        return facts.size() == 0 ? false : true;
+    }
+
     public WebElement getReference(String dataset) {
         WebElement reference = this.getRoot().findElement(By.cssSelector(format(".ds-item-reference_dataset%s", dataset)));
         return reference;

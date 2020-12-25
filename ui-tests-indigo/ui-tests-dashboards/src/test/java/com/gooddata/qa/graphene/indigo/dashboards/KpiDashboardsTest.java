@@ -157,6 +157,14 @@ public class KpiDashboardsTest extends AbstractDashboardTest {
         }
     }
 
+    @Test(dependsOnGroups = { "createProject" }, groups = { "desktop", "mobile" })
+    public void openKpiDashboardByWrongUrlTest() throws IOException, JSONException {
+            openUrl(PAGE_INDIGO_DASHBOARDS + "#/project/" + testParams.getProjectId() + "/dashboard/invalidLink");
+            indigoDashboardsPage = IndigoDashboardsPage.getInstance(browser);
+            takeScreenshot(browser, "open-KPI-dashboard-by-invalid-url-test", getClass());
+            assertTrue(indigoDashboardsPage.isDashboardNotFound(), "Should show error embedded");
+    }
+
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkTooltipShowCorrectlyOnKPIs() throws IOException {
         String factAmountUri = getFactByTitle(FACT_AMOUNT).getUri();
