@@ -131,7 +131,7 @@ public class UITestsRegistry {
             RenderSpecialCaseGeoPushpinTest.class
         });
 
-        suites.put("all", new Object[] {
+        suites.put("extended", new Object[] {
             GoodSalesAttributeBasedMetricTest.class,
             GoodSalesAttributeBucketTest.class,
             GoodSalesAttributeFilterTest.class,
@@ -157,7 +157,6 @@ public class UITestsRegistry {
             GoodSalesUndoTest.class,
             GoodSalesUndoRedoSavedInsightTest.class,
 //          WalkmeTest.class, CL-9704: Walkme is not available on new AD
-            AnalyticalDesignerSanityTest.class,
             NonProductionDatasetInsightTest.class,
             GoodSalesNotRenderedInsightTest.class,
 //          WalkmeOnEmbeddedAdTest.class, Will be unblocked by ticket QA-9656
@@ -169,8 +168,6 @@ public class UITestsRegistry {
             GoodSalesProjectNavigationTest.class,
             GoodSalesOvertimeComparisonTest.class,
             TotalsResultWithInsightTest.class,
-            VisualizationMeasureAttributeTest.class,
-            EventingBasicTest.class,
             ContributionAndComparisionTest.class,
             EventingBasicFiltersTest.class,
             EventingFiltersUnderMetric.class,
@@ -191,8 +188,6 @@ public class UITestsRegistry {
             HeatMapTest.class,
             HeatMapAdvancedTest.class,
             ReferencePointAndVisSwitchingTest.class,
-            ApplyColorPaletteOnAnalyzePageTest.class,
-            ColorPalettePickerBasicInsightAndKPITest.class,
             ColorPalettePickerAdvancedInsightAndKPITest.class,
             ColorPalettePickerUILayoutInsightAndKPITest.class,
             CustomColorPaletteUILayoutInsightAndKPITest.class,
@@ -213,6 +208,11 @@ public class UITestsRegistry {
             ManualResizingColumnTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
+        });
+
+        suites.put("all", new Object[] {
+                suites.get("sanity"),
+                suites.get("extended")
         });
 
         suites.put("crud", new Object[] {
