@@ -31,14 +31,12 @@ public class UITestsRegistry {
                 VisualizationTest.class
         });
 
+        suites.put("extended", new Object[] {
+        });
+
         suites.put("all", new Object[] {
-                EmbeddedHeadlineTest.class,
-                HeadlineByBucketComponentTest.class,
-                EmbeddedTreemapTest.class,
-                EditorPermissionTest.class,
-                VisualizationTest.class,
-                FilterTest.class,
-                FilterComponentTest.class
+                suites.get("sanity"),
+                suites.get("extended")
         });
 
         TestsRegistry.getInstance()

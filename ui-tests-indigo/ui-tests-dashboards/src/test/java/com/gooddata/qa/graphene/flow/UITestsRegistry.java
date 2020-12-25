@@ -98,10 +98,9 @@ public class UITestsRegistry {
             "testng-mobile-KpiDashboardWithTotalsResult.xml"
         });
 
-        suites.put("all", new Object[] {
+        suites.put("extended", new Object[] {
             DataSetTest.class,
             HeaderTest.class,
-            ManipulateWidgetsTest.class,
             DragWidgetsTest.class,
             PartialExportDashboardsTest.class,
             MetricsDropdownTest.class,
@@ -127,21 +126,17 @@ public class UITestsRegistry {
             KpiDashboardsParamsTest.class,
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
-            EventingBasicInsightTest.class,
             VisualizationMeasureAttributeTest.class,
             ContributionAndComparisionTest.class,
             EventingInEditMode.class,
-            VisualizationDrillableWidgetTest.class,
             VisualizationInvalidDrillConfigTest.class,
             EventingWidgetWithPoPTest.class,
             EventingWidgetWithoutDrillToDashBoardTest.class,
             EventingWidgetEditModeTest.class,
             EventingWidgetDrillToPreventDefaultDashboardTest.class,
-            EventingWidgetDrillToDashboardTest.class,
             EventingMultipleWidgetsTest.class,
             KpiCompareToPreviousPeriodTest.class,
             ReportPageApplyColorPaletteTest.class,
-            KpiApplyColorPaletteTest.class,
             ExportDataToXLSXAndCSVDashboardsTest.class,
             ExportDataToXLSXAndCSVDashboardsMediumTest.class,
             ExportDataToXLSXAndCSVDashboardsAdvancedTest.class,
@@ -160,11 +155,8 @@ public class UITestsRegistry {
             DuplicateKpiDashboardTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
-            "testng-desktop-EditMode.xml",
-            "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-KpiPop.xml",
-            "testng-desktop-SplashScreen.xml",
             "testng-desktop-MetricFormatting.xml",
             "testng-desktop-ResponsiveNavigation.xml",
             "testng-desktop-KpiPopChangeValueExceedLimit.xml",
@@ -192,6 +184,11 @@ public class UITestsRegistry {
             "testng-mobile-KpiDashboardWithTotalsResult.xml",
             "testng-mobile-EventingBasicInsight.xml",
             "testng-mobile-EventingMultipleWidgets.xml"
+        });
+
+        suites.put("all", new Object[]{
+                suites.get("sanity"),
+                suites.get("extended")
         });
 
         suites.put("crud", new Object[] {
