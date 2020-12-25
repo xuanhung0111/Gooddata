@@ -110,8 +110,8 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private final String SCHOOL_NAME_ATTRIBUTE = "schoolname";
     private final String CITY_DATASET = "city";
     private final String DELETE_SUCCESS_MESSAGE = "Success! The \"%s\" was deleted.";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published. Visit data load page";
-    private final String UP_TO_DATE_MESSAGE = "Model is already up-to-date. Visit data load page";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published! Load data now";
+    private final String UP_TO_DATE_MESSAGE = "Model is already up-to-date! Load data now";
     private final String PUBLISH_ERROR_MESSAGE = "\"Cannot publish the data model with the “Preserve data” option." +
             " If you really want to publish this model, then select “Overwrite” option (set preserveData=false) to force" +
             " publish the data model (may cause deletion of data).\"";

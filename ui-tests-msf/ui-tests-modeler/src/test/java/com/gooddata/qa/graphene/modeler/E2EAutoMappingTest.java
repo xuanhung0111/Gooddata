@@ -80,9 +80,9 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
     private Project project;
 
     private String fileName = "class.csv";
-    private final String MODEL_UP_TO_DATE_MESSAGE_DATALOAD = "Model is already up-to-date. Visit data load page";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published. Explore data";
-    private final String MODEL_UP_TO_DATE_MESSAGE = "Model is already up-to-date. Explore data";
+    private final String MODEL_UP_TO_DATE_MESSAGE_DATALOAD = "Model is already up-to-date! Load data now";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published! Explore data";
+    private final String MODEL_UP_TO_DATE_MESSAGE = "Model is already up-to-date! Explore data";
     private final String INSIGHT_NAME = "Insight Test" + generateHashString();
     private final String DASHBOARD_NAME = "Dashboard Test" + generateHashString();
     private final String CLASS_DATASET = "class";
