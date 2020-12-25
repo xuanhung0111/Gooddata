@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
@@ -317,6 +318,14 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 "Workspace is blank before switching page");
         initDashboardsPage();
         assertTrue(initAnalysePage().isBlankState(), "AD does not show blank state after switching page");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testInvalidInsight() {
+        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/invalidLink");
+        analysisPage = AnalysisPage.getInstance(browser);
+        takeScreenshot(browser, "error insight", getClass());
+        assertTrue(analysisPage.isReportNotFound(), "Should show error message not found");
     }
 
     @Test(dependsOnGroups = {"createProject"})

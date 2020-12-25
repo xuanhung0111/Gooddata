@@ -8,12 +8,13 @@ import com.gooddata.qa.graphene.indigo.analyze.BackwardCompatibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureExtendedTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesPivotTableReportTest;
+import com.gooddata.qa.graphene.indigo.analyze.ManualResizingColumnTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableAggregationTest;
 import com.gooddata.qa.graphene.indigo.analyze.RenamingMeasuresAndAttributesTest;
 import com.gooddata.qa.graphene.indigo.analyze.RedesigningDateFilterDialogOnFilterBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableTest;
 import com.gooddata.qa.graphene.indigo.analyze.PivotTableAdvancedTest;
-import com.gooddata.qa.graphene.indigo.analyze.ResizingColumnTest;
+import com.gooddata.qa.graphene.indigo.analyze.AutoResizingColumnTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.TreeMapChartReportAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.HeatMapTest;
@@ -31,6 +32,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesComparisonRecommendation
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesContributionRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.RankingFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDescriptionTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
@@ -140,6 +142,7 @@ public class UITestsRegistry {
             CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
             DateFilterTest.class,
+            RankingFilterTest.class,
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,
@@ -201,7 +204,8 @@ public class UITestsRegistry {
             WeekFilterTest.class,
             ControlFilterEmbeddedADFromExternalApplication.class,
             ControlFilterEmbeddedADProgramTest.class,
-            ResizingColumnTest.class,
+            AutoResizingColumnTest.class,
+            ManualResizingColumnTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

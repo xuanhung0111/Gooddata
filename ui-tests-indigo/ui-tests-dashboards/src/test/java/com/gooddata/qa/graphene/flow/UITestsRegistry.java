@@ -60,6 +60,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.postMessage.ControlFilterEmbed
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsDrillToDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDEditModeTest;
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDViewModeTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DuplicateKpiDashboardTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -84,11 +85,11 @@ public class UITestsRegistry {
         suites.put("pull-request", new Object[] {
             ManipulateWidgetsTest.class,
             VisualizationsTest.class,
-            InsightOnDashboardTest.class,
-            DateFilteringOnInsightTest.class,
+            //InsightOnDashboardTest.class, will be reverted after QA-12299 completed
+            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
             EmbeddingDashboardPostMessageTest.class,
             MultipleAttributeFilterManipulationTest.class,
-            "testng-desktop-KpiDrillTo.xml",
+            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
             "testng-desktop-imap-KpiAlert.xml",
             "testng-desktop-KpiDashboardWithTotalsResult.xml",
             "testng-mobile-KpiDrillTo.xml",
@@ -107,9 +108,9 @@ public class UITestsRegistry {
             ReorderInsightTest.class,
             DashboardHeadersTest.class,
             NonProductionDatasetTest.class,
-            InsightOnDashboardTest.class,
+            //InsightOnDashboardTest.class, will be reverted after QA-12299 completed
             RoutingTest.class,
-            DateFilteringOnInsightTest.class,
+            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
             CommonDateFilteringTest.class,
             DateDatasetRecommendationTest.class,
             FilteringWidgetsTest.class,
@@ -151,9 +152,11 @@ public class UITestsRegistry {
             EmbeddedKDEditModeTest.class,
             EmbeddedKDViewModeTest.class,
             DependentFilterTest.class,
+            ExtendedDateFilterTest.class,
+            DuplicateKpiDashboardTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
-            "testng-desktop-KpiDrillTo.xml",
+            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
             "testng-desktop-KpiPop.xml",
             "testng-desktop-MetricFormatting.xml",
             "testng-desktop-ResponsiveNavigation.xml",
@@ -212,7 +215,7 @@ public class UITestsRegistry {
         });
 
         suites.put("filters", new Object[] {
-            DateFilteringOnInsightTest.class,
+            //DateFilteringOnInsightTest.class, will be reverted after QA-12299 completed
             CommonDateFilteringTest.class,
             FilteringWidgetsTest.class,
             DateFilterOnCategoryBucketTest.class,
@@ -231,7 +234,7 @@ public class UITestsRegistry {
         });
 
         suites.put("drilling", new Object[] {
-            "testng-desktop-KpiDrillTo.xml",
+            //"testng-desktop-KpiDrillTo.xml", will be reverted after QA-12299 completed
             "testng-mobile-KpiDrillTo.xml"
         });
 

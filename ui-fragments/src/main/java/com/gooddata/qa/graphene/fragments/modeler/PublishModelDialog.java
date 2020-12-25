@@ -8,6 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -62,6 +63,10 @@ public class PublishModelDialog extends AbstractFragment {
         waitForElementNotVisible(publishingIcon);
         waitForElementVisible(textResultError);
         return textResultError.getText();
+    }
+
+    public boolean isPublishModelDialogDisplay() {
+        return isElementVisible(SIDEBAR, getRoot());
     }
 
     public void clickButtonCancelErrorPopUp() {

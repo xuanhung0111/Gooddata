@@ -2,8 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
@@ -46,5 +45,32 @@ public class SaveAsDialog extends AbstractFragment {
     public void cancel() {
         waitForElementVisible(cancelButton).click();
         waitForElementNotVisible(cancelButton);
+    }
+
+    public boolean isCancelButtonDisplay() {
+        return waitForElementVisible(cancelButton).isDisplayed();
+    }
+
+    public boolean isCreateDashboardButtonDisplay() {
+        return waitForElementVisible(submitButton).isDisplayed();
+    }
+
+    public String getTitle() {
+        WebElement elementVisible = waitForElementVisible(browser
+                .findElement(By.className("gd-dialog-header")));
+        return elementVisible.getText();
+    }
+
+    public String getTextContent() {
+        return browser.findElement(By.className("gd-message-text")).getText();
+    }
+
+    public String getNameDialog() {
+        return nameTextBox.getAttribute("value");
+    }
+
+    public String getTitleDuplicateDashboard() {
+        WebElement elementTitle = waitForElementVisible(browser.findElement(By.className("s-dash-title")));
+        return elementTitle.getText();
     }
 }

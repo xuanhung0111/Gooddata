@@ -1,10 +1,10 @@
-FROM harbor.intgdc.com/tools/ruby-2.3:0dec94a
+FROM harbor.intgdc.com/tools/ruby-2.3:89999e9
 
 ARG GIT_COMMIT=unspecified
 LABEL image_name="Graphene Firefox Image"
 LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
 LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
-LABEL parent_image="harbor.intgdc.com/tools/ruby-2.3:0dec94a"
+LABEL parent_image="harbor.intgdc.com/tools/ruby-2.3:89999e9"
 LABEL git_commit=$GIT_COMMIT
 
 ARG BROWSER_VERSION=83.0

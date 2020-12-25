@@ -82,5 +82,4 @@ public class MainModelContent extends AbstractFragment {
         waitForElementEnabled(textEditor);
         driverActions.moveToElement(textEditor).sendKeys(factName).sendKeys(Keys.ENTER).build().perform();
     }
-
 }
