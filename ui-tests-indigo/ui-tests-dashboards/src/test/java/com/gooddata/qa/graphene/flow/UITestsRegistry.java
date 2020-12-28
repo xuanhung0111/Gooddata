@@ -66,6 +66,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.OnDashboardGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ConfigurationOnGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.RenderGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.SwitchGeoChartToOtherChartGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardDialogTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -162,6 +163,7 @@ public class UITestsRegistry {
             ControlFilterEmbeddedKDFromExternalApplication.class,
             EmbeddedKDEditModeTest.class,
             EmbeddedKDViewModeTest.class,
+            EmbeddingDashboardDialogTest.class,
             DependentFilterTest.class,
             ExtendedDateFilterTest.class,
             DuplicateKpiDashboardTest.class,

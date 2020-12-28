@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.menu;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoEmbedDashboardDialogs;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ScheduleEmailDialog;
 import org.jboss.arquillian.graphene.Graphene;
@@ -25,6 +26,9 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
 
     @FindBy(className = "s-save_as_menu_item")
     private WebElement saveAsButton;
+
+    @FindBy(className = "s-embed-item")
+    private WebElement embedOption;
 
     @Override
     protected String getDropdownCssSelector() {
@@ -57,6 +61,11 @@ public class OptionalHeaderMenu extends AbstractReactDropDown {
     public ScheduleEmailDialog scheduleEmailing() {
         waitForElementVisible(scheduleEmail).click();
         return ScheduleEmailDialog.getInstance(browser);
+    }
+
+    public IndigoEmbedDashboardDialogs openEmbedDashboardDialog() {
+        waitForElementVisible(embedOption).click();
+        return IndigoEmbedDashboardDialogs.getInstance(browser);
     }
 
     public SaveAsDialog saveAsNew() {
