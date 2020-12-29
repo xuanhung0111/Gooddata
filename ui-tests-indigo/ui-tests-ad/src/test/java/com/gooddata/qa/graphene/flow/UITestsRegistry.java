@@ -119,20 +119,16 @@ public class UITestsRegistry {
             "testng-ad-e2e-date-test.xml"
         });
 
-        suites.put("sanity-aws", new Object[] {
-                BackwardCompatibilityTest.class,
-                RenderSpecialCaseGeoPushpinTest.class,
-                VisualizationMeasureAttributeTest.class,
-                AnalyticalDesignerSanityTest.class
-        });
-
         suites.put("sanity", new Object[] {
-                suites.get("sanity-aws"),
-                EventingBasicTest.class,
-                DateFilterADMeasureTest.class,
-                ApplyColorPaletteOnAnalyzePageTest.class,
-                ColorPalettePickerBasicInsightAndKPITest.class,
-                ADFilterBarFlowTest.class
+            AnalyticalDesignerSanityTest.class,
+            VisualizationMeasureAttributeTest.class,
+            EventingBasicTest.class,
+            BackwardCompatibilityTest.class,
+            DateFilterADMeasureTest.class,
+            ApplyColorPaletteOnAnalyzePageTest.class,
+            ColorPalettePickerBasicInsightAndKPITest.class,
+            ADFilterBarFlowTest.class,
+            RenderSpecialCaseGeoPushpinTest.class
         });
 
         suites.put("extended", new Object[] {
@@ -214,7 +210,7 @@ public class UITestsRegistry {
             "testng-ad-MetricNumberFormat.xml"
         });
 
-        suites.put("all", new Object[]{
+        suites.put("all", new Object[] {
                 suites.get("sanity"),
                 suites.get("extended")
         });
