@@ -22,6 +22,9 @@ public class Layout extends AbstractFragment {
     @FindBy(id = "paper-container")
     private Canvas canvas;
 
+    @FindBy(css = ".gdc-initial-state .gdc-ldm-blank-canvas-message")
+    private WebElement blankCanvas;
+
     public static Layout getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 Layout.class, waitForElementVisible(className(LAYOUT), searchContext));
@@ -30,6 +33,11 @@ public class Layout extends AbstractFragment {
     public Canvas getCanvas() {
         waitForElementVisible(canvas.getRoot());
         return canvas;
+    }
+
+    public String getTextBlankCanvas() {
+        waitForElementVisible(blankCanvas);
+        return blankCanvas.getText();
     }
 
     public ToolBar getToolbar() {

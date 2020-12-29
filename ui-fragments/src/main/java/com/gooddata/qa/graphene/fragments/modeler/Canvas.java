@@ -12,19 +12,11 @@ import static org.openqa.selenium.By.id;
 public class Canvas extends AbstractFragment {
     private static final String CANVAS = "paper-container";
 
-    @FindBy(className = "gdc-ldm-blank-canvas-message")
-    private WebElement blankCanvas;
-
     @FindBy(className = "joint-paper-scroller")
     private PaperScrollerBackground scrollerBackground;
 
     public static final Canvas getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(Canvas.class, waitForElementVisible(id(CANVAS), searchContext));
-    }
-
-    public String getTextBlankCanvas() {
-        waitForElementVisible(blankCanvas);
-        return blankCanvas.getText();
     }
 
     public PaperScrollerBackground getPaperScrollerBackground() {
