@@ -17,17 +17,13 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("sanity-aws", new Object[] {
-                EditorPermissionTest.class,
-                VisualizationTest.class,
-                FilterTest.class
-        });
-
         suites.put("sanity", new Object[] {
-                suites.get("sanity-aws"),
                 EmbeddedHeadlineTest.class,
                 HeadlineByBucketComponentTest.class,
                 EmbeddedTreemapTest.class,
+                EditorPermissionTest.class,
+                VisualizationTest.class,
+                FilterTest.class,
                 FilterComponentTest.class
         });
 
