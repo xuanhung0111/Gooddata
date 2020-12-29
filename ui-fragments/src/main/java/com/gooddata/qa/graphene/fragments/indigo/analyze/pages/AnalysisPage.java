@@ -771,4 +771,8 @@ public class AnalysisPage extends AbstractFragment {
     public boolean isDisableOpenAsReport() {
         return waitForElementVisible(cssSelector(".s-open_as_report"), getRoot()).getAttribute("class").contains("disabled");
     }
+
+    public boolean isReportNotFound() {
+        return isElementVisible(By.className("s-report-message-type-report_not_found"), root);
+    }
 }

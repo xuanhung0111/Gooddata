@@ -80,7 +80,7 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
         takeScreenshot(browser, "switchProjectsTest-switched", getClass());
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), NEW_PROJECT_NAME);
 
-        indigoDashboardsPage.switchProject(projectTitle).waitForDashboardLoad();
+        indigoDashboardsPage.switchProject(projectTitle).waitForDashboardLoad().waitForWidgetsLoading();
         takeScreenshot(browser, "switchProjectsTest-switched-back", getClass());
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), projectTitle);
     }

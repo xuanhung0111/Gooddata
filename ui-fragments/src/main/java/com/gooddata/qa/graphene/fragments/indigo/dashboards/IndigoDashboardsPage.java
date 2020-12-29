@@ -132,6 +132,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-dash-item-action-placeholder")
     private WebElement exportCsvAndXlsxIcon;
 
+    @FindBy(xpath = "//span[text()='Save as new']")
+    private WebElement saveAsNewButton;
+
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
@@ -176,7 +179,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage addDashboard() {
-        waitForElementVisible(addDashboard).click();
+        if (isSplashScreenPresent()) {
+            getSplashScreen().startEditingWidgets();
+        } else {
+            waitForElementVisible(addDashboard).click();
+        }
         waitForElementVisible(cancelButton);
         getInsightSelectionPanel().waitForLoading();
         return this;
@@ -214,6 +221,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public boolean isWidthResizerColorVisible() {
         return waitForElementVisible(By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME), browser)
                 .getCssValue("background-color").equals("rgba(20, 178, 226, 0.15)");
+    }
+
+    public boolean isDashboardNotFound() {
+        return isElementVisible(By.className("embedded-error"), root);
     }
 
     public int getSizeWidthResizer() {
@@ -1201,4 +1212,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
         waitForElementNotPresent(loadingLabel);
     }
+
+    public SaveAsDialog saveAsNewOnLockMode() {
+        waitForElementVisible(saveAsNewButton).click();
+        return SaveAsDialog.getInstance(browser);
+    }
+
 }
