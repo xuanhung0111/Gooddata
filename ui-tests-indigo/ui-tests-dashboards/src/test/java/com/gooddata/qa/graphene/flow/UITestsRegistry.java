@@ -70,16 +70,22 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("sanity", new Object[] {
-            ManipulateWidgetsTest.class,
-            EventingBasicInsightTest.class,
-            VisualizationDrillableWidgetTest.class,
-            EventingWidgetDrillToDashboardTest.class,
-            KpiApplyColorPaletteTest.class,
-            "testng-desktop-EditMode.xml",
-            "testng-desktop-imap-KpiAlertEvaluate.xml",
-            "testng-desktop-SplashScreen.xml"
+        suites.put("sanity-aws", new Object[] {
+                EventingBasicInsightTest.class,
+                EventingWidgetDrillToDashboardTest.class,
+                "testng-desktop-EditMode.xml",
+                "testng-desktop-imap-KpiAlertEvaluate.xml"
         });
+
+        suites.put("sanity", new HashMap<String, Object>() {{
+            put("sanity-aws", suites.get("sanity-aws"));
+            put("sanity-extend", new Object[]{
+                    ManipulateWidgetsTest.class,
+                    VisualizationDrillableWidgetTest.class,
+                    KpiApplyColorPaletteTest.class,
+                    "testng-desktop-SplashScreen.xml"
+            });
+        }});
 
         suites.put("pull-request", new Object[] {
             ManipulateWidgetsTest.class,

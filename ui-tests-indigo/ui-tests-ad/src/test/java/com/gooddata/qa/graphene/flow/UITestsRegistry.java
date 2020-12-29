@@ -117,17 +117,23 @@ public class UITestsRegistry {
             "testng-ad-e2e-date-test.xml"
         });
 
-        suites.put("sanity", new Object[] {
-            AnalyticalDesignerSanityTest.class,
-            VisualizationMeasureAttributeTest.class,
-            EventingBasicTest.class,
-            BackwardCompatibilityTest.class,
-            DateFilterADMeasureTest.class,
-            ApplyColorPaletteOnAnalyzePageTest.class,
-            ColorPalettePickerBasicInsightAndKPITest.class,
-            ADFilterBarFlowTest.class,
-            RenderSpecialCaseGeoPushpinTest.class
+        suites.put("sanity-aws", new Object[] {
+                BackwardCompatibilityTest.class,
+                RenderSpecialCaseGeoPushpinTest.class,
+                VisualizationMeasureAttributeTest.class,
+                AnalyticalDesignerSanityTest.class
         });
+
+        suites.put("sanity", new HashMap<String, Object>() {{
+            put("sanity-aws", suites.get("sanity-aws"));
+            put("sanity-extend", new Object[]{
+                    EventingBasicTest.class,
+                    DateFilterADMeasureTest.class,
+                    ApplyColorPaletteOnAnalyzePageTest.class,
+                    ColorPalettePickerBasicInsightAndKPITest.class,
+                    ADFilterBarFlowTest.class
+            });
+        }});
 
         suites.put("extended", new Object[] {
             GoodSalesAttributeBasedMetricTest.class,
