@@ -58,7 +58,7 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
     @Test(dependsOnMethods = {"initTest"})
     public void initialPageTest() {
         canvas = modeler.getLayout().getCanvas();
-        String textCanvas = canvas.getTextBlankCanvas();
+        String textCanvas = modeler.getLayout().getTextBlankCanvas();
         assertThat(textCanvas, containsString("Get started"));
         assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
                 "canvas to build your model."));
