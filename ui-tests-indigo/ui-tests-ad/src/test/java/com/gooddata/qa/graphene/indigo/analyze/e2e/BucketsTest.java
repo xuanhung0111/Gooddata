@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -23,6 +24,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
@@ -273,5 +275,24 @@ public class BucketsTest extends AbstractAdE2ETest {
             .replaceStack(ATTR_ACCOUNT)
             .getStacksBucket()
             .getAttributeName(), ATTR_ACCOUNT);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void check_attribute_dropzone_after_replace_by_other_attribute() {
+        // Graphene test for BB-1962
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addDate().addAttribute(ATTR_DEPARTMENT)
+            .addStack(ATTR_REGION);
+
+        WebElement source = analysisPage.getCatalogPanel().searchAndGet(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
+        WebElement target = analysisPage.getAttributesBucket().getFirst();
+        
+        analysisPage.dragAndHold(source, target);  
+        try {
+            assertEquals(analysisPage.waitForDropToSwitchVisible().getText(), "DROP TO SWITCH");
+        } finally {
+            analysisPage.releaseElement(target);
+        }
     }
 }
