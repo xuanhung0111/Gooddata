@@ -19,7 +19,7 @@ public class UITestsRegistry {
 
         suites.put("sanity-aws", new Object[] {
                 EditorPermissionTest.class,
-                VisualizationTest.class,
+                FilterComponentTest.class,
                 FilterTest.class
         });
 
@@ -29,7 +29,7 @@ public class UITestsRegistry {
                     EmbeddedHeadlineTest.class,
                     HeadlineByBucketComponentTest.class,
                     EmbeddedTreemapTest.class,
-                    FilterComponentTest.class
+                    VisualizationTest.class
             });
         }});
 
