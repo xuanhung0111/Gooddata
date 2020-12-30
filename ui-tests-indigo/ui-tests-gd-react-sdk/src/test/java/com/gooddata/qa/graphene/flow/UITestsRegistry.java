@@ -17,15 +17,21 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("sanity", new Object[] {
-                EmbeddedHeadlineTest.class,
-                HeadlineByBucketComponentTest.class,
-                EmbeddedTreemapTest.class,
+        suites.put("sanity-aws", new Object[] {
                 EditorPermissionTest.class,
                 VisualizationTest.class,
-                FilterTest.class,
-                FilterComponentTest.class
+                FilterTest.class
         });
+
+        suites.put("sanity", new HashMap<String, Object>() {{
+            put("sanity-aws", suites.get("sanity-aws"));
+            put("sanity-extend", new Object[]{
+                    EmbeddedHeadlineTest.class,
+                    HeadlineByBucketComponentTest.class,
+                    EmbeddedTreemapTest.class,
+                    FilterComponentTest.class
+            });
+        }});
 
         suites.put("boilerplate", new Object[] {
                 VisualizationTest.class
