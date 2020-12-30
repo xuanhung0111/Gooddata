@@ -51,10 +51,10 @@ public class UITestsRegistry {
             CsvUploaderSanityTest.class
         });
 
-        suites.put("all", new Object[] {
-                suites.get("sanity"),
-                suites.get("extended")
-        });
+        suites.put("all", new HashMap<String, Object>() {{
+            put("sanity", suites.get("sanity"));
+            put("extended", suites.get("extended"));
+        }});
 
         TestsRegistry.getInstance()
             .register(args, suites)
