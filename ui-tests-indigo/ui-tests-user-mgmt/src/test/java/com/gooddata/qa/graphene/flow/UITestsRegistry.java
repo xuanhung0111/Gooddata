@@ -14,9 +14,13 @@ public class UITestsRegistry {
             "testng-imap-user-mgmt-general.xml"
         });
 
-        suites.put("sanity", new Object[] {
-            "testng-imap-user-mgmt-sanity.xml"
+        suites.put("sanity-aws", new Object[]{
+                "testng-imap-user-mgmt-sanity.xml"
         });
+
+        suites.put("sanity", new HashMap<String, Object>() {{
+            put("sanity-aws", suites.get("sanity-aws"));
+        }});
 
         TestsRegistry.getInstance()
             .register(args, suites)

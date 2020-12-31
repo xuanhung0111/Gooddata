@@ -47,9 +47,13 @@ public class UITestsRegistry {
             "testng-csv-imap-Notification.xml"
         });
 
-        suites.put("sanity", new Object[] {
-            CsvUploaderSanityTest.class
+        suites.put("sanity-aws", new Object[]{
+                CsvUploaderSanityTest.class
         });
+
+        suites.put("sanity", new HashMap<String, Object>() {{
+            put("sanity-aws", suites.get("sanity-aws"));
+        }});
 
         suites.put("all", new HashMap<String, Object>() {{
             put("sanity", suites.get("sanity"));
