@@ -198,7 +198,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
 
         content.remove("lastSuccessfull");
         LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of(timeZone));
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("*Y:M:0:d:H:m:s");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("*yyyy:M:0:d:H:m:s");
         System.out.println(" - current time: " + format.format(localDateTime));
 
         // plusSeconds(3) - to be meta.updated <= recurrency (cannot be older)
