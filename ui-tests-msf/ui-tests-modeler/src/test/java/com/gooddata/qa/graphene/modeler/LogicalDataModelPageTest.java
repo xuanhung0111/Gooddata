@@ -278,7 +278,6 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         //edit model, set grain, add new dataset, try publish again
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "update_new_dataset.txt"));
         initDashboardIgnoreAlert();
-        toolbar.saveAsDraft();
         modeler.getLayout().waitForLoading();
         mainModelContent.focusOnDataset(CLASS_DATASET);
         Model modelClass = mainModelContent.getModel(CLASS_DATASET);
