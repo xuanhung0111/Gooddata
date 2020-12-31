@@ -26,6 +26,7 @@
     <input id="exportToPDF" type="button" value="Export To PDF"/>
     <input id="addFilter" type="button" value="Add Filter"/>
     <input id="addKpi" type="button" value="Add KPI"/>
+    <input id="saveAsNew" type="button" value="Save as new"/>
 
     <strong>Dashboard Name: </strong>
     <input id="nameDashboard" rows="2" type="text" value="" placeholder="Name Dashboard"/>
@@ -341,6 +342,24 @@
         } else {
             logger.innerHTML += message + '\n';
         }
+    }
+
+    var saveAsNew = document.getElementById('saveAsNew');
+    saveAsNew.onclick = function () {
+        var postMessageStructure = {
+            gdc: {
+                product: "dashboard",
+                event: {
+                    name: "saveAsDashboard",
+                    contextId: `export-${(new Date()).getTime()}`,
+                    data: {
+                        title : document.getElementById('nameDashboard').value
+                    }
+                }
+            }
+        }
+
+        postMessage(postMessageStructure);
     }
 </script>
 </body>
