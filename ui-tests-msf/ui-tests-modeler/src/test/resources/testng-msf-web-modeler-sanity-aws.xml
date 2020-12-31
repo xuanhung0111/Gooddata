@@ -1,23 +1,23 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="testng-msf-web-modeler">
+<suite name="testng-msf-web-modeler-sanity-aws">
     <test name="LogicalDataModelPageTest" enabled="true">
+        <groups>
+            <run>
+                <exclude name= "not-sanity-aws"/>
+            </run>
+        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.LogicalDataModelPageTest" />
-        </classes>
-    </test>
-    <test name="OutputStageRecommendViewTest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.modeler.OutputStageRecommendViewTest" />
-        </classes>
-    </test>
-    <test name="OutputStageRecommendTableTest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.modeler.OutputStageRecommendTableTest" />
         </classes>
     </test>
     <test name="ValidateImportCSVTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.ValidateImportCSVTest" />
+        </classes>
+    </test>
+    <test name="ModelingFollowUpTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ModelingFollowUpTest" />
         </classes>
     </test>
     <test name="E2ECustomMappingTest" enabled="true">
@@ -33,11 +33,6 @@
     <test name="DialogModelingTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.DialogModelingTest" />
-        </classes>
-    </test>
-    <test name="ModelingFollowUpTest" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.modeler.ModelingFollowUpTest" />
         </classes>
     </test>
     <test name="SearchModelTest" enabled="true">
