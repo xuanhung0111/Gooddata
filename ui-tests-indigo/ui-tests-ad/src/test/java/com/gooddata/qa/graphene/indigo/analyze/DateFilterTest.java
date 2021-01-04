@@ -238,16 +238,24 @@ public class DateFilterTest extends AbstractAnalyseTest {
         assertEquals(dateFilterTexts, expectedDateFilterTexts,
                 "Date was not displayed after applying compare recommendation");
 
+        // because no data
+        FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        filtersBucketReact.configDateFilter("06/01/2020", "12/31/2020");
+        analysisPage.waitForReportComputing();
+        final List<String> expectedDateFilterAfterChangeTexts = Arrays.asList(
+                "templ:DateInvoice\n:\nJun 1, 2020 - Dec 31, 2020\nCompare (all) to", "Same period (SP) previous year");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterAfterChangeTexts,
+                "Date has been changed after changing to static period");
+
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         analysisPage.waitForReportComputing();
-
         assertTrue(
                 analysisPage.getMetricsBucket().getMetricConfiguration("% " + METRIC_NUMBER_OF_PERSONS)
                         .expandConfiguration().isShowPercentSelected(),
                 "Percent was not added after using see percent recommendation");
 
         takeScreenshot(browser, "keep-date-relation-after-adding-percent", getClass());
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterTexts,
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterAfterChangeTexts,
                 "Date has been changed after adding percent");
     }
 }
