@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
@@ -92,9 +91,9 @@ public class RenderSpecialCaseGeoPushpinTest extends AbstractProjectTest {
         DateFilterPickerPanel dateFilter = analysisPage.changeReportType(ReportType.GEO_CHART)
                 .addAttributeToLocationPushpin(ATTR_LATLONG, FieldType.GEO).waitForReportComputing()
                 .addAttributeToMeasureColor(ATTR_POPULATION, FieldType.FACT).waitForReportComputing()
-                .addDateFilter().getFilterBuckets().openDateFilterPickerPanel()
-                .changePeriodWithScrollbar(DateRange.LAST_YEAR.toString());
+                .addDateFilter().getFilterBuckets().openDateFilterPickerPanel();
 
+        dateFilter.configTimeFilterByRangeHelper("01/01/2020", "01/02/2020");
         assertEquals(dateFilter.getWarningUnsupportedMessage(),
                 "Current visualization type doesn't support comparing. To compare, switch to another insight.");
         assertFalse(dateFilter.isCompareTimePeriodPresent(), "Not support compare with the period time");
