@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collections;
 
 import static com.gooddata.qa.graphene.enums.indigo.ReportType.COLUMN_CHART;
@@ -68,7 +69,6 @@ public class ControlFilterEmbeddedADProgramTest extends AbstractEventingTest {
 
     private static String INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS = "receive event after send commands";
     private static String INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS_URI;
-    private static String INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS_IDENTIFIER;
     private static String INSIGHT_TEST_RECEIVE_EVENT_AFTER_ACTION_UI = "receive event after action ui";
 
     private String financialValueOfAccountAttribute;
@@ -105,8 +105,7 @@ public class ControlFilterEmbeddedADProgramTest extends AbstractEventingTest {
             createInsight(INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS, COLUMN_CHART,
                 asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
 
-        INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS_IDENTIFIER = getObjIdentifiers(singletonList(
-            indigoRestRequest.getInsightUri(INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS))).get(0);
+        getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS))).get(0);
         createInsight(INSIGHT_TEST_RECEIVE_EVENT_AFTER_ACTION_UI, COLUMN_CHART,
             asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
 
@@ -246,9 +245,10 @@ public class ControlFilterEmbeddedADProgramTest extends AbstractEventingTest {
 
     @DataProvider(name = "verifyDateFilter")
     public Object[][] getDateFilter() {
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         return new Object[][] {
                 {"0", "0", "ALL_TIME_GRANULARITY", "relativeDateFilter", "All time"},
-                {"-6", "0", "GDC.time.year", "relativeDateFilter", "Jan 1, 2014 - Dec 31, 2020"},
+                {String.valueOf(2014 - thisYear), "0", "GDC.time.year", "relativeDateFilter", "Jan 1, 2014 - Dec 31, " + thisYear},
                 {"\"2017-01-01\"", "\"2017-12-31\"", "ALL_TIME_GRANULARITY", "absoluteDateFilter", "Jan 1, 2017 - Dec 31, 2017"},
                 {"\"2017-01-01\"", "\"2017-01-01\"", "ALL_TIME_GRANULARITY", "absoluteDateFilter", "Jan 1, 2017"}
         };
@@ -429,7 +429,7 @@ public class ControlFilterEmbeddedADProgramTest extends AbstractEventingTest {
         embeddedAnalysisPage.addAttribute(ATTR_ACCOUNT).addStack(ATTR_DEPARTMENT).waitForReportComputing();
 
         assertEquals(embeddedAnalysisPage.getMeasureAsColumnBucketBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES));
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES));
         assertEquals(embeddedAnalysisPage.getAttributesBucket().getAttributeName(), ATTR_ACCOUNT);
         assertEquals(embeddedAnalysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
         assertThat(embeddedAnalysisPage.getFilterBuckets().getFilterText(ATTR_ACCOUNT),
