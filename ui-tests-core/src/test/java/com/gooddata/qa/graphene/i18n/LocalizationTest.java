@@ -5,15 +5,28 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
 public class LocalizationTest extends GoodSalesAbstractTest {
 
+    private String languageCodeParam;
+
+    @Parameters({"languageCode"})
+    @BeforeClass(alwaysRun = true)
+    public void setup(@Optional String languageCode) {
+        this.languageCodeParam = languageCode;
+    }
+
     @Override
     protected void customizeProject() throws Throwable {
-        initLocalizationPage().selectLanguge(testParams.getLanguageCode());
+        String selectedLanguage = languageCodeParam == null ? testParams.getLanguageCode() : languageCodeParam;
+        System.out.println("### selected language:" + selectedLanguage);
+        initLocalizationPage().selectLanguge(selectedLanguage);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"entry-point"})
