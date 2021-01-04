@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -61,9 +63,9 @@ public class CustomColorsPaletteDialog extends AbstractFragment {
                 .replaceAll(".*background-color: ([^;]*);.*", "$1").replace(" ", "");
     }
 
-    public CustomColorsPaletteDialog apply() {
+    public AnalysisPage apply() {
         waitForElementPresent(apply).click();
-        return this;
+        return AnalysisPage.getInstance(browser).waitForReportComputing();
     }
 
     public String getCancelButtonText() {
