@@ -112,7 +112,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
         return new Object[][]{
             { RENAMED_TEST_INSIGHT },
             { "<button>hello</button>" },
-            //{ "新年快樂" }
+            { "新年快樂" }
         };
     }
 
