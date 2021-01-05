@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
@@ -64,6 +65,10 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
         private final String TARGER_DASHBOARD_CONFIG_LEVEL = "Target Dashboard config";  
         private final String EMPTY_DASHBOARD = "Empty Dashboard";
         private final String SOURCE_DASHBOARD_DRILL_TO_EMPTY = "Drill To Empty";
+        private final int THIS_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+        private final String EXPECTED_YEAR = String.valueOf(THIS_YEAR - 2009);
+        private final String FROM_YEAR = String.valueOf(THIS_YEAR - 2010);
+        private final String FROM_TARGET_DASHBOARD = String.valueOf(THIS_YEAR - 2011);
 
         private IndigoRestRequest indigoRestRequest;
         private ProjectRestRequest projectRestRequest;
@@ -124,7 +129,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 initIndigoDashboardsPage().addDashboard().changeDashboardTitle(TARGET_DASHBOARD)
                         .addInsight(INSIGHT_HAS_ONE_MEASURE_AND_VIEWBY);
                 indigoDashboardsPage.openExtendedDateFilterPanel()
-                        .selectFloatingRange(DateGranularity.YEARS, "9 years ago", "this year").apply();
+                        .selectFloatingRange(DateGranularity.YEARS, FROM_TARGET_DASHBOARD + " years ago", "this year").apply();
                 indigoDashboardsPage.saveEditModeWithWidgets();
 
                 indigoDashboardsPage.addDashboard().changeDashboardTitle(SOURCE_DASHBOARD_HAS_COLUMN)
@@ -156,7 +161,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         .selectWidgetByHeadline(Insight.class, INSIGHT_HAS_TWO_MEASURES);
                 configurationPanel.drillIntoDashboard(METRIC_AMOUNT_BOP, TARGET_DASHBOARD);
                 indigoDashboardsPage.openExtendedDateFilterPanel()
-                        .selectFloatingRange(DateGranularity.YEARS, "10 years ago", "this year").apply();
+                        .selectFloatingRange(DateGranularity.YEARS, FROM_YEAR + " years ago", "this year").apply();
                 indigoDashboardsPage.saveEditModeWithWidgets();
 
                 pivotTable = indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_HAS_TWO_MEASURES)
@@ -172,7 +177,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$1,526,088.14")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last 11 years");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last " + EXPECTED_YEAR + " years");
         }
 
         @Test(dependsOnMethods = "drillToTargetDashboardHasSameDateFilter")
@@ -193,7 +198,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         .selectWidgetByHeadline(Insight.class, INSIGHT_HAS_POP_MEASURE);
                 configurationPanel.drillIntoDashboard("Amount - SP year ago", TARGET_DASHBOARD);
                 indigoDashboardsPage.openExtendedDateFilterPanel()
-                        .selectFloatingRange(DateGranularity.YEARS, "10 years ago", "10 years ago").apply();
+                        .selectFloatingRange(DateGranularity.YEARS,
+                                FROM_YEAR + " years ago", FROM_YEAR + " years ago").apply();
                 indigoDashboardsPage.saveEditModeWithWidgets();
 
                 pivotTable = indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_HAS_POP_MEASURE)
@@ -207,7 +213,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$852,425.34")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "From 10 to 10 years ago");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(),
+                        "From " + FROM_YEAR + " to " + FROM_YEAR + " years ago");
         }
 
         @Test(dependsOnMethods = "drillToTargetDashboardHasSameDateFilter")
@@ -225,7 +232,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$1,526,088.14")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last 11 years");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last " + EXPECTED_YEAR + " years");
         }
 
         @Test(dependsOnMethods = "drillToTargetDashboardHasSameDateFilter")
@@ -249,7 +256,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$1,526,088.14")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last 11 years");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last " + EXPECTED_YEAR + " years");
         }
 
         @Test(dependsOnMethods = "drillToDashboardHasNoAttributeFilter")
@@ -259,7 +266,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         .addAttributeFilter(ATTR_DEPARTMENT).saveEditModeWithWidgets();
                 indigoDashboardsPage.selectKpiDashboard(SOURCE_DASHBOARD).waitForWidgetsLoading()
                         .openExtendedDateFilterPanel()
-                        .selectFloatingRange(DateGranularity.YEARS, "10 years ago", "10 years ago").apply();
+                        .selectFloatingRange(DateGranularity.YEARS, FROM_YEAR + " years ago", FROM_YEAR + " years ago")
+                        .apply();
                 pivotTable = indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_HAS_TWO_MEASURES)
                         .getPivotTableReport();
                 pivotTable.clickOnElement(METRIC_AMOUNT_BOP, 0, 0);
@@ -272,7 +280,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 assertThat(chartReport.getXaxisLabels(), equalTo(singletonList("Educationly")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "Educationly"), asList(METRIC_AMOUNT_BOP, "$807,371.56")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "From 10 to 10 years ago");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(),
+                        "From " + FROM_YEAR + " to " + FROM_YEAR + " years ago");
                 assertEquals(panel.getAttributeFilter(ATTR_PRODUCT).getSelectedItems(), "Educationly");
                 assertEquals(panel.getAttributeFilter(ATTR_DEPARTMENT).getSelectedItems(), "Direct Sales");
 
@@ -310,7 +319,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 assertThat(pivotTable.getBodyContent(),
                         hasItems(asList("2010", "Educationly", "$115,873.56", "16,876")));
                 AttributeFiltersPanel panel = indigoDashboardsPage.getAttributeFiltersPanel();
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last 11 years");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last " + EXPECTED_YEAR + " years");
                 assertEquals(panel.getAttributeFilter(ATTR_PRODUCT).getSelectedItems(), "Educationly");
                 assertEquals(panel.getAttributeFilter(ATTR_DEPARTMENT).getSelectedItems(), "Direct Sales");
 
@@ -364,7 +373,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$673,662.80")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last 10 years");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "Last " + FROM_YEAR + " years");
         }
 
         @Test(dependsOnMethods = "drillToTargetDashboardHasSameDateFilter")
@@ -377,15 +386,17 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 configurationPanel.drillIntoDashboard(METRIC_AMOUNT_BOP, TARGET_DASHBOARD);
                 indigoDashboardsPage.saveEditModeWithWidgets();
 
+                int newDateRange = THIS_YEAR - 2008;
                 indigoRestRequest.addRelativePresetsDashboardLevel(SOURCE_DASHBOARD_CONFIG_LEVEL, "New Date Range",
-                        "active", "last_12_years", "Last 12 years", "GDC.time.year", true, -11, 0);
+                        "active", "last_" + newDateRange + "_years", "Last " + newDateRange + " years",
+                        "GDC.time.year", true, -(Integer.parseInt(EXPECTED_YEAR)), 0);
 
                 initIndigoDashboardsPage().selectKpiDashboard(SOURCE_DASHBOARD_CONFIG_LEVEL).waitForWidgetsLoading();
-                indigoDashboardsPage.switchToEditMode().openExtendedDateFilterPanel().selectPeriod("Last 12 years")
+                indigoDashboardsPage.switchToEditMode().openExtendedDateFilterPanel().selectPeriod("Last " + newDateRange + " years")
                         .checkExcludeCurrent().apply();
                 indigoDashboardsPage.saveEditModeWithWidgets();
                 indigoRestRequest.hideFilterOptionsOnDashboardLevel(SOURCE_DASHBOARD_CONFIG_LEVEL, "New Date Range",
-                        "hidden", "last_12_years");
+                        "hidden", "last_" + newDateRange + "_years");
                 initIndigoDashboardsPage().selectKpiDashboard(SOURCE_DASHBOARD_CONFIG_LEVEL).waitForWidgetsLoading();
 
                 pivotTable = indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_HAS_TWO_MEASURES)
@@ -400,7 +411,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$1,526,088.14")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "From 12 to 1 year ago");
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), "From " + newDateRange + " to 1 year ago");
         }
 
         @Test(dependsOnMethods = "sourceDashboardHasDateConfiguration")
