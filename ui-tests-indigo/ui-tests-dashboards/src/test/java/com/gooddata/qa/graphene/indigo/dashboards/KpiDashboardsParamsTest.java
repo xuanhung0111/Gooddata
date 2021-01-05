@@ -182,7 +182,7 @@ public class KpiDashboardsParamsTest extends AbstractDashboardTest {
         logoutAndLoginAs(false, role);
         try {
             IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(type, params)
-                    .waitForDashboardLoad();
+                    .waitForDashboardLoad().waitForWidgetsLoading();
             assertTrue(indigoDashboardsPage.isNavigationBarPresent(),
                     "Navigation bar should not present by default");
         } finally {
