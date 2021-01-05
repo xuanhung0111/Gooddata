@@ -305,9 +305,13 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(COMPANY_DATASET);
         modelCompany.openEditDialog();
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
+        dialog.clickOnLabelInDataset(EMPLOYEE_ATTR, COMPANY_DATASET);
         assertFalse(dialog.isDefaultLabelPresent(EMPLOYEE_ATTR, COMPANY_DATASET), "Currently, it was default label");
+
+        dialog.clickOnLabelInDataset(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET);
         assertTrue(dialog.isDefaultLabelPresent(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET),
             "Currently, it should have option to set default label");
+        dialog.clickOnLabelInDataset(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET);
         dialog.clickCancel();
 
         assertEquals(createReportAndGetXaxisValue(DEFAULT_REPORT), asList("Lucky", "Job", "William", "Join", "Mie",
@@ -342,11 +346,14 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
         mainModelContent.focusOnDataset(COMPANY_DATASET);
         modelCompany.openEditDialog();
         editDialog = EditDatasetDialog.getInstance(browser);
-
+        editDialog.clickOnLabelInDataset(EMPLOYEE_ATTR, COMPANY_DATASET);
         assertTrue(editDialog.isSortLabelPresent(EMPLOYEE_ATTR, COMPANY_DATASET),
                 "Should be have option sort attribute for this label");
+
+        editDialog.clickOnLabelInDataset(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET);
         assertTrue(editDialog.isSortLabelPresent(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET),
                 "Should be have option sort attribute for this label");
+        editDialog.clickOnLabelInDataset(EMPLOYEE_ATTR + "." + HARD_WORKER_LABEL, COMPANY_DATASET);
 
         log.info("========Set Sort Ascending ========");
         editDialog.clickSortAttributeLabel(EMPLOYEE_ATTR, COMPANY_DATASET);
