@@ -23,6 +23,7 @@ import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.tagName;
 import static java.util.Collections.EMPTY_LIST;
 
 import com.gooddata.qa.browser.BrowserUtils;
@@ -33,6 +34,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.menu.OptionalHeaderMenu;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.utils.CalculateUtils;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
@@ -159,6 +161,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String DASHBOARD_TITLE_CLASS_NAME = "dash-title";
     private static final String DASHBOARD_FILTER_CLASS_NAME = "dash-filters-visible";
     private static final String ROW_CONTAINER = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
+    private static final String ADD_INSIGHT_PLACEHOLDER = ".add-insight-placeholder";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
@@ -398,6 +401,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         dragAddKpiPlaceholder();
 
         return setupConfigurationPanel(config);
+    }
+
+    public AnalysisPage addNewInsight() {
+        waitForElementVisible(cssSelector(ADD_INSIGHT_PLACEHOLDER), getRoot());
+        dragAddInsightPlaceholder();
+        sleepTightInSeconds(1);
+        browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
+        return AnalysisPage.getInstance(browser);
     }
 
     //Add KPI by order from left to right
@@ -702,6 +713,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage dragAddInsightPlaceholder() {
+        dragAddInsightPlaceholder(DropZone.LAST);
+        return this;
+    }
+
     public IndigoDashboardsPage dragAddKpiPlaceholderNext() {
         dragAddKpiPlaceholder(DropZone.NEXT);
         return this;
@@ -711,6 +727,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         // should fetch dashboard elements to avoid caching in view mode
         waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
         dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, dropZone.getCss());
+
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddInsightPlaceholder(DropZone dropZone) {
+        // should fetch dashboard elements to avoid caching in view mode
+        waitForElementVisible(cssSelector(ADD_INSIGHT_PLACEHOLDER), getRoot());
+        dragAndDropWithCustomBackend(browser, ADD_INSIGHT_PLACEHOLDER, DASHBOARD_BODY, dropZone.getCss());
 
         return this;
     }

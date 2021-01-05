@@ -101,6 +101,11 @@ public class AnalysisPageHeader extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPageHeader cancel() {
+        waitForElementVisible(cancelButton).click();
+        return this;
+    }
+
     public boolean isUndoButtonEnabled() {
         return !isElementDisabled(waitForElementVisible(undoButton));
     }
@@ -111,6 +116,10 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public boolean isRedoButtonDisabled() {
         return isElementDisabled(waitForElementVisible(redoButton));
+    }
+
+    public boolean isCancelButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(cancelButton));
     }
 
     public boolean isResetButtonEnabled() {
