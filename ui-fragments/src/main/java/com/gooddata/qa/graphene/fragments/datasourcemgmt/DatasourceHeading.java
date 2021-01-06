@@ -6,6 +6,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
@@ -20,6 +21,9 @@ public class DatasourceHeading extends AbstractFragment {
 
     @FindBy(className = "s-connect-button")
     private WebElement connectBtn;
+
+    @FindBy(className = "s-edit_alias")
+    private WebElement editAliasBtn;
 
     public static final DatasourceHeading getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DatasourceHeading.class, waitForElementVisible(className(DATASOURCE_HEADING_CLASS), searchContext));
@@ -59,5 +63,13 @@ public class DatasourceHeading extends AbstractFragment {
         waitForElementVisible(connectBtn);
         connectBtn.click();
         return ConnectWorkSpaceDialog.getInstance(browser);
+    }
+
+    public void clickMoreButton() {
+        waitForElementVisible(moreButton).click();
+    }
+
+    public void clickEditAliasButton () {
+        waitForElementVisible(editAliasBtn).click();
     }
 }
