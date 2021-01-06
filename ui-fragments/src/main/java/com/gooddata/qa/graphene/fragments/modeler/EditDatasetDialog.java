@@ -21,6 +21,7 @@ import static org.openqa.selenium.By.className;
 
 public class EditDatasetDialog extends AbstractFragment {
     private static final String EDIT_DATASET_DIALOG = "edit-dataset-dialog";
+    private static final String ROW_TABLE_CONTENT = "%s.%s.%s";
 
     @FindBy(className = "s-cancel")
     WebElement cancelButton;
@@ -40,7 +41,7 @@ public class EditDatasetDialog extends AbstractFragment {
     @FindBy(className = "public_fixedDataTableCell_cellContent")
     List<WebElement> cellTableContent;
 
-    @FindBy(className = "normal-row")
+    @FindBy(className = "public_fixedDataTable_bodyRow")
     List<WebElement> rowsInTableDialog;
 
     @FindBy(css = ".s-csvmodeling .s-fields")
@@ -174,6 +175,23 @@ public class EditDatasetDialog extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(rowsInTableDialog.stream().filter(
                 el -> el.getText().contains(modelName + "." + label)).findFirst().get()).build().perform();
+    }
+
+    public void clickOnLabelInDataset(String label, String modelName) {
+        clickOnRowInDatasetDetails(String.format(ROW_TABLE_CONTENT, "label", modelName, label));
+    }
+
+    public void clickOnAttributeInDataset(String attribute, String modelName) {
+        clickOnRowInDatasetDetails(String.format(ROW_TABLE_CONTENT, "attr", modelName, attribute));
+    }
+
+    public void clickOnFactInDataset(String fact, String modelName) {
+        clickOnRowInDatasetDetails(String.format(ROW_TABLE_CONTENT, "fact", modelName, fact));
+    }
+
+    private void clickOnRowInDatasetDetails(String rowContent) {
+        getActions().moveToElement(rowsInTableDialog.stream().filter(
+                el -> el.getText().contains(rowContent)).findFirst().get()).click().build().perform();
     }
 
     public void addFact(String factName) {
