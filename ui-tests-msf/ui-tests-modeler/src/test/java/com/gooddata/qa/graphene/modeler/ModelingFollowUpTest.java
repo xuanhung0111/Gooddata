@@ -148,9 +148,13 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
         assertTrue(viewDialog.getNumberOfAttributes() > 0);
         assertTrue(viewDialog.getNumberOfFacts() > 0);
 
+        dialog.clickOnAttributeInDataset(USERNAME_ATTRIBUTE, CLASS_DATASET);
         dialog.deleteAttributesOrFactInEditDatasetDialog(USERNAME_ATTRIBUTE);
+        dialog.clickOnAttributeInDataset(USERCODE_FIRST_ATTRIBUTE, CLASS_DATASET);
         dialog.deleteAttributesOrFactInEditDatasetDialog(USERCODE_FIRST_ATTRIBUTE);
+        dialog.clickOnFactInDataset(CLASSNAME2_ATTRIBUTE, CLASS_DATASET);
         dialog.deleteAttributesOrFactInEditDatasetDialog(CLASSNAME2_ATTRIBUTE);
+        dialog.clickOnFactInDataset(AGE_FACT, CLASS_DATASET);
         dialog.deleteAttributesOrFactInEditDatasetDialog(AGE_FACT);
 
         assertFalse(viewDialog.isAttributeExist(USERNAME_ATTRIBUTE));
