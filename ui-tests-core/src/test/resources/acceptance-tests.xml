@@ -1,48 +1,48 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-acceptance-core-test">
-    <test name="GoodSalesEmbeddedDashboardTest" enabled="false">
+    <test name="GoodSalesEmbeddedDashboardTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest"/>
         </classes>
     </test>
 
-    <test name="GoodSalesDashboardTest" enabled="false">
+    <test name="GoodSalesDashboardTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest"/>
         </classes>
     </test>
 
-    <test name="DashboardDateFilterSelectRangeTest" enabled="false">
+    <test name="DashboardDateFilterSelectRangeTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest"/>
         </classes>
     </test>
 
-    <test name="DrillToDashboardTabTest" enabled="false">
+    <test name="DrillToDashboardTabTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.DrillToDashboardTabTest"/>
         </classes>
     </test>
 
-    <test name="ExportDashboardAndComparePDFBasicTest" enabled="false">
+    <test name="ExportDashboardAndComparePDFBasicTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.ExportDashboardAndComparePDFBasicTest"/>
         </classes>
     </test>
 
-    <test name="DashboardPermissionsTest" enabled="false">
+    <test name="DashboardPermissionsTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest"/>
         </classes>
     </test>
 
-    <test name="GoodSalesReportsTest" enabled="false">
+    <test name="GoodSalesReportsTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.reports.GoodSalesReportsTest"/>
         </classes>
     </test>
 
-    <test name="GoodSalesDashboardAllKindsFiltersTest" enabled="false">
+    <test name="GoodSalesDashboardAllKindsFiltersTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest"/>
         </classes>
@@ -60,7 +60,7 @@
         </classes>
     </test>
 
-    <test name="LocalizationTest" enabled="false">
+    <test name="LocalizationTest" enabled="true">
         <parameter name="languageCode" value="ja-JP"/>
         <classes>
             <class name="com.gooddata.qa.graphene.i18n.LocalizationTest"/>
