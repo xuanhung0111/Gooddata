@@ -53,6 +53,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
     //Will be changed evert year
     private static final String THREE_YEARS_AGO = "three years ago";
+    private static final String FOUR_YEARS_AGO = "four years ago";
     private static final String DATE_FILTER_ALL_TIME = "All time";
     private static final String DATE_FILTER_THIS_MONTH = "This month";
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
@@ -309,7 +310,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
         metricFilterByDatePicker.backToOtherPeriods();
-        metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, THREE_YEARS_AGO);
+        metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, FOUR_YEARS_AGO);
         assertEquals(getListDataChartReportRender(), singletonList("$3,644.00"),
                 "Chart does not render correctly");
 
