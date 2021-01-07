@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -212,8 +213,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
-        dashboardsPage.getDashboardEditBar().saveDashboard();
-        waitForDashboardPageLoaded(browser);
+        dashboardsPage.getDashboardEditBar().saveDashboardAfterAddTab();
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
