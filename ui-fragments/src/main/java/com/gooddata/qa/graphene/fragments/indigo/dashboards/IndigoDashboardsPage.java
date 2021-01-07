@@ -194,6 +194,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage createDashboard() {
+        getSplashScreen().startEditingWidgets();
+        waitForElementVisible(cancelButton);
+        getInsightSelectionPanel().waitForLoading();
+        return this;
+    }
+
     public String checkColorColumn(int xAxis, int yAxis) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
                 .findElements(By.cssSelector(String.format(".gd-base-visualization .highcharts-series-%s rect", xAxis))));

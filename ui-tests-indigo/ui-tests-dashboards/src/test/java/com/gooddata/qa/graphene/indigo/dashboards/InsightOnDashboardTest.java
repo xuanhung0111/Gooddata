@@ -458,7 +458,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
                 setCategoryBucket(singletonList(CategoryBucket.
                         createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE), CategoryBucket.Type.VIEW))));
 
-        initIndigoDashboardsPage().addDashboard().addInsight(INSIGHT_FOR_CHECK_NO_DATA).
+        initIndigoDashboardsPage().createDashboard().addInsight(INSIGHT_FOR_CHECK_NO_DATA).
                 selectDateFilterByName(DateRange.LAST_7_DAYS.toString()).waitForWidgetsLoading();
         assertEquals(indigoDashboardsPage.getFirstWidget(Insight.class).getContentEmptyInsight(),
                 "No data for your filter selection");
