@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -11,6 +12,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
 import org.jboss.arquillian.graphene.Graphene;
@@ -351,5 +353,16 @@ public class DashboardEditBar extends AbstractFragment {
 
     private boolean isReportMenuOpen() {
         return isElementPresent(className("menuPlugin-menuOpened"), reportMenuButton);
+    }
+
+    /**
+     * Just using this method in few cases and the rest of cases are not suggesting using this.
+     * This is intended to fix add new tab on new dashboard case
+     *
+     */
+    public void saveDashboardAfterAddTab(){
+        waitForElementVisible(saveButton, 10).click();
+        sleepTightInSeconds(3);
+        waitForElementNotVisible(this.getRoot());
     }
 }
