@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
@@ -92,9 +93,11 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
             System.out.println("Verifying attribute " + attributeLayer + " ...");
             initDashboardsPage();
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            dashboardsPage.addNewTab("tab");
+            dashboardsPage.addNewTab("tab_" + generateHashString());
             dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
             dashboardEditBar.saveDashboard();
+            sleepTightInSeconds(1);
+            waitForDashboardPageLoaded(browser);
 
             // refresh the page to fix possible differences in SVG values, e.g. AUS_STATE_NAME (M-39 instead of M-40)
             BrowserUtils.refreshCurrentPage(browser);
