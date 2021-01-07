@@ -148,7 +148,7 @@ public class UITestsRegistry {
             CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
             DateFilterTest.class,
-            //RankingFilterTest.class,
+            RankingFilterTest.class,
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,
