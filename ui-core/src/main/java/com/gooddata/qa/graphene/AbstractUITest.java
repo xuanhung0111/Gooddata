@@ -585,6 +585,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         waitForElementVisible(By.id("url"), browser).sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri());
         waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
+        Graphene.waitGui().until(e -> !waitForElementVisible(By.id("demo"), browser).getText().equals("Content of postMessage API... "));
     }
 
     protected IndigoDashboardsPage initIndigoDashboardsPage(String params) {
