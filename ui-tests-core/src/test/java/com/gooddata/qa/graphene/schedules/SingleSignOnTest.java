@@ -50,7 +50,7 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
     private final By MORE_TABS_TAB = By.id("MoreTabs_Tab");
     private final By VERIFICATION_CODE_INPUT= By.id("emc");
     private final String IS_OPEN = "zen-moreTabsActive";
-
+    private int expectedMessageCount;
     private String verificationCode;
 
     @BeforeClass(alwaysRun = true)
@@ -70,6 +70,9 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
     public void initProperties() {
         log.info("init properties");
         validateAfterClass = false;
+        expectedMessageCount = doActionWithImapClient(imapClient ->
+                imapClient.getMessagesCount(GDEmails.NOREPLY_SALES_FORCE, "Verify your identity in Salesforce"));
+        log.info("Count expectedMessageCount: " + expectedMessageCount);
     }
 
     @Test
@@ -132,7 +135,7 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private void waitForVerificationCode(String title) throws MessagingException, IOException {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        String body = ImapUtils.getLastEmail(imapClient, GDEmails.NOREPLY_SALES_FORCE, title, -1)
+        String body = ImapUtils.getLastEmail(imapClient, GDEmails.NOREPLY_SALES_FORCE, title, expectedMessageCount + 1)
             .getBody();
 
         verificationCode = body.substring(body.indexOf("Verification Code: "), body.indexOf("If you didn't"))
