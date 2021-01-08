@@ -38,7 +38,7 @@ public class TestsRegistry {
             Object tests = suites.get(suite);
 
             if (tests instanceof Map) {
-                registerTests((Map<String, Object[]>) tests);
+                registerTests((Map<String, Object>) tests);
             } else {
                 registerTests((Object[]) tests);
             }
@@ -81,9 +81,13 @@ public class TestsRegistry {
         return flowFile;
     }
 
-    private void registerTests(Map<String, Object[]> phases) {
+    private void registerTests(Map<String, Object> phases) {
         for (String phase : phases.keySet()) {
-            registerTests(phases.get(phase));
+            if (phases.get(phase) instanceof Map) {
+                registerTests((Map<String, Object>) phases.get(phase));
+            } else {
+                registerTests((Object[]) phases.get(phase));
+            }
         }
     }
 
