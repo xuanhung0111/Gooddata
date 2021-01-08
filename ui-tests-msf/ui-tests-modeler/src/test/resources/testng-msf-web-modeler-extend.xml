@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testng-msf-web-modeler-extend">
+    <test name="E2ECustomMappingTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.E2ECustomMappingTest" />
+        </classes>
+    </test>
+    <test name="E2EAutoMappingTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.E2EAutoMappingTest" />
+        </classes>
+    </test>
+    <test name="DialogModelingTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.DialogModelingTest" />
+        </classes>
+    </test>
+    <test name="SearchModelTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.SearchModelTest" />
+        </classes>
+    </test>
+    <test name="ImportExportJsonTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
+        </classes>
+    </test>
+</suite>
