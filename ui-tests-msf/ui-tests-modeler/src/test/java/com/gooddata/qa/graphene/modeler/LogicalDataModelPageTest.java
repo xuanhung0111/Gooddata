@@ -74,7 +74,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private DataSourceRestRequest dataSourceRestRequest;
     private IndigoRestRequest indigoRestRequest;
     private Project project;
-    private String dataSourceId;
+    private String dataSourceId = null;
     private SnowflakeUtils snowflakeUtils;
     private DataSourceUtils dataSource;
     private ProcessUtils processUtils;
@@ -299,7 +299,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     }
 
     // User run ADDv2 makes sure he can upload data with valid Model publish above and verify on UI
-    @Test(dependsOnMethods = "publishModel")
+    @Test(dependsOnMethods = "publishModel", groups = "not-sanity-aws")
     public void runADDAndVerifyUI() throws IOException, SQLException {
         setUpDatasource();
         setUpProcess();
@@ -326,7 +326,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         if (dataloadProcess != null) {
             restClient.getProcessService().removeProcess(dataloadProcess);
         }
-        dataSourceRestRequest.deleteDataSource(dataSourceId);
+        if (dataSourceId != null) {
+            dataSourceRestRequest.deleteDataSource(dataSourceId);
+        }
     }
 
     private void setUpDatasource() throws SQLException, IOException {
