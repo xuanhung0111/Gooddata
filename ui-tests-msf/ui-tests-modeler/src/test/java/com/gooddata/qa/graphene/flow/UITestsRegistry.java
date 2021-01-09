@@ -10,12 +10,22 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("all", new Object[]{
-                "testng-msf-web-modeler.xml"
+        suites.put("sanity", new Object[]{
+                "testng-msf-web-modeler-ii.xml"
         });
 
-        suites.put("sanity", new Object[]{
-                "testng-msf-web-modeler.xml"
+        suites.put("extend", new Object[]{
+                "testng-msf-web-modeler-extend.xml"
+        });
+
+        suites.put("sanity-aws", new Object[]{
+                "testng-msf-web-modeler-sanity-aws.xml"
+        });
+
+        suites.put("all", new HashMap<String, Object>() {{
+            put("sanity", suites.get("sanity"));
+            put("extend", suites.get("extend"));
+        }
         });
 
         TestsRegistry.getInstance()
