@@ -45,4 +45,9 @@
             <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>
     </test>
+    <test name="SomeActionsOnModelPageTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.SomeActionsOnModelPageTest" />
+        </classes>
+    </test>
 </suite>

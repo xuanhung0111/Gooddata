@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
@@ -35,6 +36,10 @@ public class UrlSelectionPanel extends AbstractReactDropDown {
     @Override
     protected String getDropdownCssSelector() {
         return ".overlay.gd-dropdown";
+    }
+
+    public static String getUrlSelectionCssSelector() {
+        return ".gd-drill-to-url-section-items";
     }
 
     public static UrlSelectionPanel getInstance(SearchContext searchContext) {

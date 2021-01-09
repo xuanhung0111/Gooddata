@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.HeaderAccountMenu;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -59,6 +60,14 @@ public class Header extends AbstractFragment {
         return measureMenuItems.stream()
                 .filter(item -> item.findElement(By.tagName("span")).getAttribute("class").contains("s-menu-manage"))
                 .findAny();
+    }
+
+    public void goToLoadDataPage() {
+        WebElement loadData =  measureMenuItems.stream()
+                .filter(item -> item.findElement(By.tagName("span")).getAttribute("class").contains("tab_load_data"))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find the LOAD DATA menu"));
+        loadData.click();
     }
 
     public static final Header getInstance(SearchContext searchContext) {

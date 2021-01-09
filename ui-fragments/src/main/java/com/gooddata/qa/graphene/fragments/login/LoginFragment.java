@@ -44,6 +44,7 @@ public class LoginFragment extends AbstractFragment {
 
     private static final String ERROR_CLASS = "has-error";
     private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".login-message.is-success");
+    private static final By LOGIN_PAGE_LOADED = By.cssSelector(".s-loginPage.s-ready");
 
     private static LoginFragment instance = null;
 
@@ -130,5 +131,9 @@ public class LoginFragment extends AbstractFragment {
 
     public String getNotificationMessage() {
         return waitForElementVisible(NOTIFICATION_MESSAGE_LOCATOR, browser).getText();
+    }
+
+    public String getContainerLoginForm() {
+        return waitForElementVisible(LOGIN_PAGE_LOADED, browser).getText();
     }
 }

@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
@@ -18,6 +19,7 @@ public class Model extends AbstractFragment {
     private static final String ID_MODEL = "g[id = 'dataset.%s']";
     private static final String UNTITLED_ATTRIBUTE = "ds-item-attr%suntitledattribute";
     private static final String UNTITILED_FACT = "ds-item-fact%suntitledfact";
+    private static final By CONNECTION_TOOLTIP = By.className("tooltip-content");
 
     @FindBy(css = ".ds-title .text .v-line")
     private WebElement datasetName;
@@ -58,6 +60,14 @@ public class Model extends AbstractFragment {
         return getListItems().isAttributeExist(getDatasetTitle(), attribute);
     }
 
+    public boolean isAttributeExistOnDataset(String datasetName, String attribute) {
+        return getListItems().isAttributeExist(datasetName, attribute);
+    }
+
+    public boolean isFactExistOnDataset(String datasetName, String attribute) {
+        return getListItems().isFactExist(datasetName, attribute);
+    }
+
     public WebElement getAttribute(String attribute) {
         return getListItems().getAttribute(getDatasetTitle(), attribute);
     }
@@ -70,6 +80,26 @@ public class Model extends AbstractFragment {
         driverActions.moveToElement(moreActionButton).click().build().perform();
         PaperScrollerBackground.getInstance(browser).getContextToolbar().deleteElement();
         return this;
+    }
+
+    public Model moveAttributeOnDataset(String fromDatasetName, String attributeName, String toDatasetName) {
+        WebElement attributeEl = getListItems().getAttribute(fromDatasetName, attributeName);
+        processMoveElement(attributeEl, toDatasetName);
+        return this;
+    }
+
+    public Model moveFactOnDataset(String fromDatasetName, String fact, String toDatasetName) {
+        WebElement factEl = getListItems().getFact(fromDatasetName, fact);
+        processMoveElement(factEl, toDatasetName);
+        return this;
+    }
+
+    public void processMoveElement(WebElement element, String toDatasetName) {
+        getActions().moveToElement(element).click().build().perform();
+        WebElement moreActionButton = element.findElement(By.className("more-action-container"));
+        getActions().moveToElement(moreActionButton).click().build().perform();
+        EditDatasetDialog.MoveDeleteMenu.getInstance(browser).clickMoveButtonOnDataset();
+        EditDatasetDialog.MoveFieldDataset.getInstance(browser).selectDataset(toDatasetName);
     }
 
     public String getReferenceText(String dataset) {
@@ -232,5 +262,18 @@ public class Model extends AbstractFragment {
         public String getClassName() {
             return className;
         }
+    }
+
+    public void hoverOnTooltipDataset() {
+        WebElement pointConnection = browser.findElement(By.cssSelector(".joint-halo > div > div"));
+        getActions().moveToElement(pointConnection).build().perform();
+    }
+
+    public String getConnectionStatusOnDataset() {
+        return browser.findElement(CONNECTION_TOOLTIP).getText();
+    }
+
+    public boolean isDatasetTooltipDisplayed() {
+        return isElementVisible(CONNECTION_TOOLTIP, browser);
     }
 }

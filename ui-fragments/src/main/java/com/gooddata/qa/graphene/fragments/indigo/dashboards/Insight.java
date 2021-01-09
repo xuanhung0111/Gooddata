@@ -37,4 +37,8 @@ public class Insight extends Widget {
     public boolean isEmptyValue() {
         return isElementPresent(By.className("info-label-icon-empty"), getRoot());
     }
+
+    public String getContentEmptyInsight(){
+        return waitForElementVisible(By.cssSelector(".info-label-empty .gd-typography"), getRoot()).getText();
+    }
 }

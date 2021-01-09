@@ -59,4 +59,11 @@
             <class name="com.gooddata.qa.graphene.manage.MetricEditorTest"/>
         </classes>
     </test>
+
+    <test name="LocalizationTest" enabled="true">
+        <parameter name="languageCode" value="ja-JP"/>
+        <classes>
+            <class name="com.gooddata.qa.graphene.i18n.LocalizationTest"/>
+        </classes>
+    </test>
 </suite>

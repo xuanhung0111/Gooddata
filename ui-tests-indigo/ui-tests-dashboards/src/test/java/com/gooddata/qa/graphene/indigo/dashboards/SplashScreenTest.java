@@ -88,7 +88,7 @@ public class SplashScreenTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
-    public void checkCreateNewKpiDashboardRemoveAndCreateAgain() {
+    public void checkCreateNewKpiDashboardRemoveAndCannotSaveEmptyDashboard() {
         initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
@@ -96,26 +96,12 @@ public class SplashScreenTest extends AbstractDashboardTest {
             .saveEditModeWithWidgets();
 
         waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().getLastWidget(Kpi.class).delete();
-
-        indigoDashboardsPage.saveEditModeWithoutWidgets();
-
-        // do not use setupKpi here - it refreshes the page
-        // this is a test case without page refresh
-        waitForFragmentVisible(indigoDashboardsPage)
-                .getSplashScreen()
-                .startEditingWidgets()
-                .addKpi(kpi)
-                .saveEditModeWithWidgets();
-
-        takeScreenshot(browser, "checkCreateNewKpiDashboardRemoveAndCreateAgain", getClass());
-
-        // do not use teardownKpi here - it refreshes the page
-        // this is a test case without page refresh
-        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().getLastWidget(Kpi.class).delete();
-
-        indigoDashboardsPage
-                .saveEditModeWithoutWidgets()
-                .getSplashScreen();
+        try {
+            assertFalse(indigoDashboardsPage.isSaveEnabled(), "Save and Pushlish button should be disabled");
+            assertEquals(indigoDashboardsPage.getMessageDisabledEmptyDashboardbutton(), "Empty dashboard cannot be published");
+        } finally {
+            indigoDashboardsPage.deleteDashboardOnMenuItem(true);
+        }
     }
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
@@ -182,11 +168,11 @@ public class SplashScreenTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkCreateNewKpiDashboardNotAvailableOnMobile() {
-        SplashScreen splashScreen = initIndigoDashboardsPage().getSplashScreen();
-        String mobileMessage = splashScreen.getMobileMessage();
+        SplashScreen splashScreenWrapper = initIndigoDashboardsPage().getSplashScreenWrapper();
+        String mobileMessage = splashScreenWrapper.getMobileMessage();
 
         assertEquals(mobileMessage, SPLASH_SCREEN_MOBILE_MESSAGE);
-        splashScreen.waitForCreateKpiDashboardButtonMissing();
+        splashScreenWrapper.waitForCreateKpiDashboardButtonMissing();
 
         takeScreenshot(browser, "checkCreateNewKpiDashboardNotAvailableOnMobile", getClass());
     }
