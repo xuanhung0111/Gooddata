@@ -32,7 +32,7 @@ public class DateFilterADMeasureCombineDateTest extends AbstractAnalyseTest {
     private static final String DATE_FILTER_LAST_YEAR = "Last year";
     //TODO workaround for bug QA-9139 Update Graphene Test for year 2019
     //Will be changed evert year
-    private static final String THREE_YEARS_AGO = "three years ago";
+    private static final String FOUR_YEARS_AGO = "four years ago";
     @Override
     public void initProperties() {
         super.initProperties();
@@ -290,7 +290,7 @@ public class DateFilterADMeasureCombineDateTest extends AbstractAnalyseTest {
     private void createInsightUsingDateFilterOnAD(String insight, String switchDimension, String periodTime) {
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT)
                 .addDateFilter().waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration().addFilterByDate(THREE_YEARS_AGO);
+                .expandConfiguration().addFilterByDate(FOUR_YEARS_AGO);
         analysisPage.getFilterBuckets().getDateFilter().click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -304,7 +304,7 @@ public class DateFilterADMeasureCombineDateTest extends AbstractAnalyseTest {
         initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
                 .addMetric(METRIC_AVG_AMOUNT).addDate().waitForReportComputing().getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-                .addFilterByDate(THREE_YEARS_AGO);
+                .addFilterByDate(FOUR_YEARS_AGO);
         analysisPage.getFilterBuckets().getDateFilter().click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
