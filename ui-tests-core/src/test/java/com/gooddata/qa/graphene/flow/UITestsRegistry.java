@@ -134,6 +134,7 @@ public class UITestsRegistry {
         suites.put("basic-aws", new Object[] {
                 SimpleProjectEtlTest.class,
                 GoodSalesDashboardTest.class,
+                GoodSalesReportsTest.class,
                 "testng-imap-GoodSales-email-schedule.xml",
                 "testng-imap-project-n-users-sanity-test.xml"
         });
@@ -141,7 +142,6 @@ public class UITestsRegistry {
         suites.put("basic", new HashMap<String, Object>() {{
             put("basic-aws", suites.get("basic-aws"));
             put("basic-extend", new Object[] {
-                    GoodSalesReportsTest.class,
                     "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
             });
             //separate localization test into one phase so it does not affect to other tests
