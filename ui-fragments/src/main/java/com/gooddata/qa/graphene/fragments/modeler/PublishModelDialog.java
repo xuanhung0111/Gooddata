@@ -40,6 +40,9 @@ public class PublishModelDialog extends AbstractFragment {
     @FindBy(css = ".gd-dialog-close .s-dialog-close-button")
     private WebElement btnCancelSuccess;
 
+    @FindBy(className = "sub-error")
+    private WebElement errorPublish;
+
     public static final PublishModelDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PublishModelDialog.class, waitForElementVisible(SIDEBAR, searchContext));
     }
@@ -55,6 +58,11 @@ public class PublishModelDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void overwriteDataAcceptError() {
+        btnOverwrite.click();
+        btnPublish.click();
+    }
+
     public void clickCancel() {
         btnCancel.click();
     }
@@ -63,6 +71,10 @@ public class PublishModelDialog extends AbstractFragment {
         waitForElementNotVisible(publishingIcon);
         waitForElementVisible(textResultError);
         return textResultError.getText();
+    }
+
+    public String getErrorPublish() {
+        return waitForElementVisible(errorPublish).getText();
     }
 
     public boolean isPublishModelDialogDisplay() {

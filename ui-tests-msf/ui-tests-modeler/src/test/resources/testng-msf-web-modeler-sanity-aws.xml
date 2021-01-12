@@ -50,4 +50,9 @@
             <class name="com.gooddata.qa.graphene.modeler.SomeActionsOnModelPageTest" />
         </classes>
     </test>
+    <test name="WarningMessageTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.WarningMessageTest" />
+        </classes>
+    </test>
 </suite>
