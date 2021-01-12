@@ -23,6 +23,5 @@ public class ConfirmDeleteDatasetDialog extends AbstractFragment {
 
     public void clickDeleteDataset() {
         btnDelete.click();
-        waitForFragmentNotVisible(this);
     }
 }
