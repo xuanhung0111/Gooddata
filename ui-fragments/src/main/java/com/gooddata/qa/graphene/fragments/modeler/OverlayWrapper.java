@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.modeler.datasource.BubleContent;
+import com.gooddata.qa.graphene.fragments.modeler.datasource.DropDownDSContent;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -73,9 +75,26 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "timer-detail")
     private SaveAsDraftDialog saveAsDraftDialog;
 
+    @FindBy(className = "s-message-text-header-value")
+    private WebElement messageConnectDatasource;
+
+    @FindBy(className = "bubble-content")
+    private WebElement popUpTable;
+
+    @FindBy(className = "ldm-control-load-menu")
+    private ControlLoadMenu controlMenu;
+
+    @FindBy(className = "dropdown-body")
+    private DropDownDSContent dsDropdown;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 OverlayWrapper.class, waitForElementVisible(className(OVERLAY_WRAPPER), searchContext));
+    }
+
+    public DropDownDSContent getDSDropdown() {
+        waitForFragmentVisible(dsDropdown);
+        return dsDropdown;
     }
 
     public String getTextPublishSuccess() {
@@ -103,11 +122,19 @@ public class OverlayWrapper extends AbstractFragment {
                 OverlayWrapper.class, wrapperList.get(index));
     }
 
+    public String getMessageConnectDatasource() {
+        return waitForElementVisible(messageConnectDatasource).getText();
+    }
+
     public IndigoTableDropDown getIndigoTableDropDown() {
         waitForFragmentVisible(indigoTableDropDown);
         return indigoTableDropDown;
     }
 
+    public ControlLoadMenu getControlLoadMenu() {
+        waitForFragmentVisible(controlMenu);
+        return controlMenu;
+    }
     public WaitingDialog getWaitingDialog() {
         waitForFragmentVisible(waitingDialog);
         return waitingDialog;
@@ -163,6 +190,9 @@ public class OverlayWrapper extends AbstractFragment {
         return outputStage;
     }
 
+    public BubleContent getPopUpTable() {
+        return BubleContent.getInstance(browser);
+    }
     public void discardDraft() {
         waitForFragmentVisible(saveAsDraftDialog).discardDraft();
     }

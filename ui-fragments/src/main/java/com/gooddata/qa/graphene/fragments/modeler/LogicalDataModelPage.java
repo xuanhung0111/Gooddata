@@ -13,7 +13,7 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.id;
-
+import static java.lang.String.format;
 
 public class LogicalDataModelPage extends AbstractFragment {
     public static final String URI_TEMPLATE = "/admin/modeler/#/projects/{projectId}";
@@ -57,5 +57,10 @@ public class LogicalDataModelPage extends AbstractFragment {
             listItemName.add(item.getText());
         }
         return listItemName;
+    }
+
+    public boolean isOpenCorrectModelerPage(String id) {
+        String currentUrl = browser.getCurrentUrl();
+        return currentUrl.contains(format(URI_TEMPLATE, id));
     }
 }

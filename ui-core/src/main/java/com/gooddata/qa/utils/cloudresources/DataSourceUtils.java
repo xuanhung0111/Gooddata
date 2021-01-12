@@ -41,6 +41,17 @@ public class DataSourceUtils {
                 .setUrl(testParams.getSnowflakeJdbcUrl());
     }
 
+    public ConnectionInfo createSnowflakeUseCustomSchema(String database, DatabaseType dbType, String schema) {
+        return new ConnectionInfo()
+                .setWarehouse(WAREHOUSE_NAME)
+                .setDbType(dbType)
+                .setDatabase(database)
+                .setSchema(schema)
+                .setUserName(testParams.getSnowflakeUserName())
+                .setPassword(testParams.getSnowflakePassword())
+                .setUrl(testParams.getSnowflakeJdbcUrl());
+    }
+
     public ConnectionInfo createRedshiftConnectionInfo(String database, DatabaseType dbType, String schema) {
         return new ConnectionInfo()
                 .setDbType(dbType)

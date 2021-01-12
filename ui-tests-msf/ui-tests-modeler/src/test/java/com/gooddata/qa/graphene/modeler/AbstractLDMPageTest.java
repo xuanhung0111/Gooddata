@@ -1,7 +1,11 @@
 package com.gooddata.qa.graphene.modeler;
 
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
+import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPage;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
+import org.openqa.selenium.TimeoutException;
+
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
 
@@ -29,6 +33,19 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
             browser.switchTo().alert().accept();
             browser.switchTo().defaultContent();
             return initLogicalDataModelPage();
+        }
+    }
+
+    protected DataSourceManagementPage initDatasourceManagementPage() {
+        try {
+            openUrl(DataSourceManagementPage.URI);
+            return DataSourceManagementPage.getInstance(browser);
+        } catch (TimeoutException timeout) {
+            takeScreenshot(browser, "Datasource timeout", getClass());
+            timeout.printStackTrace();
+            browser.navigate().refresh();
+        } finally {
+            return DataSourceManagementPage.getInstance(browser);
         }
     }
 }

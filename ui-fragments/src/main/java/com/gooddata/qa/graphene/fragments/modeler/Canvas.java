@@ -15,6 +15,9 @@ public class Canvas extends AbstractFragment {
     @FindBy(className = "joint-paper-scroller")
     private PaperScrollerBackground scrollerBackground;
 
+    @FindBy(className = "joint-paper")
+    private MainModelContent mainModelContent;
+
     public static final Canvas getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(Canvas.class, waitForElementVisible(id(CANVAS), searchContext));
     }
@@ -22,5 +25,10 @@ public class Canvas extends AbstractFragment {
     public PaperScrollerBackground getPaperScrollerBackground() {
         waitForElementVisible(scrollerBackground.getRoot());
         return scrollerBackground;
+    }
+
+    public MainModelContent getModelContent() {
+        waitForElementVisible(mainModelContent.getRoot());
+        return mainModelContent;
     }
 }
