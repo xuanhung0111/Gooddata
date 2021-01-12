@@ -53,11 +53,11 @@ public class Model extends AbstractFragment {
     }
 
     public String getAttributeText(String attribute) {
-        return getListItems().getAttribute(getDatasetTitle(), attribute).getText();
+        return getListItems().getAttribute(getDatasetTitle().toLowerCase(), attribute).getText();
     }
 
     public boolean isAttributeExistOnModeler(String attribute) {
-        return getListItems().isAttributeExist(getDatasetTitle(), attribute);
+        return getListItems().isAttributeExist(getDatasetTitle().toLowerCase(), attribute);
     }
 
     public boolean isAttributeExistOnDataset(String datasetName, String attribute) {
@@ -69,11 +69,11 @@ public class Model extends AbstractFragment {
     }
 
     public WebElement getAttribute(String attribute) {
-        return getListItems().getAttribute(getDatasetTitle(), attribute);
+        return getListItems().getAttribute(getDatasetTitle().toLowerCase(), attribute);
     }
 
     public Model deleteAttributeOnDataset(String attributeName) {
-        WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
+        WebElement attribute = getListItems().getAttribute(getDatasetTitle().toLowerCase(), attributeName);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(attribute).click().build().perform();
         WebElement moreActionButton = attribute.findElement(By.className("more-action-container"));
@@ -228,6 +228,12 @@ public class Model extends AbstractFragment {
     public void openEditDialog() {
         AddMorePopUp addMore = openMorePopUpOnDataset();
         addMore.editDatasetDialog();
+    }
+
+    //open Dialog in case there are some overlay wrapper on UI
+    public void openEditDialog(int index) {
+        AddMorePopUp addMore = openMorePopUpOnDataset();
+        addMore.editDatasetDialog(index);
     }
 
     public WebElement getUntitledAttribute(String datasetName) {

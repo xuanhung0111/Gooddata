@@ -4,6 +4,7 @@ public class SnowflakeTableUtils {
     // Dataset names in GD workspace
     public static final String METRIC_AMOUNT = "Amount";
     public static final String METRIC_AGE = "Age";
+    public static final String METRIC_PRICE = "Price";
     public static final String DATE_FILTER_ALL_TIME = "All time";
     public static final String DATE_DATASET_BIRTHDAY = "birthday";
     public static final String DATE_DATASET = "Date";

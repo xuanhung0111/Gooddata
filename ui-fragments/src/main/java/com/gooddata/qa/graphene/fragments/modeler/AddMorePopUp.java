@@ -40,6 +40,11 @@ public class AddMorePopUp extends AbstractFragment {
         return OverlayWrapper.getInstance(browser).getEditDatasetDialog();
     }
 
+    public EditDatasetDialog editDatasetDialog(int index) {
+        btnEdit.click();
+        return OverlayWrapper.getInstanceByIndex(browser, index).getEditDatasetDialog();
+    }
+
     public EditDatasetDialog editDatasetDialog() {
         btnEdit.click();
         return OverlayWrapper.getInstance(browser).getEditDatasetDialog();
@@ -49,4 +54,5 @@ public class AddMorePopUp extends AbstractFragment {
         btnSetPrimaryKey.click();
         OverlayWrapper.getInstance(browser).getChangePrimaryKeyDialog().searchPrimaryKey(datasetName, attributeName);
     }
+
 }

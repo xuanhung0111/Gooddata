@@ -18,6 +18,9 @@ public class DatasourceHeading extends AbstractFragment {
     @FindBy(className = "s-more-button")
     private WebElement moreButton;
 
+    @FindBy(className = "s-connect-button")
+    private WebElement connectBtn;
+
     public static final DatasourceHeading getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DatasourceHeading.class, waitForElementVisible(className(DATASOURCE_HEADING_CLASS), searchContext));
     }
@@ -50,5 +53,11 @@ public class DatasourceHeading extends AbstractFragment {
     public DatasourceMessageBar getErrorMessageDialog () {
         waitForElementVisible(moreButton).click();
         return MoreContentDialog.getInstance(browser).getErrorMessageDialog();
+    }
+
+    public ConnectWorkSpaceDialog clickConnectButton() {
+        waitForElementVisible(connectBtn);
+        connectBtn.click();
+        return ConnectWorkSpaceDialog.getInstance(browser);
     }
 }
