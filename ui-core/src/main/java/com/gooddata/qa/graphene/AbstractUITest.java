@@ -210,10 +210,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
         int tabsCount = tabs.getNumberOfTabs();
         dashboardsPage.addNewTab(tabName);
         checkRedBar(browser);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
         dashboardsPage.getDashboardEditBar().saveDashboardAfterAddTab();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
