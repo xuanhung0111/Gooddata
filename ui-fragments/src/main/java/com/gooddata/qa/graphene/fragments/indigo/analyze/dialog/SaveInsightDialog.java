@@ -1,10 +1,11 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.dialog;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.SearchContext;
@@ -24,11 +25,15 @@ public class SaveInsightDialog extends AbstractFragment {
     @FindBy(className = "s-dialog-submit-button")
     private WebElement submitButton;
 
-    public static final String ROOT_CLASS = "s-dialog";
+    public static final String ROOT_SELECTOR = ".s-dialog:not(.s-unsave-change-confirmation-dialog)";
 
     public static SaveInsightDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(SaveInsightDialog.class,
-                waitForElementVisible(className(ROOT_CLASS), searchContext));
+                waitForElementVisible(cssSelector(ROOT_SELECTOR), searchContext));
+    }
+
+    public boolean isSaveInsightDialogDisplay() {
+        return isElementVisible(cssSelector(ROOT_SELECTOR), browser);
     }
 
     public void save(final String name) {

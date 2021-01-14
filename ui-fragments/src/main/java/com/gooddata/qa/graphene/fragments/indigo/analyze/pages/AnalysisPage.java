@@ -518,6 +518,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage cancel() {
+        getPageHeader().cancel();
+        return this;
+    }
+
     public AnalysisPage clear() {
         getPageHeader().getResetButton().click();
         return this;
@@ -633,6 +638,26 @@ public class AnalysisPage extends AbstractFragment {
 
     public boolean isSaveInsightEnabled() {
         return getPageHeader().isSaveButtonEnabled();
+    }
+
+    public boolean isUndoInsightEnabled() {
+        return getPageHeader().isUndoButtonEnabled();
+    }
+
+    public boolean isRedoInsightDisabled() {
+        return getPageHeader().isRedoButtonDisabled();
+    }
+
+    public boolean isRedoInsightEnabled() {
+        return getPageHeader().isRedoButtonEnabled();
+    }
+
+    public boolean isResetInsightEnabled() {
+        return getPageHeader().isResetButtonEnabled();
+    }
+
+    public boolean isCancelInsightEnabled() {
+        return getPageHeader().isCancelButtonEnabled();
     }
 
     public AnalysisPage saveInsight(final String insight) {

@@ -50,7 +50,8 @@ public enum ProjectFeatureFlags {
     XAE_VERSION("xae_version"),
     ENABLE_TABLE_COLUMNS_GROW_TO_FIT("enableTableColumnsGrowToFit"),
     ENABLE_EDIT_INSIGHTS_FROM_KD("enableEditInsightsFromKD"),
-    ENABLE_EXPLORE_INSIGHTS_FROM_KD("enableExploreInsightsFromKD");
+    ENABLE_EXPLORE_INSIGHTS_FROM_KD("enableExploreInsightsFromKD"),
+    ENABLE_KPI_DASHBOARD_NEW_INSIGHT("enableKPIDashboardNewInsight");
 
     private final String featureFlag;
 

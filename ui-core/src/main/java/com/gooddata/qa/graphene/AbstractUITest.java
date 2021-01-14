@@ -531,6 +531,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return initEmbeddedIndigoDashboardPageByUrl(preventDefault);
     }
 
+    public IndigoDashboardsPage initEmbeddedIndigoDashboardWithShowNavigation(EmbeddedType type, boolean... showNavigation) {
+        return type == EmbeddedType.IFRAME ? initEmbeddedIndigoDashboardPageByIframe() : initEmbeddedIndigoDashboardWithShowNavigationByUrl(showNavigation);
+    }
+
     public EmailSchedulePage initEmailSchedulesPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
         waitForSchedulesPageLoaded(browser);
@@ -704,6 +708,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return IndigoDashboardsPage.getInstance(browser);
     }
 
+    private IndigoDashboardsPage initEmbeddedIndigoDashboardWithShowNavigationByUrl(boolean... showNavigation) {
+        openUrl(getEmbeddedIndigoDashboardShowNavigationUri(showNavigation));
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
     private String getEmbeddedIndigoDashboardPageUri( boolean... preventDefault) {
         String prevent = "";
         if (preventDefault.length != 0) {
@@ -714,6 +723,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public enum EmbeddedType {
         IFRAME, URL
+    }
+
+    private String getEmbeddedIndigoDashboardShowNavigationUri( boolean... showNavigation) {
+        String navigation = "";
+        if (showNavigation.length != 0) {
+            navigation = showNavigation[0] ? "?showNavigation=true" : "?showNavigation=false";
+        }
+        return format(EMBEDDED_INDIGO_DASHBOARD_PAGE_URI, testParams.getProjectId() + navigation);
     }
 
     public boolean comparePDF(String exportedDashboardName) throws IOException {

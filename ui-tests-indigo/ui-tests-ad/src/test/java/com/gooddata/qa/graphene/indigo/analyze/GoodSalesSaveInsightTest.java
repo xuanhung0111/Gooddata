@@ -85,7 +85,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
                 .getTrackersCount();
 
         analysisPage.setInsightTitle(insightName).saveInsight();
-        assertFalse(isElementVisible(className(SaveInsightDialog.ROOT_CLASS), browser),
+        assertFalse(isElementVisible(className(SaveInsightDialog.ROOT_SELECTOR), browser),
                 "Save dialog exists");
         //make sure data is cleared before open insight
         assertTrue(analysisPage.resetToBlankState().isBlankState());
@@ -185,7 +185,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
                 .saveWithoutSubmitting(insight)
                 .cancel();
 
-        assertFalse(isElementPresent(className(SaveInsightDialog.ROOT_CLASS), browser),
+        assertFalse(isElementPresent(className(SaveInsightDialog.ROOT_SELECTOR), browser),
                 "Save dialog does not exist");
         assertFalse(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " exists in Saved Insight list");
