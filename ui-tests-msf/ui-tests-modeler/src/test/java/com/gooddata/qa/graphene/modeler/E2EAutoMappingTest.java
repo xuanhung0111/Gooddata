@@ -109,14 +109,6 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         initLogicalDataModelPage();
         mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
         modeler.getLayout().waitForLoading();
-        toolbar.clickPublish();
-        PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
-        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
-        assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE_DATALOAD);
-        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
-                testParams.getProjectId()));
-        wrapper.closePublishSuccess();
         final CsvFile csv = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + fileName));
         FileUploadDialog uploadDialog = sidebar.openCSVDialog();
@@ -135,9 +127,10 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         assertTrue(isElementVisible(mainModelContent.getModel(CLASS_DATASET).getRoot()));
 
         toolbar.clickPublish();
-        publishModelDialog = PublishModelDialog.getInstance(browser);
+        PublishModelDialog  publishModelDialog = PublishModelDialog.getInstance(browser);
         publishModelDialog.overwriteData();
-        wrapper = OverlayWrapper.getInstance(browser);
+
+        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
                 testParams.getProjectId()));
