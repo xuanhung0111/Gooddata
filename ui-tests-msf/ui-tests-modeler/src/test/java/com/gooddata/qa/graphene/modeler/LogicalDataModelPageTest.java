@@ -261,15 +261,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
                 testParams.getProjectId()));
         wrapper.closePublishSuccess();
-
-        // try publish already model
-        toolbar.clickPublish();
-        publishModelDialog.preserveData();
-        assertEquals(wrapper.getTextPublishSuccess(), UP_TO_DATE_MESSAGE);
-        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
-                testParams.getProjectId()));
-        wrapper.closePublishSuccess();
-
+        
         String sql = getResourceAsString("/model_view.txt");
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, testParams.getProjectId());
         modelView = modelRestRequest.getProductionProjectModelView(false);
