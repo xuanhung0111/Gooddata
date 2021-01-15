@@ -154,7 +154,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
            String json = JsonUtils.getJsonObjectFromFile(exportFile).toString();
            assertThat(json, containsString("{\"identifier\":{\"id\":\"dataset.city\",\"type\":\"dataset\"}"));
            assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.people\",\"type\":\"dataset\"}"));
-           assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
+           assertThat(json, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
            assertThat(json, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"createddate\",\"type\":\"templateDataset\"}"));
            assertThat(json, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"birthday\",\"type\":\"templateDataset\"}"));
            assertThat(json, containsString(getJsonContentMapping(testParams.getProjectId(), "/content_mapping_after_publish.txt")));
@@ -176,7 +176,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
            String jsonOnBlankProject = JsonUtils.getJsonObjectFromFile(exportOnBlankProject).toString();
            assertThat(jsonOnBlankProject, containsString("{\"identifier\":{\"id\":\"dataset.city\",\"type\":\"dataset\"}"));
            assertThat(jsonOnBlankProject, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.people\",\"type\":\"dataset\"}"));
-           assertThat(jsonOnBlankProject, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
+           assertThat(jsonOnBlankProject, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"dataset.district\",\"type\":\"dataset\"}"));
            assertThat(jsonOnBlankProject, containsString("\"collapse\":false},{\"identifier\":{\"id\":\"createddate\",\"type\":\"templateDataset\"}"));
            assertThat(jsonOnBlankProject, containsString("\"collapse\":true},{\"identifier\":{\"id\":\"birthday\",\"type\":\"templateDataset\"}"));
            assertThat(jsonOnBlankProject, containsString(getJsonContentMapping(projectBlank, "/content_mapping_after_publish.txt")));
