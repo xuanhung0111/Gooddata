@@ -7,11 +7,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
-    private static final String OVERLAY_WRAPPER = "target-bl";
+    private static final String OVERLAY_WRAPPER = "overlay-wrapper";
 
     @FindBy(className = "s-create-datasource-dialog-item-snowflake")
     private WebElement snowflakeResource;
@@ -26,8 +28,8 @@ public class OverlayWrapper extends AbstractFragment {
     private WebElement popupResource;
 
     public static OverlayWrapper getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(
-                OverlayWrapper.class, waitForElementVisible(className(OVERLAY_WRAPPER), searchContext));
+        List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
+        return Graphene.createPageFragment(OverlayWrapper.class, wrapperList.get(1));
     }
 
     public void selectSnowflakeItem() {

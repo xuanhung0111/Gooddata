@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 public class DataSourceMenu extends AbstractFragment {
     private static final By MENU_CLASS = By.className("navigation");
@@ -55,6 +56,10 @@ public class DataSourceMenu extends AbstractFragment {
             originalList.add(e.getText());
         }
         return originalList;
+    }
+
+    public boolean isListDatasourceEmpty() {
+        return isElementPresent(By.className("empty-list"), browser);
     }
 
     public DataSourceMenu selectDataSource(String title) {
