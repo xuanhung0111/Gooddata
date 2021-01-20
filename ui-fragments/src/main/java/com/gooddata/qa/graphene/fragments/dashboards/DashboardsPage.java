@@ -746,6 +746,12 @@ public class DashboardsPage extends AbstractFragment {
         waitForFragmentNotVisible(menu);
     }
 
+    public void waitForDashboardComputing() {
+        Function<WebDriver, Boolean> itemsLoaded = browser -> browser.findElement(By.className("loading-indicator-filtering"))
+                .getAttribute("style").contains("display: none;");
+        Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(itemsLoaded);
+    }
+
     /**
      * add sample text to current dashboard tab to prevent it empty
      * @return DashboardsPage
