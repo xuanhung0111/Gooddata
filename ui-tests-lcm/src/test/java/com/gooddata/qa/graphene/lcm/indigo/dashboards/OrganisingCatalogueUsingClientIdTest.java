@@ -200,7 +200,8 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
         Assert.notEmpty(catalogueClientPanel.expandCatalogGroupLabels("Opp. Snapshot").getFieldNamesInViewPort());
 
         openAnalyzePage("includeObjectsWithTags", tagNameForFolder);
-        assertEquals(catalogueClientPanel.getNoObjectsFound(), "No objects found.");
+        //TODO: Change message Workaround issue BB-2714
+        assertEquals(catalogueClientPanel.getNoObjectsFound(), "The workspace contains no data.");
 
         CatalogPanel cataloguePanelSearch = initAnalysePage().getCatalogPanel();
         cataloguePanelSearch.search("f");
