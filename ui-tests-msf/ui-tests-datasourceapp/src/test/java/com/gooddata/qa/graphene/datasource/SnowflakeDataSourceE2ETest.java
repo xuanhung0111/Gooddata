@@ -49,10 +49,16 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     // +  clicks on button <Data-source-type>
     @Test(dependsOnGroups = {"createProject"})
     public void initialStageTest() {
-        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
+        if(testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) {
-            throw new SkipException("Initial Page is not tested on PI or Production environment");
-        } else {
+            throw new SkipException("Initial Page is not tested on PI or Production environment !!");
+        }
+    }
+
+    //In case, has ADS Datasource on Domain , verify display list datasource and show Detail of first datasource
+    @Test(dependsOnMethods = {"initialStageTest"})
+    public void verifyFirstUIDatasourceTest() {
+        if (dsMenu.isListDatasourceEmpty()) {
             initDatasourceManagementPage();
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
@@ -62,6 +68,12 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             dataSourceManagementPage = initDatasourceManagementPage();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
             dsMenu.selectSnowflakeResource();
+        } else {
+            initDatasourceManagementPage();
+            String firstDSText = dsMenu.getListDataSources().get(0);
+            ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+            DatasourceHeading heading = container.getDatasourceHeading();
+            assertEquals(firstDSText, heading.getName());
         }
     }
 
@@ -140,7 +152,6 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
                 snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
                 snowflakeDetail.getTextSchema());
-        assertEquals(dsMenu.sortDataSource(), dsMenu.getListDataSources());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
 
