@@ -121,12 +121,12 @@ public class WeekFilterTest extends AbstractAnalyseTest {
                 .setMeasureBucket(asList(MeasureBucket
                         .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
                 .setCategoryBucket(asList(
-                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_YEAR_SNAPSHOT),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DATE_SNAPSHOT),
                         CategoryBucket.Type.VIEW)))
                 .setFilter(singletonList(FilterAttribute.createFilter(
                     getAttributeByTitle(ATTR_FORECAST_CATEGORY),
                     singletonList(objectElementsByID.get(0).getRight()))))
-                .setDateFilter(FilterDate.createFilterDate(getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(),
+                .setDateFilter(FilterDate.createFilterDate(getDatasetByTitle(ATTR_DATE_SNAPSHOT).getUri(),
                     "2000-06-06", "2020-07-05")));
 
         initAnalysePage().openInsight(INSIGHT_HAS_POP_METRIC_IN_A_CONTEXT_OF_WEEKS).waitForReportComputing()
@@ -339,13 +339,13 @@ public class WeekFilterTest extends AbstractAnalyseTest {
                 .setMeasureBucket(asList(MeasureBucket
                     .createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT))))
                 .setCategoryBucket(asList(
-                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_YEAR_SNAPSHOT),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DATE_SNAPSHOT),
                         CategoryBucket.Type.VIEW)))
                 .setFilter(singletonList(FilterAttribute.createFilter(
                     getAttributeByTitle(ATTR_STAGE_NAME), asList(objectElementsByID.get(0).getRight(),
                         objectElementsByID.get(1).getRight(), objectElementsByID.get(2).getRight(),
                         objectElementsByID.get(3).getRight(), objectElementsByID.get(4).getRight()))))
-                .setDateFilter(FilterDate.createFilterDate(getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(),
+                .setDateFilter(FilterDate.createFilterDate(getDatasetByTitle(ATTR_DATE_SNAPSHOT).getUri(),
                     "2020-06-06", "2020-07-05")));
 
         initAnalysePage().openInsight(INSIGHT_HAS_SOME_GLOBAL_AND_LOCAL_FILTER).waitForReportComputing()
