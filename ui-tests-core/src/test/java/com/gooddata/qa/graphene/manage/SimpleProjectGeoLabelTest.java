@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.manage;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardGeoChart;
@@ -89,13 +90,19 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"})
     public void verifyGeoChartTest() {
+        // logout then login is a workaround to bypass token expiration issue
+        // some of time auth token expired when the geo report need to get geo result
+        // refresh page does not work, the geo report keep loading
+        // TODO: investigate why this happen
+        logoutAndLoginAs(true, UserRoles.ADMIN);
         for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
             System.out.println("Verifying attribute " + attributeLayer + " ...");
             initDashboardsPage();
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             dashboardsPage.addNewTab("tab_" + generateHashString());
             dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
-            dashboardEditBar.saveDashboard();
+            sleepTightInSeconds(2);
+            dashboardEditBar.saveDashboardAfterAddTab();
             sleepTightInSeconds(1);
             waitForDashboardPageLoaded(browser);
 
