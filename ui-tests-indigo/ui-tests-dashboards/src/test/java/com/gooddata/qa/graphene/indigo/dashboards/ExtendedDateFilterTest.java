@@ -97,17 +97,7 @@ public class ExtendedDateFilterTest extends AbstractDashboardTest {
                     .selectFloatingRange(DateGranularity.QUARTERS, "2 quarters ago", "this quarter").apply();
             takeScreenshot(browser, "check-Kpi-Alert-Dialog-check-xxxxxxxxxx", getClass());
             assertTrue(kpi.hasSetAlert(), "Kpi alert should keep active status");
-
-            indigoDashboardsPage.switchToEditMode().openExtendedDateFilterPanel()
-                    .selectPeriod(LAST_7_DAYS).checkExcludeCurrent().apply();
-            indigoDashboardsPage.saveEditModeWithWidgets();
-
-            //Covering issue RAIL-1477
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS, false);
-            initIndigoDashboardsPage();
-            assertTrue(kpi.hasSetAlert(), "Kpi alert should keep active status");
         } finally {
-            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_KPI_DASHBOARD_EXTENDED_DATE_FILTERS, true);
             deleteAlertForLastKpi();
         }
     }
