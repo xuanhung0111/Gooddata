@@ -502,6 +502,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         log.info("listValuePrice : " + listValuePrice);
         assertEquals(listValue, singletonList("$80.00"), "Unconnected filter make impact to insight");
         assertEquals(listValuePrice, singletonList("$12,000.00"), "Unconnected filter make impact to insight");
+
     }
 
     protected Metrics getMetricCreator() {
