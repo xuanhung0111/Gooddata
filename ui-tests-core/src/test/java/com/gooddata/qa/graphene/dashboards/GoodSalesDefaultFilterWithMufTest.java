@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -131,9 +132,13 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
             getFilter(ATTR_PRODUCT).editAttributeFilterValues(COMPUSCI, EDUCATIONLY, PHOENIXSOFT);
+            dashboardsPage.waitForDashboardComputing();
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(COMPUSCI, PHOENIXSOFT);
+            dashboardsPage.waitForDashboardComputing();
 
-            dashboardsPage.saveDashboard();
+            sleepTightInSeconds(2);
+            waitForDashboardPageLoaded(browser);
+            dashboardsPage.getDashboardEditBar().clickSaveDashboardButton();
             AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), asList(COMPUSCI, PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
@@ -147,9 +152,13 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
             getFilter(ATTR_PRODUCT).editAttributeFilterValues(PHOENIXSOFT);
+            dashboardsPage.waitForDashboardComputing();
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
+            dashboardsPage.waitForDashboardComputing();
 
-            dashboardsPage.saveDashboard();
+            sleepTightInSeconds(2);
+            waitForDashboardPageLoaded(browser);
+            dashboardsPage.getDashboardEditBar().clickSaveDashboardButton();
             AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
