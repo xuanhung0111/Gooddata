@@ -497,4 +497,14 @@ public class PivotTableReport extends AbstractFragment {
         final WebElement headerValueElement = headerElement.findElement(By.cssSelector(TABLE_HEADER_VALUE_SELECTOR));
         return isShortenedTitleDesignByCss(headerValueElement, width);
     }
+
+    public String getColorCellElement(String columnTitle, int headerIndex, int rowIndex) {
+        waitForElementVisible(attributeValuePresent);
+        int columnIndex = getHeadersMeasure().indexOf(columnTitle);
+        List<List<WebElement>> elements = waitForCollectionIsNotEmpty(rows).stream()
+            .filter(ElementUtils::isElementVisible)
+            .map(e -> e.findElements(By.className(format("gd-column-measure-%s", columnIndex))))
+            .collect(toList());
+        return elements.get(rowIndex).get(headerIndex).getAttribute("style");
+    }
 }

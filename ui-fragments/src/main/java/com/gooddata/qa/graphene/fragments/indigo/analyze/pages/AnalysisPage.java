@@ -402,9 +402,21 @@ public class AnalysisPage extends AbstractFragment {
             () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPage removeAttribute(String attr) {
-        return drag(getAttributesBucket().get(attr).findElement(By.className("adi-bucket-item-header")),
-                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    public AnalysisPage removeAttribute(String attribute) {
+        WebElement from = getAttributesBucket().get(attribute).findElement(By.className("adi-bucket-item-header"));
+        waitForElementVisible(from);
+        Actions driverActions = new Actions(browser);
+
+        // Move item from bucket component to trash icon is not working well on chromeDriver when insight has from 2+ measures/attributes. 
+        // This additional #moveByOffset(-10, -5) is a work around to make it work properly.
+        driverActions.clickAndHold(from).moveByOffset(-10, -5).perform();
+        try {
+            WebElement dropZone = waitForElementVisible(BY_TRASH_PANEL, browser);
+            driverActions.moveToElement(dropZone).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+        return this;
     }
 
     public AnalysisPage removeFilter(String attr) {
