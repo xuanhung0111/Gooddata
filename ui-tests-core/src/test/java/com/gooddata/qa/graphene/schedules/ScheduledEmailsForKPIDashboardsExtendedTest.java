@@ -199,7 +199,7 @@ public class ScheduledEmailsForKPIDashboardsExtendedTest extends AbstractGoodSal
             initIndigoDashboardsPage();
             addKPIToDashboard(indigoDashboardsPage, nameDashboardSchedule);
             indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
-            indigoDashboardsPage.scheduleEmailing().addRecipientToField(imapUser).submit();
+            indigoDashboardsPage.scheduleEmailing().addRecipientToField(singletonList(imapUser)).submit();
 
             PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
             if (personalInfoDialog.getEmail().equals(userDeleted) &&

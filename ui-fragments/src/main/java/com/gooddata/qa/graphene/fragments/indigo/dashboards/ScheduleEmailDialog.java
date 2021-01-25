@@ -89,9 +89,11 @@ public class ScheduleEmailDialog extends AbstractFragment {
         return waitForCollectionIsNotEmpty(recipientsSuggestion).stream().map(WebElement::getText).collect(toList());
     }
 
-    public ScheduleEmailDialog addRecipientToField(String email) {
+    public ScheduleEmailDialog addRecipientToField(List<String> emails) {
         clickToField();
-        getActions().sendKeys(email).sendKeys(Keys.ENTER).perform();
+        emails.forEach(email -> {
+            getActions().sendKeys(email).sendKeys(Keys.ENTER).perform();
+        });
         return this;
     }
 
