@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.sdk.common.GoodDataRestException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -9,7 +10,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.FindBy;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -453,5 +456,12 @@ public class EditDatasetDialog extends AbstractFragment {
             waitForElementVisible(cancelBtn).click();
             waitForFragmentNotVisible(this);
         }
+    }
+
+    public Optional<String> checkIdOfAttributeDatasetSameWithTitleDataset(String id) {
+        return getRoot().findElements(By.className("public_fixedDataTable_bodyRow")).stream()
+                .filter(el -> isElementVisible(el))
+                .map(el -> el.getText().split("\n")[2]).collect(Collectors.toList())
+                .stream().filter(content -> !content.contains(id) && content != "").findAny();
     }
 }

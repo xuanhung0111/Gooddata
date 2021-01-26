@@ -12,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -86,6 +87,9 @@ public class OverlayWrapper extends AbstractFragment {
 
     @FindBy(className = "dropdown-body")
     private DropDownDSContent dsDropdown;
+
+    @FindBy(className = "icon-navigateup")
+    private WebElement navigateUpBtn;
 
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -241,6 +245,12 @@ public class OverlayWrapper extends AbstractFragment {
 
         public String getName() {
             return name;
+        }
+    }
+
+    public void closeDropdownContentOfAttribute() {
+        if (isElementVisible(navigateUpBtn)) {
+            navigateUpBtn.click();
         }
     }
 }
