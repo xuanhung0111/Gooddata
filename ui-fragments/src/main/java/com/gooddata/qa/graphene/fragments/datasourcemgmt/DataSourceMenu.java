@@ -49,6 +49,16 @@ public class DataSourceMenu extends AbstractFragment {
         OverlayWrapper.getInstance(browser).selectBigqueryItem();
     }
 
+    public void selectS3DataSource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectS3Item();
+    }
+
+    public void selectGenericDataSource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectGenericItem();
+    }
+
     public List<String> getListDataSources() {
         List<String> originalList = new ArrayList<String>();
         for (WebElement e : datasources) {
