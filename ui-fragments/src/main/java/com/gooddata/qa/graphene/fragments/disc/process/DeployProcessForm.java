@@ -76,6 +76,13 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(className = "s-btn-edit_data_source")
     private WebElement btnEditDatasource;
 
+    @FindBy(className = "link")
+    private WebElement switchToDatasourceLink;
+
+    @FindBy(className = "generic-add-data-source-button")
+    private WebElement addDatasourceButton;
+
+
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
     }
@@ -308,6 +315,16 @@ public class DeployProcessForm extends AbstractFragment {
     public void submit() {
         clickSubmitButton();
         waitForFragmentNotVisible(this);
+    }
+
+    public DeployProcessForm clickSwitchToDataSourceLink() {
+        waitForElementVisible(switchToDatasourceLink).click();
+        return this;
+    }
+
+    public DeploySDDProcessDialog clickAddDatasource() {
+        waitForElementVisible(addDatasourceButton).click();
+        return DeploySDDProcessDialog.getInstance(browser);
     }
 
     private ProcessTypeDropdown getProcessTypeDropdown() {
