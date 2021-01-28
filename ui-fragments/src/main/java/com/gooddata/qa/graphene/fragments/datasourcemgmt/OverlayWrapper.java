@@ -27,6 +27,12 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(css = ".create-datasource-dialog")
     private WebElement popupResource;
 
+    @FindBy(className = "s-create-datasource-dialog-item-s3-data-source")
+    private WebElement s3Resource;
+
+    @FindBy(className = "s-create-datasource-dialog-item-generic-data-source")
+    private WebElement genericResource;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
         return Graphene.createPageFragment(OverlayWrapper.class, wrapperList.get(1));
@@ -48,5 +54,15 @@ public class OverlayWrapper extends AbstractFragment {
         waitForElementVisible(popupResource);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(bigqueryResource).click().build().perform();
+    }
+
+    public void selectS3Item() {
+        waitForElementVisible(popupResource);
+        getActions().moveToElement(s3Resource).click().build().perform();
+    }
+
+    public void selectGenericItem() {
+        waitForElementVisible(popupResource);
+        getActions().moveToElement(genericResource).click().build().perform();
     }
 }
