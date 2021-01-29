@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -31,8 +32,6 @@ public class SplashScreen extends AbstractFragment {
         sleepTightInSeconds(1);
         waitForElementVisible(createKpiDashboardButton).click();
         waitForElementNotVisible(createKpiDashboardButton);
-        //Splash screen is fading, not disappear immediately
-        waitForElementNotVisible(By.className("splashscreen-content"), getRoot());
         return IndigoDashboardsPage.getInstance(browser);
     }
 

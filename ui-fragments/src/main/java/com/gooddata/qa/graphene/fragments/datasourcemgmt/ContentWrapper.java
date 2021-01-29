@@ -14,7 +14,7 @@ public class ContentWrapper extends AbstractFragment {
     public static final String CONTENT_WRAPPER_CLASS = "content-wrapper";
     private static final int TIMEOUT_WAIT_CONTENT_LOADED = 5 * 60;
 
-    @FindBy(className = "loader-wraper")
+    @FindBy(className = "loader-wrapper")
     private static WebElement loading;
 
     public static final ContentWrapper getInstance(SearchContext searchContext) {

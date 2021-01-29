@@ -41,6 +41,12 @@ public class DataMapping extends AbstractFragment {
         return sourceColumn.getText();
     }
 
+    public String getWarningSourceColumnByName(String name, String type) {
+        WebElement row = getRowByName(name, type);
+        WebElement sourceColumn = row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
+        return sourceColumn.getText();
+    }
+
     public String getSourceTypeByName(String name, String type) {
         WebElement row = getRowByName(name, type);
         if (type == "date") {
@@ -114,6 +120,13 @@ public class DataMapping extends AbstractFragment {
         WebElement sourceType = row.findElement(By.cssSelector(".model-mapping-source-type .s-editable-label"));
         driverActions.moveToElement(sourceType).click().build().perform();
         return OverlayWrapper.getInstanceByIndex(browser, 1).getIndigoTableDropDown().getListDropdownOption();
+    }
+
+    public String getWarningMessage(String labelName, String type) {
+        WebElement row = getRowByName(labelName, type);
+        WebElement warningIcon = row.findElement(By.className("icon-warning"));
+        getActions().moveToElement(warningIcon).pause(1000).build().perform();
+        return browser.findElement(By.cssSelector(".bubble-content .content")).getText();
     }
 
     public enum SOURCE_TYPE{

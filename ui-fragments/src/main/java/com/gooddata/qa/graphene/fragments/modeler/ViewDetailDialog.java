@@ -12,6 +12,8 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollBarIconToViewElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -41,11 +43,15 @@ public class ViewDetailDialog extends AbstractFragment {
     @FindBy(className = "selected-row")
     WebElement selectedRow;
 
+    @FindBy(className = "s-navigatedown")
+    WebElement navigateDownButton;
+
     private static final String VIEW_DETAIL_DIALOG = "indigo-table-component";
     private static final String ATTRIBUTE_NAME = "//div[@class='title attribute'][contains(text(),'%s')]";
     private static final String ATTRIBUTE_PRIMARY = "//div[@class='title primary-key'][contains(text(),'%s')]";
     private static final String FACT_NAME = "//div[@class='title fact'][contains(text(),'%s')]";
     private static final String LABEL_NAME = "//div[@class='title label label-text'][contains(text(),'%s')]";
+    private static final String LABEL_LINK_NAME = "//div[@class='title label label-link'][contains(text(),'%s')]";
     private static final String DATATYPE_CHANGE = "//div[@class='gd-list-item %s']";
 
     public static ViewDetailDialog getInstance(SearchContext searchContext) {
@@ -103,6 +109,14 @@ public class ViewDetailDialog extends AbstractFragment {
     public void addNewLabel(String attribute, String labelName){
         WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
         processAddNewLabel(labelName, attributeName);
+    }
+
+    public void addNewLabelTypeHyperlink(String attribute, String labelName) {
+        WebElement attributeName = this.getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
+        hoverOnElementByJS(attributeName);
+        waitForElementVisible(addLabelButton);
+        getActions().moveToElement(addLabelButton).click().build().perform();
+        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().addLink(labelName);
     }
 
     public void processAddNewLabel(String labelName, WebElement attributeElement){
@@ -177,4 +191,51 @@ public class ViewDetailDialog extends AbstractFragment {
         executor.executeScript(mouseOverScript, element);
     }
 
+    public String getIdentifierOfAttribute(String attribute) {
+        WebElement attributeName = browser.findElement(xpath(format(ATTRIBUTE_NAME, attribute)));
+        scrollBarIconToViewElement(attributeName, browser, 50, 15000);
+        getActions().moveToElement(attributeName).click().build().perform();
+        return selectedRow.getText().split("\n")[1];
+    }
+
+    public String getIdentifierOfFact(String fact) {
+        WebElement factName = browser.findElement(xpath(format(FACT_NAME, fact)));
+        scrollBarIconToViewElement(factName, browser, 100, 15000);
+        getActions().moveToElement(factName).click().build().perform();
+        return selectedRow.getText().split("\n")[1];
+    }
+
+    public String getTypeOfLabelLink(String label) {
+        WebElement labelLink = getRoot().findElement(xpath(format(LABEL_LINK_NAME, label)));
+        scrollBarIconToViewElement(labelLink, browser, 50, 15000);
+        getActions().moveToElement(labelLink).click().build().perform();
+        return selectedRow.getText().split("\n")[0];
+    }
+
+    public String getTyeOfAttribute(String attributeName) {
+        WebElement element = getRoot().findElement(xpath(format(ATTRIBUTE_NAME, attributeName)));
+        getActions().moveToElement(element).click().build().perform();
+        return selectedRow.getText();
+    }
+
+    public String getTypeOfLabel(String labelName) {
+        WebElement labelEl = getRoot().findElement(xpath(format(LABEL_NAME, labelName)));
+        scrollBarIconToViewElement(labelEl, browser, 20, 15000);
+        getActions().moveToElement(labelEl).click().build().perform();
+        return selectedRow.getText().split("\n")[0];
+    }
+
+    public boolean isChangeLabelTypeIconVisible() {
+        return isElementVisible(By.className("s-navigatedown"), getRoot());
+    }
+
+    public void clickChangeLabelType() {
+        waitForElementVisible(navigateDownButton).click();
+    }
+
+    public ViewDetailDialog moveToLabelLink(String labelName) {
+        WebElement element = getRoot().findElement(xpath(format(LABEL_LINK_NAME, labelName)));
+        getActions().moveToElement(element).click().build().perform();
+        return this;
+    }
 }

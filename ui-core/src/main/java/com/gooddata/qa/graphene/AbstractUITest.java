@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
@@ -120,7 +121,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             openUrl(PAGE_LOGIN);
         }
         LoginFragment.getInstance(browser).login(username, password, true);
-        waitForElementVisible(cssSelector("a.account-menu,.gd-header-account,.hamburger-icon,.logo-anchor"), browser);
+        waitForElementVisible(cssSelector("a.account-menu,.gd-header-account,.hamburger-icon,.logo-anchor,.adi-editor-main,.is-dashboard-loaded"), browser);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
@@ -573,10 +574,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
+        return initEmbeddedIndigoDashboardPageByIframe(true);
+    }
+
+    public <T extends AbstractFragment> T initEmbeddedIndigoDashboardPageByIframe(boolean isLoggedIn) {
         tryToInitEmbeddedIndigoDashboardPage();
         browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
         waitForOpeningIndigoDashboard();
-        return IndigoDashboardsPage.getInstance(browser);
+        return isLoggedIn ? (T) IndigoDashboardsPage.getInstance(browser) : (T) LoginFragment.getInstance(browser);
     }
 
     public void tryToInitEmbeddedIndigoDashboardPage(){
@@ -615,6 +620,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(format(EMBEDDED_ANALYZE_PAGE_URI, testParams.getProjectId()));
         return AnalysisPage.getInstance(browser);
     }
+
     protected void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className("gd-loading-equalizer");
         try {

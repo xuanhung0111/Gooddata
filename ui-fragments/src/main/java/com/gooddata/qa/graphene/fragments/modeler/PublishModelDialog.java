@@ -8,6 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -39,6 +40,9 @@ public class PublishModelDialog extends AbstractFragment {
     @FindBy(css = ".gd-dialog-close .s-dialog-close-button")
     private WebElement btnCancelSuccess;
 
+    @FindBy(className = "sub-error")
+    private WebElement errorPublish;
+
     public static final PublishModelDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PublishModelDialog.class, waitForElementVisible(SIDEBAR, searchContext));
     }
@@ -54,6 +58,11 @@ public class PublishModelDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void overwriteDataAcceptError() {
+        btnOverwrite.click();
+        btnPublish.click();
+    }
+
     public void clickCancel() {
         btnCancel.click();
     }
@@ -62,6 +71,14 @@ public class PublishModelDialog extends AbstractFragment {
         waitForElementNotVisible(publishingIcon);
         waitForElementVisible(textResultError);
         return textResultError.getText();
+    }
+
+    public String getErrorPublish() {
+        return waitForElementVisible(errorPublish).getText();
+    }
+
+    public boolean isPublishModelDialogDisplay() {
+        return isElementVisible(SIDEBAR, getRoot());
     }
 
     public void clickButtonCancelErrorPopUp() {

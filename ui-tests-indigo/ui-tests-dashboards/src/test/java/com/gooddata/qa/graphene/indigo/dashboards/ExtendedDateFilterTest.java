@@ -23,6 +23,12 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+
 public class ExtendedDateFilterTest extends AbstractDashboardTest {
 
     private ProjectRestRequest projectRestRequest;
@@ -44,13 +50,13 @@ public class ExtendedDateFilterTest extends AbstractDashboardTest {
         assertEquals(indigoDashboardsPage.saveEditModeWithWidgets().getDateFilterSelection(), LAST_7_DAYS.toString());
 
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(ALL_TIME).apply();
-        assertEquals(indigoDashboardsPage.getDateFilterSelection(), "allTime"); //Bug RAIL-1645
+        assertEquals(indigoDashboardsPage.getDateFilterSelection(), "All time");
 
         initIndigoDashboardsPage();
         assertEquals(indigoDashboardsPage.getDateFilterSelection(), LAST_7_DAYS.toString());
 
         indigoDashboardsPage.switchToEditMode().openExtendedDateFilterPanel().selectStaticPeriod("01/01/2018", "01/01/2019").apply();
-        assertEquals(indigoDashboardsPage.saveEditModeWithWidgets().getDateFilterSelection(), "1/1/2018–1/1/2019");
+        assertEquals(indigoDashboardsPage.saveEditModeWithWidgets().getDateFilterSelection(), "01/01/2018–01/01/2019");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
@@ -63,17 +69,17 @@ public class ExtendedDateFilterTest extends AbstractDashboardTest {
 
         indigoDashboardsPage.openExtendedDateFilterPanel().selectStaticPeriod("01/01/2018", "01/01/2019").apply();
         kpi.hoverAndClickKpiAlertButton();
-        assertEquals(getBubbleMessage(browser), "Alerts are not supported");
+        assertEquals(getBubbleMessage(browser), "Alerts are not supported for the static date period");
 
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(LAST_7_DAYS).checkExcludeCurrent().apply();
         kpi.hoverAndClickKpiAlertButton();
-        assertEquals(getBubbleMessage(browser), "Alerts are not supported");
+        assertTrue(kpi.hasAlertDialogOpen(), "Alert dialog should open");
 
         indigoDashboardsPage.openExtendedDateFilterPanel()
                 .selectFloatingRange(DateGranularity.MONTHS, "2 months ago", "this month").apply();
         kpi.hoverAndClickKpiAlertButton();
         takeScreenshot(browser, "check-Kpi-Alert-Dialog-check", getClass());
-        assertEquals(getBubbleMessage(browser), "Alerts are not supported");
+        assertTrue(kpi.hasAlertDialogOpen(), "Alert dialog should open");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
@@ -109,11 +115,11 @@ public class ExtendedDateFilterTest extends AbstractDashboardTest {
     @DataProvider(name = "dateFilterProvider")
     public Object[][] dateFilterProvider() {
         return new Object[][] {
-                {DateRange.LAST_7_DAYS, "prev. 6d"},
-                {DateRange.LAST_30_DAYS, "prev. 29d"},
-                {DateRange.LAST_90_DAYS, "prev. 89d"},
-                {DateRange.LAST_12_MONTHS, "prev. 11m"},
-                {DateRange.LAST_4_QUARTERS, "prev. 3q"},
+                {DateRange.LAST_7_DAYS, "prev. 7d"},
+                {DateRange.LAST_30_DAYS, "prev. 30d"},
+                {DateRange.LAST_90_DAYS, "prev. 90d"},
+                {DateRange.LAST_12_MONTHS, "prev. 12m"},
+                {DateRange.LAST_4_QUARTERS, "prev. 4q"},
         };
     }
 
@@ -190,5 +196,33 @@ public class ExtendedDateFilterTest extends AbstractDashboardTest {
                 .selectFloatingRange(DateGranularity.MONTHS, "this month", "this month").apply();
         assertEquals(indigoDashboardsPage.saveEditModeWithWidgets()
                 .openExtendedDateFilterPanel().getSelectedDateFilter(), DateRange.FLOATING_RANGE);
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void checkDatePresets() {
+        List<String> currentDatePresets = initIndigoDashboardsPage()
+                .addDashboard().openExtendedDateFilterPanel().getDateRangeOptions();
+        List<String> expectedDatePresets = Stream.of(DateRange.values()).map(dateRange -> dateRange.toString())
+                .collect(Collectors.toList());
+        assertEquals(currentDatePresets, expectedDatePresets);
+
+        initIndigoDashboardsPage().addDashboard().openExtendedDateFilterPanel()
+                .selectStaticPeriod("01/01/2018", "01/01/2019").apply();
+        currentDatePresets = indigoDashboardsPage.openExtendedDateFilterPanel().getDateRangeOptions();
+        assertEquals(currentDatePresets, expectedDatePresets);
+
+        initIndigoDashboardsPage().addDashboard().openExtendedDateFilterPanel()
+                .selectFloatingRange(DateGranularity.MONTHS, "this month", "this month").apply();
+        currentDatePresets = indigoDashboardsPage.openExtendedDateFilterPanel().getDateRangeOptions();
+        assertEquals(currentDatePresets, expectedDatePresets);
+
+        initIndigoDashboardsPage().addDashboard().openExtendedDateFilterPanel().selectPeriod(ALL_TIME).apply();
+        currentDatePresets = indigoDashboardsPage.openExtendedDateFilterPanel().getDateRangeOptions();
+        assertEquals(currentDatePresets, expectedDatePresets);
+
+        initIndigoDashboardsPage().addDashboard().openExtendedDateFilterPanel().selectPeriod(LAST_7_DAYS)
+                .checkExcludeCurrent().apply();
+        currentDatePresets = indigoDashboardsPage.openExtendedDateFilterPanel().getDateRangeOptions();
+        assertEquals(currentDatePresets, expectedDatePresets);
     }
 }

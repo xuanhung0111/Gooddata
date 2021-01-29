@@ -26,6 +26,9 @@ public class MainModelContent extends AbstractFragment {
     @FindBy(className = "joint-halo")
     private InteractiveAction interactiveAction;
 
+    @FindBy(className = "joint-paper-grid")
+    private WebElement gridPaperModeler;
+
     public static MainModelContent getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 MainModelContent.class, waitForElementVisible(className(JOINT_PAPER), searchContext));
@@ -83,4 +86,7 @@ public class MainModelContent extends AbstractFragment {
         driverActions.moveToElement(textEditor).sendKeys(factName).sendKeys(Keys.ENTER).build().perform();
     }
 
+    public void loseFocusOnDataset() {
+        getActions().moveToElement(gridPaperModeler).moveByOffset(1, 1).click();
+    }
 }

@@ -59,7 +59,7 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     private final String COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER = "Column chart has drill url and drill down";
 
     private final String DASHBOARD_COLUMN_CHART_ONLY_MEASURES = "Dashboard with Column chart has only measures";
-    private final String DASHBOARD_COLUMN_CHART_HAS_NOT_HYPERLINK = "Dashboard with Column chart has not url hyperlink";
+    private final String DASHBOARD_COLUMN_CHART_HAS_NOT_HYPERLINK = "Dashboard with Column chart has not hyperlink";
     private final String DASHBOARD_COLUMN_CHART_HAS_HYPERLINK = "Dashboard hyperlink";
     private final String DASHBOARD_COLUMN_CHART_HAS_MANY_HYPERLINKS = "Dashboard two hyperlinks";
     private final String DASHBOARD_COLUMN_CHART_LONG_ATTRIBUTE_HAS_HYPERLINK = "Dashboard long hyperlink";
@@ -74,13 +74,15 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     private final String DASHBOARD_COLUMN_CHART_CHANGE_DRILL_CONFIG = "Hyperlink to insight";
     private final String DASHBOARD_COLUMN_CHART_CHANGE_CUSTOM_TO_HYPERLINK = "Custom to hyperlink";
     private final String DASHBOARD_COLUMN_CHART_CHANGE_CUSTOM_TO_DRILL_DASHBOARD = "Custom to dashboard";
-    private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_INDENTIFIER = "Contain Identifier";
+    private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_IDENTIFIER = "Contain Identifier";
     private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_INSIGHTS = "Contain Insights";
-    private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_NOT_CONTAIN_INDENTIFIER = "Not contain Identifier";
+    private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_NOT_CONTAIN_IDENTIFIER = "Not contain Identifier";
     private final String DASHBOARD_COLUMN_CHART_CUSTOM_URL_WITHOUT_PROTOCOL = "Without protocol";
     private final String DASHBOARD_COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER = "Drill picker";
     private final String DASHBOARD_COLUMN_CHART_DRILL_URL_TO_DRILL_DASHBOARD = "Updated drill hyperlink to drill to dashboard";
     private final String DASHBOARD_COLUMN_CHART_DRILL_URL_TO_CUSTOM_URL = "Updated drill hyperlink to drill to custom url";
+    private final String DASHBOARD_COLUMN_CHART_NOT_HYPERLINK = "Not hyperlink";
+    private final String DASHBOARD_COLUMN_CHART_USED_HYPERLINK = "Has hyperlink";
 
     private IndigoRestRequest indigoRestRequest;
     private ProjectRestRequest projectRestRequest;
@@ -181,18 +183,50 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillHasNotUrlHyperlink(METRIC_AMOUNT_BOP);
         assertFalse(configurationPanel.hasHyperlink(), "Should not allow to drill to URL Hyperlink without hyperlink attribute.");
+        assertFalse(configurationPanel.hasHyperlinkLoading(), "Should not show hyperlink loading icon");
+    }
+
+    @Test(dependsOnGroups = "createProject", description = "This test case covered QA-12364 Attribute on hyperlink label section and insight section load forever")
+    public void drillToUrlHasNotHyperlinkEditMode() {
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_NOT_HYPERLINK)
+            .addInsight(COLUMN_CHART_HAS_NOT_HYPERLINK)
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_NOT_HYPERLINK);
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+        indigoDashboardsPage.saveEditModeWithWidgets();
+
+        initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_NOT_HYPERLINK).waitForWidgetsLoading();
+        indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_NOT_HYPERLINK);
+        configurationPanel = indigoDashboardsPage.getConfigurationPanel();
+        configurationPanel.drillHasNotUrlHyperlink(METRIC_AMOUNT_BOP);
+        assertFalse(configurationPanel.hasHyperlink(), "Should not allow to drill to URL Hyperlink without hyperlink attribute.");
+        assertFalse(configurationPanel.hasHyperlinkLoading(), "Should not show hyperlink loading icon.");
+    }
+
+    @Test(dependsOnGroups = "createProject", description = "This test case covered QA-12364 Attribute on hyperlink label section and insight section load forever")
+    public void drillToUrlHasHyperlinkEditMode() {
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_USED_HYPERLINK)
+            .addInsight(COLUMN_CHART_HAS_MANY_HYPERLINKS)
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS);
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+        indigoDashboardsPage.saveEditModeWithWidgets();
+
+        initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_USED_HYPERLINK).waitForWidgetsLoading();
+        indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS);
+        configurationPanel = indigoDashboardsPage.getConfigurationPanel();
+        configurationPanel.drillIntoUrlHyperlink(METRIC_AMOUNT_BOP, ATTR_DEPARTMENT);
+        assertEquals(configurationPanel.getAttributeDrillUrl(), "Department (Department)");
     }
 
     @Test(dependsOnGroups = "createProject", dataProvider = "insightHasHyperlink")
-    public void drillToUrlHyperlink(String dashboard, String insigh, String attribute, String urlCompare, String messageCompare) {
-        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(dashboard).addInsight(insigh).selectWidgetByHeadline(Insight.class, insigh);
-        
+    public void drillToUrlHyperlink(String dashboard, String insight, String attribute, String urlCompare, String messageCompare) {
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(dashboard).addInsight(insight).selectWidgetByHeadline(Insight.class, insight);
+
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoUrlHyperlink(METRIC_AMOUNT_BOP, attribute);
         indigoDashboardsPage.openExtendedDateFilterPanel().selectStaticPeriod("10/09/2010", "11/11/2010").apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
-        ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, insigh).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, insight).getChartReport();
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
@@ -205,7 +239,7 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = "drillToUrlHyperlink")
-    public void editDrillHiperlinkToDrillInsight() {
+    public void editDrillHyperlinkToDrillInsight() {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_HAS_HYPERLINK).waitForWidgetsLoading();
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK);
             configurationPanel = indigoDashboardsPage.getConfigurationPanel().clickRemoveMetricDrillInteractions();
@@ -216,14 +250,15 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.waitForDrillModalDialogLoading();
     }
 
-    @Test(dependsOnGroups = "createProject" , description = "This test case covered the editing from drill to hyperlink url to drill to dashboard")
-    public void editDrillHiperlinkToDrillDashboard() {
+    @Test(dependsOnGroups = "createProject", description = "This test case covered the editing from drill to hyperlink url to drill to dashboard")
+    public void editDrillHyperlinkToDrillDashboard() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_DRILL_URL_TO_DRILL_DASHBOARD)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
-                    
+
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoUrlHyperlink(METRIC_AMOUNT_BOP, ATTR_DEPARTMENT);
+        assertEquals(configurationPanel.getAttributeDrillUrl(),"Department (Department)");
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
 
@@ -233,17 +268,18 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
         chartReport.clickOnElement(Pair.of(0, 0));
-        chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK).getChartReport();
+        indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK).getChartReport();
         indigoDashboardsPage.waitForWidgetsLoading();
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the editing from drill to hyperlink url to custom url")
-    public void editDrillHiperlinkToDrillCustomUrl() {
+    public void editDrillHyperlinkToDrillCustomUrl() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_DRILL_URL_TO_CUSTOM_URL)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
-            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);    
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoUrlHyperlink(METRIC_AMOUNT_BOP, ATTR_DEPARTMENT);
+        assertEquals(configurationPanel.getAttributeDrillUrl(),"Department (Department)");
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
 
@@ -254,17 +290,17 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
     }
 
     @Test(dependsOnMethods = "drillToUrlHyperlink")
-    public void deleteDrillHiperlinkConfig() {
+    public void deleteDrillHyperlinkConfig() {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_LONG_ATTRIBUTE_HAS_HYPERLINK).waitForWidgetsLoading();
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_LONG_ATTRIBUTE_HAS_HYPERLINK);
             configurationPanel = indigoDashboardsPage.getConfigurationPanel().clickRemoveMetricDrillInteractions();
             indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_LONG_ATTRIBUTE_HAS_HYPERLINK).getChartReport();
-        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling with many hyperlinks")
@@ -274,16 +310,17 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoUrlHyperlink(METRIC_AMOUNT_BOP, ATTR_DEPARTMENT);
+        assertEquals(configurationPanel.getAttributeDrillUrl(),"Department (Department)");
         configurationPanel.drillIntoUrlHyperlink(METRIC_BEST_CASE, ATTR_REGION);
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("intgdc.com/dashboards/Direct%20Sales");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -291,14 +328,14 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = "drillConfigManyUrlHyperlink")
-    public void deleteAllDrillHiperlinkConfig() {
+    public void deleteAllDrillHyperlinkConfig() {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_SOME_ATTRIBUTES_HAS_HYPERLINK).waitForWidgetsLoading();
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS);
             configurationPanel = indigoDashboardsPage.getConfigurationPanel();
             configurationPanel.clickRemoveMetricDrillInteractions().clickRemoveMetricDrillInteractions();
             indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_MANY_HYPERLINKS).getChartReport();
-        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
     }
 
     @Test(dependsOnGroups = "createProject", dataProvider = "configDrillToUrlHyperlink")
@@ -309,48 +346,48 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, insight).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
-    } 
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+    }
 
-    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl" , 
-        description = "This test case covered the emoving measure which is set drill drill to Url on KD")
+    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl",
+        description = "This test case covered the removing measure which is set drill drill to Url on KD")
     public void removeMeasureWhichSetDrill() {
         initAnalysePage().openInsight(COLUMN_CHART_REMOVE_MEASURE).waitForReportComputing().removeMetric(METRIC_AMOUNT_BOP).saveInsight().waitForReportComputing();
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_REMOVE_MEASURE).waitForWidgetsLoading();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_MEASURE).getChartReport();
-        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_MEASURE);
         assertEquals(waitForElementVisible(BY_WARNING_MESSAGE_BAR, browser).getText(), "Some interactions were removedShow more");
         indigoDashboardsPage.saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl" , 
+    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl",
         description = "This test case covered the removing attribute which is used in URL as a hyperlink label from insight")
     public void removeAttributeWhichSetDrill() {
         initAnalysePage().openInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).waitForReportComputing()
             .removeAttribute(ATTR_DEPARTMENT).saveInsight().waitForReportComputing();
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_REMOVE_ATTRIBUTE).waitForWidgetsLoading();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         assertEquals(waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser).getText(),"Failed to load URL.");
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         assertEquals(waitForElementVisible(BY_WARNING_MESSAGE_BAR, browser).getText(),"Some interactions were removedShow more");
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
     }
 
-    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl" , 
+    @Test(dependsOnMethods = "prepareDashboardWithConfigDrillToUrl",
         description = "This test case covered the changing attribute which is used in URL as hyperlink label to other label, such as Text")
     public void changeAttributeHyperlink() throws IOException {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_CHANGE_ATTRIBUTE_TYPE).waitForWidgetsLoading();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_CHANGE_ATTRIBUTE_TYPE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("intgdc.com/dashboards/East%20Coast");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -360,7 +397,7 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_CHANGE_ATTRIBUTE_TYPE);
         assertEquals(waitForElementVisible(BY_WARNING_MESSAGE_BAR, browser).getText(), "Some interactions were removedShow more");
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should not allow to drill to Url.");
         } finally {
             attributeRestRequest.setHyperlinkTypeForAttribute(ATTR_REGION, hyperlinkType);
         }
@@ -371,12 +408,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_HYPERLINK_EMBEDDED).waitForWidgetsLoading();
         chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
         initEmbeddedIndigoDashboardPageByType(EmbeddedType.URL).waitForWidgetsLoading();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("intgdc.com/dashboards/embedded/Direct%20Sales");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -389,35 +426,35 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         String insightIDValue = drillCustomUrlDialog.getToolTipFromVisibilityQuestionIcon(insightID).toLowerCase();
         drillCustomUrlDialog.addInsightID().apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains(insightIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
         }
     }
-    
+
     @Test(dependsOnGroups = "createProject", description = "This test case covered the removing attribute which used as a parameter in custom URL")
     public void removeAttributeUsedCustomUrl() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL)
             .addInsight(COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL)
-            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL);         
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoCustomUrl(METRIC_AMOUNT_BOP);
         DrillCustomUrlDialog.getInstance(browser).addInsight(ATTR_REGION).apply();
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
-        
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+
         initAnalysePage().openInsight(COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL).waitForReportComputing()
             .removeAttribute(ATTR_REGION).saveInsight().waitForReportComputing();
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL).waitForWidgetsLoading();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         assertEquals(waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser).getText(), "Failed to load URL.");
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_ATTRIBUTE_CUSTOM_URL);
@@ -427,10 +464,10 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling to custom Url that only contains Identifiers")
-    public void drilltoCustomUrlByIdentifier() {
+    public void drillToCustomUrlByIdentifier() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_IDENTIFIER)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
-            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);    
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoCustomUrl(METRIC_AMOUNT_BOP);
         DrillCustomUrlDialog drillCustomUrlDialog = DrillCustomUrlDialog.getInstance(browser);
@@ -439,12 +476,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains(projectIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -456,12 +493,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         String insightIDValue = drillCustomUrlDialog.getToolTipFromVisibilityQuestionIcon(insightID).toLowerCase();
         drillCustomUrlDialog.addInsightID().apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains(insightIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -473,12 +510,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         String widgetIDValue = drillCustomUrlDialog.getToolTipFromVisibilityQuestionIcon(widgetID).toLowerCase();
         drillCustomUrlDialog.addWidgetID().apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains(widgetIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -490,12 +527,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         String dashboardIDValue = drillCustomUrlDialog.getToolTipFromVisibilityQuestionIcon(dashboardID).toLowerCase();
         drillCustomUrlDialog.addDashboardID().apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains(dashboardIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -503,22 +540,22 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling to custom Url that only contain insight identifiers")
-    public void drilltoCustomUrlByInsights() {
+    public void drillToCustomUrlByInsights() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_INSIGHTS)
             .addInsight(COLUMN_CHART_REMOVE_MEASURE)
-            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_MEASURE);         
+            .selectWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_MEASURE);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoCustomUrl(METRIC_AMOUNT_BOP);
         DrillCustomUrlDialog.getInstance(browser).addInsight(ATTR_DEPARTMENT).apply();
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_REMOVE_MEASURE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("intgdc.com/dashboards/Direct%20Sales");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -527,18 +564,18 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = "createProject", dataProvider = "configDrillToCustomUrl")
     public void prepareDashboardHasCustomUrl(String dashboard, String insight) {
-        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(dashboard).addInsight(insight).selectWidgetByHeadline(Insight.class, insight);         
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(dashboard).addInsight(insight).selectWidgetByHeadline(Insight.class, insight);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
         configurationPanel.drillIntoCustomUrl(METRIC_AMOUNT_BOP);
         DrillCustomUrlDialog.getInstance(browser).addDashboardID().apply();
         indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, insight).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
     }
 
     @Test(dependsOnMethods = "prepareDashboardHasCustomUrl", description = "This test case covered the changing from drill to custom Url to hyperlink")
-    public void editDrillCustomUrlToDrillHiperlink() {
+    public void editDrillCustomUrlToDrillHyperlink() {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_CHANGE_CUSTOM_TO_HYPERLINK).waitForWidgetsLoading();
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         configurationPanel = indigoDashboardsPage.getConfigurationPanel();
@@ -546,12 +583,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("intgdc.com/dashboards/Direct%20Sales");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -567,11 +604,11 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
         chartReport.clickOnElement(Pair.of(0, 0));
-        chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK).getChartReport();
+        indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK).getChartReport();
         indigoDashboardsPage.waitForWidgetsLoading();
     }
 
-    @Test(dependsOnMethods = "editDrillHiperlinkToDrillInsight", description = "This test case covered the changing from drill to insight to drill to custom Url")
+    @Test(dependsOnMethods = "editDrillHyperlinkToDrillInsight", description = "This test case covered the changing from drill to insight to drill to custom Url")
     public void editDrillInsightToDrillCustomUrl() {
         initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_COLUMN_CHART_HAS_HYPERLINK).waitForWidgetsLoading();
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK);
@@ -582,21 +619,21 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_HAS_HYPERLINK).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("www.google.com");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
         }
     }
 
-    @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling custon Url that is inputed by keyboard and contained Identifiers")
-    public void drilltoCustomUrlByInputContainIdentifiers() {
-        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_INDENTIFIER)
+    @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling custom Url that is inputted by keyboard and contained Identifiers")
+    public void drillToCustomUrlByInputContainIdentifiers() {
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_IDENTIFIER)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         indigoDashboardsPage.saveEditModeWithWidgets();
@@ -613,21 +650,21 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("project/" + projectIDValue + "/dashboard/" + dashboardIDValue);
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
         }
     }
 
-    @Test(dependsOnGroups = "createProject", 
-        description = "This test case covered the drilling custom Url that is inputed by keyboard and contained insight identifiers")
-    public void drilltoCustomUrlByInputContainInsights() {
+    @Test(dependsOnGroups = "createProject",
+        description = "This test case covered the drilling custom Url that is inputted by keyboard and contained insight identifiers")
+    public void drillToCustomUrlByInputContainInsights() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_CONTAIN_INSIGHTS)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
@@ -640,12 +677,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("https://www.google.com/search?q=Direct%20Sales");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -653,8 +690,8 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling custom Url that has not contained identifier")
-    public void drilltoCustomUrlHasNotIdentifier() {
-        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_NOT_CONTAIN_INDENTIFIER)
+    public void drillToCustomUrlHasNotIdentifier() {
+        initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_NOT_CONTAIN_IDENTIFIER)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
         indigoDashboardsPage.saveEditModeWithWidgets();
@@ -666,12 +703,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("www.google.com");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -679,7 +716,7 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling to custom Url that is not contained protocol")
-    public void drilltoCustomUrlWithoutProtocol() {
+    public void drillToCustomUrlWithoutProtocol() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_CUSTOM_URL_WITHOUT_PROTOCOL)
             .addInsight(COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE);
@@ -692,12 +729,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_WITH_DEPARTMENT_ATTRIBUTE).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.clickOnElement(Pair.of(0, 0));
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("google.com");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);
@@ -705,7 +742,7 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = "createProject", description = "This test case covered the drilling with drill down to show drill picker")
-    public void DrillUrlWithDrillPicker() {
+    public void drillUrlWithDrillPicker() {
         initIndigoDashboardsPage().addDashboard().changeDashboardTitle(DASHBOARD_COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER)
             .addInsight(COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER)
             .selectWidgetByHeadline(Insight.class, COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER);
@@ -716,12 +753,12 @@ public class KPIDashboardsDrillToUrlTest extends AbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, COLUMN_CHART_DRILL_URL_WITH_DRILL_PICKER).getChartReport();
-        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Should allow to drill to Url.");
         chartReport.openDrillingPicker(Pair.of(0, 0)).drillToUrl();
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isDirectToGoodData = browser.getCurrentUrl().contains("google.com");
-            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url."); 
+            assertTrue(isDirectToGoodData, "Should drill to Url with correctly url.");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
             BrowserUtils.switchToFirstTab(browser);

@@ -158,6 +158,7 @@ public class UITestsRegistry {
             EmbeddedKDEditModeTest.class,
             EmbeddedKDViewModeTest.class,
             DependentFilterTest.class,
+            ExtendedDateFilterTest.class,
             DuplicateKpiDashboardTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",

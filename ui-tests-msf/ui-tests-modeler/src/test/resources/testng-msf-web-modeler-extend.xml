@@ -40,4 +40,9 @@
             <class name="com.gooddata.qa.graphene.modeler.LDMBigQueryCurrentTest" />
         </classes>
     </test>
+    <test name="WarningMessageTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.WarningMessageTest" />
+        </classes>
+    </test>
 </suite>

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -16,6 +17,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -41,6 +44,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     private static final String RENAMED_TEST_INSIGHT = "Renamed-Test-Insight";
     private static final String INSIGHT_CREATED_BY_EDITOR = "Insight-Created-By-Editor";
     private static final String INSIGHT_CREATED_BY_MAIN_USER = "Insight-Created-By-Main-User";
+    private static final String INSIGHT_FOR_CHECK_NO_DATA = "Insight-For-Check-No-Data";
     private static final List<String> INSIGHTS_FOR_FILTER_TEST = asList(INSIGHT_CREATED_BY_EDITOR,
             INSIGHT_CREATED_BY_MAIN_USER);
     private IndigoRestRequest indigoRestRequest;
@@ -58,6 +62,11 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupDashboardENV"})
@@ -441,9 +450,18 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
         }
     }
 
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
+    @Test(dependsOnGroups = {"createProject", "setupDashboardENV"})
+    public void checkRenderingOfNoDataInsight() {
+        indigoRestRequest.createInsight(new InsightMDConfiguration(INSIGHT_FOR_CHECK_NO_DATA, ReportType.BAR_CHART).
+                setMeasureBucket(singletonList(MeasureBucket.
+                        createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))).
+                setCategoryBucket(singletonList(CategoryBucket.
+                        createCategoryBucket(getAttributeByTitle(ATTR_ACTIVITY_TYPE), CategoryBucket.Type.VIEW))));
+
+        initIndigoDashboardsPage().createDashboard().addInsight(INSIGHT_FOR_CHECK_NO_DATA).
+                selectDateFilterByName(DateRange.LAST_7_DAYS.toString()).waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.getFirstWidget(Insight.class).getContentEmptyInsight(),
+                "No data for your filter selection");
     }
 
     private void checkInsightRender(final Insight insight, final String expectedHeadline,

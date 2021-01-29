@@ -13,7 +13,7 @@ public class UITestsRegistry {
         Map<String, Object> suites = new HashMap<>();
 
         suites.put("freemium", new Object[] {
-                BasicFreemiumTest.class
+//                BasicFreemiumTest.class // will enable after QA-12463
         });
 
         suites.put("growth", new Object[]{

@@ -69,6 +69,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = SPLASH_SCREEN_CLASS_NAME)
     private SplashScreen splashScreen;
 
+    @FindBy(className = SPLASH_SCREEN_WRAPPER_CLASS_NAME)
+    private SplashScreen splashScreenWrapper;
+
     @FindBy(className = "gd-header")
     private Header header;
 
@@ -132,6 +135,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-dash-item-action-placeholder")
     private WebElement exportCsvAndXlsxIcon;
 
+    @FindBy(xpath = "//span[text()='Save as new']")
+    private WebElement saveAsNewButton;
+
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
@@ -143,6 +149,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
     private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
+    private static final String SPLASH_SCREEN_WRAPPER_CLASS_NAME = "splashscreen-wrapper";
     private static final String FLUID_LAYOUT_ROWS_CSS = ".gd-fluidlayout-row:not(.s-fluid-layout-row-dropzone)";
     private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-all";
     private static final String FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME = "gd-fluidlayout-width-resizer";
@@ -163,6 +170,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
+    private static final By DISABLED_EMPTYDASHBOARDBUTTON_BUBBLE_MESSAGE = cssSelector(".bubble-content div.content");
 
     /* This snippet get value from background-color to a semicolon ";"
      *  For example : "background-color: rgb(255, 0, 0);"  ->  " rgb(255, 0, 0)"
@@ -176,7 +184,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage addDashboard() {
-        waitForElementVisible(addDashboard).click();
+        if (isSplashScreenPresent()) {
+            getSplashScreen().startEditingWidgets();
+        } else {
+            waitForElementVisible(addDashboard).click();
+        }
+        waitForElementVisible(cancelButton);
+        getInsightSelectionPanel().waitForLoading();
+        return this;
+    }
+
+    public IndigoDashboardsPage createDashboard() {
+        getSplashScreen().startEditingWidgets();
         waitForElementVisible(cancelButton);
         getInsightSelectionPanel().waitForLoading();
         return this;
@@ -216,12 +235,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
                 .getCssValue("background-color").equals("rgba(20, 178, 226, 0.15)");
     }
 
+    public boolean isDashboardNotFound() {
+        return isElementVisible(By.className("embedded-error"), root);
+    }
+
     public int getSizeWidthResizer() {
         return getRoot().findElements(By.className(FLUID_LAYOUT_WIDTH_RESIZER_CLASS_NAME)).size();
     }
 
     public SplashScreen getSplashScreen() {
         return waitForFragmentVisible(splashScreen);
+    }
+
+    public SplashScreen getSplashScreenWrapper() {
+        return waitForFragmentVisible(splashScreenWrapper);
     }
 
     public WebElement getSaveButton() {
@@ -1200,5 +1227,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
         }
 
         waitForElementNotPresent(loadingLabel);
+    }
+
+    public SaveAsDialog saveAsNewOnLockMode() {
+        waitForElementVisible(saveAsNewButton).click();
+        return SaveAsDialog.getInstance(browser);
+    }
+
+    public String getMessageDisabledEmptyDashboardbutton () {
+        if (isElementVisible(saveButton)){
+            getActions().moveToElement(saveButton).perform();
+            saveButton.click();
+        }
+        return waitForElementVisible(DISABLED_EMPTYDASHBOARDBUTTON_BUBBLE_MESSAGE, browser).getText();
     }
 }

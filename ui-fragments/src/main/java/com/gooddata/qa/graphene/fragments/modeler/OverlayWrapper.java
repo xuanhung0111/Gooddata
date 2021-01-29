@@ -110,6 +110,12 @@ public class OverlayWrapper extends AbstractFragment {
         return waitForElementVisible(successMessage).findElement(By.tagName("a")).getAttribute("href");
     }
 
+    public String getMoveLabelSuccess() {
+        String message = waitForElementVisible(successMessage).getText();
+        waitForFragmentNotVisible(this);
+        return message;
+    }
+
     public void closePublishSuccess() {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(closeToastMessage).click().build().perform();

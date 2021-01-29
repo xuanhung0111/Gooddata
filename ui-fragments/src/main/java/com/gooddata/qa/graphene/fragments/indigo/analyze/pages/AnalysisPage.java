@@ -124,6 +124,9 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "adi-bucket-invitation-inner")
     private List<WebElement> bucketInvitationList;
 
+    @FindBy(css = ".s-bucket-view .adi-bucket-invitation-inner span")
+    private WebElement droptoSwitch;
+
     public static final String MAIN_CLASS = "adi-editor";
     private static final By BY_TRASH_PANEL = className("s-trash");
     private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
@@ -770,5 +773,21 @@ public class AnalysisPage extends AbstractFragment {
 
     public boolean isDisableOpenAsReport() {
         return waitForElementVisible(cssSelector(".s-open_as_report"), getRoot()).getAttribute("class").contains("disabled");
+    }
+
+    public boolean isReportNotFound() {
+        return isElementVisible(By.className("s-report-message-type-report_not_found"), root);
+    }
+
+    public void dragAndHold(WebElement source, WebElement target) {
+        getActions().clickAndHold(source).moveToElement(target).perform();
+    }
+
+    public void releaseElement(WebElement target) {
+        getActions().moveToElement(target).release().perform();
+    }
+    
+    public WebElement waitForDropToSwitchVisible () {
+        return waitForElementVisible(droptoSwitch);
     }
 }

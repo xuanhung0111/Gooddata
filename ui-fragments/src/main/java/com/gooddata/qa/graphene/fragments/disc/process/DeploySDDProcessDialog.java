@@ -24,7 +24,7 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     @FindBy(className = "input-text")
     private WebElement clientIdentifierInput;
 
-    @FindBy(className = "button-text")
+    @FindBy(className = "datasource-selection-button")
     private WebElement dataSourceTitle;
 
     @FindBy(css = ".deploy-sdd-process-distribute-data-scope .ait-dataset-selection-radio-all")
@@ -35,6 +35,9 @@ public class DeploySDDProcessDialog extends AbstractFragment {
 
     @FindBy(className = "datasource-selection-button")
     private DataSourceDropdown selectionDataSourceDropDown;
+
+    @FindBy(css = ".csv-datadistribution-path-input .input-text")
+    private WebElement inputDataPath;
 
     public static DeploySDDProcessDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(DeploySDDProcessDialog.class,
@@ -90,6 +93,20 @@ public class DeploySDDProcessDialog extends AbstractFragment {
 
     public DataSourceDropdown getSelectionDataSourceDropdown() {
         return waitForFragmentVisible(selectionDataSourceDropDown);
+    }
+
+    public boolean isS3DatasourceDisabled() {
+        return selectionDataSourceDropDown .getRoot().getAttribute("class").contains("disabled");
+    }
+
+    public DeploySDDProcessDialog inputDatasourcePath(String path) {
+        waitForElementVisible(inputDataPath).clear();
+        inputDataPath.sendKeys(path);
+        return this;
+    }
+
+    public String getDatasourcePath() {
+        return waitForElementVisible(inputDataPath).getAttribute("value");
     }
 
     public enum Scope {
