@@ -58,7 +58,7 @@
         <arquillian.xml>arquillian.xml</arquillian.xml>
 
         <!-- possible values are: local-firefox/local-chrome -->
-        <test.execution.env>local-chrome</test.execution.env>
+        <test.execution.env>local-firefox</test.execution.env>
 
         <coreModuleName>ui-core</coreModuleName>
         <corePath>${moduleCorePath}</corePath>
