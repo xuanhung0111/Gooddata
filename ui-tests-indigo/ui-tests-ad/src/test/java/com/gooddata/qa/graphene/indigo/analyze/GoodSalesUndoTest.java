@@ -186,7 +186,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART), "Should be column chart");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    // @Test(dependsOnGroups = {"createProject"}) // Because behavior changes by ONE-4857
     public void testAfterReset() {
         ReportState baseState = ReportState.getCurrentState(initAnalysePage()
                 .changeReportType(ReportType.COLUMN_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)

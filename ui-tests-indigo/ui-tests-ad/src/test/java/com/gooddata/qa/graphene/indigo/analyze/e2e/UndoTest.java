@@ -101,7 +101,7 @@ public class UndoTest extends AbstractAdE2ETest {
             .getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    // @Test(dependsOnGroups = {"createProject"})  // Because behavior changes by ONE-4857
     public void should_properly_deserialize_auto_generated_filters() {
         assertTrue(initAnalysePage().changeReportType(ReportType.COLUMN_CHART).addAttribute(ATTR_ACTIVITY_TYPE)
             .resetToBlankState()
