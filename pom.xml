@@ -37,6 +37,7 @@
         <screenResolution>fullscreen</screenResolution>
 
         <chromeDriverBinaryPath>/usr/bin/chromium-browser</chromeDriverBinaryPath>
+        <edgeDriverBinaryPath>/usr/bin/msedgedriver</edgeDriverBinaryPath>
         <!-- Add option 'no-sandbox' in case running chromium inside docker -->
         <chromeDriverArguments></chromeDriverArguments>
         <!-- (seconds) -->
@@ -352,6 +353,10 @@
                                                 <value>${chromeDriverBinaryPath}</value>
                                             </property>
                                             <property>
+                                                <name>edgeDriverBinaryPath</name>
+                                                <value>${edgeDriverBinaryPath}</value>
+                                            </property>
+                                            <property>
                                                 <name>firefoxDriverBinaryPath</name>
                                                 <value>${firefoxDriverBinaryPath}</value>
                                             </property>
@@ -474,6 +479,19 @@
             <properties>
                 <arquillian.xml>arquillian-local-chrome.xml</arquillian.xml>
                 <browser>chrome</browser>
+            </properties>
+        </profile>
+        <profile>
+            <id>local-edge</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>local-edge</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-local-edge.xml</arquillian.xml>
+                <browser>edge</browser>
             </properties>
         </profile>
 

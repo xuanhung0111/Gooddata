@@ -37,6 +37,26 @@ microservices:
           - '**/target/media/video/**/**_failed.mp4'
         junitArtifacts:
           - '**/target/surefire-reports/*.xml'
+  graphene-edge:
+    docker:
+      dockerfile: './Dockerfile_edge'
+      customTags:
+        - '89.0.774.4-89.0.774.4'
+        - 'latest'
+      cacheFromTag: 'latest'
+    buildOnChangeOf:
+      paths:
+        - 'Dockerfile_edge'
+    tests:
+      isolated:
+        dockerComposePath: './docker-compose-edge-acceptance-test.yaml'
+        artifacts:
+          - '**/target/screenshots/**'
+          - '**/target/downloads/**'
+          - '**/target/media/video/**/**_failed.mp4'
+          - '**/Downloads/**'
+        junitArtifacts:
+          - '**/target/surefire-reports/*.xml'
   graphene-chrome-uisdk:
     docker:
       dockerfile: './Dockerfile_chrome_uisdk'
