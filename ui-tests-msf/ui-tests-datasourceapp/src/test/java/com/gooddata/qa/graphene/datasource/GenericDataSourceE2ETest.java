@@ -151,6 +151,7 @@ public class GenericDataSourceE2ETest extends AbstractDatasourceManagementTest {
         assertTrue(configuration.isEmptyParameter(), "Should delete all parameters");
 
         container.clickCancelButton();
+        dsMenu.selectDataSource(DATASOURCE_NAME);
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         configuration.inputAddParameter(COUNTRY_KEY, COUNTRY_VALUE);
