@@ -61,7 +61,6 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -69,15 +68,18 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) {
             throw new SkipException("Initial Page is not tested on PI or Production environment");
-        } else {
-            initDatasourceManagementPage();
+        }
+        initDatasourceManagementPage();
+
+        //In case, has ADS Datasource on Domain , ignore test check "Create new S3 Datasource"
+        if (dsMenu.isListDatasourceEmpty()) {
             assertTrue(dataSourceManagementPage.isCreateS3DatasourceButtonDisplayed(),
                     "Should have create S3 datasource button");
-            dsMenu.selectS3DataSource();
-            contentWrapper.waitLoadingManagePage();
-            container = contentWrapper.getContentDatasourceContainer();
-            configuration = container.getS3ConnectionConfiguration();
         }
+        dsMenu.selectS3DataSource();
+        contentWrapper.waitLoadingManagePage();
+        container = contentWrapper.getContentDatasourceContainer();
+        configuration = container.getS3ConnectionConfiguration();
     }
 
     @Test(dependsOnMethods = "initialStageTest")
@@ -196,6 +198,7 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         assertEquals(configuration.getErrorMessageOnS3DatasourceParamLine(SECRET_PARAM), REQUIRED_ERROR_MSG);
         container.clickCancelButton();
 
+        dsMenu.selectDataSource(DATASOURCE_NAME);
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         configuration.addBucket(BUCKET_VALUE);
