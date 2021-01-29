@@ -9,12 +9,14 @@
         <property name="browser">chrome</property>
         <property name="dimensions">${screenResolution}</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
-        <property name="chromeArguments">${chromeDriverArguments} --ignore-certificate-errors</property>
+        <property name="chromeArguments">${chromeDriverArguments} ignore-certificate-errors</property>
         <property name="chromePrintOptions">true</property>
         <property name="loggingPrefs">browser=ALL</property>
+        <property name="platformName">ANY</property>
         <property name="chromeExperimentalOption">
-            {"prefs": {"download.default_directory": "${browserDownloadFolder}", "download.prompt_for_download": "false"}}
+            {"prefs": {"download.default_directory": "${browserDownloadFolder}", "download.prompt_for_download": false}}
         </property>
+<!--        <property propertyname="chromeExperimentalOption">{"excludeSwitches": "disable-popup-blocking","useAutomationExtension": false}</property>-->
     </extension>
 
     <extension qualifier="graphene">
