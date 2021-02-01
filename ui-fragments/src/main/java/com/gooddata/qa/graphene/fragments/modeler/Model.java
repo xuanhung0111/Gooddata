@@ -76,7 +76,7 @@ public class Model extends AbstractFragment {
     }
 
     public Model deleteAttributeOnDataset(String attributeName) {
-        WebElement attribute = getListItems().getAttribute(getDatasetTitle(), attributeName);
+        WebElement attribute = getListItems().getAttribute(getDatasetTitle().toLowerCase(), attributeName);
         deleteItemProcess(attribute);
         return this;
     }
@@ -119,7 +119,7 @@ public class Model extends AbstractFragment {
     }
 
     public String getFactText(String fact) {
-        return getListItems().getFact(getDatasetTitle(), fact).getText();
+        return getListItems().getFact(getDatasetTitle().toLowerCase(), fact).getText();
     }
 
     public String getDateText() {
@@ -139,12 +139,12 @@ public class Model extends AbstractFragment {
 
     public void setPrimaryKey(String attributeName) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
-        addMore.setPrimaryKey(getDatasetTitle(), attributeName);
+        addMore.setPrimaryKey(getDatasetTitle().toLowerCase(), attributeName);
     }
 
     public void searchPrimaryKey(String attributeName) {
         AddMorePopUp addMore = openMorePopUpOnDataset();
-        addMore.searchPrimaryKey(getDatasetTitle(), attributeName);
+        addMore.searchPrimaryKey(getDatasetTitle().toLowerCase(), attributeName);
     }
 
     public void deleteDataset() {
