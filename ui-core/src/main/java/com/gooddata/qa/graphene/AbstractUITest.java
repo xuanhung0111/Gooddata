@@ -442,6 +442,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public AnalysisPage initAnalysePage() {
+        try {
+            return  initAnalyseIgnoreAlert();
+        } catch (Exception handleAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            return initAnalyseIgnoreAlert();
+        }
+    }
+
+    public AnalysisPage initAnalyseIgnoreAlert() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         return AnalysisPage.getInstance(browser);
     }
