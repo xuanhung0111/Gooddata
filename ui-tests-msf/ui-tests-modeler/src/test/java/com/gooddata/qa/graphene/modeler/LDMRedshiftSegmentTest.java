@@ -121,6 +121,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
     private DataSourceUtils dataSource;
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
+    private DataloadProcess processMaster;
     private OverlayWrapper wrapper;
     private DataSourcePanelContent datasourcePanel;
     private DataSourceDropDownBar dropDownBar;
@@ -138,7 +139,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
     private String DATASOURCE_PASSWORD;
     private LcmBrickFlowBuilder lcmBrickFlowBuilder;
     private RestClient domainRestClient;
-    private boolean useK8sExecutor = false;
+    private boolean useK8sExecutor = true;
     private String defaultS3AccessKey;
     private String defaultS3SecretKey;
     private DataSourceContentConnected connected;
@@ -295,10 +296,20 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         publishModelDialog.overwriteData();
         //setUpKPIs on Master workspace after publish
         setUpKPIs();
+        setUpProcessOnMaster();
         createLCM();
     }
 
-    @Test(dependsOnMethods = "updateModelAndRunLCMTest" )
+    /**
+     * Verify cover ticket TMA-1275 Skip cloning ADDv2 process into LCM master
+     */
+    @Test(dependsOnMethods = {"updateModelAndRunLCMTest"})
+    public void checkADDv2NotSync() {
+        assertFalse(initDISCIgnoreAlert(clientProjectId1).hasProcess("PROCESS_NAME"),
+                "Process should not be sync");
+    }
+
+    @Test(dependsOnMethods = "checkADDv2NotSync" )
     public void editAndPublishModelTest() throws IOException {
         String masterProjectId = lcmBrickFlowBuilder.getLCMServiceProject().getMasterProject(testParams.getUserDomain(), SEGMENT_ID);
         logout();
@@ -390,6 +401,9 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         if (dataloadProcess != null) {
             domainRestClient.getProcessService().removeProcess(dataloadProcess);
         }
+        if (processMaster != null) {
+            domainRestClient.getProcessService().removeProcess(processMaster);
+        }
         dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         initDatasourceManagementPage();
@@ -409,6 +423,13 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
 
         redshiftUtils.closeRedshiftConnection();
         redshiftUtilOther.closeRedshiftConnection();
+    }
+
+    private void setUpProcessOnMaster() {
+        // Create New Process Schedule On Master
+        log.info("Setup Process...............");
+        processMaster = new ScheduleUtils(domainRestClient).createDataDistributionProcess(domainRestClient.getProjectService()
+                        .getProjectById(projectId), "PROCESS_NAME", dataSourceId, SEGMENT_ID, "att_lcm_default_data_product", "1");
     }
 
     private void setUpProcess() {
