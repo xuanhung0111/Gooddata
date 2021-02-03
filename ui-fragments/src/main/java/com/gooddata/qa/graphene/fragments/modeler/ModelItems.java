@@ -35,6 +35,11 @@ public class ModelItems extends AbstractFragment {
         return facts.size() == 0 ? false : true;
     }
 
+    public boolean isPrimaryKeyExist(String dataset, String key) {
+        return this.getRoot().findElement(By.cssSelector(format(".ds-item-attr%s%s", dataset, key)))
+                .getAttribute("isprimarykey").equals("true");
+    }
+
     public WebElement getReference(String dataset) {
         WebElement reference = this.getRoot().findElement(By.cssSelector(format(".ds-item-reference_dataset%s", dataset)));
         return reference;

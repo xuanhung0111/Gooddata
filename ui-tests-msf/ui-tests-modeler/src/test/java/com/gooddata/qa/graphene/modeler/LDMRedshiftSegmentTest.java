@@ -239,6 +239,12 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         assertEquals(dialog.getEditDatasetZone().getTextDatatypeByName(BIRTHDAY_DATE), "Date");
         dialog.clickImportButton();
 
+        modeler.getLayout().waitForLoading();
+        mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
+        Model modelPerson = mainModelContent.getModel(PERSON_TABLE);
+        mainModelContent.focusOnDataset(PERSON_TABLE);
+        modelPerson.isPrimaryKeyExistOnDataset(PERSON_TABLE, ID_ATTRIBUTE.toLowerCase());
+
         //Add table PRE_CAR and verify preview Dialog
         connected.clearSearchText();
         connected.searchTable(PRE_OTHER_TABLE);
