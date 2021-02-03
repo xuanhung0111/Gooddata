@@ -17,6 +17,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -130,10 +131,22 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return ResourceUtils.createTempFileFromString(replacedContent);
     }
 
-    protected EmbeddedAnalysisPage openEmbeddedPage(final String url) {
+    protected EmbeddedAnalysisPage openEmbeddedPageWithoutAlert(final String url) {
         browser.get("file://" + url);
         browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
         return EmbeddedAnalysisPage.getInstance(browser);
+    }
+
+    protected EmbeddedAnalysisPage openEmbeddedPage(final String url) {
+        try {
+            return openEmbeddedPageWithoutAlert(url);
+        }
+        catch (UnhandledAlertException unhandledAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            return openEmbeddedPageWithoutAlert(url);
+        }
     }
 
     protected void cleanUpLogger() {

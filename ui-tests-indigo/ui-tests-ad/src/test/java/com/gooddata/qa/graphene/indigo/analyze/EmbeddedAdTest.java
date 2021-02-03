@@ -10,6 +10,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import org.openqa.selenium.UnhandledAlertException;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertEquals;
@@ -208,14 +209,25 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
         return getRootUrl() + format(EMBEDDED_URI, testParams.getProjectId());
     }
 
-    private void embedAdToWrapperPage(final String url) {
+    private void embedAdToWrapperPageWithoutAlert(final String url) {
         browser.get(IFRAME_WRAPPER_URL);
         final WebElement urlTextBox = waitForElementVisible(By.id("url"), browser);
         urlTextBox.sendKeys(url);
         // clicking on go button is not stable
         urlTextBox.submit();
-
         browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
+    }
+
+    private void embedAdToWrapperPage(final String url) {
+        try {
+            embedAdToWrapperPageWithoutAlert(url);
+        }
+        catch (UnhandledAlertException unhandledAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            embedAdToWrapperPageWithoutAlert(url);
+        }
     }
 
     private EmbeddedAnalysisPage getEmbeddedAnalysisPage() {

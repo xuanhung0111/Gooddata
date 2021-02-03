@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.openqa.selenium.UnhandledAlertException;
 
 import java.io.File;
 import java.io.IOException;
@@ -455,7 +456,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     private IndigoDashboardsPage InitDashboardIgnoreAlert() {
         try {
             return initIndigoDashboardsPage();
-        } catch (Exception handleAlert) {
+        } catch (UnhandledAlertException unhandledAlert) {
             browser.navigate().refresh();
             browser.switchTo().alert().accept();
             browser.switchTo().defaultContent();

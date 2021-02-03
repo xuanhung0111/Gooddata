@@ -20,6 +20,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -349,14 +350,25 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
         return getRootUrl() + format(EMBEDDED_URI, testParams.getProjectId());
     }
 
-    private void embedAdToWrapperPage(final String url) {
+    private void embedAdToWrapperPageWithoutAlert(final String url) {
         browser.get(IFRAME_WRAPPER_URL);
         final WebElement urlTextBox = waitForElementVisible(By.id("url"), browser);
         urlTextBox.sendKeys(url);
         // clicking on go button is not stable
         urlTextBox.submit();
-
         browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
+    }
+
+    private void embedAdToWrapperPage(final String url) {
+        try {
+            embedAdToWrapperPageWithoutAlert(url);
+        }
+        catch (UnhandledAlertException unhandledAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            embedAdToWrapperPageWithoutAlert(url);
+        }
     }
 
     private EmbeddedAnalysisPage getEmbeddedAnalysisPage() {
