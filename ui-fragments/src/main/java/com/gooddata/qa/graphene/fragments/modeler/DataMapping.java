@@ -71,7 +71,7 @@ public class DataMapping extends AbstractFragment {
                 : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
-                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
+                .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).pause(1000).build().perform();
         return this;
     }
 
@@ -125,8 +125,8 @@ public class DataMapping extends AbstractFragment {
     public String getWarningMessage(String labelName, String type) {
         WebElement row = getRowByName(labelName, type);
         WebElement warningIcon = row.findElement(By.className("icon-warning"));
-        getActions().moveToElement(warningIcon).pause(1000).build().perform();
-        return browser.findElement(By.cssSelector(".bubble-content .content")).getText();
+        getActions().moveToElement(warningIcon).pause(2000).build().perform();
+        return browser.findElement(By.cssSelector(".bubble-content .content  span")).getText();
     }
 
     public enum SOURCE_TYPE{
