@@ -33,6 +33,24 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "s-create-datasource-dialog-item-generic-data-source")
     private WebElement genericResource;
 
+    //The username was not recognized and will be skipped    --[2]
+    @FindBy(css = ".bubble-negative .content")
+    private WebElement contentErrorMessage;
+
+    //The Data Source is already shared with this username. Its settings will be overriden --[2]
+    @FindBy(css = ".bubble-warning-tooltip .content")
+    private WebElement contentWarningMessage;
+
+    //child : s-dialog-close-button, error-detail: Data Source could not be shared with any of the provided usernames.
+    @FindBy(className = "data-source-user-add-error-dialog")
+    private WebElement errorAddUserFailPopUp;
+
+    @FindBy(className = "s-delete-datasource-user-dialog")
+    private DeleteUserDialog deleteUserDialog;
+
+    @FindBy(className = "data-source-user-edit-dialog")
+    private EditUserDialog editUserDialog;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
         return Graphene.createPageFragment(OverlayWrapper.class, wrapperList.get(1));
