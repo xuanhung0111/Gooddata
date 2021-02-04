@@ -1,0 +1,39 @@
+FROM harbor.intgdc.com/tools/ruby-2.3:89999e9
+
+ARG GIT_COMMIT=unspecified
+LABEL image_name="Graphene Edge Image"
+LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
+LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
+LABEL parent_image="harbor.intgdc.com/tools/ruby-2.3:89999e9"
+LABEL git_commit=$GIT_COMMIT
+
+ARG BROWSER_VERSION=microsoft-edge-dev-89.0.774.4
+ARG DRIVER_VERSION=89.0.774.4
+
+#===============
+# Edge
+#===============
+RUN set -x && \
+    yum clean all && \
+    yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit maven-bin unzip && \
+    yum groupinstall --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit Fonts
+
+# download and install msedge rpm package
+RUN curl https://packages.microsoft.com/yumrepos/edge/$BROWSER_VERSION-1.x86_64.rpm > /tmp/$BROWSER_VERSION-1.x86_64.rpm && \
+    yum install --setopt=tsflags=nodocs -y /tmp/$BROWSER_VERSION-1.x86_64.rpm && \
+    ln -fs /opt/microsoft/msedge-dev/msedge /usr/bin/msedge && \
+    rm -f /tmp/$BROWSER_VERSION-1.x86_64.rpm && \
+    yum clean all && rm -rf /var/cache/yum
+
+
+#==============
+# EdgeDriver
+#==============
+RUN curl https://msedgedriver.azureedge.net/$DRIVER_VERSION/edgedriver_linux64.zip > /tmp/msedgedriver-$DRIVER_VERSION-linux64.zip && \
+    unzip /tmp/msedgedriver-$DRIVER_VERSION-linux64.zip -d /opt/selenium && \
+    rm /tmp/msedgedriver-$DRIVER_VERSION-linux64.zip && \
+    mv /opt/selenium/msedgedriver /opt/selenium/msedgedriver-$DRIVER_VERSION && \
+    chmod 755 /opt/selenium/msedgedriver-$DRIVER_VERSION && \
+    ln -fs /opt/selenium/msedgedriver-$DRIVER_VERSION /usr/bin/msedgedriver && \
+    sed -i -e 's|exec -a "$0" "$HERE/msedge" "$@"|exec -a "$0" "$HERE/msedge" "--no-sandbox" "--ignore-certificate-errors" "$@"|g' /usr/bin/microsoft-edge
+    

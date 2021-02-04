@@ -15,9 +15,9 @@ services:
     command: |
       sh -c '
       ./integration-mvn-test.sh \
-      -DbrowserDownloadFolder=/graphene-tests/ui-tests-core \
-      -Dtest.execution.env=local-firefox \
-      -DfirefoxDriverBinaryPath=/bin/geckodriver \
+      -DbrowserDownloadFolder=/graphene-tests/Downloads \
+      -Dtest.execution.env=local-edge \
+      -DedgeDriverBinaryPath=/bin/msedgedriver \
       -pl ui-tests-core,ui-tests-indigo/ui-tests-ad,ui-tests-indigo/ui-tests-dashboards \
       -Dtestng.suite.xml=acceptance-tests.xml \
       -Dhost=att-graphene.dev.intgdc.com \
