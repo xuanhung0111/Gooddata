@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-acceptance-ad-test">
-    <test name="GoodSalesInsightTest" enabled="false">
+    <test name="GoodSalesInsightTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesInsightTest"/>
         </classes>

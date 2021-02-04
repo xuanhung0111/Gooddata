@@ -1,12 +1,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="testng-acceptance-kd-test">
-    <test name="ManipulateWidgetsTest" enabled="false">
+    <test name="ManipulateWidgetsTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest"/>
         </classes>
     </test>
 
-    <test name="EventingBasicInsightTest" enabled="false">
+    <test name="EventingBasicInsightTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingBasicInsightTest"/>
         </classes>
