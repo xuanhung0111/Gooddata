@@ -24,6 +24,9 @@ public class FileUploadDialog extends AbstractFragment {
     @FindBy(className = "s-cancel-file")
     private WebElement cancelButton;
 
+    @FindBy(className = "import-error-message")
+    private WebElement errorMessage;
+
     public static FileUploadDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(FileUploadDialog.class,
                 waitForElementPresent(className("import-csv"), context));
@@ -58,5 +61,9 @@ public class FileUploadDialog extends AbstractFragment {
     public void cancelDialog() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    public String getErrorMessage() {
+        return waitForElementVisible(errorMessage).getText();
     }
 }

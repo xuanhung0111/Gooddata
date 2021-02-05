@@ -12,6 +12,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public class PublishModelDialog extends AbstractFragment {
     private static final By SIDEBAR = By.className("publish-model");
@@ -42,6 +43,9 @@ public class PublishModelDialog extends AbstractFragment {
 
     @FindBy(className = "sub-error")
     private WebElement errorPublish;
+
+    @FindBy(css = ".gd-dialog-content .input-checkbox")
+    private WebElement csvCheckbox;
 
     public static final PublishModelDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PublishModelDialog.class, waitForElementVisible(SIDEBAR, searchContext));
@@ -85,4 +89,7 @@ public class PublishModelDialog extends AbstractFragment {
         btnCancelError.click();
     }
 
+    public boolean isUploadCsvChecked () {
+        return waitForElementPresent(csvCheckbox).isSelected();
+    }
 }
