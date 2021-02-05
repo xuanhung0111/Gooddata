@@ -2,9 +2,11 @@ package com.gooddata.qa.graphene.fragments.modeler;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.ArrayList;
@@ -47,6 +49,24 @@ public class PreviewCSVDialog extends AbstractFragment {
     @FindBy(className = "data-type-picker")
     private List<WebElement> dataTypePicker;
 
+    @FindBy(css = ".create-dataset-option .input-radio")
+    private WebElement createDataset;
+
+    @FindBy(css = ".modify-dataset-option .input-radio")
+    private WebElement modifyDataset;
+
+    @FindBy(className = "dataset-dropdown")
+    private WebElement datasetDropdown;
+
+    @FindBy(className = "dataset-name")
+    private WebElement datasetName;
+
+    @FindBy(className = "existing-dataset-warning")
+    private WebElement datasetWarning;
+
+    @FindBy(className = "action")
+    private WebElement linkModifyDataset;
+
     public static PreviewCSVDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
                 PreviewCSVDialog.class, waitForElementVisible(className("preview-csv-dialog"), searchContext));
@@ -88,5 +108,43 @@ public class PreviewCSVDialog extends AbstractFragment {
 
     public void closeFirstTableDialog() {
         dataTypePicker.stream().findFirst().get().click();
+    }
+
+    public boolean isSelectedCreateDataset() {
+        return createDataset.isSelected();
+    }
+
+    public void checkOnCreateNewDataset() {
+        createDataset.click();
+    }
+
+    public boolean isSelectedModifyDataset() {
+        return modifyDataset.isSelected();
+    }
+
+    public void checkOnModifyDatasetStructure() {
+        modifyDataset.click();
+    }
+
+    public String getDatasetNameModify() {
+        return waitForElementVisible(datasetDropdown).getText();
+    }
+
+    public void editCreateNewDataset(String editDataset) {
+        getActions().moveToElement(datasetName).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
+                .sendKeys(Keys.DELETE).sendKeys(editDataset).build().perform();
+    }
+
+    public boolean isExistingDatasetWarningDisplay() {
+        return isElementVisible(datasetWarning);
+    }
+
+    public String getDatasetWarningDisplay() {
+
+        return waitForElementVisible(datasetWarning).getText();
+    }
+
+    public void clickModifyDatasetLink() {
+        waitForElementVisible(linkModifyDataset).click();
     }
 }
