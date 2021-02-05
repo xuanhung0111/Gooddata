@@ -6,6 +6,7 @@ public enum ResourceDirectory {
     ZIP_FILES("zip-file"),
     PAYROLL_CSV("payroll-csv"),
     UPLOAD_CSV("upload-csv"),
+    OVERRIDE_CSV("override-csv"),
     MAQL_FILES("maql-file"),
     API_RESOURCES("api-resources"),
     SQL_FILES("sql-file"),

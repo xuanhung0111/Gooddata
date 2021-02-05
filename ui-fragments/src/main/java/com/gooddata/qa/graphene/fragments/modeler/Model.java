@@ -75,6 +75,10 @@ public class Model extends AbstractFragment {
         return getListItems().isPrimaryKeyExist(datasetName, key);
     }
 
+    public boolean isFactExistOnModeler(String attribute) {
+        return getListItems().isFactExist(getDatasetTitle().toLowerCase(), attribute);
+        }
+
     public WebElement getAttribute(String attribute) {
         return getListItems().getAttribute(getDatasetTitle().toLowerCase(), attribute);
     }
