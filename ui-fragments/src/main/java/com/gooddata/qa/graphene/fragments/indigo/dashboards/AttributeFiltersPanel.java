@@ -60,7 +60,14 @@ public class AttributeFiltersPanel extends AbstractFragment {
 
     public void dragAndDropAttributeFilter(WebDriver driver, WebElement from, WebElement dropZone) {
         Actions builder = new Actions(driver);
-        builder.clickAndHold(from).moveToElement(dropZone).release(dropZone).build().perform();
+        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
+        // Move the mouse pointer to the top-right corner of the fragment before moving to the specific Element
+        builder.clickAndHold(from).moveByOffset(5, 5).perform();
+        try {
+            builder.moveToElement(dropZone).perform();
+        } finally {
+            builder.release().perform();
+        }
     }
 
     public WebElement getIndexWebElementAttributeFilter(int index) {
