@@ -31,6 +31,7 @@ import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -272,38 +273,42 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
 
     @Test(dependsOnMethods = "searchAndReviewDataTest")
     public void updateModelAndRunLCMTest() throws IOException {
-        //delete Attribute, delete Date
-        mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
-        mainModelContent.focusOnDataset(PERSON_DATASET);
+        if (testParams.isTestingEnvironment()) {
+            //delete Attribute, delete Date
+            mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
+            mainModelContent.focusOnDataset(PERSON_DATASET);
 
-        Model modelPerson = mainModelContent.getModel(PERSON_DATASET);
-        modelPerson.deleteAttributeOnDataset("clientid").deleteAttributeOnDataset("deleted");
+            Model modelPerson = mainModelContent.getModel(PERSON_DATASET);
+            modelPerson.deleteAttributeOnDataset("clientid").deleteAttributeOnDataset("deleted");
 
-        DateModel modelTimestamp = mainModelContent.getDateModel(TIMESTAMP_DATASET);
-        mainModelContent.focusOnDateDataset(TIMESTAMP_DATASET);
-        modelTimestamp.deleteDateModel();
-        // there are 2 overlay wrapper on UI now, need provide index
-        OverlayWrapper.getInstanceByIndex(browser, 1).getConfirmDeleteDatasetDialog().clickDeleteDataset();
+            DateModel modelTimestamp = mainModelContent.getDateModel(TIMESTAMP_DATASET);
+            mainModelContent.focusOnDateDataset(TIMESTAMP_DATASET);
+            modelTimestamp.deleteDateModel();
+            // there are 2 overlay wrapper on UI now, need provide index
+            OverlayWrapper.getInstanceByIndex(browser, 1).getConfirmDeleteDatasetDialog().clickDeleteDataset();
 
-        //add table from OTHER schema
-        dropDownBar.selectDatasource(DATASOURCE_NAME_OTHER);
-        connected = dataSourceContent.clickButtonConnect();
-        DataSourceSchema schema =  connected.getDatasourceSchema();
-        DataSourceSchemaContent schemaContent = schema.getSchemaContent();
-        jsFile = getResourceAsString("/dragdrop.js");
-        schemaContent.dragdropTableToCanvas(PRE_OTHER_TABLE, jsFile);
-        PreviewCSVDialog dialogOther = PreviewCSVDialog.getInstance(browser);
-        dialogOther.clickImportButton();
+            //add table from OTHER schema
+            dropDownBar.selectDatasource(DATASOURCE_NAME_OTHER);
+            connected = dataSourceContent.clickButtonConnect();
+            DataSourceSchema schema = connected.getDatasourceSchema();
+            DataSourceSchemaContent schemaContent = schema.getSchemaContent();
+            jsFile = getResourceAsString("/dragdrop.js");
+            schemaContent.dragdropTableToCanvas(PRE_OTHER_TABLE, jsFile);
+            PreviewCSVDialog dialogOther = PreviewCSVDialog.getInstance(browser);
+            dialogOther.clickImportButton();
 
-        //publish model
-        toolbar = modeler.getToolbar();
-        toolbar.clickPublish();
-        PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
-        //setUpKPIs on Master workspace after publish
-        setUpKPIs();
-        setUpProcessOnMaster();
-        createLCM();
+            //publish model
+            toolbar = modeler.getToolbar();
+            toolbar.clickPublish();
+            PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
+            publishModelDialog.overwriteData();
+            //setUpKPIs on Master workspace after publish
+            setUpKPIs();
+            setUpProcessOnMaster();
+            createLCM();
+        } else {
+            throw new SkipException("Skip test LCM on Client demo !!");
+        }
     }
 
     /**
@@ -410,8 +415,17 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         if (processMaster != null) {
             domainRestClient.getProcessService().removeProcess(processMaster);
         }
-        dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
-        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+        if (dataMappingProjectIdUtils != null) {
+            dataMappingProjectIdUtils.deleteClientIdDataMapping(CLIENT_ID_1);
+        }
+        try {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+        } catch (Exception handleAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+        }
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
             deleteDatasource(DATASOURCE_NAME);
