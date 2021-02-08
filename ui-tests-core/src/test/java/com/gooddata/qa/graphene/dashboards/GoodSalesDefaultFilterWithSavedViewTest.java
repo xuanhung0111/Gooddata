@@ -25,6 +25,9 @@ import java.io.IOException;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
@@ -110,7 +113,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
             getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
             getFilter(DF_VARIABLE).changeSelectionToOneValue();
         }
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
@@ -131,7 +136,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(RISK_ASSESSMENT);
         getFilter(DF_VARIABLE).editAttributeFilterValues(RISK_ASSESSMENT);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "Default-filter-is-set-on-default-saved-view", getClass());
         assertThat(DEFAULT_VIEW, containsString(savedViewWidget.getCurrentSavedView()));
@@ -140,12 +147,16 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), singletonList(RISK_ASSESSMENT));
 
         savedViewWidget.openSavedViewMenu().selectSavedView(SAVED_VIEW_WITH_STAGE_NAME_FILTER);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         takeScreenshot(browser, "Default-filter-does-not-affect-to-saved-view-with-stage-name-filter", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), RISK_ASSESSMENT);
         assertTrue(getReport(REPORT_WITH_PROMPT_FILTER).hasNoData(), "Report is not render correctly");
 
         savedViewWidget.openSavedViewMenu().selectSavedView(SAVED_VIEW_WITH_ALL_FILTERS);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         takeScreenshot(browser, "Default-filter-does-not-affect-to-saved-view-with-all-filters", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
@@ -158,12 +169,15 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu().selectSavedView(SAVED_VIEW_WITH_STAGE_NAME_FILTER);
+        sleepTightInSeconds(3);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
 
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(RISK_ASSESSMENT);
         getFilter(DF_VARIABLE).editAttributeFilterValues(RISK_ASSESSMENT);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "Default-filter-not-affect-on-stage-name-filter-included-in-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
@@ -171,6 +185,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), RISK_ASSESSMENT);
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        waitForDashboardPageLoaded(browser);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), RISK_ASSESSMENT);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), RISK_ASSESSMENT);
     }
@@ -187,7 +202,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(INTEREST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(INTEREST);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "Default-filter-not-affect-on-all-filters-included-in-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_ALL_FILTERS);
@@ -195,6 +212,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), INTEREST);
     }
@@ -217,7 +236,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
             getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
             getFilter(DF_VARIABLE).changeSelectionToOneValue();
         }
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
         dashboardsPage.applyValuesForGroupFilter();
@@ -230,7 +251,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "DF-applied-for-filter-group-on-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
@@ -239,6 +262,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertTrue(getReport(REPORT_WITH_PROMPT_FILTER).hasNoData(), "Report is not rendered correctly");
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        sleepTightInSeconds(3);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
         AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), singletonList(SHORT_LIST));
@@ -257,7 +281,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         if (!multipleChoice) getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(SHORT_LIST);
 
@@ -267,7 +293,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
         if (!multipleChoice) getFilter(ATTR_DEPARTMENT).changeSelectionToOneValue();
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "Add-additional-filter-but-do-not-set-default-value-from-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
@@ -283,6 +311,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        sleepTightInSeconds(3);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         if (multipleChoice) {
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), ALL);
@@ -306,7 +335,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getRoot());
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(SHORT_LIST);
 
@@ -316,7 +347,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
         getFilter(ATTR_DEPARTMENT).editAttributeFilterValues(INSIDE_SALES);
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         takeScreenshot(browser, "Add-and-set-default-value-for-additional-filter-from-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
@@ -326,6 +359,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                 asList(SHORT_LIST, INSIDE_SALES));
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        sleepTightInSeconds(3);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), INSIDE_SALES);
         AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeValues(),
@@ -347,6 +381,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         getFilter(DF_VARIABLE).editAttributeFilterValues(INTEREST, DISCOVERY, RISK_ASSESSMENT);
         dashboardsPage.saveDashboard().publishDashboard(true);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(),
                 asList(INTEREST, DISCOVERY, RISK_ASSESSMENT));
 
@@ -362,7 +398,9 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             initDashboardsPage().selectDashboard(dashboard).editDashboard();
             getFilter(DF_VARIABLE).editAttributeFilterValues(RISK_ASSESSMENT);
-            dashboardsPage.saveDashboard();
+            dashboardsPage.getDashboardEditBar().saveDashboard();
+            waitForDashboardPageLoaded(browser);
+            sleepTightInSeconds(3);
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
             initDashboardsPage().selectDashboard(dashboard);
@@ -396,6 +434,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                 .editAttributeFilterValues(RISK_ASSESSMENT);
 
         dashboardsPage.saveDashboard().publishDashboard(true);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
         AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(),
                 singletonList(RISK_ASSESSMENT));
 
@@ -428,6 +468,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         dashboardsPage.saveDashboard().publishDashboard(true);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -447,12 +489,14 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                     .getSavedViewWidget()
                     .openSavedViewMenu()
                     .selectSavedView(savedView1);
+            sleepTightInSeconds(3);
 
             takeScreenshot(browser, "Viewer-saved-view-shows-all-when-value-out-of-range-variable-filter", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
             AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), asList(DISCOVERY, SHORT_LIST));
 
             savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
+            sleepTightInSeconds(3);
             takeScreenshot(browser, "Viewer-saved-view-updated-upon-change-of-variable-filter", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
             AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), singletonList(DISCOVERY));
@@ -478,6 +522,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         getFilter(DF_VARIABLE).changeSelectionToOneValue();
         dashboardsPage.saveDashboard().publishDashboard(true);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -495,6 +541,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                     .getSavedViewWidget()
                     .openSavedViewMenu()
                     .selectSavedView(savedView);
+            sleepTightInSeconds(3);
 
             takeScreenshot(browser, "Viewer-saved-view-shows-first-value-when-out-of-range-in-single-choice-mode", getClass());
             // Due to WA-6145, filter shows all instead of first value in available list
@@ -521,6 +568,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         getFilter(DF_VARIABLE).editAttributeFilterValues(RISK_ASSESSMENT);
         dashboardsPage.saveDashboard().publishDashboard(true);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -542,6 +591,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                     .getSavedViewWidget()
                     .openSavedViewMenu()
                     .selectSavedView(DEFAULT_VIEW);
+            sleepTightInSeconds(3);
 
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
             AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), asList(INTEREST, SHORT_LIST));
