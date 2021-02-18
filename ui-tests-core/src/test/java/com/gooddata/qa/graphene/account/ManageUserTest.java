@@ -7,9 +7,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.fragments.freegrowth.ManageTabs;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -66,7 +69,32 @@ public class ManageUserTest extends AbstractProjectTest {
                 .isDeactivePermissionAvailable(newAdminUser), "Deactive button is displayed");
     }
 
-    private String accessProjectWithAnotherLogin(String user, String password, String screenShotName, boolean isSuccess) 
+    @Test(dependsOnMethods = "enableAddedUser")
+    public void allowUserRoleEnterMangeUserGroups() throws JSONException {
+        log.info("Login with Editor + Admin user");
+        logoutAndLoginAs(true, UserRoles.EDITOR_AND_USER_ADMIN);
+        initManagePage();
+        ManageTabs manageTabs  = ManageTabs.getInstance(browser);
+        assertTrue(manageTabs.isProjectAndUserTabVisible(), "Project and user tab should be visible");
+        ProjectAndUsersPage projectAndUsersPage =initProjectsAndUsersPage();
+        assertTrue(projectAndUsersPage.isManageUserGroupLinkDisplayed(), "Manage User Group link should be displayed");
+        UserManagementPage userManage = projectAndUsersPage.openUserManagementPage().waitForUsersContentLoaded();
+        assertEquals(userManage.getUserRole(testParams.getInfoUser(UserRoles.EDITOR_AND_USER_ADMIN).getKey()),
+                "Editor + User Admin");
+
+        log.info("Login with editor user");
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+        initManagePage();
+        assertFalse(manageTabs.isProjectAndUserTabVisible(), "Project and user tab shouldn't be visible");
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.EDITOR_AND_USER_ADMIN);
+    }
+
+    private String accessProjectWithAnotherLogin(String user, String password, String screenShotName, boolean isSuccess)
             throws JSONException {
         logout();
         signInAtGreyPages(user, password);

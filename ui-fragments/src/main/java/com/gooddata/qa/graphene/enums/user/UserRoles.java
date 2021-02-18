@@ -4,8 +4,8 @@ public enum UserRoles {
 
     ADMIN("2", "Admin"),
     EDITOR("5", "Editor"),
-    EDITOR_AND_INVITATIONS("11", "EditorAndInvitations"),
-    EDITOR_AND_USER_ADMIN("10", "EditorAndUserAdmin"),
+    EDITOR_AND_INVITATIONS("10", "EditorAndInvitations"),
+    EDITOR_AND_USER_ADMIN("11", "EditorAndUserAdmin"),
     EXPLORER("8", "Explorer"),
     EXPLORER_EMBEDDED("9", "ExplorerEmbedded"),
     VIEWER("4", "Viewer"),
