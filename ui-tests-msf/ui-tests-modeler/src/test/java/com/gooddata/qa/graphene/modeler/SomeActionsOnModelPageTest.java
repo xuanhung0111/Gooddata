@@ -35,7 +35,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
@@ -97,10 +96,6 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
     @Test(dependsOnMethods = {"initTest"})
     public void initialPageTest() {
         canvas = modeler.getLayout().getCanvas();
-        String textCanvas = modeler.getLayout().getTextBlankCanvas();
-        assertThat(textCanvas, containsString("Get started"));
-        assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
-                "canvas to build your model."));
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "initial_default_model.txt"));
         initLogicalDataModelPage();
         waitForFragmentVisible( modeler.getLayout());
@@ -408,7 +403,7 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
     public void publishOverrideModel() {
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         wrapper.closePublishSuccess();
     }

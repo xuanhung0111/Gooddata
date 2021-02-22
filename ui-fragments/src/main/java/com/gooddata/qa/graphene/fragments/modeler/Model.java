@@ -51,7 +51,9 @@ public class Model extends AbstractFragment {
     }
 
     public Model clickCollapseButton() {
-        waitForElementVisible(toggleIcon).click();
+        Actions action = getActions();
+        waitForElementVisible(toggleIcon);
+        action.moveToElement(toggleIcon).click().build().perform();
         return this;
     }
 

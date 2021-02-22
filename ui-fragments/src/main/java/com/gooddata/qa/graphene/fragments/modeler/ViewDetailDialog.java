@@ -84,8 +84,8 @@ public class ViewDetailDialog extends AbstractFragment {
         return true;
     }
 
-    public boolean isRowSelected(String label) {
-        return selectedRow.findElements(By.xpath(format(LABEL_NAME, label))).size() != 0? true : false;
+    public boolean isRowSelected(String text) {
+        return selectedRow.getText().contains(text)? true : false;
     }
 
     public void editLabelName(String label, String newName) {
