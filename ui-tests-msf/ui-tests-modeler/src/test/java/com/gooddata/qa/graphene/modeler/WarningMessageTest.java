@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
 import com.gooddata.qa.graphene.fragments.modeler.EditDatasetDialog;
 import com.gooddata.qa.graphene.fragments.modeler.DataMapping;
 import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
+import com.gooddata.qa.graphene.fragments.modeler.ViewMode;
 import com.gooddata.qa.utils.http.RestClient;
 import org.testng.annotations.Test;
 
@@ -60,14 +61,6 @@ public class WarningMessageTest extends AbstractLDMPageTest {
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
         restClient = new RestClient(getProfile(ADMIN));
-    }
-
-    @Test(dependsOnMethods = {"initTest"})
-    public void initialPageTest() {
-        String textCanvas = modeler.getLayout().getTextBlankCanvas();
-        assertThat(textCanvas, containsString("Get started"));
-        assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
-                "canvas to build your model."));
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "initial_model_warning.txt"));
         initLogicalDataModelPage();
         waitForFragmentVisible( modeler.getLayout());
@@ -75,7 +68,7 @@ public class WarningMessageTest extends AbstractLDMPageTest {
         mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
     }
 
-    @Test(dependsOnMethods = {"initialPageTest"})
+    @Test(dependsOnMethods = {"initTest"})
     public void noFactAndPrimaryKey() {
         Model cityDataset = mainModelContent.getModel(CITY_DATASET);
         modelCity = mainModelContent.getModel(CITY_DATASET);
@@ -119,6 +112,7 @@ public class WarningMessageTest extends AbstractLDMPageTest {
 
     @Test(dependsOnMethods = {"noFactAndPrimaryKey"})
     public void unmappedFieldAndDuplicatedSourceColumn() {
+        ToolBar.getInstance(browser).clickEditBtn();
         mainModelContent.focusOnDataset(CITY_DATASET);
         mainModelContent.addAttributeToDataset(HOMETOWN_ATTR, CITY_DATASET);
         modelCity.openEditDialog();

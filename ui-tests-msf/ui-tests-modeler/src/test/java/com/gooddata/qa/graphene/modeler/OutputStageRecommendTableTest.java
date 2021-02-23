@@ -94,10 +94,8 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     // STEP 3: User try  to create OutputStage with Mode “Create Table” , check that suggest Output Stage correct
     @Test(dependsOnMethods = "initData")
     public void createTableMode(){
-        LogicalDataModelPage ldmPage = initLogicalDataModelPage();
-        Modeler modeler = initLogicalDataModelPage().getDataContent().getModeler();
+        Modeler modeler = openViewModeLDMPage().getDataContent().getModeler();
         toolbar = modeler.getToolbar();
-        sidebar = modeler.getSidebar();
         canvas = modeler.getLayout().getCanvas();
         OutputStage outputStage = toolbar.openOutputStagePopUp();
         outputStage.selectDatasource(DATA_SOURCE_NAME);
@@ -117,8 +115,8 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     public void updateTableAndInsertData() throws SQLException, IOException {
         setUpDatabase();
         // user edit something on table
+        ToolBar.getInstance(browser).clickButtonChangeToEditMode();
         MainModelContent mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
-        mainModelContent = canvas.getPaperScrollerBackground().getMainModelContent();
         Model modelUser = mainModelContent.getModel(USER_DATASET);
         mainModelContent.focusOnDataset(USER_DATASET);
         mainModelContent.addAttributeToDataset(USERNAME_ATTRIBUTE, USER_DATASET);

@@ -10,7 +10,6 @@ import com.gooddata.qa.graphene.fragments.modeler.SearchDropDown.SEARCH_ITEM;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;

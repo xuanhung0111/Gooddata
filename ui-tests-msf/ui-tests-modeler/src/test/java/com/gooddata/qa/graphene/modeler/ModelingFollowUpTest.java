@@ -58,10 +58,6 @@ public class ModelingFollowUpTest extends AbstractLDMPageTest {
     @Test(dependsOnMethods = {"initTest"})
     public void initialPageTest() {
         canvas = modeler.getLayout().getCanvas();
-        String textCanvas = modeler.getLayout().getTextBlankCanvas();
-        assertThat(textCanvas, containsString("Get started"));
-        assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
-                "canvas to build your model."));
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "initial_model.txt"));
 
         assertEquals(ldmPage.getLinkDISC(), format("https://%s/admin/disc/#/projects", testParams.getHost()));
