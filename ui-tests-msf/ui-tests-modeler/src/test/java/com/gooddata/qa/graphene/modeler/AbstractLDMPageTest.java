@@ -2,10 +2,17 @@ package com.gooddata.qa.graphene.modeler;
 
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPage;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
+import com.gooddata.qa.graphene.fragments.modeler.Layout;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
+import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
+import com.gooddata.qa.graphene.fragments.modeler.ViewMode;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.String.format;
@@ -18,13 +25,37 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
         testParams.setDomainUser(domainUser);
     }
 
-    public LogicalDataModelPage initLogicalDataModelPage() {
+    public LogicalDataModelPage openViewModeLDMPage() {
         openUrl(LogicalDataModelPage.getUri(testParams.getProjectId()));
         return LogicalDataModelPage.getInstance(browser);
     }
 
+    public LogicalDataModelPage initLogicalDataModelPage() {
+        openUrl(LogicalDataModelPage.getUri(testParams.getProjectId()));
+        sleepTightInSeconds(60);
+        if (Layout.getInstance(browser).waitForLoading().isInitialPagePresent()) {
+            ViewMode.getInstance(browser).clickButtonChangeToEditMode();
+        }
+        if (!isElementPresent(By.className("gdc-ldm-sidebar"), browser)) {
+            switchToEditMode();
+        }
+        return LogicalDataModelPage.getInstance(browser);
+    }
+
+    public void switchToEditMode() {
+            ToolBar.getInstance(browser).clickEditBtn();
+    }
+
     public LogicalDataModelPage initLogicalDataModelPageByPID(String pid) {
         openUrl(LogicalDataModelPage.getUri(pid));
+        sleepTightInSeconds(60);
+        // make sure that is view mode initial
+        if (Layout.getInstance(browser).isInitialPagePresent()) {
+            ViewMode.getInstance(browser).clickButtonChangeToEditMode();
+        }
+        if (!isElementPresent(By.className("gdc-ldm-sidebar"), browser)) {
+            switchToEditMode();
+        }
         return LogicalDataModelPage.getInstance(browser);
     }
 
@@ -66,5 +97,10 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
     protected ProjectDetailPage initDiscProjectDetailPage(String id) {
         openUrl(format(ProjectDetailPage.URI, id));
         return waitForFragmentVisible(projectDetailPage);
+    }
+
+    protected void openEditMode() {
+        initLogicalDataModelPage();
+        ViewMode.getInstance(browser).clickButtonChangeToEditMode();
     }
 }

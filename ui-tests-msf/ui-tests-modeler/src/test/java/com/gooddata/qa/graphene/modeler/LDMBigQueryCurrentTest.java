@@ -37,6 +37,7 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.cloudresources.BigQueryUtils.deleteDataset;
 import static com.gooddata.qa.utils.cloudresources.BigQueryUtils.deleteTable;
 import static com.gooddata.qa.utils.cloudresources.SnowflakeTableUtils.*;
@@ -220,6 +221,7 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
         publishModelDialog.overwriteData();
+        sleepTightInSeconds(200);
     }
 
     @Test(dependsOnMethods = "editDatasetDetail" )

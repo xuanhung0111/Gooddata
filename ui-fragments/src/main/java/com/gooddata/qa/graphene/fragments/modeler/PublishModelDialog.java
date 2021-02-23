@@ -59,7 +59,18 @@ public class PublishModelDialog extends AbstractFragment {
     public void overwriteData() {
         btnOverwrite.click();
         btnPublish.click();
+    }
+
+    public void overwriteDataSwitchToEditMode() {
+        overwriteData();
         waitForFragmentNotVisible(this);
+        ToolBar.getInstance(browser).clickEditBtn();
+    }
+
+    public void overwriteInTableView() {
+        overwriteData();
+        waitForFragmentNotVisible(this);
+        ToolBar.getInstanceInTableView(browser, 1).clickEditBtn();
     }
 
     public void overwriteDataAcceptError() {

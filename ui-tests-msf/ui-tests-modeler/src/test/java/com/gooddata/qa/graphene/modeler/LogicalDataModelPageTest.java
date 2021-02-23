@@ -56,7 +56,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static java.lang.String.format;
@@ -133,10 +132,6 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
     @Test(dependsOnMethods = {"initTest"})
     public void initialPageTest() {
-        String textCanvas = modeler.getLayout().getTextBlankCanvas();
-        assertThat(textCanvas, containsString("Get started"));
-        assertThat(textCanvas, containsString("Drag items from the left panel to\n" +
-                "canvas to build your model."));
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "initial_model.txt"));
         //MSF-17161: Update links in the modeler page header
         assertEquals(ldmPage.getLinkDISC(), format("https://%s/admin/disc/#/projects", testParams.getHost()));
@@ -255,7 +250,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
         //second try publish with overwrite data mode
         toolbar.clickPublish();
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
@@ -279,7 +274,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
         // publish with preserve mode after update model
         toolbar.clickPublish();
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
                 testParams.getProjectId()));

@@ -25,7 +25,6 @@ import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
 import com.gooddata.qa.graphene.fragments.modeler.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.modeler.PreviewCSVDialog;
 import com.gooddata.qa.graphene.fragments.modeler.GenericList;
-import com.gooddata.qa.graphene.fragments.modeler.DatasetEdit;
 import com.gooddata.qa.graphene.fragments.modeler.ChooseReferencePopUp;
 import com.gooddata.qa.graphene.fragments.modeler.Model;
 import com.gooddata.qa.graphene.fragments.modeler.EditDatasetDialog;
@@ -128,7 +127,7 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
 
         toolbar.clickPublish();
         PublishModelDialog  publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
 
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
@@ -200,7 +199,7 @@ public class E2EAutoMappingTest extends AbstractLDMPageTest {
         dialogEdit.saveChanges();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
