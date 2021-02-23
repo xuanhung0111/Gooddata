@@ -94,9 +94,8 @@ public class OutputStageRecommendViewTest extends AbstractLDMPageTest {
     // STEP 3: User try  to create OutputStage with Mode “Create View” , check that suggest Output Stage correct
     @Test(dependsOnMethods = "initData")
     public void createViewMode() {
-        LogicalDataModelPage ldmPage = initLogicalDataModelPage();
+        LogicalDataModelPage ldmPage = openViewModeLDMPage();
         Modeler modeler = ldmPage.getDataContent().getModeler();
-        sidebar = modeler.getSidebar();
         toolbar = modeler.getToolbar();
         OutputStage outputStage = toolbar.openOutputStagePopUp();
         outputStage.selectDatasource(DATA_SOURCE_NAME);

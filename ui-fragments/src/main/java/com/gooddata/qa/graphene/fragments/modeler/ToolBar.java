@@ -27,6 +27,9 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "s-publish")
     private WebElement btnPublishOnToolbar;
 
+    @FindBy(className = "s-edit")
+    private WebElement editButton;
+
     @FindBy(className = "gd-actions-menu-section")
     private WebElement btnActionMenu;
 
@@ -47,6 +50,9 @@ public class ToolBar extends AbstractFragment {
 
     @FindBy(className = "desc")
     private WebElement description;
+
+    @FindBy(className = "change-to-edit-mode")
+    private WebElement changeToEditModeBtn;
 
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
@@ -83,6 +89,11 @@ public class ToolBar extends AbstractFragment {
     public void clickSaveAsDraftBtn() {
         waitForElementVisible(saveAsDraftButton);
         saveAsDraftButton.click();
+    }
+
+    public void clickEditBtn() {
+        waitForElementVisible(editButton);
+        editButton.click();
     }
 
     public String getDescriptionSaveButton() {
@@ -128,5 +139,10 @@ public class ToolBar extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(clearSearchTextIcon).click().build().perform();
         return this;
+    }
+
+    public void clickButtonChangeToEditMode() {
+        Actions actions = new Actions(browser);
+        actions.moveToElement(changeToEditModeBtn).click().build().perform();
     }
 }

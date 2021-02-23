@@ -301,7 +301,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
             toolbar = modeler.getToolbar();
             toolbar.clickPublish();
             PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-            publishModelDialog.overwriteData();
+            publishModelDialog.overwriteDataSwitchToEditMode();
             //setUpKPIs on Master workspace after publish
             setUpKPIs();
             setUpProcessOnMaster();
@@ -391,7 +391,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         toolbar = modeler.getToolbar();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
 
         String sql = getResourceAsString("/model_redshift_current.txt");
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, projectId);
