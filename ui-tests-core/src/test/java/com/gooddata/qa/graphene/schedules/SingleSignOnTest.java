@@ -104,6 +104,17 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
             asList(asList("", METRIC_AMOUNT), asList(METRIC_AMOUNT, "1.1662545654E8")));
     }
 
+    @Test
+    public void loginEnabledSso() {
+        logout();
+        browser.get("https://" + testParams.getHost());
+        LoginFragment.waitForPageLoaded(browser);
+        LoginFragment.getInstance(browser).clickLoginServiceChanelAccount();
+        LoginFragment.getInstance(browser).login(testParams.getUser(), testParams.getPassword(), true);
+        waitForElementVisible(cssSelector("a.account-menu,.gd-header-account,.hamburger-icon,.logo-anchor"), browser);
+        takeScreenshot(browser, "login-ui-by-sso", this.getClass());
+    }
+
     private void loginIsolatedSalesForceDomain() throws IOException, MessagingException {
         browser.get("https://" + testParams.getHost());
         LoginFragment loginFragment = LoginFragment.getInstance(browser);
@@ -124,7 +135,7 @@ public class SingleSignOnTest extends AbstractGoodSalesEmailSchedulesTest {
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + testParams.getUser());
     }
-
+    
     private void chooseTab(String name) {
         WebElement moreTabsTab = waitForElementVisible(MORE_TABS_TAB, browser);
         if (!moreTabsTab.getAttribute("class").contains(IS_OPEN)) {
