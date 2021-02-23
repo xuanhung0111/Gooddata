@@ -42,6 +42,9 @@ public class LoginFragment extends AbstractFragment {
     @FindBy(className = "s-btn-use_organization_login")
     private WebElement useOrganisationLoginButton;
 
+    @FindBy(xpath = "//button[@id='ember881']")
+    private WebElement loginServiceChanelAccount;
+
     private static final String ERROR_CLASS = "has-error";
     private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".login-message.is-success");
     private static final By LOGIN_PAGE_LOADED = By.cssSelector(".s-loginPage.s-ready");
@@ -135,5 +138,9 @@ public class LoginFragment extends AbstractFragment {
 
     public String getContainerLoginForm() {
         return waitForElementVisible(LOGIN_PAGE_LOADED, browser).getText();
+    }
+
+    public void clickLoginServiceChanelAccount(){
+        waitForElementVisible(loginServiceChanelAccount).click();
     }
 }
