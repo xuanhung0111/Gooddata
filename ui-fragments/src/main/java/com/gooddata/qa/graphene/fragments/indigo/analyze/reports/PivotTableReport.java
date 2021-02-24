@@ -67,7 +67,7 @@ public class PivotTableReport extends AbstractFragment {
     @FindBy(css = ".ag-numeric-header .gd-pivot-table-header-label")
     private List<WebElement> headersMeasure;
 
-    @FindBy(css = ".ag-header-group-cell-with-group[col-id='0_0']")
+    @FindBy(css = ".ag-header-group-cell-with-group[col-id='groupingDescriptor_0']")
     private List<WebElement> headersColumns;
 
     @FindBy(css = ".gd-row-attribute-column-header.gd-column-group-header")
@@ -82,7 +82,7 @@ public class PivotTableReport extends AbstractFragment {
     @FindBy(css = ".gd-row-attribute-column:not(.gd-cell-hide)")
     private List<WebElement> rowAttributeColumns;
 
-    @FindBy(css = ".ag-header-group-cell-with-group:not([col-id='0_0']) .gd-pivot-table-header-label")
+    @FindBy(css = ".ag-header-group-cell-with-group:not([col-id='groupingDescriptor_0']) .gd-pivot-table-header-label")
     private List<WebElement> columnGroupHeaders;
 
     public static PivotTableReport getInstance(final SearchContext searchContext) {
