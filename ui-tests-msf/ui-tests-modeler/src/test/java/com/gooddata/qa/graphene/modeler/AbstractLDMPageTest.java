@@ -32,13 +32,7 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
 
     public LogicalDataModelPage initLogicalDataModelPage() {
         openUrl(LogicalDataModelPage.getUri(testParams.getProjectId()));
-        sleepTightInSeconds(60);
-        if (Layout.getInstance(browser).waitForLoading().isInitialPagePresent()) {
-            ViewMode.getInstance(browser).clickButtonChangeToEditMode();
-        }
-        if (!isElementPresent(By.className("gdc-ldm-sidebar"), browser)) {
-            switchToEditMode();
-        }
+        switchModelPageToViewMode();
         return LogicalDataModelPage.getInstance(browser);
     }
 
@@ -48,7 +42,12 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
 
     public LogicalDataModelPage initLogicalDataModelPageByPID(String pid) {
         openUrl(LogicalDataModelPage.getUri(pid));
-        sleepTightInSeconds(60);
+        switchModelPageToViewMode();
+        return LogicalDataModelPage.getInstance(browser);
+    }
+
+    public void switchModelPageToViewMode() {
+        sleepTightInSeconds(6);
         // make sure that is view mode initial
         if (Layout.getInstance(browser).isInitialPagePresent()) {
             ViewMode.getInstance(browser).clickButtonChangeToEditMode();
@@ -56,7 +55,6 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
         if (!isElementPresent(By.className("gdc-ldm-sidebar"), browser)) {
             switchToEditMode();
         }
-        return LogicalDataModelPage.getInstance(browser);
     }
 
     public LogicalDataModelPage initDashboardIgnoreAlert() {

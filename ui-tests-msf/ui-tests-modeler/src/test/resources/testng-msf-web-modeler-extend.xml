@@ -45,4 +45,9 @@
             <class name="com.gooddata.qa.graphene.modeler.WarningMessageTest" />
         </classes>
     </test>
+    <test name="DescriptionOfDatasetTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.DescriptionOfDatasetTest" />
+        </classes>
+    </test>
 </suite>
