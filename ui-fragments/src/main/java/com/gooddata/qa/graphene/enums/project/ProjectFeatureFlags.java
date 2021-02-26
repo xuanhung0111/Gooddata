@@ -23,6 +23,7 @@ public enum ProjectFeatureFlags {
     ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault"),
     REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled"),
     ENABLE_ANALYTICAL_DESIGNER_EXPORT("enableAnalyticalDesignerExport"),
+    ENABLE_MULTIPLE_DATES("enableMultipleDates"),
     ENABLE_ACTIVE_FILTER_CONTEXT("enableActiveFilterContext"),
     ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter"),
     ENABLE_CUSTOM_COLOR_PICKER("enableCustomColorPicker"),
