@@ -95,6 +95,7 @@ import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.analyze.RenderSpecialCaseGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADProgramTest;
+import com.gooddata.qa.graphene.indigo.analyze.BulletChartTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -214,6 +215,7 @@ public class UITestsRegistry {
             AutoResizingColumnTest.class,
             ManualResizingColumnTest.class,
             ADMeasureFormatTest.class,
+            BulletChartTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
