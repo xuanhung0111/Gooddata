@@ -44,9 +44,9 @@ public class RankingFilterPanel extends AbstractFragment {
 
     public static final By LOCATOR = className("s-rf-dropdown-body");
 
-    private final By BY_OPERATORS_SELECT = className("s-rf-operator-dropdown-body");
-    private final By BY_ATTRIBUTES_SELECT = className("s-rf-attribute-dropdown-body");
-    private final By BY_MEASURES_SELECT = className("s-rf-measure-dropdown-body");
+    private final By BY_OPERATORS_SELECT = cssSelector(".s-rf-operator-dropdown-body button span");
+    private final By BY_ATTRIBUTES_SELECT = cssSelector(".s-rf-attribute-dropdown-body button span");
+    private final By BY_MEASURES_SELECT = cssSelector(".s-rf-measure-dropdown-body button .gd-rf-measure-title");
     private static final By BY_NO_OPTION_BUBBLE = cssSelector(".bubble-content div.content");
     private final String IS_CLOSED = "icon-navigatedown";
 

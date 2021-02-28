@@ -225,21 +225,13 @@ public class RankingFilterTest extends AbstractAnalyseTest {
         analysisPage.openFilterBarPicker().checkItem("Count of " + ATTR_SALES_REP, 6).apply();
         assertThat(analysisPage.getFilterBuckets().getFilterText("Count of " + ATTR_SALES_REP + " (M6)"), containsString("All"));
 
-        analysisPage.openRankingFilterPanel(TOP + " 10").inputOperator("5").apply();
-        assertThat(analysisPage.getFilterBuckets().getFilterText(TOP + " 5"), containsString(METRIC_AMOUNT_PERCENT));
-        List<String> resultCompare = asList("342,535,179,484%", "83,042,163,020%", "859,691,557,522%", "424,227,112,078%");
-        assertThat(analysisPage.getChartReport().getTotalsStackedColumn(), equalTo(resultCompare));
-
-        FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-        DateFilterPickerPanel dateFilterPickerPanel = filtersBucket.openDatePanelOfFilter(filtersBucket.getDateFilter());
-        dateFilterPickerPanel.changeCompareType(CompareTypeDropdown.CompareType.PREVIOUS_PERIOD).apply();
-
-        analysisPage.openRankingFilterPanel(TOP + " 5").selectOperator(BOTTOM).inputOperator("3")
-            .outOf(ATTR_DEPARTMENT).basedOn(METRIC_SUM_OF_AMOUNT).apply();
+        analysisPage.openRankingFilterPanel(TOP + " 10")
+            .outOf(ATTR_DEPARTMENT).basedOn(METRIC_SUM_OF_AMOUNT).selectOperator(BOTTOM).inputOperator("3").apply();
+        analysisPage.waitForReportComputing();
         assertEquals(analysisPage.openRankingFilterPanel(BOTTOM + " 3 out of " + ATTR_DEPARTMENT)
             .getPreview(), BOTTOM + " 3" + " out of " + ATTR_DEPARTMENT + " based on " + METRIC_SUM_OF_AMOUNT);
         assertThat(analysisPage.getFilterBuckets().getFilterText(BOTTOM + " 3 out of " + ATTR_DEPARTMENT), containsString(METRIC_SUM_OF_AMOUNT));
-        List<String> resultCompareUpdated = asList("340,337,309,938%", "83,042,163,020%", "853,848,794,572%", "424,227,112,078%");
+        List<String> resultCompareUpdated = asList("342,535,179,484%", "83,042,163,020%", "859,691,557,522%", "424,227,112,078%");
         assertThat(analysisPage.getChartReport().getTotalsStackedColumn(), equalTo(resultCompareUpdated));
 
         String messageBubble = analysisPage.openMeasureFilterPanel("Count of " + ATTR_SALES_REP,6).getWarningMessage();
@@ -330,7 +322,7 @@ public class RankingFilterTest extends AbstractAnalyseTest {
         analysisPage.undo();
 
         FilterBarPicker filterBarPicker = analysisPage.openFilterBarPicker();
-        filterBarPicker.checkItem(RANKING_FILTER).apply();
+        filterBarPicker.uncheckItem(RANKING_FILTER).apply();
         analysisPage.saveInsightAs("Save as after check remove Ranking Filter").waitForReportComputing();
         assertFalse(analysisPage.getFilterBuckets().isRankingFilterVisible(),"Ranking filter should not be enabled");
         assertThat(analysisPage.getChartReport().getTotalsStackedColumn(), equalTo(asList("56,474,579,377%", "28,609,946,135%")));

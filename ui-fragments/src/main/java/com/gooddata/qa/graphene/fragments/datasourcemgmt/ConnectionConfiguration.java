@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.datasourcemgmt;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -11,12 +12,18 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 
 public class ConnectionConfiguration extends AbstractFragment {
     public static final String CONNECTION_CONFIGURATION_CLASS = "create-or-edit-inner-connection-container";
+    private static final String KEY_PARAMETER = "generic-parameter-key-field";
+    private static final String KEY_SECURE_PARAMETER = "generic-parameter-secure-key-field";
+    private static final By ADDING_COMPONENT = By.className("generic-parameter-adding");
+    private static final By PARAMETER_INPUT = By.className("generic-parameter-input");
 
     @FindBy(className = "gd-input-field")
     protected List<WebElement> input;
@@ -38,6 +45,36 @@ public class ConnectionConfiguration extends AbstractFragment {
 
     @FindBy(className = "output-stage-section")
     private WebElement outputStageSection;
+
+    @FindBy(className = "provider-label-value")
+    private WebElement datasourceType;
+
+    @FindBy(className = "s-add_parameter")
+    private WebElement addParameterBtn;
+
+    @FindBy(className = "s-add_secure_parameter")
+    private WebElement addSecureParameterBtn;
+
+    @FindBy(className = "icon-trash")
+    private WebElement trashIcon;
+
+    @FindBy(className = "generic-parameter-input")
+    private List<WebElement> parameterInput;
+
+    @FindBy(className = KEY_PARAMETER)
+    private WebElement parameterKeyField;
+
+    @FindBy(className = "generic-parameter-value-field")
+    private WebElement parameterValueField;
+
+    @FindBy(className = KEY_SECURE_PARAMETER)
+    private WebElement parameterSecureKeyField;
+
+    @FindBy(className = "generic-parameter-secure-value-field")
+    private WebElement parameterSecureValueField;
+
+    @FindBy(className = "generic-parameters-empty-container")
+    private WebElement emptyParameters;
 
     public static final ConnectionConfiguration getInstance(SearchContext context) {
         return Graphene.createPageFragment(ConnectionConfiguration.class, waitForElementVisible(className(CONNECTION_CONFIGURATION_CLASS), context));
@@ -168,4 +205,118 @@ public class ConnectionConfiguration extends AbstractFragment {
         addSchemaOutputStage(schema);
     }
 
+    // ========= These function use for Generic Datasource ============
+
+    public String getDatasourceType() {
+        return waitForElementVisible(datasourceType).getText();
+    }
+
+    public ConnectionConfiguration clickAddParameterButton() {
+        waitForElementVisible(addParameterBtn).click();
+        return this;
+    }
+
+    public ConnectionConfiguration clickAddSecureParameterButton() {
+        waitForElementVisible(addSecureParameterBtn).click();
+        return this;
+    }
+
+    public boolean isAddingComponentDisplayed() {
+        return isElementVisible(ADDING_COMPONENT, this.getRoot()) && addParameterBtn.isDisplayed()
+                && addSecureParameterBtn.isDisplayed();
+    }
+
+    public boolean isNewLineParameterDisplayed() {
+        return isElementVisible(PARAMETER_INPUT, this.getRoot()) && isElementVisible(parameterKeyField) &&
+            isElementVisible(parameterValueField);
+    }
+
+    public boolean isNewLineSecureParameterDisplayed() {
+        return isElementVisible(PARAMETER_INPUT, this.getRoot()) && isElementVisible(parameterSecureKeyField) &&
+                isElementVisible(parameterSecureValueField);
+    }
+
+    public ConnectionConfiguration clickOnTrash() {
+        waitForElementVisible(trashIcon).click();
+        return this;
+    }
+
+    public ConnectionConfiguration inputOnlyAddParameter(String key) {
+        waitForElementVisible(parameterKeyField).clear();
+        parameterKeyField.sendKeys(key);
+        return this;
+    }
+
+    public ConnectionConfiguration inputAddParameter(String key, String value) {
+        inputOnlyAddParameter(key);
+        waitForElementVisible(parameterValueField).clear();
+        parameterValueField.sendKeys(value);
+        return this;
+    }
+
+    public ConnectionConfiguration inputOnlyAddSecureParameter(String key) {
+        waitForElementVisible(parameterSecureKeyField).clear();
+        parameterSecureKeyField.sendKeys(key);
+        return this;
+    }
+
+    public ConnectionConfiguration inputAddSecureParameter(String key, String value) {
+        inputOnlyAddSecureParameter(key);
+        waitForElementVisible(parameterSecureValueField).clear();
+        parameterSecureValueField.sendKeys(value);
+        return this;
+    }
+
+    public List<String> getParameterValue(String inputText) {
+        String key = waitForElementVisible(parameterKeyField).getAttribute(inputText);
+        String value = waitForElementVisible(parameterValueField).getAttribute(inputText);
+        return asList(key, value);
+    }
+
+    public List<String> getPlaceHolderParameterInput() {
+        return getParameterValue("placeholder");
+    }
+
+    public List<String> getCurrentParameterValue() {
+        return getParameterValue("value");
+    }
+
+    public List<String> getSecureParameterValue(String inputText) {
+        String key = waitForElementVisible(parameterSecureKeyField).getAttribute(inputText);
+        String value = waitForElementVisible(parameterSecureValueField).getAttribute(inputText);
+        return asList(key, value);
+    }
+
+    public List<String> getPlaceHolderSecureParameterInput() {
+        return getSecureParameterValue("placeholder");
+    }
+
+    public List<String> getCurrentSecureParameterInput() {
+        return getSecureParameterValue("value");
+    }
+
+    public int countTrashIcon() {
+        return browser.findElements(By.className("icon-trash")).size();
+    }
+
+    public WebElement getParamInfo(String parameterName, String keyField) {
+        return parameterInput.stream().filter(el -> el.findElement(By.className(keyField))
+                .getAttribute("value").equals(parameterName)).findFirst().get();
+    }
+
+    public void deleteParameterValue(String parameterName) {
+        getParamInfo(parameterName, KEY_PARAMETER).findElement(By.className("icon-trash")).click();
+    }
+
+    public void deleteSecureParameter(String parameterName) {
+        getParamInfo(parameterName, KEY_SECURE_PARAMETER).findElement(By.className("icon-trash")).click();
+    }
+
+    public boolean isEmptyParameter() {
+        return isElementVisible(emptyParameters);
+    }
+
+    public String getErrorMessageOnParamLine(int rowLine) {
+        return parameterInput.get(rowLine).findElement(By.className("required-message")).getText();
+    }
 }

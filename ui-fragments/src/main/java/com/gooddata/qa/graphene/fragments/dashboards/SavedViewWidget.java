@@ -95,7 +95,7 @@ public class SavedViewWidget extends AbstractFragment{
         waitForElementVisible(this.getRoot()).click();
         waitForElementVisible(savedViewPopupMenu.getRoot());
         try {
-            waitForElementVisible(loadingIcon, getRoot(), 1);
+            waitForElementVisible(loadingIcon, getRoot(), 3);
             waitForElementNotPresent(loadingIcon);
         } catch (TimeoutException e) {
             //SavedViewMenu already loaded so WebDriver unable to catch the loading indicator
@@ -329,7 +329,7 @@ public class SavedViewWidget extends AbstractFragment{
         public void selectSavedView(String savedView) {
             for (WebElement ele : savedViews) {
                 if (!savedView.equals(ele.getText())) continue;
-                ele.click();
+                waitForElementVisible(ele).click();
                 return;
             }
             throw new NoSuchElementException(String.format("Can not find '%s' saved view!", savedView));

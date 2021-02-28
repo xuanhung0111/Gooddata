@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.fragments.modeler.TableView;
 import com.gooddata.qa.graphene.fragments.modeler.TableViewDataset;
 import com.gooddata.qa.graphene.fragments.modeler.MainModelContent;
 import com.gooddata.qa.graphene.fragments.modeler.GenericList;
-import com.gooddata.qa.graphene.fragments.modeler.DatasetEdit;
 import com.gooddata.qa.graphene.fragments.modeler.ChooseReferencePopUp;
 import com.gooddata.qa.graphene.fragments.modeler.DataMapping;
 import com.gooddata.qa.graphene.fragments.modeler.FileUploadDialog;
@@ -42,6 +41,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.openqa.selenium.UnhandledAlertException;
 
 import java.io.File;
 import java.io.IOException;
@@ -231,7 +231,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         toolbarTableView = ToolBar.getInstanceInTableView(browser, 1);
         toolbarTableView.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteInTableView();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
@@ -301,7 +301,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         dialog.saveChanges();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
@@ -384,7 +384,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         }
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
@@ -455,7 +455,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     private IndigoDashboardsPage InitDashboardIgnoreAlert() {
         try {
             return initIndigoDashboardsPage();
-        } catch (Exception handleAlert) {
+        } catch (UnhandledAlertException unhandledAlert) {
             browser.navigate().refresh();
             browser.switchTo().alert().accept();
             browser.switchTo().defaultContent();

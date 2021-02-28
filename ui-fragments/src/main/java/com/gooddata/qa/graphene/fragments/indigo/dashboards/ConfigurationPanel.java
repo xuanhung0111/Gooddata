@@ -105,6 +105,7 @@ public class ConfigurationPanel extends AbstractFragment {
 
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".gd-message.error");
     private static final By SUCCESS_MESSAGE_LOCATOR = By.cssSelector(".gd-message.success");
+    private static final By WARNING_MESSAGE_LOCATOR = By.cssSelector(".gd-message.warning");
     private static final By HYPERLINK_URL_TITLE = className("s-drill-to-attribute-url-section-title");
     private static final By HYPERLINK_LOADING = className("s-drill-to-attribute-url-section-loading");
 
@@ -243,7 +244,11 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public String getSuccessMessage() {
         return waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, getRoot()).getText();
-    }    
+    }
+
+    public String getWarningMessage() {
+        return waitForElementVisible(WARNING_MESSAGE_LOCATOR, getRoot()).getText();
+    }
 
     public String getSelectedDataSetColor() {
         return waitForFragmentVisible(dateDataSetSelect).getSelectionColor();

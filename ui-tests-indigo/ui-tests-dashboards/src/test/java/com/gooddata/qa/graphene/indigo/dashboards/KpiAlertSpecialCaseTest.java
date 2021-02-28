@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.sdk.model.md.Restriction.identifier;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
@@ -186,29 +187,72 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
-    public void checkAlertWhenChangeMetricExpression() throws JSONException, IOException {
+    public void checkAlertWhenTriggeringSecondTime() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
         String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
-            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, "10");
 
-            String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
-                    numberFactUri, firstNameAttributeUri, firstNameValueUri);
-
-            new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
-                    .changeMetricExpression(sumOfNumberMetricUri, newMaqlExpression);
             updateCsvDataset(DATASET_NAME, otherCsvFilePath);
 
             Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
-            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered-first-time", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
 
             assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 1)),
                     "Alert email is not sent to mailbox");
+
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_GOES_ABOVE, "10");
+
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+            kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
+
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered-second-time", getClass());
+            assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
+
+            assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 2)),
+                    "Second alert email is not sent to mailbox");
+
+        } finally {
+            getMdService().removeObjByUri(indigoDashboardUri);
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
+    public void removeBrokenAlert() throws JSONException, IOException {
+        String kpiName = generateUniqueName();
+        String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
+
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
+
+        try {
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, "10");
+
+            updateCsvDataset(DATASET_NAME, otherCsvFilePath);
+
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
+
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered-first-time", getClass());
+            assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
+
+            assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 1)),
+                    "Alert email is not sent to mailbox");
+
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_GOES_ABOVE, "10");
+
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+            kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
+
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered-second-time", getClass());
+            assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
+
+            assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 2)),
+                    "Second alert email is not sent to mailbox");
 
         } finally {
             getMdService().removeObjByUri(indigoDashboardUri);
@@ -421,6 +465,37 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
             projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, false);
 
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
+    public void checkAlertWhenChangeMetricExpression() throws JSONException, IOException {
+        String kpiName = generateUniqueName();
+        String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
+
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
+
+        try {
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
+
+            String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                    numberFactUri, firstNameAttributeUri, firstNameValueUri);
+
+            new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                    .changeMetricExpression(sumOfNumberMetricUri, newMaqlExpression);
+            updateCsvDataset(DATASET_NAME, otherCsvFilePath);
+
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
+
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
+            assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
+
+            assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 1)),
+                    "Alert email is not sent to mailbox");
+
+        } finally {
+            getMdService().removeObjByUri(indigoDashboardUri);
             updateCsvDataset(DATASET_NAME, csvFilePath);
         }
     }

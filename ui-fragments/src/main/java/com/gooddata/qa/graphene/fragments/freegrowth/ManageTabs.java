@@ -3,10 +3,12 @@ package com.gooddata.qa.graphene.fragments.freegrowth;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.hamcrest.CoreMatchers;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.openqa.selenium.By.cssSelector;
@@ -47,5 +49,9 @@ public class ManageTabs extends AbstractFragment {
     public ManageTabs clickScheduleEmailTab() {
         scheduleEmailTab.click();
         return this;
+    }
+
+    public boolean isProjectAndUserTabVisible() {
+        return isElementVisible(By.className("s-menu-projectPage"), getRoot());
     }
 }

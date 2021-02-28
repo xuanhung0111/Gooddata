@@ -20,7 +20,7 @@ services:
       -DfirefoxDriverBinaryPath=/bin/geckodriver \
       -pl ui-tests-core,ui-tests-indigo/ui-tests-ad,ui-tests-indigo/ui-tests-dashboards \
       -Dtestng.suite.xml=acceptance-tests.xml \
-      -Dhost=att-graphene.na.intgdc.com \
+      -Dhost=att-graphene.dev.intgdc.com \
       -Duser=bear@gooddata.com \
       -Dpassword=jindrisska \
       -Duser.domain=default \

@@ -89,11 +89,13 @@ import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableTes
 import com.gooddata.qa.graphene.indigo.analyze.GroupingAndSubTotalsPivotTableAdvancedTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterBarFlowTest;
 import com.gooddata.qa.graphene.indigo.analyze.ADFilterInsightValueTest;
+import com.gooddata.qa.graphene.indigo.analyze.ADMeasureFormatTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureCombineDateTest;
 import com.gooddata.qa.graphene.indigo.analyze.WeekFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADFromExternalApplication;
 import com.gooddata.qa.graphene.indigo.analyze.RenderSpecialCaseGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADProgramTest;
+import com.gooddata.qa.graphene.indigo.analyze.BulletChartTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -148,7 +150,7 @@ public class UITestsRegistry {
             CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
             DateFilterTest.class,
-            //RankingFilterTest.class,
+            RankingFilterTest.class,
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,
@@ -212,6 +214,8 @@ public class UITestsRegistry {
             ControlFilterEmbeddedADProgramTest.class,
             AutoResizingColumnTest.class,
             ManualResizingColumnTest.class,
+            ADMeasureFormatTest.class,
+            BulletChartTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

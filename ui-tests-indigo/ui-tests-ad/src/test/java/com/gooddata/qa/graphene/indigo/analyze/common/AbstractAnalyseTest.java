@@ -37,6 +37,7 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
         // TODO: BB-1675 enableNewADFilterBar FF should be removed
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_MULTIPLE_DATES, false);
     }
 
     protected void checkingOpenAsReport(String screenShot) {

@@ -260,6 +260,12 @@ public class DashboardEditBar extends AbstractFragment {
         sleepTightInSeconds(3); // take sometime for saving current dashboard into user profile settings
     }
 
+    public void clickSaveDashboardButton() {
+        waitForElementVisible(saveButton, 3);
+        saveButton.click();
+        waitForFragmentNotVisible(this);
+    }
+
     public DashboardEditBar deleteDashboardWithConfirm() {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();

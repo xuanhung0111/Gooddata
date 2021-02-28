@@ -50,8 +50,14 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
     public void initialStageTest() {
         if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) {
-            throw new SkipException("Initial Page is not tested on PI or Production environment");
-        } else {
+            throw new SkipException("Initial Page is not tested on PI or Production environment !!");
+        }
+    }
+
+    //In case, has ADS Datasource on Domain , verify display list datasource and show Detail of first datasource
+    @Test(dependsOnMethods = {"initialStageTest"})
+    public void verifyFirstUIDatasourceTest() {
+        if (dsMenu.isListDatasourceEmpty()) {
             initDatasourceManagementPage();
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
@@ -61,6 +67,12 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
             dataSourceManagementPage = initDatasourceManagementPage();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
             dsMenu.selectBigQueryResource();
+        } else {
+            initDatasourceManagementPage();
+            String firstDSText = dsMenu.getListDataSources().get(0);
+            ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+            DatasourceHeading heading = container.getDatasourceHeading();
+            assertEquals(firstDSText, heading.getName());
         }
     }
 
@@ -132,8 +144,7 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         contentWrapper.waitLoadingManagePage();
         ConnectionDetail bigqueryDetail = container.getConnectionDetail();
         checkBigqueryDetail(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(),
-                bigqueryDetail.getTextProject(),  bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
-        assertEquals(dsMenu.sortDataSource(), dsMenu.getListDataSources());
+                bigqueryDetail.getTextProject(), bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
 
@@ -157,7 +168,7 @@ public class BigqueryDataSourceE2ETest extends AbstractDatasourceManagementTest 
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        checkBigQueryDetailUpdate(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(),bigqueryDetail.getTextProject(),
+        checkBigQueryDetailUpdate(container.getDatasourceHeading().getName(), bigqueryDetail.getTextClientEmail(), bigqueryDetail.getTextProject(),
                 bigqueryDetail.getTextDataset(), bigqueryDetail.getTextPrefix());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME_CHANGED), "list data sources doesn't have created Datasource");
     }

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.id;
@@ -39,7 +40,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     @FindBy(xpath = "//form/div/span/button[text()='Delete']")
     private WebElement deleteProjectDialogButton;
 
-    @FindBy(className = "project-page-manage-link")
+    @FindBy(className = USER_MANAGEMENT_LINK_CLASS_NAME)
     private WebElement userManagementLink;
     
     @FindBy(css = ".leaveProject .s-btn-leave")
@@ -80,6 +81,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     private static final By CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR = By
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
     private static final By EMAILING_DASHBOARDS_TAB_LOCATOR = By.cssSelector(".s-menu-schedulePage");
+    private static final String USER_MANAGEMENT_LINK_CLASS_NAME = "project-page-manage-link";
 
     public static final ProjectAndUsersPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(ProjectAndUsersPage.class, waitForElementVisible(id("p-projectPage"), context));
@@ -330,5 +332,9 @@ public class ProjectAndUsersPage extends AbstractFragment {
         return !waitForElementVisible(nameButton)
                 .getAttribute("class")
                 .contains("button-disabled");
+    }
+
+    public boolean isManageUserGroupLinkDisplayed() {
+        return isElementVisible(By.className(USER_MANAGEMENT_LINK_CLASS_NAME), getRoot());
     }
 }

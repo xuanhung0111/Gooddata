@@ -339,6 +339,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
         publishModelDialog.overwriteData();
+        sleepTightInSeconds(200);
 
         String sql = getResourceAsString("/model_snowflake_current.txt");
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, projectId);
@@ -502,7 +503,6 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         log.info("listValuePrice : " + listValuePrice);
         assertEquals(listValue, singletonList("$80.00"), "Unconnected filter make impact to insight");
         assertEquals(listValuePrice, singletonList("$12,000.00"), "Unconnected filter make impact to insight");
-
     }
 
     protected Metrics getMetricCreator() {

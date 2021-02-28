@@ -30,4 +30,14 @@
             <class name="com.gooddata.qa.graphene.datasource.BigQueryDataSourceAdvancedE2ETest" />
         </classes>
     </test>
+    <test name="GenericDataSourceE2ETest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.datasource.GenericDataSourceE2ETest" />
+        </classes>
+    </test>
+    <test name="S3DataSourceE2ETest" enabled="false">
+        <classes>
+            <class name="com.gooddata.qa.graphene.datasource.S3DataSourceE2ETest" />
+        </classes>
+    </test>
 </suite>

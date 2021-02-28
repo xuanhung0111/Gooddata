@@ -2,10 +2,13 @@ package com.gooddata.qa.graphene.fragments.datasourcemgmt;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
@@ -51,5 +54,13 @@ public class MoreContentDialog extends AbstractFragment {
     public GenerateOutputStageDialog getGenerateDialog() {
         waitForElementVisible(outputStageButton).click();
         return GenerateOutputStageDialog.getInstance(browser);
+    }
+
+    public boolean isGenerateOutputStageEnabled() {
+        return isElementPresent(By.className("s-generate-os-menu-item"), getRoot());
+    }
+
+    public boolean isPublishIntoWorkspaceEnabled() {
+        return isElementPresent(By.className("s-publish-ws-menu-item"), getRoot());
     }
 }

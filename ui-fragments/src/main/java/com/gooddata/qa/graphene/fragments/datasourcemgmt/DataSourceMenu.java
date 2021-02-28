@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 public class DataSourceMenu extends AbstractFragment {
     private static final By MENU_CLASS = By.className("navigation");
@@ -48,6 +49,16 @@ public class DataSourceMenu extends AbstractFragment {
         OverlayWrapper.getInstance(browser).selectBigqueryItem();
     }
 
+    public void selectS3DataSource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectS3Item();
+    }
+
+    public void selectGenericDataSource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectGenericItem();
+    }
+
     public List<String> getListDataSources() {
         List<String> originalList = new ArrayList<String>();
         for (WebElement e : datasources) {
@@ -55,6 +66,10 @@ public class DataSourceMenu extends AbstractFragment {
             originalList.add(e.getText());
         }
         return originalList;
+    }
+
+    public boolean isListDatasourceEmpty() {
+        return isElementPresent(By.className("empty-list"), browser);
     }
 
     public DataSourceMenu selectDataSource(String title) {

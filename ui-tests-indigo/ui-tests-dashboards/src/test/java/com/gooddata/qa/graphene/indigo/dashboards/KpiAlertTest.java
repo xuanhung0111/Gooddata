@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_ERROR_MESSAGE_BAR;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
@@ -21,6 +26,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.fragments.datasourcemgmt.DatasourceMessageBar;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFilter;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
@@ -407,13 +414,6 @@ public class KpiAlertTest extends AbstractDashboardTest {
         }
     }
 
-    private Kpi getLastKpiAfterAlertsLoaded() {
-        return waitForFragmentVisible(indigoDashboardsPage)
-            .waitForWidgetsLoading()
-            .waitForAlertsLoaded()
-            .getLastWidget(Kpi.class);
-    }
-
     @Test(dependsOnMethods = {"updateAlertWhenKpiValueIsEmpty"}, groups = {"desktop"})
     public void checkUIAlertDialogContentHasManyWidgetsOnKPIsTest() throws JSONException, IOException {
         String kpiUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()),"Alert Dialog");
@@ -425,5 +425,123 @@ public class KpiAlertTest extends AbstractDashboardTest {
         assertTrue(indigoDashboardsPage.isAlertDialogContentCenter(indigoDashboardsPage.getNavigationDashboardWidth(),
                 indigoDashboardsPage.getDashboardContentWidth(), kpiAlertDialog.getAlertDialogContentWidth(),
                 indigoDashboardsPage.getDistanceFromLeftToAlertDialogContent()));
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void removeBrokenAlert() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createNumOfActivitiesKpi(), 0);
+
+        try {
+            initIndigoDashboardsPage().switchToEditMode()
+                    .addAttributeFilter(ATTR_ACCOUNT)
+                    .addAttributeFilter(ATTR_DEPARTMENT)
+                    .saveEditModeWithWidgets();
+
+            waitForFragmentVisible(indigoDashboardsPage);
+            getLastKpiAfterAlertsLoaded()
+                    .openAlertDialog()
+                    .setThreshold("1")
+                    .setAlert();
+
+            indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).clickOnContent();
+            indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilter(ATTR_ACCOUNT).setChecked(false);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+            browser.navigate().refresh();
+            waitForFragmentVisible(indigoDashboardsPage);
+            assertEquals(waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser).getText(),"Someone disabled or removed filters" +
+                    " that you use to watch for changes to your KPIs. To see the correct KPI values, remove the broken alerts, or update" +
+                    " the KPIs individually. Alternatively, enter edit mode and add the removed filters back, or re-enable the disabled filters.");
+        } finally {
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void updateAlertWithoutChanging() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createNumOfActivitiesKpi(), 0);
+
+        try {
+            initIndigoDashboardsPage();
+            getLastKpiAfterAlertsLoaded()
+                    .openAlertDialog()
+                    .setThreshold("1")
+                    .setAlert();
+
+            getLastKpiAfterAlertsLoaded()
+                    .openAlertDialog()
+                    .setAlert();
+
+            indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).clickOnContent();
+            assertEquals(indigoDashboardsPage.getConfigurationPanel().getWarningMessage(),"Users have set up 1 alert " +
+                    "for this KPI. Modifying the KPI will affect this alert.");
+        } finally {
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void removeOtherAlert() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createNumOfActivitiesKpi(), 0);
+        String anotherKpiUri = addWidgetToWorkingDashboardFluidLayout(createLostKpi(), 0);
+        try {
+            initIndigoDashboardsPage();
+            getLastKpiAfterAlertsLoaded()
+                    .openAlertDialog()
+                    .setThreshold("1")
+                    .setAlert();
+
+            waitForFragmentVisible(indigoDashboardsPage)
+                    .waitForWidgetsLoading()
+                    .waitForAlertsLoaded().getWidgetByHeadline(Kpi.class, METRIC_NUMBER_OF_ACTIVITIES)
+                    .openAlertDialog()
+                    .setThreshold("1")
+                    .setAlert();
+
+            indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
+            indigoDashboardsPage.saveEditModeWithWidgets();
+            Kpi kpi = getLastKpiAfterAlertsLoaded();
+            kpi.clickOnContent();
+            assertTrue(kpi.hasSetAlert(), "should keep alert of unrelated kpi");
+        } finally {
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(anotherKpiUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
+    public void updateAlertWithFiltering() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboardFluidLayout(createNumOfActivitiesKpi(), 0);
+        try {
+            initIndigoDashboardsPage().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT, "14 West")
+                    .selectDateFilterByName(DATE_FILTER_THIS_MONTH).saveEditModeWithWidgets();
+            indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME).getAttributeFiltersPanel().getAttributeFilter(ATTR_ACCOUNT).selectAllValues();
+            getLastKpiAfterAlertsLoaded()
+                    .openAlertDialog()
+                    .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
+                    .setThreshold("100")
+                    .setAlert();
+
+            browser.navigate().refresh();
+            waitForFragmentVisible(indigoDashboardsPage);
+            KpiAlertDialog kpiAlertDialog = getLastKpiAfterAlertsLoaded().openAlertDialog();
+            assertEquals(kpiAlertDialog.getAlertMessageText(), "KPI is now filtered differently than when the alert was set up. Apply alert filters to dashboard");
+            AttributeFilter accountFilter = indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_ACCOUNT);
+            assertEquals(accountFilter.getSelectedItems(), "14 West");
+            kpiAlertDialog.setThreshold("1000").setAlert();
+            assertEquals(getLastKpiAfterAlertsLoaded().openAlertDialog().getThreshold(), "1000");
+
+            kpiAlertDialog.applyAlertFilters();
+            indigoDashboardsPage.waitForWidgetsLoading();
+            assertEquals(accountFilter.waitForLoading().getSelectedItems(), "All");
+        } finally {
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
+        }
+    }
+
+    private Kpi getLastKpiAfterAlertsLoaded() {
+        return waitForFragmentVisible(indigoDashboardsPage)
+                .waitForWidgetsLoading()
+                .waitForAlertsLoaded()
+                .getLastWidget(Kpi.class);
     }
 }

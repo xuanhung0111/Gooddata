@@ -13,7 +13,6 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -68,6 +67,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-adi-am-operator-selector-title")
     private WebElement outcomeOfOperator;
 
+    @FindBy(className = "adi-measure-number-format-button")
+    private WebElement formatMeasureButton;
+
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
@@ -80,6 +82,8 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
     private static final String DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME = "button-dropdown";
     private static final String SHOW_ON_SECONDARY_AXIS_CLASS_NAME = "s-show-on-secondary-axis";
+    private static final By BY_CUSTOM_FORMAT_OPTION = By.className("s-format-preset-customFormat");
+    private static final By BY_MEASURE_FORMAT_DROPDOWN = By.className("gd-measure-number-format-dropdown-body");
 
     private static final String DISABLED = "is-disabled";
 
@@ -140,10 +144,18 @@ public class MetricConfiguration extends AbstractFragment {
         return waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()).getText().replaceAll("[\\r\\n]+", " ");
     }
 
-    public MetricConfiguration showPercents() {
-        waitForElementVisible(showInPercentLabel).click();
-        assertTrue(waitForElementPresent(showInPercents).isSelected(), "Show in percents isn't checked");
+    public String getFormatMeasureText() {
+        return waitForElementVisible(formatMeasureButton).getText();
+    }
+
+    public MetricConfiguration showPercents(boolean isCheck) {
+        if (waitForElementPresent(showInPercents).isSelected() != isCheck)
+            waitForElementVisible(showInPercentLabel).click();
         return this;
+    }
+
+    public MetricConfiguration showPercents() {    
+        return showPercents(true);
     }
 
     public MetricConfiguration checkShowOnSecondaryAxis() {
@@ -381,6 +393,33 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public List<String> getListFormatPresets() {
+        waitForElementVisible(formatMeasureButton).click();
+        WebElement tooltip = waitForElementVisible(BY_MEASURE_FORMAT_DROPDOWN, browser);
+        
+        return waitForCollectionIsNotEmpty(tooltip.findElements(cssSelector(".gd-list-item.gd-format-preset"))).stream()
+            .map(item -> item.findElement(cssSelector(".gd-format-preset-name")).getText())
+            .collect(Collectors.toList());
+    }
+
+    public MetricConfiguration changeFormatMeasure(FormatMeasurePreset formatMeasure) {
+        if (!waitForElementVisible(formatMeasureButton).getAttribute("class").contains("is-active")) {
+            formatMeasureButton.click();
+        }
+        waitForElementVisible(className(formatMeasure.toString()), browser).click();
+        return this;
+    }
+
+    public MetricConfiguration openCustomFormatMeasureDialog() {
+        waitForElementVisible(formatMeasureButton).click();
+        waitForElementVisible(BY_CUSTOM_FORMAT_OPTION, browser).click();
+        return this;
+    }
+
+    public CustomMeasureFormatDialog getCustomMeasureFormatDialog() {
+        return CustomMeasureFormatDialog.getInstance(browser);
+    }
+
     public static class AttributeFilterPicker extends AbstractPicker {
 
         @FindBy(css = ".s-select-all-checkbox")
@@ -517,6 +556,28 @@ public class MetricConfiguration extends AbstractFragment {
         private String type;
 
         OperatorCalculated(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
+    public enum FormatMeasurePreset {
+
+        INHERIT("s-format-preset-inherit"),
+        ROUNDED("s-format-preset-rounded"),
+        DECIMAL_1("s-format-preset-decimal-1"),
+        DECIMAL_2("s-format-preset-decimal-2"),
+        PERCENT_ROUNDED("s-format-preset-percent-rounded"),
+        PERCENT_1("s-format-preset-percent-1"),
+        PERCENT_2("s-format-preset-percent-2");
+
+        private String type;
+
+        FormatMeasurePreset(String type) {
             this.type = type;
         }
 

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene;
 import com.gooddata.sdk.model.project.Project;
 import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.sdk.service.project.ProjectService;
+import org.openqa.selenium.UnhandledAlertException;
 import com.gooddata.sdk.model.project.ProjectValidationResults;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.common.TestParameters;
@@ -65,7 +66,15 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public void openUrl(String url) {
-        openUrl(getRootUrl(), url);
+        try {
+            openUrl(getRootUrl(), url);
+        }
+        catch (UnhandledAlertException unhandledAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            openUrl(getRootUrl(), url);
+        }
     }
 
     public void openNodeJsUrl(String url) {
