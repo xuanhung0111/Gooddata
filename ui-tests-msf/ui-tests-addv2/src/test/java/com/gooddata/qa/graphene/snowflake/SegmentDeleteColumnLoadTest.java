@@ -183,10 +183,7 @@ public class SegmentDeleteColumnLoadTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         lastSuccessful = LocalDateTime.now().withNano(0);
         time = parseToTimeStampFormat(lastSuccessful);
         timeSecond = parseToTimeStampFormat(lastSuccessful.plusSeconds(5));

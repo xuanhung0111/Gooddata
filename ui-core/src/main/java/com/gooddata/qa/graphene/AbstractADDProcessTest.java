@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
+import com.gooddata.sdk.service.project.ProjectService;
 import org.testng.annotations.AfterClass;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
 
     protected RestClient domainRestClient;
     protected LcmBrickFlowBuilder lcmBrickFlowBuilder;
+    private ProjectService service;
     protected boolean useK8sExecutor = false;
 
     @Override
@@ -24,6 +26,7 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
         super.customizeProject();
         lcmBrickFlowBuilder = new LcmBrickFlowBuilder(testParams, useK8sExecutor);
         domainRestClient = new RestClient(getProfile(DOMAIN));
+        service = domainRestClient.getProjectService();
     }
 
     protected String generateScheduleName() {
@@ -52,6 +55,13 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
                 new RestClient.RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
                 projectId);
         userManagementRestRequest.addUserToProject(email, userRole);
+    }
+
+    protected void lcmCreateNewVersion() {
+        String previousMaster = lcmBrickFlowBuilder.getCurrentMasterProject();
+        lcmBrickFlowBuilder.runLcmFlow();
+        //delete master after delete segment: BB-2315
+        service.removeProject(service.getProjectById(previousMaster));
     }
 
     @AfterClass(alwaysRun = true)

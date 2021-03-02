@@ -104,8 +104,8 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
     protected IndigoDashboardsPage indigoDashboardsPage;
 
     @Override
-    protected void customizeProject() {
-        domainRestClient = new RestClient(getProfile(DOMAIN));
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         dataSource = new DataSourceUtils(testParams.getDomainUser());
         dataSourceRestRequest = new DataSourceRestRequest(domainRestClient, testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -452,8 +452,7 @@ public class BigQuerySegmentLoadTest extends AbstractADDProcessTest {
 
     private void updateLCM() {
         log.info("Update LCM .......................");
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         log.info("LCM updated successfully .......................");
     }
 

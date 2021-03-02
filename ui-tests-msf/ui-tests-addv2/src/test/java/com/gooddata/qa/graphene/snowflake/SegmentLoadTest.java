@@ -182,8 +182,7 @@ public class SegmentLoadTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         lastSuccessful = LocalDateTime.now().withNano(0);
         time = parseToTimeStampFormat(lastSuccessful);
         timeIncremental = parseToTimeStampFormat(LocalDateTime.now().plusSeconds(3));
