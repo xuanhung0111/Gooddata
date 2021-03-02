@@ -51,6 +51,7 @@ public abstract class AbstractTest extends Arquillian {
     @BeforeClass(alwaysRun = true)
     public void loadProperties() {
         testParams = TestParameters.getInstance();
+        log.setLevel(testParams.getLogLevel());
     }
 
     @AfterClass(alwaysRun = true)
