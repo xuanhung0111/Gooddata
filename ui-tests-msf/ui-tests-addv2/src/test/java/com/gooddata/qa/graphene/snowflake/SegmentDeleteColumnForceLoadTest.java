@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.sdk.service.project.ProjectService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -138,8 +139,7 @@ public class SegmentDeleteColumnForceLoadTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         lastSuccessful = LocalDateTime.now().withNano(0);
         timeForceFullLoad = parseToTimeStampFormat(lastSuccessful);
         timeLoadFrom = parseToTimeStampFormat(lastSuccessful.plusSeconds(5));
