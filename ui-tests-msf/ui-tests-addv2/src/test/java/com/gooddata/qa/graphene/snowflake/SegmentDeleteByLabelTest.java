@@ -180,8 +180,7 @@ public class SegmentDeleteByLabelTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         // On platform , Default Label will auto-asign to attribute which doesn't have,
         // so we need write test remove default label on Clients
         MaqlRestRequest maqlRestRequestProject1 = new MaqlRestRequest(project1, getProfile(Profile.ADMIN));
@@ -306,8 +305,7 @@ public class SegmentDeleteByLabelTest extends AbstractADDProcessTest {
                 .withDefaultLabelOfAtrribute(Pair.of(PK_CUSKEY, PK_CUSKEY_LINK));
         ldmmodelChangeDefaultLabel = new LdmModel();
         setupMaql(ldmmodelChangeDefaultLabel.withDataset(datasetMultiNoMainChangeDefault).buildMaqlChangeDefaultLabel());
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         CsvFile csvfile = datasetNormalChangeDefaultLabel();
         snowflakeUtils.dropColumn(TABLE_CUSTOMERS_MUlTILABELS_HASDEFAULT, PKCOLUMN_CUSKEY_LINK);
         snowflakeUtils.addColumn(TABLE_CUSTOMERS_MUlTILABELS_HASDEFAULT, PKCOLUMN_CUSKEY_LABEL, VARCHAR_TYPE);

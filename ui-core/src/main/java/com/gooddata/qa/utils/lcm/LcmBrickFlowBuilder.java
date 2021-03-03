@@ -91,6 +91,13 @@ final public class LcmBrickFlowBuilder {
         lcmServiceProject.deleteProject(masterProject);
     }
 
+    public String getCurrentMasterProject() {
+        String masterProject = lcmServiceProject.getMasterProject(testParams.getUserDomain(), segmentId);
+        log.info("Domain: " + testParams.getUserDomain());
+        log.info("Master project: " + masterProject);
+        return masterProject;
+    }
+
     public LcmBrickFlowBuilder release() {
         log.info("----Start releasing--------------");
         ProcessExecutionDetail detail = lcmServiceProject.release(releaseSegments);

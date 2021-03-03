@@ -129,7 +129,7 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        domainRestClient = new RestClient(getProfile(DOMAIN));
+        super.customizeProject();
         dataSource = new DataSourceUtils(testParams.getDomainUser());
         dataSourceRestRequest = new DataSourceRestRequest(domainRestClient, testParams.getProjectId());
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -281,7 +281,7 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
     public void changeBusiness() {
         updateModel();
         updateDatabase();
-        updateLCM();
+        lcmCreateNewVersion();
     }
 
     /**
@@ -561,7 +561,7 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        updateLCM();
+        lcmCreateNewVersion();
     }
 
     private void updateModel() {
@@ -570,10 +570,7 @@ public class RedShiftSegmentLoadTest extends AbstractADDProcessTest {
         setupMaql(new LdmModel().withDataset(datasetMappingProjectId).buildMaqlUpdateModel());
     }
 
-    private void updateLCM() {
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
-    }
+
 
     private void updateDatabase() {
         redshiftUtils.addColumn(TABLE_MAPPING_PROJECT_ID_HAS_CLIENT_ID_COLUMN, COLUMN_ADDRESS, VARCHAR_TYPE);

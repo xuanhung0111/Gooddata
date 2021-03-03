@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.enums.DateRange.THIS_YEAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
@@ -54,6 +55,7 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.lcm.LcmBrickFlowBuilder;
 
+import com.gooddata.sdk.service.project.ProjectService;
 import org.springframework.util.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -70,6 +72,9 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
 
     private String devProjectId;
     private String clientProjectId;
+    private ProjectService service;
+    private RestClient restClient;
+
 
     private LcmBrickFlowBuilder lcmBrickFlowBuilder;
 
@@ -100,6 +105,7 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
     @Override
     protected void customizeProject() throws Throwable {
         devProjectId = testParams.getProjectId();
+        restClient = new RestClient(getProfile(DOMAIN));
         clientProjectId = createProjectUsingFixture(CLIENT_PROJECT_TITLE, ResourceTemplate.GOODSALES,
                 testParams.getDomainUser());
 
@@ -191,8 +197,11 @@ public class OrganisingCatalogueUsingClientIdTest extends AbstractProjectTest {
         initMetricPage().openMetricDetailPage(METRIC_AMOUNT_BOP).moveToFolder("SecondFolder");
         initMetricPage().openMetricDetailPage(METRIC_AVG_AMOUNT).moveToFolder("ThirdFolder");
 
-        lcmBrickFlowBuilder.deleteMasterProject();
+        String previousMaster = lcmBrickFlowBuilder.getCurrentMasterProject();
         lcmBrickFlowBuilder.runLcmFlow();
+        //delete master after delete segment: BB-2315
+        service = restClient.getProjectService();
+        service.removeProject(service.getProjectById(previousMaster));
 
         testParams.setProjectId(clientProjectId);
         CatalogPanel catalogueClientPanel = initAnalysePage().getCatalogPanel();
