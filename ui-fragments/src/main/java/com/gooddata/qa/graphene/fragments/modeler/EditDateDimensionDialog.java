@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementContainDisabledAttribute;
@@ -49,6 +50,7 @@ public class EditDateDimensionDialog extends AbstractFragment {
 
     public void clickCancel() {
         cancelButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 }

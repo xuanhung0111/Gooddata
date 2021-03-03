@@ -28,12 +28,12 @@ public class AddMorePopUp extends AbstractFragment {
 
     public void setPrimaryKey(String datasetName, String attributeName) {
         btnSetPrimaryKey.click();
-        OverlayWrapper.getInstance(browser).getChangePrimaryKeyDialog().setPrimaryKey(datasetName, attributeName);
+        OverlayWrapper.getInstanceByIndex(browser, 1).getChangePrimaryKeyDialog().setPrimaryKey(datasetName, attributeName);
     }
 
     public void deleteDataset() {
         btnDelete.click();
-        OverlayWrapper.getInstance(browser).getConfirmDeleteDatasetDialog().clickDeleteDataset();
+        OverlayWrapper.getInstanceByIndex(browser, 1).getConfirmDeleteDatasetDialog().clickDeleteDataset();
     }
 
     public EditDatasetDialog viewDetail() {
@@ -47,12 +47,12 @@ public class AddMorePopUp extends AbstractFragment {
 
     public EditDatasetDialog editDatasetDialog() {
         btnEdit.click();
-        return OverlayWrapper.getInstance(browser).getEditDatasetDialog();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getEditDatasetDialog();
     }
 
     public void searchPrimaryKey(String datasetName, String attributeName) {
         btnSetPrimaryKey.click();
-        OverlayWrapper.getInstance(browser).getChangePrimaryKeyDialog().searchPrimaryKey(datasetName, attributeName);
+        OverlayWrapper.getInstanceByIndex(browser, 1).getChangePrimaryKeyDialog().searchPrimaryKey(datasetName, attributeName);
     }
 
 }

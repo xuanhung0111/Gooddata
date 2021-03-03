@@ -111,7 +111,7 @@ public class DataMapping extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         WebElement sourceType = row.findElement(By.className("s-editable-label"));
         driverActions.moveToElement(sourceType).click().build().perform();
-        return OverlayWrapper.getInstanceByIndex(browser, 1).getIndigoTableDropDown().getListDropdownOption();
+        return OverlayWrapper.getInstanceByIndex(browser, 2).getIndigoTableDropDown().getListDropdownOption();
     }
 
     public List<String> getDropdownDateFormatByName(String name, String type) {
@@ -119,7 +119,7 @@ public class DataMapping extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         WebElement sourceType = row.findElement(By.cssSelector(".model-mapping-source-type .s-editable-label"));
         driverActions.moveToElement(sourceType).click().build().perform();
-        return OverlayWrapper.getInstanceByIndex(browser, 1).getIndigoTableDropDown().getListDropdownOption();
+        return OverlayWrapper.getInstanceByIndex(browser, 2).getIndigoTableDropDown().getListDropdownOption();
     }
 
     public String getWarningMessage(String labelName, String type) {
