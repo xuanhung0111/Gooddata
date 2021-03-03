@@ -11,8 +11,11 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_PROGRESS_MESSAGE_BAR;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_SUCCESS_MESSAGE_BAR;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 
 public class PostMessageKPIDashboardPage extends AbstractFragment {
 
@@ -83,8 +86,17 @@ public class PostMessageKPIDashboardPage extends AbstractFragment {
     }
 
     public void exportToPDF() {
+        //wait for exporting dashboard in maximum 10 minutes
+        int exportingTextDisplayedTimeoutInSeconds = 600;
+
         waitForElementVisible(exportToPDF).click();
         browser.switchTo().frame("iframe");
+
+        waitForElementVisible(BY_PROGRESS_MESSAGE_BAR, browser);
+        waitForElementNotPresent(BY_PROGRESS_MESSAGE_BAR, exportingTextDisplayedTimeoutInSeconds);
+
+        waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, browser);
+        waitForElementNotPresent(BY_SUCCESS_MESSAGE_BAR, exportingTextDisplayedTimeoutInSeconds);
     }
 
     public void addKpi() {
