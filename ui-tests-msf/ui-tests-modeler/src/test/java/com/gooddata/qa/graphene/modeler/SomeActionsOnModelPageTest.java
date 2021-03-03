@@ -162,12 +162,13 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
         modelCompany.clickCancelEditPopUp();
 
         modelCompany.moveAttributeOnDataset(COMPANY_DATASET, STREET_ATTR, CITY_DATASET);
-        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        OverlayWrapper wrapper = OverlayWrapper.getInstanceByIndex(browser, 1);
         assertEquals(wrapper.getMoveLabelSuccess(),format("Success! The \"%s\" was moved to dataset %s",
             STREET_ATTR, CITY_DATASET));
 
         modelCompany.moveFactOnDataset(COMPANY_DATASET, POPULATION_FACT, CITY_DATASET);
-        assertEquals(wrapper.getMoveLabelSuccess(),format("Success! The \"%s\" was moved to dataset %s", POPULATION_FACT,
+        OverlayWrapper wrapperMsg = OverlayWrapper.getInstanceByIndex(browser, 1);
+        assertEquals(wrapperMsg.getMoveLabelSuccess(),format("Success! The \"%s\" was moved to dataset %s", POPULATION_FACT,
             CITY_DATASET));
 
         mainModelContent.focusOnDataset(CITY_DATASET);
@@ -213,13 +214,13 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
         assertFalse(viewDialog.isChangeLabelTypeIconVisible(), "Must be hidden icon navigatedown");
 
         viewDialog.moveToLabelLink(OFFICE_LINK_ATTR).clickChangeLabelType();
-        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().clickAddTextLabel();
+        OverlayWrapper.getInstanceByIndex(browser,2).getTextEditorWrapper().clickAddTextLabel();
         assertEquals(viewDialog.getTypeOfLabel(OFFICE_LINK_ATTR), "Text label");
 
         viewDialog.getTypeOfLabel(OFFICE_TEXT_ATTR);
         assertTrue(viewDialog.isChangeLabelTypeIconVisible(), "Must be shown icon navigatedown");
         viewDialog.clickChangeLabelType();
-        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().clickAddLinkLabel();
+        OverlayWrapper.getInstanceByIndex(browser,2).getTextEditorWrapper().clickAddLinkLabel();
         assertEquals(viewDialog.getTypeOfLabelLink(OFFICE_TEXT_ATTR), "Hyperlink");
         dialog.saveChanges();
         publishOverrideModel();

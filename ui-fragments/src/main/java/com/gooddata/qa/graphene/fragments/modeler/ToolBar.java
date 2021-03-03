@@ -116,12 +116,12 @@ public class ToolBar extends AbstractFragment {
 
     public void exportJson() {
         btnActionMenu.click();
-        OverlayWrapper.getInstance(browser).exportJson();
+        OverlayWrapper.getInstanceByIndex(browser, 1).exportJson();
     }
 
     public void importJson(String jsonFilePath) {
         btnActionMenu.click();
-        OverlayWrapper.getInstance(browser).importJson(jsonFilePath);
+        OverlayWrapper.getInstanceByIndex(browser, 1).importJson(jsonFilePath);
     }
 
     public static final ToolBar getInstanceInTableView(SearchContext searchContext, int index) {

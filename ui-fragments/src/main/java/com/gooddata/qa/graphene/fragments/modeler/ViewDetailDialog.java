@@ -116,7 +116,7 @@ public class ViewDetailDialog extends AbstractFragment {
         hoverOnElementByJS(attributeName);
         waitForElementVisible(addLabelButton);
         getActions().moveToElement(addLabelButton).click().build().perform();
-        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().addLink(labelName);
+        OverlayWrapper.getInstanceByIndex(browser,2).getTextEditorWrapper().addLink(labelName);
     }
 
     public void processAddNewLabel(String labelName, WebElement attributeElement){
@@ -124,7 +124,7 @@ public class ViewDetailDialog extends AbstractFragment {
         waitForElementVisible(addLabelButton);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(addLabelButton).click().build().perform();
-        OverlayWrapper.getInstanceByIndex(browser,1).getTextEditorWrapper().addLabel(labelName);
+        OverlayWrapper.getInstanceByIndex(browser,2).getTextEditorWrapper().addLabel(labelName);
     }
 
     public void addNewLabelForPrimaryKey(String attribute, String labelName){
