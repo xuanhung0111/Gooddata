@@ -111,7 +111,7 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         ErrorContent error = uploadDialog.importInvalidCSV();
         assertEquals(error.getErrorMessage(), errorMessage);
         assertEquals(error.getErrorTitle(), "Model generation failed");
-        OverlayWrapper.getInstance(browser).closeWaitingDialog();
+        OverlayWrapper.getInstanceByIndex(browser, 1).closeWaitingDialog();
     }
 
     @DataProvider(name = "errorCsvFilePreviewProvider")
@@ -173,6 +173,6 @@ public class ValidateImportCSVTest extends AbstractLDMPageTest {
         ErrorContent error = uploadDialog.importInvalidCSV();
         assertThat(error.getErrorMessage(), containsString(errorMessage));
         assertEquals(error.getErrorTitle(), "Load data from file failed.");
-        OverlayWrapper.getInstance(browser).closeWaitingDialog();
+        OverlayWrapper.getInstanceByIndex(browser, 1).closeWaitingDialog();
     }
 }

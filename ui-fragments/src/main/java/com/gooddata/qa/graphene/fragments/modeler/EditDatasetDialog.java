@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -89,7 +90,8 @@ public class EditDatasetDialog extends AbstractFragment {
         hoverOnAttributeOrFactInDialog(attribute);
         viewDetail.addNewLabel(attribute, labelName);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void addNewLabelTypeHyperlink(String attribute, String labelName){
@@ -105,7 +107,8 @@ public class EditDatasetDialog extends AbstractFragment {
         hoverOnAttributeOrFactInDialog(attribute);
         viewDetail.addNewLabelForPrimaryKey(attribute, labelName);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void deleteLabel(String label) {
@@ -195,7 +198,8 @@ public class EditDatasetDialog extends AbstractFragment {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         viewDetail.editAttributeName(attribute, newName);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void changeAttributeNameAndNotSave(String attribute, String newName) {
@@ -276,21 +280,24 @@ public class EditDatasetDialog extends AbstractFragment {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         viewDetail.editLabelName(label, newName);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void changeDatatypeOfMainLabel(String attribute, String dataTypeClass) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         viewDetail.editDatatypeOfLabel(attribute + " (default)", dataTypeClass);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void changeDatatypeOfLabel(String attribute, String dataTypeClass) {
         ViewDetailDialog viewDetail = getViewDetailDialog();
         viewDetail.editDatatypeOfLabel(attribute, dataTypeClass);
         saveChangeButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public String getTextLabel(String label) {

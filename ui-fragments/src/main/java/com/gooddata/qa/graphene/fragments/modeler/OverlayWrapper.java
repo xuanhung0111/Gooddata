@@ -13,6 +13,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -116,7 +117,8 @@ public class OverlayWrapper extends AbstractFragment {
 
     public String getMoveLabelSuccess() {
         String message = waitForElementVisible(successMessage).getText();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
         return message;
     }
 
@@ -215,14 +217,15 @@ public class OverlayWrapper extends AbstractFragment {
         waitForElementVisible(dropDowImportJson).click();
         getConfirmImportDialog().proceedImportJson();
         Modeler.getInstance(browser).pickJsonFile(jsonFilePath);
-        waitForFragmentNotVisible(this);
+//        waitForFragmentNotVisible(this);
     }
 
     public OverlayWrapper closeWaitingDialog() {
         Actions driverActions = new Actions(browser);
         waitForElementVisible(closeWaitingDialog);
         driverActions.moveToElement(closeWaitingDialog).pause(2000).click().build().perform();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
         return this;
     }
 

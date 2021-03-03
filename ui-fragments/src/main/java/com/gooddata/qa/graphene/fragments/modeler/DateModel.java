@@ -29,7 +29,7 @@ public class DateModel extends AbstractFragment {
     public EditDateDimensionDialog openEditDateDimensionDialog() {
         Actions driverActions = new Actions(browser);
         driverActions.click(this.getModelAction().editDate()).perform();
-        return OverlayWrapper.getInstance(browser).getDateDimensionDialog();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getDateDimensionDialog();
     }
 
     public void deleteDateModel() {

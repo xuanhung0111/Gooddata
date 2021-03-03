@@ -20,7 +20,7 @@
             <class name="com.gooddata.qa.graphene.modeler.SearchModelTest" />
         </classes>
     </test>
-    <test name="ImportExportJsonTest" enabled="true">
+    <test name="ImportExportJsonTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>

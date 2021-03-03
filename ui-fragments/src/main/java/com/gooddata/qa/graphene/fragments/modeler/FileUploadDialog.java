@@ -8,6 +8,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.io.File;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -45,22 +46,23 @@ public class FileUploadDialog extends AbstractFragment {
     }
 
     public ErrorContent importInvalidCSV() {
-        return OverlayWrapper.getInstance(browser).getWaitingDialog().waitForLoading().getErrorContent();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getWaitingDialog().waitForLoading().getErrorContent();
     }
 
     public void importValidData() {
-        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        OverlayWrapper wrapper = OverlayWrapper.getInstanceByIndex(browser, 1);
         wrapper.waittingDialog();
         wrapper.closeWaitingDialog();
     }
 
     public PreviewCSVDialog importCSVShowPreview() {
-        return OverlayWrapper.getInstance(browser).getPreviewCSVDialog();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getPreviewCSVDialog();
     }
 
     public void cancelDialog() {
         waitForElementVisible(cancelButton).click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(2);
+//        waitForFragmentNotVisible(this);
     }
 
     public String getErrorMessage() {
