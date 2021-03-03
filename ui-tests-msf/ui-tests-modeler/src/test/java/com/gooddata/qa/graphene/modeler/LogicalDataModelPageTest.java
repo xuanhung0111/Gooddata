@@ -231,7 +231,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         modelClass.addNewLabel(CLASSNAME2_ATTRIBUTE, CLASSNAME2_LABEL);
         mainModelContent.focusOnDataset(CLASS_DATASET);
         modelClass.deleteAttributeOnDataset(CLASSNAME2_ATTRIBUTE);
-        assertEquals(OverlayWrapper.getInstance(browser).getTextDeleteSuccess(),format(DELETE_SUCCESS_MESSAGE, CLASSNAME2_ATTRIBUTE) );
+        assertEquals(OverlayWrapper.getInstanceByIndex(browser, 1).getTextDeleteSuccess(),format(DELETE_SUCCESS_MESSAGE, CLASSNAME2_ATTRIBUTE) );
         assertFalse(modelClass.isAttributeExistOnModeler(CLASSNAME2_ATTRIBUTE));
     }
 

@@ -29,7 +29,7 @@ public class Sidebar extends AbstractFragment {
 
     public FileUploadDialog openCSVDialog() {
         importCSVButton.click();
-        FileUploadDialog dialog  = OverlayWrapper.getInstance(browser).getFileUploadDialog();
+        FileUploadDialog dialog  = OverlayWrapper.getInstanceByIndex(browser, 1).getFileUploadDialog();
         return dialog;
     }
 }
