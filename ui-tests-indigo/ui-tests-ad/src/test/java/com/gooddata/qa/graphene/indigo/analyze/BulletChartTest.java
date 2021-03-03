@@ -116,6 +116,8 @@ public class BulletChartTest extends AbstractAnalyseTest {
         // TODO: BB-1675 enableNewADFilterBar FF should be removed
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_NEW_AD_FILTER_BAR, true);
         projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_MEASURE_VALUE_FILTERS, true);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EXPLORE_INSIGHTS_FROM_KD, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -499,6 +501,6 @@ public class BulletChartTest extends AbstractAnalyseTest {
         takeScreenshot(browser, pdfFileName, getClass());
         log.info(pdfFileName + contents.toString());
 
-        assertThat(contents, hasItems(BULLET_CHART_TEST_ON_KD, METRIC_AMOUNT_BOP, METRIC_AMOUNT));
+        assertThat(contents, hasItems(BULLET_CHART_TEST_ON_KD, "Exclude", "Direct Sales", "Inside Sales", "Include"));
     }
 }
