@@ -215,8 +215,8 @@ public class OverlayWrapper extends AbstractFragment {
 
     public void importJson(String jsonFilePath) {
         waitForElementVisible(dropDowImportJson).click();
-        getConfirmImportDialog().proceedImportJson();
         Modeler.getInstance(browser).pickJsonFile(jsonFilePath);
+        sleepTightInSeconds(3);
 //        waitForFragmentNotVisible(this);
     }
 

@@ -123,7 +123,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
     private DataloadProcess processMaster;
-    private OverlayWrapper wrapper;
+    private ToastMessage toastMessage;
     private DataSourcePanelContent datasourcePanel;
     private DataSourceDropDownBar dropDownBar;
     private DataSourceContent dataSourceContent;
@@ -177,15 +177,14 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         connectWorkSpaceDialog.searchWorkspace(projectId);
         connectWorkSpaceDialog.selectedWorkspaceOnSearchList(projectId);
         ldmPage = connectWorkSpaceDialog.clickSelect();
+        toastMessage = ToastMessage.getInstance(browser);
+        assertEquals(toastMessage.getToastMessage(), "Data Source connected. You can now use it in the model.");
 
         modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
         toolbar = modeler.getToolbar();
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
-
-        wrapper = OverlayWrapper.getInstance(browser);
-        assertEquals(wrapper.getMessageConnectDatasource(), "Data Source connected. You can now use it in the model.");
         datasourcePanel = DataSourcePanelContent.getInstance(browser);
         dropDownBar = datasourcePanel.getDropdownDatasource();
         assertEquals(dropDownBar.getTextButton(), DATASOURCE_NAME);
@@ -285,7 +284,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
             mainModelContent.focusOnDateDataset(TIMESTAMP_DATASET);
             modelTimestamp.deleteDateModel();
             // there are 2 overlay wrapper on UI now, need provide index
-            OverlayWrapper.getInstanceByIndex(browser, 1).getConfirmDeleteDatasetDialog().clickDeleteDataset();
+            OverlayWrapper.getInstanceByIndex(browser, 2).getConfirmDeleteDatasetDialog().clickDeleteDataset();
 
             //add table from OTHER schema
             dropDownBar.selectDatasource(DATASOURCE_NAME_OTHER);
