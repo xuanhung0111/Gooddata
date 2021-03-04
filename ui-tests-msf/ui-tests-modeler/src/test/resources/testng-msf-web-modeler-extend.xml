@@ -20,7 +20,7 @@
             <class name="com.gooddata.qa.graphene.modeler.SearchModelTest" />
         </classes>
     </test>
-    <test name="ImportExportJsonTest" enabled="false">
+    <test name="ImportExportJsonTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.ImportExportJsonTest" />
         </classes>
@@ -35,7 +35,7 @@
             <class name="com.gooddata.qa.graphene.modeler.LDMRedshiftSegmentTest" />
         </classes>
     </test>
-    <test name="LDMBigQueryCurrentTest" enabled="false">
+    <test name="LDMBigQueryCurrentTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.modeler.LDMBigQueryCurrentTest" />
         </classes>

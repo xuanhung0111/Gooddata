@@ -28,6 +28,6 @@ public class DataSourceDropDownBar extends AbstractFragment {
 
     public void  selectDatasource(String dsName) {
         dropdownButton.click();
-        OverlayWrapper.getInstanceByIndex(browser, 1).getDSDropdown().selectDatasource(dsName);
+        OverlayWrapper.getInstanceByIndex(browser, 2).getDSDropdown().selectDatasource(dsName);
     }
 }
