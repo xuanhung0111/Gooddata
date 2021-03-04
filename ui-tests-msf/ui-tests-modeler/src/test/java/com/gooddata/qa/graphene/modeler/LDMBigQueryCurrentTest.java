@@ -86,7 +86,7 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
     private String dataSourceId;
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
-    private OverlayWrapper wrapper;
+    private ToastMessage toastMessage;
     private DataSourcePanelContent datasourcePanel;
     private DataSourceDropDownBar dropDownBar;
     private DataSourceContent dataSourceContent;
@@ -138,6 +138,8 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
         connectWorkSpaceDialog.searchWorkspace(projectId);
         connectWorkSpaceDialog.selectedWorkspaceOnSearchList(projectId);
         ldmPage = connectWorkSpaceDialog.clickSelect();
+        toastMessage = ToastMessage.getInstance(browser);
+        assertEquals(toastMessage.getToastMessage(), "Data Source connected. You can now use it in the model.");
 
         modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
@@ -145,8 +147,6 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
 
-        wrapper = OverlayWrapper.getInstance(browser);
-        assertEquals(wrapper.getMessageConnectDatasource(), "Data Source connected. You can now use it in the model.");
         datasourcePanel = DataSourcePanelContent.getInstance(browser);
         dropDownBar = datasourcePanel.getDropdownDatasource();
         assertEquals(dropDownBar.getTextButton(), DATASOURCE_NAME);
@@ -199,7 +199,7 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
         //Verify Detail Dataset :  Mapped to, Mapping Fields
         mainModelContent.focusOnDataset(DATASET_MAPPING_PROJECT_ID);
         Model model = mainModelContent.getModel(DATASET_MAPPING_PROJECT_ID);
-        model.openEditDialog(1);
+        model.openEditDialog(2);
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
         DataMapping mappingTab = dialog.clickOnDataMappingTab();
         dialog.clickOnDataMappingTab();

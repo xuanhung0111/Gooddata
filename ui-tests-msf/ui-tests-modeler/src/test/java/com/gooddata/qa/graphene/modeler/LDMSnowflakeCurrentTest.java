@@ -112,7 +112,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
     private DataSourceUtils dataSource;
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
-    private OverlayWrapper wrapper;
+    private ToastMessage toastMessage;
     private DataSourcePanelContent datasourcePanel;
     private DataSourceDropDownBar dropDownBar;
     private DataSourceContent dataSourceContent;
@@ -156,15 +156,16 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         connectWorkSpaceDialog.searchWorkspace(projectId);
         connectWorkSpaceDialog.selectedWorkspaceOnSearchList(projectId);
         ldmPage = connectWorkSpaceDialog.clickSelect();
+        toastMessage = ToastMessage.getInstance(browser);
+        assertEquals(toastMessage.getToastMessage(), "Data Source connected. You can now use it in the model.");
 
         modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
         toolbar = modeler.getToolbar();
+
         modeler.getLayout().waitForLoading();
         canvas = modeler.getLayout().getCanvas();
 
-        wrapper = OverlayWrapper.getInstance(browser);
-        assertEquals(wrapper.getMessageConnectDatasource(), "Data Source connected. You can now use it in the model.");
         datasourcePanel = DataSourcePanelContent.getInstance(browser);
         dropDownBar = datasourcePanel.getDropdownDatasource();
         assertEquals(dropDownBar.getTextButton(), DATASOURCE_NAME);
@@ -260,12 +261,12 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         mainModelContent.focusOnDateDataset(TIMESTAMP_DATASET);
         modelTimestamp.deleteDateModel();
         // there are 2 overlay wrapper on UI now, need provide index
-        OverlayWrapper.getInstanceByIndex(browser,1).getConfirmDeleteDatasetDialog().clickDeleteDataset();
+        OverlayWrapper.getInstanceByIndex(browser,2).getConfirmDeleteDatasetDialog().clickDeleteDataset();
 
         //Go to detail of Dataset person, add system fields
         mainModelContent.focusOnDataset(PERSON_DATASET);
         // there are 2 overlay wrapper on UI now, need provide index
-        modelPerson.openEditDialog(1);
+        modelPerson.openEditDialog(2);
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
         DataMapping mappingTab = dialog.clickOnDataMappingTab();
         LdmControlLoad controlLoad = LdmControlLoad.getInstance(browser);
@@ -280,7 +281,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         //Verify Detail Dataset Person : Mapped to,Mapping Fields, Datatype,
         mainModelContent.focusOnDataset(PERSON_DATASET);
         // there are 2 overlay wrapper on UI now, need provide index
-        modelPerson.openEditDialog(1);
+        modelPerson.openEditDialog(2);
         dialog.clickOnDataMappingTab();
         MappedTo mappedTo = MappedTo.getInstance(browser);
         assertEquals(mappedTo.getSourceName(), PERSON_TABLE);
@@ -304,7 +305,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         //Verify Detail Dataset Car :  Mapped to, Mapping Fields
         mainModelContent.focusOnDataset(CAR_DATASET);
         Model modelCar = mainModelContent.getModel(CAR_DATASET);
-        modelCar.openEditDialog(1);
+        modelCar.openEditDialog(2);
         dialog.clickOnDataMappingTab();
         MappedTo mappedToCar = MappedTo.getInstance(browser);
         assertEquals(mappedToCar.getSourceName(), PRE_CAR_TABLE);
