@@ -188,6 +188,8 @@ public class ControlFilterEmbeddedKDFromExternalApplication extends AbstractDash
             INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS_URI);
         assertEquals(content.getJSONObject("data").getJSONObject("insight").getString("title"),
             INSIGHT_TEST_RECEIVE_EVENT_AFTER_SEND_COMMANDS);
+
+        indigoDashboardsPage.waitForSaveButtonEnabled().saveEditMode();
     }
 
     @Test(dependsOnMethods = {"sendCommandsAddFilterToEmbeddedGDC"})
