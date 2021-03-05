@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static org.openqa.selenium.By.className;
 
 import java.io.File;
 import java.util.Collection;
@@ -14,11 +15,12 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -298,5 +300,16 @@ public final class WaitUtils {
             }
             return false;
         });
+    }
+
+    public static void waitForLoadingIconHidden() {
+        final By loadingIcon = className("gd-spinner");
+        try {
+            Function<WebDriver, Boolean> isLoadingIconVisible = browser -> isElementVisible(loadingIcon, browser);
+            Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(isLoadingIconVisible);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+        waitForElementNotVisible(loadingIcon);
     }
 }
