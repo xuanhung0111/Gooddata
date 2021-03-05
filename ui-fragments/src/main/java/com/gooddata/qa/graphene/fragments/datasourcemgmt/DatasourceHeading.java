@@ -2,10 +2,12 @@ package com.gooddata.qa.graphene.fragments.datasourcemgmt;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -37,6 +39,16 @@ public class DatasourceHeading extends AbstractFragment {
     public void clickEditButton() {
         waitForElementVisible(moreButton).click();
         MoreContentDialog.getInstance(browser).clickEditButton();
+    }
+
+    public boolean isEditButtonEnable() {
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).isEditButtonEnable();
+    }
+
+    public boolean isDeleteButtonEnable() {
+        waitForElementVisible(moreButton).click();
+        return MoreContentDialog.getInstance(browser).isDeleteButtonEnable();
     }
 
     public DeleteDatasourceDialog clickDeleteButton() {

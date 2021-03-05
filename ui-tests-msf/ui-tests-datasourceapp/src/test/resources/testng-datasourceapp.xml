@@ -40,4 +40,9 @@
             <class name="com.gooddata.qa.graphene.datasource.S3DataSourceE2ETest" />
         </classes>
     </test>
+    <test name="ACLsE2ETest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.datasource.ACLsE2ETest"/>
+        </classes>
+    </test>
 </suite>

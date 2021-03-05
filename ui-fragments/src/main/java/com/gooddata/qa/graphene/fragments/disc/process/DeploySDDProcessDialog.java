@@ -99,6 +99,10 @@ public class DeploySDDProcessDialog extends AbstractFragment {
         return selectionDataSourceDropDown .getRoot().getAttribute("class").contains("disabled");
     }
 
+    public String getTextErrorDatasource() {
+        return selectionDataSourceDropDown.getRoot().getText();
+    }
+
     public DeploySDDProcessDialog inputDatasourcePath(String path) {
         waitForElementVisible(inputDataPath).clear();
         inputDataPath.sendKeys(path);
