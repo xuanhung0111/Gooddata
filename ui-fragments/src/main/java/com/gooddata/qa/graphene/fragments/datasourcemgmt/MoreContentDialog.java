@@ -36,6 +36,16 @@ public class MoreContentDialog extends AbstractFragment {
         waitForElementVisible(editButton).click();
     }
 
+    public boolean isEditButtonEnable() {
+        final By editButton = className("s-edit-menu-item");
+        return isElementPresent(editButton, browser);
+    }
+
+    public boolean isDeleteButtonEnable() {
+        final By deleteButton = className("s-delete-menu-item");
+        return isElementPresent(deleteButton, browser);
+    }
+
     public DeleteDatasourceDialog clickDeleteButton() {
         waitForElementVisible(deleteButton).click();
         return DeleteDatasourceDialog.getInstance(browser);
