@@ -340,8 +340,8 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         mappingTab.editSourceColumnByName(CITY_ATTRIBUTE, DataMapping.SOURCE_TYPE.LABEL.getName(),"city", false);
         mappingTab.editSourceColumnByName(BIRTHDAY_DATE, DataMapping.SOURCE_TYPE.REFERENCE.getName(),"birthday", false);
         mappingTab.editDistributedLoadMapping("clientid", true);
-        mappingTab.editIncrementalLoadMapping("timestamp", true);
         mappingTab.editDeletedRowsMapping("deleted", true);
+        mappingTab.editIncrementalLoadMapping("timestamp", true);
         dialog.saveChanges();
 
         //Verify Detail Dataset Person : Mapped to,Mapping Fields, Datatype,
