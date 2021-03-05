@@ -9,6 +9,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForLoadingIconHidden;
 
 public class ViewMode extends AbstractFragment {
 
@@ -24,5 +25,6 @@ public class ViewMode extends AbstractFragment {
     public void clickButtonChangeToEditMode() {
         Actions actions = new Actions(browser);
         actions.moveToElement(changeToEditModeBtn).click().build().perform();
+        waitForLoadingIconHidden();
     }
 }
