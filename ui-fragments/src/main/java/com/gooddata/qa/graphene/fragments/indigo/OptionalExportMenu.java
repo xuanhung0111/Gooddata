@@ -17,6 +17,9 @@ public class OptionalExportMenu extends AbstractReactDropDown {
     @FindBy(className = "s-gd-export-menu-open-report")
     private WebElement openAsReportButton;
 
+    @FindBy(className = "s-options-menu-explore-insight")
+    private WebElement exploreInsight;
+
     @Override
     protected String getDropdownCssSelector() {
         throw new UnsupportedOperationException("Unsupported getDropdownCssSelector() method");
@@ -39,6 +42,10 @@ public class OptionalExportMenu extends AbstractReactDropDown {
 
     public boolean isOpenAsReportButtonEnabled() {
         return !isElementDisabled(waitForElementVisible(openAsReportButton));
+    }
+
+    public void exploreInsight() {
+       waitForElementVisible(exploreInsight).click();
     }
 
     public void exportReport() {

@@ -52,7 +52,8 @@ public enum ProjectFeatureFlags {
     ENABLE_TABLE_COLUMNS_GROW_TO_FIT("enableTableColumnsGrowToFit"),
     ENABLE_EDIT_INSIGHTS_FROM_KD("enableEditInsightsFromKD"),
     ENABLE_EXPLORE_INSIGHTS_FROM_KD("enableExploreInsightsFromKD"),
-    ENABLE_KPI_DASHBOARD_NEW_INSIGHT("enableKPIDashboardNewInsight");
+    ENABLE_KPI_DASHBOARD_NEW_INSIGHT("enableKPIDashboardNewInsight"),
+    RESPONSIVE_UI_DATE_FORMAT("responsiveUiDateFormat");
 
     private final String featureFlag;
 

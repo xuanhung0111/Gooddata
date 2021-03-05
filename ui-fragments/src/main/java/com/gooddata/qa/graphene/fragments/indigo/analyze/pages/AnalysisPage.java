@@ -24,6 +24,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Ranking
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu.File;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.PivotTableReport;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -126,6 +127,9 @@ public class AnalysisPage extends AbstractFragment {
 
     @FindBy(css = ".s-bucket-view .adi-bucket-invitation-inner span")
     private WebElement droptoSwitch;
+
+    @FindBy(className = "s-cancel-edit-from-kd")
+    private WebElement cancelEditFromKD;
 
     public static final String MAIN_CLASS = "adi-editor";
     private static final By BY_TRASH_PANEL = className("s-trash");
@@ -501,6 +505,12 @@ public class AnalysisPage extends AbstractFragment {
 
     public OptionalExportMenu clickOptionsButton() {
         return getPageHeader().clickOptionsButton();
+    }
+
+    public IndigoDashboardsPage cancelEditFromKD() {
+        waitForElementVisible(cancelEditFromKD).click();
+        browser.switchTo().defaultContent();
+        return IndigoDashboardsPage.getInstance(browser);
     }
 
     public String getExplorerMessage() {
