@@ -72,6 +72,10 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
 
+    // This updating to cover the story FET-492
+    @FindBy(css = ".highcharts-xaxis-labels span[opacity = '1'], .highcharts-xaxis-labels span[visibility = 'visible']")
+    private List<WebElement> xAxisLabelsHighcharts;
+
     @FindBy(css = ".highcharts-yaxis-labels text[text-anchor = 'middle'], .highcharts-yaxis-labels text[text-anchor = 'end']")
     private List<WebElement> yAxisLabels;
 
@@ -391,6 +395,15 @@ public class ChartReport extends AbstractFragment {
             return Collections.emptyList();
         }
         return getLabels(xAxisLabels);
+    }
+
+    // This updating to cover the story FET-492
+    public List<String> getXaxisLabelsHighcharts() {
+        // Axis labels will be empty in case report has no attribute.
+        if (xAxisLabelsHighcharts.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return getLabels(xAxisLabelsHighcharts);
     }
 
     public List<String> getYaxisLabels() {

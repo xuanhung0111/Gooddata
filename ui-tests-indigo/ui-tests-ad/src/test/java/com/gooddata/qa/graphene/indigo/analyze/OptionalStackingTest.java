@@ -165,7 +165,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Inside Sales"),
                         asList(METRIC_AMOUNT, "$15,370,157.08")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertNotEquals(chartReport.getXLocationColumn(0, 0), chartReport.getXLocationColumn(0, 1));
 
@@ -213,7 +213,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         }
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertNotEquals(chartReport.getXLocationColumn(0, 0), chartReport.getXLocationColumn(1, 0));
 
@@ -255,7 +255,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Include"), asList(ATTR_DEPARTMENT, "Direct Sales"),
                         asList("Direct Sales", "$46,843,842.45")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertNotEquals(chartReport.getXLocationColumn(0, 0), chartReport.getXLocationColumn(0, 1));
 
@@ -301,7 +301,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Direct Sales"),
                         asList("West Coast", "$21,601,868.15")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertEquals(chartReport.getTotalsStackedColumn(),
                 asList("$33,562,482.51", "$15,370,157.08", "$46,843,842.45", "$20,848,974.50"));
@@ -449,7 +449,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Direct Sales"),
                         asList(METRIC_BEST_CASE, "8,403,394")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertEquals(chartReport.getTotalsStackedColumn(),
                 asList("$41,965,876.85", "$18,870,335.32", "$67,301,832.18", "$24,331,544.12"));
@@ -487,7 +487,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Direct Sales"),
                         asList(METRIC_BEST_CASE, "20.02%")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
@@ -521,7 +521,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1, 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Direct Sales"),
                         asList(METRIC_BEST_CASE, "8,403,394")));
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
@@ -582,7 +582,7 @@ public class OptionalStackingTest extends AbstractAnalyseTest {
         metricsBucket.getMetricConfiguration(METRIC_BEST_CASE).expandConfiguration().checkShowOnSecondaryAxis();
 
         ChartReport chartReport = analysisPage.getChartReport();
-        assertEquals(chartReport.getXaxisLabels(),
+        assertEquals(chartReport.getXaxisLabelsHighcharts(),
                 asList("Direct Sales", "Exclude", "Inside Sales",  "Direct Sales", "Include", "Inside Sales"));
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"), asList(ATTR_DEPARTMENT, "Direct Sales"),

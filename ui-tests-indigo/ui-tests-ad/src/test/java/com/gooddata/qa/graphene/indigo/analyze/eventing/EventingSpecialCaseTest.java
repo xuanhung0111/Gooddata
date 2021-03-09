@@ -90,7 +90,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
 
         cleanUpLogger();
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+        Pair<Integer, Integer> position = getColumnPositionHighcharts(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
         chartReport.clickOnElement(position);
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
@@ -181,7 +181,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         cleanUpLogger();
 
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+        Pair<Integer, Integer> position = getColumnPositionHighcharts(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
         chartReport.clickOnElement(position);
 
         JSONObject content = getLatestPostMessageObj();
@@ -233,7 +233,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
 
         cleanUpLogger();
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
-        Pair<Integer, Integer> position = getColumnPosition(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
+        Pair<Integer, Integer> position = getColumnPositionHighcharts(chartReport, METRIC_NUMBER_OF_ACTIVITIES, "East Coast");
         chartReport.clickOnElement(position);
         JSONObject content = getLatestPostMessageObj();
 
