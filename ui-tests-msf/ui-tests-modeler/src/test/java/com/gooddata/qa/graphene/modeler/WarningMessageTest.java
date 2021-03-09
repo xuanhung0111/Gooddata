@@ -80,7 +80,7 @@ public class WarningMessageTest extends AbstractLDMPageTest {
         assertTrue(modelCity.isWarningMessageDisplayed(), "Warning message should be displayed");
         assertEquals(modelCity.getWarningMessageContent(), NO_FACT_KEY);
 
-        publishModel();
+        toolbar.clickPublish();
         ErrorContent error = ErrorContent.getInstance(browser);
         assertThat(error.getErrorMessage(), containsString(String.format(ERROR_PUBLISH, CITY_DATASET)));
         error.cancel();
@@ -152,6 +152,6 @@ public class WarningMessageTest extends AbstractLDMPageTest {
     public void publishModel() {
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteDataAcceptError();
+        publishModelDialog.publishModel();
     }
 }

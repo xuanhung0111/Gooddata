@@ -258,7 +258,7 @@ public class ImportCSVTest extends AbstractLDMPageTest {
         toolbar.clickPublish();
         PublishModelDialog  publishModelDialog = PublishModelDialog.getInstance(browser);
         assertTrue(publishModelDialog.isUploadCsvChecked(), "Must check on CSV upload");
-        publishModelDialog.overwriteDataSwitchToEditMode();
+        publishModelDialog.publishSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
     }
