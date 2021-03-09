@@ -404,7 +404,7 @@ public class SomeActionsOnModelPageTest extends AbstractLDMPageTest {
     public void publishOverrideModel() {
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteDataSwitchToEditMode();
+        publishModelDialog.publishSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         wrapper.closePublishSuccess();
     }

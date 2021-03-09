@@ -126,7 +126,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
         //publish with overwrite data mode
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.overwriteData();
+        publishModelDialog.publishModel();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),

@@ -7,6 +7,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -59,9 +60,16 @@ public class LeaveConfirmDialog extends AbstractFragment {
 
     public void clickPublishButton() {
         waitForElementVisible(publishButton).click();
+        waitLoadingPublish();
     }
 
     public void waitForLeaveConfirmDialogHidden() {
         waitForFragmentNotVisible(this);
+    }
+
+    private void waitLoadingPublish() {
+        if(isElementPresent(By.cssSelector(".gdc-ldm-waiting-dialog .waiting-dialog-content"), browser)) {
+            waitForFragmentNotVisible(WaitingDialog.getInstance(browser));
+        }
     }
 }
