@@ -51,6 +51,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -184,6 +185,44 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public static final IndigoDashboardsPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(IndigoDashboardsPage.class, waitForElementVisible(id(MAIN_ID), context));
+    }
+
+    /* Get and parse dashboard URL to parameters then add some parameters to have expected embed code
+     *  For example : https://staging3.intgdc.com/dashboards/#/project/xtuuemh43miequnxq9ohc69cb9tr0lei/dashboard/aabCXIZ3e6lT
+     *      EmbedURL =  dashboard_link_before_#_characters + "embedded" + dashboard_link_after_#_characters
+     *      EmbedIframe which EmbedURL is covered in <iframe> tag
+     *  Index0: EmbedIframe
+     *  Index1: EmbedURL
+     */
+    public List<String> expectedEmbedCodes(boolean showNavigate, String customHeight, String tagType, String tags) {
+        final String url = browser.getCurrentUrl();
+        final String urlBeforeHashtag = url.substring(0,url.indexOf("#") - 1);
+        final String urlAfterHashtag =  url.substring(url.lastIndexOf("#") - 1);
+
+        //add parameter for show/hide navigation bar (true = show, false = hide)
+        final String nav = "?showNavigation=" + showNavigate;
+
+        // add parameter customHeight(height of iframe for embed dashboard)
+        // add parameter tags to filter by tag for embedded dashboard (Ex: include/exclude tags "activity", "date")
+        String tagsAndCustomHeightInUrl = tagsAndCustomHeightInUrl(customHeight,tagType,tags);
+        String tagsAndCustomHeightInIframe = tagsAndCustomHeightInIframe(customHeight,tagType,tags);
+
+        // Embed content which using for embed iframe
+        final String embedIframeCode = "<iframe src=\""
+                + urlBeforeHashtag + "/embedded" + urlAfterHashtag + nav + tagsAndCustomHeightInIframe
+                + "\" width=\"100%\" frameborder=\"0\"></iframe>";
+
+        // Embed content which using for embed URL
+        final String embedUrlCode = urlBeforeHashtag + "/embedded" + urlAfterHashtag + nav + tagsAndCustomHeightInUrl;
+        return Arrays.asList(embedIframeCode, embedUrlCode);
+    }
+
+    public List<String> expectedEmbedCodes(final boolean shouldNavigate) {
+        return expectedEmbedCodes(shouldNavigate, "");
+    }
+
+    public List<String> expectedEmbedCodes(final boolean shouldNavigate, String customHeight) {
+        return expectedEmbedCodes(shouldNavigate, customHeight,"","");
     }
 
     public IndigoDashboardsPage addDashboard() {
@@ -458,6 +497,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public SaveAsDialog saveAsDialog() {
         return openHeaderOptionsButton().saveAsNew();
+    }
+
+    public IndigoEmbedDashboardDialogs openEmbedDialog(){
+        return openHeaderOptionsButton().openEmbedDashboardDialog();
     }
 
     public boolean hasDateFilter() {
@@ -1264,5 +1307,52 @@ public class IndigoDashboardsPage extends AbstractFragment {
             saveButton.click();
         }
         return waitForElementVisible(DISABLED_EMPTYDASHBOARDBUTTON_BUBBLE_MESSAGE, browser).getText();
+    }
+
+    /* Get and parse dashboard URL to parameters then add some parameters to have expected URL embed code
+     *  For example : https://staging3.intgdc.com/dashboards/#/project/xtuuemh43miequnxq9ohc69cb9tr0lei/dashboard/aabCXIZ3e6lT
+     *      EmbedURL =  dashboard_link_before_#_characters + "embedded" + dashboard_link_after_#_characters
+     *      EmbedURLNoParameters = EmbedURL
+     *      EmbedURLWithCustomHeight = EmbedURL + <set_height_parameter>
+     *      EmbedURLWithFilterByTags = EmbedURL + <filter_by_tag_parameter>
+     *      EmbedURLWithCustomHeight&FilterByTags = EmbedURL + <set_height_parameter> + <filter_by_tag_parameter>
+     */
+    private String tagsAndCustomHeightInUrl(String customHeight, String tagType, String tags){
+        if (customHeight.isEmpty() & tags.isEmpty()){
+            return "";
+        }
+        // contain only tag & without custom height
+        else if (!tags.isEmpty() & customHeight.isEmpty()){
+            return "&" + tagType + "ObjectsWithTags=[" + tags + "]";
+        }
+        //contain only custom height
+        else if (!customHeight.isEmpty() & tags.isEmpty()){
+            return "&setHeight=" + customHeight;
+        }
+        else
+            // include both custom height & tags
+            return "&setHeight=" + customHeight + "&" + tagType + "ObjectsWithTags=[" + tags + "]";
+    }
+
+    /* Get and parse dashboard URL to parameters then add some parameters to have expected Iframe embed code
+     *  For example : https://staging3.intgdc.com/dashboards/#/project/xtuuemh43miequnxq9ohc69cb9tr0lei/dashboard/aabCXIZ3e6lT
+     *      EmbedURL =  dashboard_link_before_#_characters + "embedded" + dashboard_link_after_#_characters
+     *      EmbedIframe which EmbedURL is covered in <iframe> tag
+     */
+    private String tagsAndCustomHeightInIframe(String customHeight, String tagType, String tags){
+        if (customHeight.isEmpty() & tags.isEmpty()){
+            return "";
+        }
+        // contain only tag & without custom height
+        else if (!tags.isEmpty() & customHeight.isEmpty()){
+            return "&" + tagType + "ObjectsWithTags=[" + tags + "]";
+        }
+        //contain only custom height
+        else if (!customHeight.isEmpty() & tags.isEmpty()){
+            return "&setHeight=" + customHeight + "\" " + "height=\"" + customHeight + "px";
+        }
+        else
+            // include both custom height & tags
+            return "&setHeight=" + customHeight + "&" + tagType + "ObjectsWithTags=[" + tags + "]" + "\" " + "height=\"" + customHeight + "px";
     }
 }
