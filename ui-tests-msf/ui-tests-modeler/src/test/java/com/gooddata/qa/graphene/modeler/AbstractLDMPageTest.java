@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPag
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
-
 import com.gooddata.qa.graphene.fragments.modeler.Layout;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
 import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
