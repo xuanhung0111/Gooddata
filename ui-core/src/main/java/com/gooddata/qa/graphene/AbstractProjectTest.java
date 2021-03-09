@@ -344,7 +344,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             uploadFileToWebDav(csvResource, webdavUrl);
             uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
-            String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1);
+            String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
             new RolapRestRequest(getAdminRestClient(), testParams.getProjectId())
                     .postEtlPullIntegration(integrationEntry);
         } catch (JSONException | IOException | URISyntaxException e) {

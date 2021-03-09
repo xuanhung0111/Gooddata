@@ -9,7 +9,7 @@
         <property name="browser">chrome</property>
         <property name="dimensions">${screenResolution}</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
-        <property name="chromeArguments">${chromeDriverArguments} ignore-certificate-errors</property>
+        <property name="chromeArguments">${chromeDriverArguments} --ignore-certificate-errors</property>
         <property name="chromePrintOptions">true</property>
         <property name="loggingPrefs">browser=ALL</property>
         <property name="platformName">ANY</property>
@@ -26,7 +26,7 @@
         <property name="waitGuardInterval">${timeout:90}</property>
     </extension>
 <!--
-    <extension qualifier="recorder">
+    <extension qualifier="screenRecorder">
         <property name="rootFolder">target/media</property>
         <property name="videoFolder">video</property>
         <property name="videoName">testVideo</property>
