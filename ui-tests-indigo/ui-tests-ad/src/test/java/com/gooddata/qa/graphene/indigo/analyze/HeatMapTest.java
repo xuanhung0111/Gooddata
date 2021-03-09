@@ -131,7 +131,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing();
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
         assertEquals(chartReport.getXaxisLabels(), asList("Direct Sales", "Inside Sales"));
         assertEquals(chartReport.getYaxisLabels(), asList("Web Meeting", "Phone Call", "In Person Meeting", "Email"));
@@ -273,7 +273,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         assertEquals(chartReport.getTrackersCount(), 2);
         assertEquals(chartReport.getDataLabels(), asList("2", "2"));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Activity Type", "Phone Call"),
                         asList("# of Activities, Activity: Jan 1, 2015 - Jan 1, 2016 (Activity Type: Email, Phone Call, Web Meeting)", "2")));
     }
@@ -287,7 +287,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
                 .addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call");
         assertEquals(chartReport.getTrackersCount(), 2);
         assertEquals(chartReport.getDataLabels(), asList("50,780", "33,920"));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Activity Type", "Phone Call"), asList("# of Activities (Activity Type: Email, Phone Call)", "50,780")));
     }
 
@@ -352,12 +352,12 @@ public class HeatMapTest extends AbstractAnalyseTest {
 
         ChartReport chartReport = analysisPage.addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTrackersCount(), 8);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Activity Type", "Web Meeting"), asList("Department", "Direct Sales"), asList("# of Activities", "23,931")));
 
         analysisPage.reorderRowAndColumn(ATTR_DEPARTMENT, ATTR_ACTIVITY_TYPE);
         assertEquals(chartReport.getTrackersCount(), 8);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Department", "Inside Sales"), asList("Activity Type", "Email"), asList("# of Activities", "12,305")));
 
         analysisPage.getAttributesBucket().setTitleItemBucket(ATTR_DEPARTMENT, ATTR_DEPARTMENT + "Rename");
@@ -529,7 +529,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
         ChartReport chartReport = initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing()
                 .addMetric("METRIC TEST").waitForReportComputing().getChartReport();
         assertEquals(chartReport.getDataLabels(), asList("3"));
-        log.info("chartReport.getTooltipTextOnTrackerByIndex(0,0) : " + chartReport.getTooltipTextOnTrackerByIndex(0, 0));
+        log.info("chartReport.getTooltipTextOnTrackerByIndexHighCharts(0,0) : " + chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0));
         Screenshots.takeScreenshot(browser, "Check Insight With Custom Metric", getClass());
 
         logoutAndLoginAs(true, UserRoles.EDITOR);
@@ -538,7 +538,7 @@ public class HeatMapTest extends AbstractAnalyseTest {
             chartReport = initAnalysePage().changeReportType(ReportType.HEAT_MAP).waitForReportComputing()
                     .addMetric("METRIC TEST").waitForReportComputing().getChartReport();
             assertEquals(chartReport.getDataLabels(), asList("2"));
-            log.info("chartReport.getTooltipTextOnTrackerByIndex(0,0) : " + chartReport.getTooltipTextOnTrackerByIndex(0, 0));
+            log.info("chartReport.getTooltipTextOnTrackerByIndexHighCharts((0,0) : " + chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0));
             Screenshots.takeScreenshot(browser, "Check Insight With Custom Metric For User Editor", getClass());
 
         } finally {

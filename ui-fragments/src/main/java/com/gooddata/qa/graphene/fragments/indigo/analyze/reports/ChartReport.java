@@ -45,6 +45,10 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
 
+    // This updating to cover the story FET-492
+    @FindBy(css = ".highcharts-series-0 path[opacity='1']")
+    private List<WebElement> trackersHighcharts;
+
     @FindBy(css = ".highcharts-markers *")
     private List<WebElement> markers;
 
@@ -269,6 +273,15 @@ public class ChartReport extends AbstractFragment {
                     .count();
         }
 
+        // This updating to cover the story FET-492
+        if (isHeatMapChart()) {
+            return (int) waitForCollectionIsNotEmpty(trackersHighcharts).stream()
+                .map(e -> e.getAttribute("opacity"))
+                .map(Integer::parseInt)
+                .filter(i -> i > 0)
+                .count();
+        }
+
         return (int) waitForCollectionIsNotEmpty(trackers).stream()
             .map(e -> e.getAttribute("height"))
             .map(Integer::parseInt)
@@ -282,6 +295,12 @@ public class ChartReport extends AbstractFragment {
 
     public List<List<String>> getTooltipTextOnTrackerByIndex(int groupIndex, int index) {
         displayTooltipOnTrackerByIndex(groupIndex, index);
+        return getTooltipText();
+    }
+
+    // This updating to cover the story FET-492
+    public List<List<String>> getTooltipTextOnTrackerByIndexHighCharts(int groupIndex, int index) {
+        displayTooltipOnTrackerByIndexHighCharts(groupIndex, index);
         return getTooltipText();
     }
 
@@ -457,6 +476,11 @@ public class ChartReport extends AbstractFragment {
         return getRoot().getAttribute("class").contains("visualization-pie");
     }
 
+    // This updating to cover the story FET-492
+    private boolean isHeatMapChart() {
+        return getRoot().getAttribute("class").contains("visualization-heatmap");
+    }
+
     private boolean isTreeMapChart() {
         return getRoot().getAttribute("class").contains("visualization-treemap");
     }
@@ -471,6 +495,14 @@ public class ChartReport extends AbstractFragment {
     private void displayTooltipOnTrackerByIndex(int groupIndex, int index) {
         WebElement tracker = getTracker(groupIndex, index);
         checkIndex(index);
+        getActions().moveToElement(tracker).moveByOffset(1, 1).perform();
+        waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
+    }
+
+    // This updating to cover the story FET-492
+    private void displayTooltipOnTrackerByIndexHighCharts(int groupIndex, int index) {
+        WebElement tracker = getTracker(groupIndex, index);
+        checkIndexHighCharts(index);
         getActions().moveToElement(tracker).moveByOffset(1, 1).perform();
         waitForElementVisible(BY_HIGHCHARTS_TOOLTIP, browser);
     }
@@ -526,6 +558,14 @@ public class ChartReport extends AbstractFragment {
     private void checkIndex(int index) {
         waitForCollectionIsNotEmpty(trackers);
         if (index < 0 || index >= trackers.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    // This updating to cover the story FET-492
+    private void checkIndexHighCharts(int index) {
+        waitForCollectionIsNotEmpty(trackersHighcharts);
+        if (index < 0 || index >= trackersHighcharts.size()) {
             throw new IndexOutOfBoundsException();
         }
     }
