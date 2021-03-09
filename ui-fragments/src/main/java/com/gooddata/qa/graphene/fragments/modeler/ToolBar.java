@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
@@ -18,6 +17,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ToolBar extends AbstractFragment {
     private static final By TOOLBAR = By.className("gdc-ldm-toolbar");
@@ -60,13 +60,6 @@ public class ToolBar extends AbstractFragment {
 
     public void clickPublish() {
         btnPublishOnToolbar.click();
-        try {
-            Function<WebDriver, Boolean> isLoadingNotPresent =
-                    browser -> !isElementPresent(By.cssSelector(".gdc-ldm-waiting-dialog .waiting-dialog-content"), browser);
-            Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until(isLoadingNotPresent);
-        } catch (TimeoutException e) {
-            //do nothing
-        }
     }
 
     public void saveAsDraft() {

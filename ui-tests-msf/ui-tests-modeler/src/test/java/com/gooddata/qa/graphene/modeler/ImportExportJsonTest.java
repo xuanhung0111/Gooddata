@@ -135,7 +135,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
            projectBlank = createNewEmptyProject(restClient, BLANK_PROJECT_TITLE);
            toolbar.clickPublish();
            PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-           publishModelDialog.publishSwitchToEditMode();
+           publishModelDialog.overwriteDataSwitchToEditMode();
            OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
            wrapper.closePublishSuccess();
 
@@ -179,7 +179,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
 
            toolbar.clickPublish();
            publishModelDialog = PublishModelDialog.getInstance(browser);
-           publishModelDialog.publishSwitchToEditMode();
+           publishModelDialog.overwriteDataSwitchToEditMode();
            wrapper = OverlayWrapper.getInstance(browser);
            wrapper.closePublishSuccess();
            String sql = getResourceAsString("/model_view_import_blank_project.txt");
