@@ -161,8 +161,7 @@ public class SegmentDeleteTableLoadTest extends AbstractADDProcessTest {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create process" + e.getMessage());
         }
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
         lastSuccessful = LocalDateTime.now().withNano(0);
         lastSecondSuccessful = lastSuccessful.plusSeconds(5);
         lastThirdSuccessful = lastSuccessful.plusSeconds(10);

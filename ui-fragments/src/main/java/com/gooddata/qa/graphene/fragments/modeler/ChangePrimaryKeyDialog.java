@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -57,7 +58,8 @@ public class ChangePrimaryKeyDialog extends AbstractFragment {
     public void setPrimaryKey(String datasetName, String attributeName) {
         searchPrimaryKey(datasetName, attributeName);
         clickSetKey();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(1);
+//        waitForFragmentNotVisible(this);
     }
 
     public void searchPrimaryKey(String datasetName, String attributeName) {

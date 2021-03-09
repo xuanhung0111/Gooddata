@@ -112,11 +112,12 @@ public class LcmRestUtils {
             });
             //delete master project
             final String masterProject = getMasterProjectId(restClient, domain, segmentId);
-            service.removeProject(service.getProjectById(masterProject));
             //delete segment
             final String segment = String.format("/gdc/domains/%s/dataproducts/%s/segments/%s",
                     domain, ATT_LCM_DATA_PRODUCT, segmentId);
             restClient.execute(RestRequest.initDeleteRequest(segment), HttpStatus.NO_CONTENT);
+            //delete master after delete segment: BB-2315
+            service.removeProject(service.getProjectById(masterProject));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -134,10 +135,11 @@ public class LcmRestUtils {
             });
             //delete master project
             final String masterProject = getMasterProjectIdDefault(restClient, domain, segmentId);
-            service.removeProject(service.getProjectById(masterProject));
             //delete segment
             final String segment = String.format("/gdc/domains/%s/dataproducts/default/segments/%s", domain, segmentId);
             restClient.execute(RestRequest.initDeleteRequest(segment), HttpStatus.NO_CONTENT);
+            //delete master after delete segment: BB-2315
+            service.removeProject(service.getProjectById(masterProject));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

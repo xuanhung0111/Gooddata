@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.add;
+package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.AbstractGeoPushpinTest;
 import com.gooddata.qa.graphene.entity.dashboard.ExportDashboardDefinition;
@@ -6,7 +6,6 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ResizeBullet;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.common.StatusBar;
 import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;

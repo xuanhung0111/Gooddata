@@ -40,7 +40,7 @@ public class DataSourceSchemaContent extends AbstractFragment {
         action.moveToElement(table.findElement(By.className("type-name"))).click().build().perform();
         waitForElementVisible(table.findElement(By.className("icon-circle-question")));
         action.moveToElement(table.findElement(By.className("icon-circle-question"))).click().build().perform();
-        return OverlayWrapper.getInstance(browser).getPopUpTable();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getPopUpTable();
     }
 
     public void dragdropTableToCanvas(String name, String jsFile) {

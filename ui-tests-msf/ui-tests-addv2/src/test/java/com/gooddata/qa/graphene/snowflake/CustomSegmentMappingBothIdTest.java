@@ -122,8 +122,7 @@ public class CustomSegmentMappingBothIdTest extends AbstractADDProcessTest {
         setUpProcess();
         prepareTimestamp();
         // re-run LCM flow apply updated Model
-        lcmBrickFlowBuilder.deleteMasterProject();
-        lcmBrickFlowBuilder.runLcmFlow();
+        lcmCreateNewVersion();
     }
 
     @DataProvider

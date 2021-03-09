@@ -213,8 +213,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "CompuSci"), asList(METRIC_AMOUNT_BOP, "$852,425.34")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(),
-                        "From " + FROM_YEAR + " to " + FROM_YEAR + " years ago");
+                // This updating to cover the story RAIL-1446
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), FROM_YEAR + " years ago");
         }
 
         @Test(dependsOnMethods = "drillToTargetDashboardHasSameDateFilter")
@@ -280,8 +280,8 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 assertThat(chartReport.getXaxisLabels(), equalTo(singletonList("Educationly")));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_PRODUCT, "Educationly"), asList(METRIC_AMOUNT_BOP, "$807,371.56")));
-                assertEquals(indigoDashboardsPage.getDateFilterSelection(),
-                        "From " + FROM_YEAR + " to " + FROM_YEAR + " years ago");
+                // This updating to cover the story RAIL-1446
+                assertEquals(indigoDashboardsPage.getDateFilterSelection(), FROM_YEAR + " years ago");
                 assertEquals(panel.getAttributeFilter(ATTR_PRODUCT).getSelectedItems(), "Educationly");
                 assertEquals(panel.getAttributeFilter(ATTR_DEPARTMENT).getSelectedItems(), "Direct Sales");
 
@@ -294,9 +294,9 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid", "CompuSci", "Inside Sales", "Educationly",
                         "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
 
-                assertThat(chartReport.getXaxisLabels(), equalTo(expectedXAxisLabels));
+                assertThat(chartReport.getXaxisLabelsHighcharts(), equalTo(expectedXAxisLabels));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                        asList(asList(ATTR_DEPARTMENT, "Direct Sales"), 
+                        asList(asList(ATTR_DEPARTMENT, "Direct Sales"),
                                 asList(ATTR_PRODUCT, "CompuSci"),
                                 asList(METRIC_AMOUNT_BOP, "$673,662.80")));
                 assertEquals(indigoDashboardsPage.getDateFilterSelection(), "01/01/2011–01/01/2012");
@@ -332,7 +332,7 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                         "Grammar Plus", "PhoenixSoft", "WonderKid", "CompuSci", "Inside Sales", "Educationly",
                         "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
 
-                assertThat(chartReport.getXaxisLabels(), equalTo(expectedXAxisLabels));
+                assertThat(chartReport.getXaxisLabelsHighcharts(), equalTo(expectedXAxisLabels));
 
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                         asList(asList(ATTR_DEPARTMENT, "Direct Sales"), asList(ATTR_PRODUCT, "CompuSci"),
@@ -446,9 +446,9 @@ public class KPIDashboardsDrillToDashboardTest extends AbstractDashboardTest {
                 List<String> expectedXAxisLabels = asList("CompuSci", "Direct Sales", "Educationly", "Explorer",
                         "Grammar Plus", "PhoenixSoft", "WonderKid", "CompuSci", "Inside Sales", "Educationly",
                         "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
-                assertThat(chartReport.getXaxisLabels(), equalTo(expectedXAxisLabels));
+                assertThat(chartReport.getXaxisLabelsHighcharts(), equalTo(expectedXAxisLabels));
                 assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
-                        asList(asList(ATTR_DEPARTMENT, "Direct Sales"), 
+                        asList(asList(ATTR_DEPARTMENT, "Direct Sales"),
                                 asList(ATTR_PRODUCT, "CompuSci"),
                                 asList(METRIC_AMOUNT_BOP, "$1,255,922.48")));
                 assertEquals(indigoDashboardsPage.getDateFilterSelection(), "All time");

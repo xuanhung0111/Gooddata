@@ -62,6 +62,11 @@ import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDEditMode
 import com.gooddata.qa.graphene.indigo.dashboards.postMessage.EmbeddedKDViewModeTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DuplicateKpiDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KPIDashboardsCreateNewInsightFromKDTest;
+import com.gooddata.qa.graphene.indigo.dashboards.OnDashboardGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ConfigurationOnGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.dashboards.RenderGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.dashboards.SwitchGeoChartToOtherChartGeoPushpinTest;
+import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardDialogTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -151,17 +156,22 @@ public class UITestsRegistry {
             ResizeWidgetsAndRowsTest.class,
             ExportKPIDashboardsToPDF.class,
             KPIDashboardsDrillToInsightTest.class,
-            KPIDashboardsDrillToDashboardTest.class,            
+            KPIDashboardsDrillToDashboardTest.class,
             KPIDashboardsDrillDownTest.class,
             KPIDashboardsDrillDownAdvancedTest.class,
             KPIDashboardsDrillToUrlTest.class,
             ControlFilterEmbeddedKDFromExternalApplication.class,
             EmbeddedKDEditModeTest.class,
             EmbeddedKDViewModeTest.class,
+            EmbeddingDashboardDialogTest.class,
             DependentFilterTest.class,
             ExtendedDateFilterTest.class,
             DuplicateKpiDashboardTest.class,
             KPIDashboardsCreateNewInsightFromKDTest.class,
+            OnDashboardGeoPushpinTest.class,
+            ConfigurationOnGeoPushpinTest.class,
+            RenderGeoPushpinTest.class,
+            SwitchGeoChartToOtherChartGeoPushpinTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-KpiDrillTo.xml",
@@ -192,7 +202,7 @@ public class UITestsRegistry {
             "testng-mobile-DropDownNavigation.xml",
             "testng-mobile-KpiDashboardWithTotalsResult.xml",
             "testng-mobile-EventingBasicInsight.xml",
-            "testng-mobile-EventingMultipleWidgets.xml"
+            "testng-mobile-EventingMultipleWidgets.xml",
         });
 
         suites.put("all", new HashMap<String, Object>() {{

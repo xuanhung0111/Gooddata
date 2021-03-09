@@ -56,6 +56,14 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
         return Pair.of(row, col);
     }
 
+    // This updating to cover the story FET-492
+    protected Pair<Integer, Integer> getColumnPositionHighcharts(ChartReport chartReport, String legend, String attributeValue) {
+        int row = chartReport.getLegendIndex(legend);
+        List<String> labels = chartReport.getXaxisLabelsHighcharts();
+        int col = labels.indexOf(attributeValue);
+        return Pair.of(row, col);
+    }
+
     protected Pair<Integer, Integer> getColumnPosition(ChartReport chartReport, String legend) {
         int row = chartReport.getLegendIndex(legend);
         return Pair.of(row, 0);

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.datasourcemgmt;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -33,15 +34,48 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "s-create-datasource-dialog-item-generic-data-source")
     private WebElement genericResource;
 
+    @FindBy(css = ".bubble-negative .content")
+    private WebElement contentErrorMessage;
+
+    @FindBy(css = ".bubble-warning-tooltip .content")
+    private WebElement contentWarningMessage;
+
+    @FindBy(className = "data-source-user-add-error-dialog")
+    private WebElement errorAddUserFailPopUp;
+
+    @FindBy(className = "s-delete-datasource-user-dialog")
+    private DeleteUserDialog deleteUserDialog;
+
+    @FindBy(className = "data-source-user-edit-dialog")
+    private EditUserDialog editUserDialog;
+
     public static OverlayWrapper getInstance(SearchContext searchContext) {
         List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
         return Graphene.createPageFragment(OverlayWrapper.class, wrapperList.get(1));
+    }
+
+    public static OverlayWrapper getInstanceByIndex(SearchContext searchContext, int index) {
+        List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
+        return Graphene.createPageFragment(
+                OverlayWrapper.class, wrapperList.get(index));
     }
 
     public void selectSnowflakeItem() {
         waitForElementVisible(popupResource);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(snowflakeResource).click().build().perform();
+    }
+
+    public String getTextErrorShareUser() {
+        waitForElementVisible(errorAddUserFailPopUp);
+        return errorAddUserFailPopUp.getText();
+    }
+
+    public void actionOnErrorShareUserDialog() {
+        waitForElementVisible(errorAddUserFailPopUp);
+        WebElement closeButton = errorAddUserFailPopUp.findElement(By.className("s-dialog-close-button"));
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(closeButton).click().build().perform();
     }
 
     public void selectRedshiftItem() {
@@ -64,5 +98,15 @@ public class OverlayWrapper extends AbstractFragment {
     public void selectGenericItem() {
         waitForElementVisible(popupResource);
         getActions().moveToElement(genericResource).click().build().perform();
+    }
+
+    public String getErrorAddUserMessage() {
+        waitForElementVisible(contentErrorMessage);
+        return contentErrorMessage.getText();
+    }
+
+    public String getWarningAddUserMessage() {
+        waitForElementVisible(contentWarningMessage);
+        return contentWarningMessage.getText();
     }
 }

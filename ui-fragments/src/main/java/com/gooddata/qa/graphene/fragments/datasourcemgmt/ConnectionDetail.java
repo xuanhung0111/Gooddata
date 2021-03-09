@@ -40,6 +40,12 @@ public class ConnectionDetail extends AbstractFragment {
     @FindBy(className = "publish-loading-modal-container")
     private static WebElement loadingModal;
 
+    @FindBy(className = "user-heading")
+    private UserHeading userHeading;
+
+    @FindBy(className = "user-field")
+    private UserField userField;
+
     public static final ConnectionDetail getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ConnectionDetail.class, waitForElementVisible(CONNECTION_DETAIL_CLASS, searchContext));
     }
@@ -59,6 +65,14 @@ public class ConnectionDetail extends AbstractFragment {
 
     public PublishResult getPublishResultDialog() {
         return PublishResult.getInstance(browser);
+    }
+
+    public UserHeading getUserHeading() {
+        return UserHeading.getInstance(browser);
+    }
+
+    public UserField getUserField() {
+        return UserField.getInstance(browser);
     }
 
     public ConnectionDetail waitLoadingModelPage() {

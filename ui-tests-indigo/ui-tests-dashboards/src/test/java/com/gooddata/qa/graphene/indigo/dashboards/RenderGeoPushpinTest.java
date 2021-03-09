@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.add;
+package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.AbstractGeoPushpinTest;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;

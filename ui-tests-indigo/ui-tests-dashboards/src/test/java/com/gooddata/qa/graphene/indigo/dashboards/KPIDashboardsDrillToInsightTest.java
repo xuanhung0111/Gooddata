@@ -151,7 +151,7 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
 
         // This assert is to cover the bug ONE-4587 - Infinite rendering loop of visualisation in KD
         assertEquals(drillChartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.YELLOW_LIGHT.toString());
-        assertEquals(drillChartReport.getXaxisLabels(), asList("Direct Sales", "2011"));
+        assertEquals(drillChartReport.getXaxisLabelsHighcharts(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("$40,105,983.96", "14,069,855"));
         assertEquals(drillModalDialog.getTitleInsight(), SOURCE_INSIGHT_HAS_TWO_MEASURES);
         drillModalDialog.close();
@@ -162,7 +162,7 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         // This assert is to cover the bug ONE-4587 - Infinite rendering loop of visualisation in KD
         assertEquals(drillChartReport.checkColorColumn(0, 0), ColorPaletteRequestData.ColorPalette.CYAN.toString());
         assertEquals(drillChartReport.getYaxisTitle(), METRIC_BEST_CASE);
-        assertEquals(drillChartReport.getXaxisLabels(), asList("Direct Sales", "2011"));
+        assertEquals(drillChartReport.getXaxisLabelsHighcharts(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("13,273,818"));
         assertEquals(drillModalDialog.getTitleInsight(), TARGET_INSIGHT_FIRST);
         drillModalDialog.close();
@@ -187,7 +187,7 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         chartReport.openDrillingPicker(Pair.of(0, 1)).drillToInsight();
         indigoDashboardsPage.waitForDrillModalDialogLoading();
         assertEquals(drillChartReport.getYaxisTitle(), METRIC_BEST_CASE);
-        assertEquals(drillChartReport.getXaxisLabels(), asList("Direct Sales", "2011"));
+        assertEquals(drillChartReport.getXaxisLabelsHighcharts(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("13,273,818"));
         assertEquals(drillModalDialog.getTitleInsight(), TARGET_INSIGHT_FIRST);
         drillModalDialog.close();

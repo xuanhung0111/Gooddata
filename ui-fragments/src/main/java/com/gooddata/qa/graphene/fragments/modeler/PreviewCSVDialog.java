@@ -11,6 +11,8 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
@@ -86,7 +88,8 @@ public class PreviewCSVDialog extends AbstractFragment {
 
     public void clickCancelButton() {
         cancelButton.click();
-        waitForFragmentNotVisible(this);
+        sleepTightInSeconds(3);
+//        waitForFragmentNotVisible(this);
     }
 
     public void clickImportButton() {

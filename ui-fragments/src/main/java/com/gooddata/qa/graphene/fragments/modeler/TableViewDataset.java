@@ -57,14 +57,14 @@ public class TableViewDataset extends AbstractFragment {
         WebElement row = getRowByName(datasetName);
         List<WebElement> cells = row.findElements(TABLE_CELLS);
         cells.get(3).findElement(By.className("s-update_from_file")).click();
-        return OverlayWrapper.getInstance(browser).getFileUploadDialog();
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getFileUploadDialog();
     }
 
     public void clickButtonDownloadTemplate(String datasetName) {
         WebElement row = getRowByName(datasetName);
         List<WebElement> cells = row.findElements(TABLE_CELLS);
         cells.get(3).findElement(By.className("s-csv_template")).click();
-        OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
+        OverlayWrapper wrapper = OverlayWrapper.getInstanceByIndex(browser, 1);
         wrapper.waittingDialog();
         //wrapper.closeWaitingDialog();
     }

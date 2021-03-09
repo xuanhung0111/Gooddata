@@ -112,7 +112,7 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         ChartReport chartReport = analysisPage.getChartReport();
         assertFalse(chartReport
-                        .isColumnHighlighted(getColumnPosition(chartReport, "East Coast", "Email")),
+                        .isColumnHighlighted(getColumnPositionHighcharts(chartReport, "East Coast", "Email")),
                 "Chart(East Coast, Email) should not be highlighted");
     }
 
@@ -126,7 +126,7 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         ChartReport chartReport = analysisPage.getChartReport();
         assertTrue(chartReport
-                        .isColumnHighlighted(getColumnPosition(chartReport, "East Coast", "Email")),
+                        .isColumnHighlighted(getColumnPositionHighcharts(chartReport, "East Coast", "Email")),
                 "Chart(East Coast, Email) should be highlighted");
     }
 }

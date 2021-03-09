@@ -188,23 +188,23 @@ public class Model extends AbstractFragment {
     }
 
     public void editAttributeNameAndNotSave(String attribute, String newName) {
-        OverlayWrapper.getInstance(browser).getEditDatasetDialog().changeAttributeNameAndNotSave(attribute, newName);
+        OverlayWrapper.getInstanceByIndex(browser,1).getEditDatasetDialog().changeAttributeNameAndNotSave(attribute, newName);
     }
 
     public void addAttribute(String attributeName) {
-        OverlayWrapper.getInstance(browser).getEditDatasetDialog().addAttribute(attributeName);
+        OverlayWrapper.getInstanceByIndex(browser,1).getEditDatasetDialog().addAttribute(attributeName);
     }
 
     public boolean isAttributeExist(String attributeName) {
-        return OverlayWrapper.getInstance(browser).getEditDatasetDialog().isAttributeExist(attributeName);
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getEditDatasetDialog().isAttributeExist(attributeName);
     }
 
     public void addFact(String factName) {
-        OverlayWrapper.getInstance(browser).getEditDatasetDialog().addFact(factName);
+        OverlayWrapper.getInstanceByIndex(browser, 1).getEditDatasetDialog().addFact(factName);
     }
 
     public boolean isFactExist(String factName) {
-        return OverlayWrapper.getInstance(browser).getEditDatasetDialog().isFactExist(factName);
+        return OverlayWrapper.getInstanceByIndex(browser, 1).getEditDatasetDialog().isFactExist(factName);
     }
 
     public void editLabelName(String label, String newName) {
