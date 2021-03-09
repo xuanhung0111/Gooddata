@@ -78,6 +78,11 @@
             <artifactId>gax</artifactId>
             <version>1.49.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.arquillian.extension</groupId>
+            <artifactId>arquillian-desktop-video-recorder</artifactId>
+            <version>1.1.6.Final</version>
+        </dependency>
     </dependencies>
 
     <profiles>

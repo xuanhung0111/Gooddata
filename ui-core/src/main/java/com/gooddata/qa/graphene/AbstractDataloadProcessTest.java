@@ -82,7 +82,9 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
                 .addSecureParameter(Parameter.ADS_PASSWORD, testParams.getPassword());
     }
 
-    @AfterClass(alwaysRun = true)
+    /* Viet fix to force it follows Aquillian cycle */
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@AfterClass(alwaysRun = true)
     public void removeAdsInstance() throws ParseException, JSONException, IOException {
         adsHelper.removeAds(ads);
     }
@@ -202,7 +204,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         GD_ENDCODE_PARAM_PROVISIONING("gdEndcodeParamProvision.txt"),
         GD_ENDCODE_PARAM_ROLLOUT("gdEndcodeParamRollout.txt");
 
-        private String name;
+        private final String name;
 
         TxtFile(String name) {
             this.name = name;

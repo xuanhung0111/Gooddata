@@ -25,15 +25,24 @@
         <property name="waitAjaxInterval">${timeout:90}</property>
         <property name="waitGuardInterval">${timeout:90}</property>
     </extension>
-
-    <extension qualifier="screenRecorder">
+<!--
+    <extension qualifier="recorder">
         <property name="rootFolder">target/media</property>
         <property name="videoFolder">video</property>
         <property name="videoName">testVideo</property>
         <property name="video">test</property>
         <property name="screenshot">none</property>
     </extension>
-
+-->
+    <!-- This fix is for control the recoding in code and the version of Arquillian is 1.1.6.Final
+        The properties <rootDir> it can not able to create nested folders,
+        if you want nested folder you have to create parent manually
+        the property <"takeOnlyOnFail"> is always = false, if not it cannot be control in code -->
+    <extension qualifier="recorder">
+        <property name="rootDir">target/videos</property>
+        <property name="takeOnlyOnFail">false</property>
+        <property name="screenshot">none</property>
+    </extension>
     <extension qualifier="drone">
         <property name="instantiationTimeoutInSeconds">120</property>
     </extension>

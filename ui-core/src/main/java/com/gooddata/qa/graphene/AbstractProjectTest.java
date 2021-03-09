@@ -85,7 +85,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     private RestClient restClient;
     private List<String> createdProjects = new ArrayList<>();
 
-    @BeforeClass(alwaysRun = true)
+    /* Viet fix to force it follows Aquillian cycle */
+    @BeforeClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@BeforeClass(alwaysRun = true)
     public void enableDynamicUser() {
         useDynamicUser = Boolean.parseBoolean(testParams.loadProperty("useDynamicUser"));
     }
@@ -342,7 +344,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             uploadFileToWebDav(csvResource, webdavUrl);
             uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
-            String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
+            String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1);
             new RolapRestRequest(getAdminRestClient(), testParams.getProjectId())
                     .postEtlPullIntegration(integrationEntry);
         } catch (JSONException | IOException | URISyntaxException e) {

@@ -74,7 +74,6 @@ public class TestParameters {
     private String localhostSDK;
     private String brickAppstore;
     private String lcmDataloadProcessComponentVersion;
-    private String logLevel;
 
     public static TestParameters getInstance() {
         String propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
@@ -146,7 +145,6 @@ public class TestParameters {
         uisdkVersion = loadProperty("uisdkVersion");
         appType = loadProperty("appType");
         localhostSDK = loadProperty("localhostSDK");
-        logLevel = loadProperty("logLevel");
     }
 
     /**
@@ -527,31 +525,5 @@ public class TestParameters {
         }
         return Pair.of(user, password);
     }
-    public Level getLogLevel(){
-        if (logLevel != null){
-            switch (logLevel.toUpperCase()) {
-                case "ALL":
-                    return Level.ALL;
-                case "CONFIG":
-                    return Level.CONFIG;
-                case "SEVERE":
-                    return Level.SEVERE;
-                case "WARNING":
-                    return Level.WARNING;
-                case "INFO":
-                    return Level.INFO;
-                case "FINE":
-                    return Level.FINE;
-                case "FINER":
-                    return Level.FINER;
-                case "FINEST":
-                    return Level.FINEST;
-                case "OFF":
-                    return Level.OFF;
-                default:
-                    return Level.FINE; //incase configure value is not fallen on any value above
-            }
-        }
-        else return Level.FINE; //incase this value in properties file is null or empty or not configured
-    }
+
 }

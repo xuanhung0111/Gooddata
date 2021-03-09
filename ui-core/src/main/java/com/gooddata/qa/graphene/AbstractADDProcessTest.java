@@ -54,7 +54,9 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
         userManagementRestRequest.addUserToProject(email, userRole);
     }
 
-    @AfterClass(alwaysRun = true)
+    /* Viet fix to force it follows Aquillian cycle*/
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@AfterClass(alwaysRun = true)
     public void cleanUpLCM() {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER || lcmBrickFlowBuilder == null) {
             return;
