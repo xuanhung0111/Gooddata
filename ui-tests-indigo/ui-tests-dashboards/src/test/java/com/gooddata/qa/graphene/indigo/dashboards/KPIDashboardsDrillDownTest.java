@@ -385,7 +385,6 @@ public class KPIDashboardsDrillDownTest extends AbstractDashboardTest {
     public Object[][] getChartOnlyMeasures() {
         return new Object[][]{
             { DASHBOARD_COLUMN_CHART_ONLY_MEASURES, COLUMN_CHART_ONLY_MEASURES, "column chart"},
-            { DASHBOARD_HEAT_MAP_ONLY_MEASURES, HEAT_MAP_ONLY_MEASURES, "heat map"},
             { DASHBOARD_LINE_CHART_ONLY_MEASURES, LINE_CHART_ONLY_MEASURES, "line chart"},
             { DASHBOARD_BULLET_CHART_ONLY_MEASURES, BULLET_CHART_ONLY_MEASURES, "bullet chart"}
         };
@@ -405,6 +404,20 @@ public class KPIDashboardsDrillDownTest extends AbstractDashboardTest {
 
         chartReport.clickOnElement(Pair.of(0, 0));
         assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)),"Should not allow to drill down on " + chartName + " that only has measures.");
+    }
+
+    @Test(dependsOnGroups = "createProject", description = "This test case covered the story FET-492")
+    public void drillDownOnHeatMapChartOnlyMeasures() {
+        initIndigoDashboardsPage().addDashboard().addInsight(HEAT_MAP_ONLY_MEASURES);
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
+        indigoDashboardsPage.changeDashboardTitle(DASHBOARD_HEAT_MAP_ONLY_MEASURES).waitForWidgetsLoading().saveEditModeWithWidgets();
+
+        ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, HEAT_MAP_ONLY_MEASURES).getChartReport();
+        chartReport.getTooltipTextOnTrackerByIndexHighCharts(0,0);
+        assertThat(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0,0), equalTo(asList(asList("Amount", "$116,625,456.54"))));
+
+        chartReport.clickOnElement(Pair.of(0, 0));
+        assertFalse(chartReport.isColumnHighlighted(Pair.of(0, 0)),"Should not allow to drill down on heat map that only has measures.");
     }
 
     @DataProvider(name = "chartWithStackData")
