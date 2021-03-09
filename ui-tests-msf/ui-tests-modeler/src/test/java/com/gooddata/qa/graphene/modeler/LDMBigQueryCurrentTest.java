@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.*;
 
 import com.gooddata.qa.graphene.fragments.modeler.*;
+import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
 import com.gooddata.qa.graphene.fragments.modeler.datasource.*;
 import com.gooddata.qa.utils.cloudresources.*;
 import com.gooddata.qa.utils.http.RestClient;
@@ -219,7 +220,7 @@ public class LDMBigQueryCurrentTest extends AbstractLDMPageTest {
         toolbar = modeler.getToolbar();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishModel();
+        publishModelDialog.overwriteData();
         sleepTightInSeconds(200);
     }
 

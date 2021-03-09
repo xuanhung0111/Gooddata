@@ -1,4 +1,4 @@
- package com.gooddata.qa.graphene.modeler;
+package com.gooddata.qa.graphene.modeler;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -230,7 +230,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         toolbarTableView = ToolBar.getInstanceInTableView(browser, 1);
         toolbarTableView.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishInTableView();
+        publishModelDialog.overwriteInTableView();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
@@ -300,7 +300,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         dialog.saveChanges();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishSwitchToEditMode();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
@@ -383,7 +383,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         }
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishSwitchToEditMode();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
