@@ -45,7 +45,7 @@
         <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
         <extendedTimeoutMultiple>20</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
-        <test.module>ui-tests-core</test.module>
+        <test.module>.</test.module>
         <targetFolder>${user.dir}${file.separator}${test.module}${file.separator}target</targetFolder>
         <browserDownloadFolder>${targetFolder}${file.separator}downloads</browserDownloadFolder>
         <language>en-US</language>

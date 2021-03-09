@@ -59,7 +59,7 @@ public abstract class AbstractTest extends Arquillian {
     // Store extra dynamic users in tests and will be deleted after test
     List<String> extraUsers = new ArrayList<>();
 
-    /* Viet fix to force it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     @BeforeSuite(groups = {"arquillian"}, inheritGroups = true)
     @Override
     public void arquillianBeforeSuite() throws Exception {
@@ -68,7 +68,7 @@ public abstract class AbstractTest extends Arquillian {
         loadProperties();
     }
 
-    /* Viet fix to fore it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     // Reserve for use later
     @AfterSuite(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
     @Override
@@ -76,7 +76,7 @@ public abstract class AbstractTest extends Arquillian {
         super.arquillianAfterSuite();
     }
 
-    /* Viet fix to fore it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     @BeforeClass(groups = {"arquillian"}, inheritGroups = true)
     @Override
     public void arquillianBeforeClass() throws Exception {
@@ -84,7 +84,7 @@ public abstract class AbstractTest extends Arquillian {
         //loadProperties();
     }
 
-    /* Viet fix to fore it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
     @Override
     public void arquillianAfterClass() throws Exception {
@@ -92,7 +92,7 @@ public abstract class AbstractTest extends Arquillian {
         deleteUsers();
     }
 
-    /* Viet fix to fore it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     @BeforeMethod(groups = {"arquillian"}, inheritGroups = true)
     @Override
     public void arquillianBeforeTest(Method testMethod) throws Exception {
@@ -100,7 +100,7 @@ public abstract class AbstractTest extends Arquillian {
         beforeTest(testMethod);
     }
 
-    /* Viet fix to fore it follows Aquillian cycle */
+    /* Viet fix to force it follows Arquillian cycle */
     @AfterMethod(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
     @Override
     public void arquillianAfterTest(Method testMethod) throws Exception {
