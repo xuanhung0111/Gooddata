@@ -1,16 +1,5 @@
 package com.gooddata.qa.graphene.modeler;
 
-import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
-import com.gooddata.qa.graphene.fragments.modeler.Modeler;
-import com.gooddata.qa.graphene.fragments.modeler.Sidebar;
-import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
-import com.gooddata.qa.graphene.fragments.modeler.Canvas;
-import com.gooddata.qa.graphene.fragments.modeler.Model;
-import com.gooddata.qa.graphene.fragments.modeler.DateModel;
-import com.gooddata.qa.graphene.fragments.modeler.MainModelContent;
-import com.gooddata.qa.graphene.fragments.modeler.EditDateDimensionDialog;
-import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
-import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
 import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
 import com.gooddata.sdk.model.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.sdk.model.project.Project;
@@ -22,6 +11,17 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
+import com.gooddata.qa.graphene.fragments.modeler.Modeler;
+import com.gooddata.qa.graphene.fragments.modeler.Sidebar;
+import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
+import com.gooddata.qa.graphene.fragments.modeler.Canvas;
+import com.gooddata.qa.graphene.fragments.modeler.Model;
+import com.gooddata.qa.graphene.fragments.modeler.DateModel;
+import com.gooddata.qa.graphene.fragments.modeler.MainModelContent;
+import com.gooddata.qa.graphene.fragments.modeler.EditDateDimensionDialog;
+import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
+import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -55,6 +55,7 @@ import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static java.lang.String.format;
@@ -78,8 +79,6 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
 
-    private final String PRESERVE_DATA = "Preserve data";
-    private final String DROP_DATA = "Drop data";
     private final String USER_DATASET = "user";
     private final String DATABASE_NAME = "ATT_MODELER_DATABASE";
     private final String INSIGHT_NAME = "Insight Test";
@@ -245,12 +244,13 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         //first try publish with preserve data mode
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        assertEquals(publishModelDialog.getTextOption(), DROP_DATA);
-        assertTrue(publishModelDialog.isPreserveDataDisable());
+        publishModelDialog.preserveData();
+        assertEquals(publishModelDialog.getTextError(), PUBLISH_ERROR_MESSAGE);
+        publishModelDialog.clickButtonCancelErrorPopUp();
 
         //second try publish with overwrite data mode
-        publishModelDialog.chooseDropData();
-        publishModelDialog.publishSwitchToEditMode();
+        toolbar.clickPublish();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
@@ -274,8 +274,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
         // publish with preserve mode after update model
         toolbar.clickPublish();
-        assertEquals(publishModelDialog.getTextOption(), DROP_DATA);
-        publishModelDialog.publishSwitchToEditMode();
+        publishModelDialog.overwriteDataSwitchToEditMode();
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
                 testParams.getProjectId()));

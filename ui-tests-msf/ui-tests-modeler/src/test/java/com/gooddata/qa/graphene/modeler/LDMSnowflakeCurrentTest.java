@@ -339,7 +339,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         toolbar = modeler.getToolbar();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishModel();
+        publishModelDialog.overwriteData();
         sleepTightInSeconds(200);
 
         String sql = getResourceAsString("/model_snowflake_current.txt");
