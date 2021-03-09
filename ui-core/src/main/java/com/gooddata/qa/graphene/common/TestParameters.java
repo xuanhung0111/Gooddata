@@ -524,5 +524,4 @@ public class TestParameters {
         }
         return Pair.of(user, password);
     }
-
 }
