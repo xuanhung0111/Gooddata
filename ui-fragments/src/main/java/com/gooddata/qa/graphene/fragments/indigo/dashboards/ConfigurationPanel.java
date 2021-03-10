@@ -26,6 +26,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.List;
 import java.util.function.Function;

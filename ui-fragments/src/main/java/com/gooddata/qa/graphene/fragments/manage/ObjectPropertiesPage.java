@@ -1,13 +1,14 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
@@ -114,6 +115,11 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
 
     public Collection<String> getTags() {
         return getElementTexts(tags);
+    }
+
+    public boolean isAddedTagsVisible(){
+        waitForElementPresent(By.cssSelector(".tag"), browser);
+        return isElementVisible(By.cssSelector(".tag"), browser);
     }
 
     public boolean canAddTag() {
