@@ -169,6 +169,21 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
                 ReportType.BAR_CHART.getLabel(), "Chart type is not as expected");
     }
 
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" },
+            description = "This test is to cover the bug: https://jira.intgdc.com/browse/ONE-4857")
+    public void disabledUndoRedoButtonAfterPressingClearButton() throws JSONException, IOException {
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART).openInsight(INSIGHT_TEST)
+            .resetToBlankState()
+            .addMetric(METRIC_SNAPSHOT_BOP)
+            .waitForReportComputing()
+            .undo();
+
+        assertFalse(analysisPage.isUndoInsightEnabled(), "Undo button should be disabled");
+        analysisPage.redo().resetToBlankState();
+        assertFalse(analysisPage.isUndoInsightEnabled(), "Undo button should be disabled");
+        assertTrue(analysisPage.isRedoInsightDisabled(), "Redo button should be disabled");
+    }
+
     private void checkUndoRedoAfterSaveInsight() throws JSONException, IOException {
         final AnalysisPageHeader header = analysisPage.getPageHeader();
         final String savedTitle = header.getInsightTitle();
