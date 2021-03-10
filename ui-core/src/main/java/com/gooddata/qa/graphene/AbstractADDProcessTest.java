@@ -64,7 +64,9 @@ public class AbstractADDProcessTest extends AbstractDataIntegrationTest {
         service.removeProject(service.getProjectById(previousMaster));
     }
 
-    @AfterClass(alwaysRun = true)
+     /* Viet fix to force it follows Aquillian cycle*/
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@AfterClass(alwaysRun = true)
     public void cleanUpLCM() {
         if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER || lcmBrickFlowBuilder == null) {
             return;

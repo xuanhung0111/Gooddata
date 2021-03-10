@@ -94,7 +94,9 @@ public class AbstractGeoPushpinTest extends AbstractProjectTest {
         initAttributePage().initAttribute(ATTR_GEO_PUSHPIN).selectGeoLableType(CHART_TYPE);
     }
 
-    @AfterClass(alwaysRun = true)
+    /* Viet fix to force it follows Aquillian cycle */
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@AfterClass(alwaysRun = true)
     public void removeAdsInstance() throws ParseException, JSONException, IOException {
         if (BrowserUtils.isFirefox()) {
             throw new SkipException("Skip test case on Firefox Browser due to disabled weblg ");

@@ -203,8 +203,9 @@ public abstract class AbstractFreemiumGrowthTest extends AbstractUITest {
         log.info("deleted project:" + projectId);
     }
 
-
-    @AfterClass(alwaysRun = true)
+    /* Viet fix to fore it follows Aquillian cycle */
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    //@AfterClass(alwaysRun = true)
     public void deleteProjectTearDown(ITestContext context) {
         if (testParams.isReuseProject()) {
             log.info("Project is being re-used and won't be deleted.");

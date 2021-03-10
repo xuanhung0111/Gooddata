@@ -14,19 +14,24 @@ import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 import org.apache.http.ParseException;
+import org.arquillian.extension.recorder.video.desktop.configuration.DesktopVideoConfiguration;
+import org.arquillian.extension.recorder.video.desktop.impl.DesktopVideoRecorder;
+import org.arquillian.recorder.reporter.ReporterConfiguration;
+import org.arquillian.recorder.reporter.impl.TakenResourceRegister;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 
-import java.io.FileInputStream;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.*;
+
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -34,7 +39,12 @@ import java.util.logging.Logger;
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
 
-    protected TestParameters testParams;
+    protected static TestParameters testParams;
+    protected static TakenResourceRegister reg = new TakenResourceRegister();
+    protected static DesktopVideoConfiguration config = new DesktopVideoConfiguration (new ReporterConfiguration());
+
+    @ArquillianResource
+    protected static DesktopVideoRecorder recorder = new DesktopVideoRecorder(reg);
 
     @Drone
     protected WebDriver browser;
@@ -44,16 +54,88 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapPassword;
 
     protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
-
+    protected ch.qos.logback.classic.Logger logger =
+            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
     // Store extra dynamic users in tests and will be deleted after test
     List<String> extraUsers = new ArrayList<>();
 
-    @BeforeClass(alwaysRun = true)
-    public void loadProperties() {
+    /* Viet fix to force it follows Arquillian cycle */
+    @BeforeSuite(groups = {"arquillian"}, inheritGroups = true)
+    @Override
+    public void arquillianBeforeSuite() throws Exception {
+        super.arquillianBeforeSuite();
+        beforeSuite();
+        loadProperties();
+    }
+
+    /* Viet fix to force it follows Arquillian cycle */
+    // Reserve for use later
+    @AfterSuite(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    @Override
+    public void arquillianAfterSuite() throws Exception {
+        super.arquillianAfterSuite();
+    }
+
+    /* Viet fix to force it follows Arquillian cycle */
+    @BeforeClass(groups = {"arquillian"}, inheritGroups = true)
+    @Override
+    public void arquillianBeforeClass() throws Exception {
+        super.arquillianBeforeClass();
+        //loadProperties();
+    }
+
+    /* Viet fix to force it follows Arquillian cycle */
+    @AfterClass(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    @Override
+    public void arquillianAfterClass() throws Exception {
+        super.arquillianAfterClass();
+        deleteUsers();
+    }
+
+    /* Viet fix to force it follows Arquillian cycle */
+    @BeforeMethod(groups = {"arquillian"}, inheritGroups = true)
+    @Override
+    public void arquillianBeforeTest(Method testMethod) throws Exception {
+        super.arquillianBeforeTest(testMethod);
+        beforeTest(testMethod);
+    }
+
+    /* Viet fix to force it follows Arquillian cycle */
+    @AfterMethod(groups = {"arquillian"}, inheritGroups = true, alwaysRun = true)
+    @Override
+    public void arquillianAfterTest(Method testMethod) throws Exception {
+        super.arquillianAfterTest(testMethod);
+        afterTest();
+    }
+
+    public static void loadProperties() {
         testParams = TestParameters.getInstance();
     }
 
-    @AfterClass(alwaysRun = true)
+    protected void beforeSuite(){
+        log.info("Initial recording configuration!");
+        recorder.init(config);
+    }
+
+    public void beforeTest(Method testMethod){
+        try {
+            log.info("Try to start recording");
+            recorder.startRecording(testMethod.getName() + "_" + new Date().toString().replace(" ","_"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void afterTest(){
+        try {
+            log.info("Try to stop recording!");
+            recorder.stopRecording();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //@AfterClass(alwaysRun = true)
     public void deleteUsers() throws ParseException, IOException, JSONException {
         final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
         final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
