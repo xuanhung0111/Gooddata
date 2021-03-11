@@ -314,7 +314,7 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
                         .setMeasureBucket(asList(
                                 MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
                         .setCategoryBucket(asList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), CategoryBucket.Type.ATTRIBUTE),
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), CategoryBucket.Type.VIEW),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(segment), CategoryBucket.Type.SEGMENT))));
     }
 
@@ -324,6 +324,6 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
                         .setMeasureBucket(singletonList(
                                 MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
                         .setCategoryBucket(singletonList(
-                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), CategoryBucket.Type.ATTRIBUTE))));
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), CategoryBucket.Type.VIEW))));
     }
 }
