@@ -50,6 +50,9 @@ public class ScheduleEmailDialog extends AbstractFragment {
     @FindBy(css = ".s-gd-schedule-email-dialog-subject input")
     private WebElement subjectInput;
 
+    @FindBy(css = ".s-gd-schedule-email-dialog-attachment span")
+    private WebElement defaultAttachmentName;
+
     public static ScheduleEmailDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(ScheduleEmailDialog.class,
                 waitForElementVisible(className(DIALOG_ROOT), context));
@@ -119,10 +122,22 @@ public class ScheduleEmailDialog extends AbstractFragment {
         return this;
     }
 
+    public String getDateText() {
+        return waitForElementVisible(datepickerInput).getAttribute("value");
+    }
+
+    public String getDefaultAttachmentNameText() {
+        return waitForElementVisible(defaultAttachmentName).getText();
+    }
+
     public ScheduleEmailDialog setSubject(String date) {
         ElementUtils.clear(waitForElementVisible(subjectInput));
         getActions().sendKeys(date, Keys.ENTER).perform();
         return this;
+    }
+
+    public String getSubjectDefaultPlaceHolder() {
+        return waitForElementVisible(subjectInput).getAttribute("placeholder");
     }
 
     public ScheduleEmailDialog chooseTime(String time) {

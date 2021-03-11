@@ -11,6 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.tagName;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -25,6 +26,7 @@ public class Widget extends AbstractFragment {
     public static final By HINT_LOCATOR = By.cssSelector(".gd-editable-label:hover");
     public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
     public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
+    public static final By ITEM_ACTION_PLACEHOLDER = By.className("s-dash-item-action-placeholder");
 
     @FindBy(css = LEGEND_ITEM_NAME)
     private List<WebElement> legendNames;
@@ -164,9 +166,18 @@ public class Widget extends AbstractFragment {
     }
 
     public OptionalExportMenu openOptionsMenu() {
-        getActions().moveToElement(waitForElementPresent(By.className("s-dash-item-action-placeholder"), getRoot())).build().perform();
+        getActions().moveToElement(waitForElementPresent(ITEM_ACTION_PLACEHOLDER, getRoot())).build().perform();
         waitForElementVisible(optionsButton).click();
         return Graphene.createPageFragment(OptionalExportMenu.class,
             waitForElementVisible(By.className("s-options-menu-bubble"), browser));
+    }
+
+    public AnalysisPage exploreInsight() {
+        getActions().moveToElement(waitForElementPresent(ITEM_ACTION_PLACEHOLDER, getRoot())).click().build().perform();
+        return InsightConfiguration.getInstance(browser).exploreInsight();
+    }
+
+    public AnalysisPage editInsight() {
+        return InsightConfiguration.getInstance(browser).editInsight();
     }
 }

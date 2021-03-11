@@ -139,6 +139,20 @@ public final class ProjectRestRequest extends CommonRestRequest {
         executeRequest(initPutRequest(url, settingItem.toString()), HttpStatus.NO_CONTENT);
     }
 
+    public void createProjectConfiguration(final String key, final String value) {
+        String url = format(PROJECT_CONFIGURATION_LINK, projectId);
+        executeRequest(initPostRequest(url, new JSONObject() {{
+            put("settingItem", new JSONObject() {{
+                put("key", key);
+                put("value", value);
+                put("source", "project");
+                put("links", new JSONObject() {{
+                    put("self", url + "/" + key);
+                }});
+            }});
+        }}.toString()), HttpStatus.CREATED);
+    }
+
     public String getValueOfDomainFeatureFlag(String key) throws IOException {
         JSONArray items = this.getJsonObject(DOMAIN_CONFIGURATION_LINK).getJSONObject("settings")
             .getJSONArray("items");

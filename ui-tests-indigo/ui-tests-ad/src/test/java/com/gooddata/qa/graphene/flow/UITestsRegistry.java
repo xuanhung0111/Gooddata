@@ -96,6 +96,7 @@ import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbedded
 import com.gooddata.qa.graphene.indigo.analyze.RenderSpecialCaseGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.analyze.postMessage.ControlFilterEmbeddedADProgramTest;
 import com.gooddata.qa.graphene.indigo.analyze.BulletChartTest;
+import com.gooddata.qa.graphene.indigo.analyze.InternationalDateFormatTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -216,6 +217,7 @@ public class UITestsRegistry {
             ManualResizingColumnTest.class,
             ADMeasureFormatTest.class,
             BulletChartTest.class,
+            InternationalDateFormatTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http.user.mgmt;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 
@@ -477,6 +478,22 @@ public final class UserManagementRestRequest extends CommonRestRequest {
     public void addUsersToUserGroup(final String userGroupId,
             final String... userURIs) throws JSONException, ParseException, IOException {
         modifyUsersInGroup(userGroupId, "ADD", userURIs);
+    }
+
+    public void changeValueInternationalDateFormatOfUser(final String value) throws IOException {
+        String internationalDateUrl = getCurrentUserProfileUri() + "/config/responsiveUiDateFormat";
+
+        final String content = new JSONObject() {{
+            put("settingItem", new JSONObject() {{
+                put("key", "responsiveUiDateFormat");
+                put("value", value);
+                put("source", "user");
+                put("links", new JSONObject() {{
+                    put("self", internationalDateUrl);
+                }});
+            }});
+        }}.toString();
+        executeRequest(RestRequest.initPutRequest(internationalDateUrl, content), HttpStatus.NO_CONTENT);
     }
 
     private void modifyUsersInGroup(final String userGroupId,
