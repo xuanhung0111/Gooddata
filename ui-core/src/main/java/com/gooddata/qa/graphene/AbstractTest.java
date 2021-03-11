@@ -65,7 +65,7 @@ public abstract class AbstractTest extends Arquillian {
     public void arquillianBeforeSuite() throws Exception {
         super.arquillianBeforeSuite();
         beforeSuite();
-        loadProperties();
+//        loadProperties();
     }
 
     /* Viet fix to force it follows Arquillian cycle */
@@ -81,7 +81,7 @@ public abstract class AbstractTest extends Arquillian {
     @Override
     public void arquillianBeforeClass() throws Exception {
         super.arquillianBeforeClass();
-        //loadProperties();
+        loadProperties();
     }
 
     /* Viet fix to force it follows Arquillian cycle */
