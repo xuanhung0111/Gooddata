@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.indigo.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.indigo.OptionalExportMenu;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CanvasSelect.DataLabel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.CANVAS;
 import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket.Items.Y_AXIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -316,6 +318,41 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
                 deleteProject(targetProjectId);
             }
         }
+    }
+
+    @Test(dependsOnGroups = {"createProject"},
+            description = "this test covers for Fet-620 Data label isn't shown when combine min, max + show data label + stack to 100%")
+    public void checkDataLabelsWhenStackToPercentWithSettingMinMaxAndShowDataLabels(){
+        String[] expectedDataLabels = {"6.33%", "56.74%", "36.93%", "31.79%", "56.12%", "38.4%"};
+        String insight = "Insight: " + generateHashString();
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(insight, ReportType.COLUMN_CHART)
+                .setMeasureBucket(
+                    asList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_BEST_CASE)),
+                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_WON)),
+                        MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_AMOUNT_BOP))))
+                .setCategoryBucket(asList(
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_FORECAST_CATEGORY),
+                        CategoryBucket.Type.ATTRIBUTE),
+                    CategoryBucket.createCategoryBucket(getAttributeByTitle(ATTR_DEPARTMENT),
+                        CategoryBucket.Type.ATTRIBUTE))));
+
+        initAnalysePage().openInsight(insight).waitForReportComputing()
+            .getStacksBucket().checkOption(OptionalStacking.MEASURES).checkOption(OptionalStacking.PERCENT);
+        analysisPage.openConfigurationPanelBucket().getItemConfiguration(CANVAS.toString()).expandConfiguration()
+            .getCanvasSelect().selectByName(DataLabel.SHOW.toString());
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
+        assertThat(chartReport.getDataLabels(), hasItems(expectedDataLabels));
+
+        analysisPage.openConfigurationPanelBucket().getItemConfiguration(Y_AXIS.toString())
+             .expandConfiguration().setMinMaxValueOnAxis("0.04", "0.8");
+        assertThat(chartReport.getDataLabels(), hasItems(expectedDataLabels));
+
+        analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        assertThat(chartReport.getDataLabels(), hasItems(expectedDataLabels));
+
+        analysisPage.resetToBlankState();
     }
 
     private void checkInsightIsRendered() {
