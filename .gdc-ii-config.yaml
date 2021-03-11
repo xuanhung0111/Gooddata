@@ -15,6 +15,7 @@ microservices:
         artifacts:
           - '**/target/screenshots/**'
           - '**/target/downloads/**'
+          - '**/target/videos/**'
           - '**/target/media/video/**/**_failed.mp4'
         junitArtifacts:
           - '**/target/surefire-reports/*.xml'
@@ -33,6 +34,7 @@ microservices:
         dockerComposePath: './docker-compose-firefox-acceptance-test.yaml'
         artifacts:
           - '**/target/screenshots/**'
+          - '**/target/videos/**'
           - '**/target/downloads/**'
           - '**/target/media/video/**/**_failed.mp4'
         junitArtifacts:
@@ -52,6 +54,7 @@ microservices:
         dockerComposePath: './docker-compose-edge-acceptance-test.yaml'
         artifacts:
           - '**/target/screenshots/**'
+          - '**/target/videos/**'
           - '**/target/downloads/**'
           - '**/target/media/video/**/**_failed.mp4'
           - '**/Downloads/**'
@@ -145,6 +148,7 @@ integratedTests:
     image: harbor.intgdc.com/staging/graphene-firefox:latest
     artifacts:
       - '**/target/screenshots/**'
+      - '**/target/videos/**'
       - '**/target/media/video/**/**_failed.mp4'
     junitArtifacts:
       - '**/target/surefire-reports/*.xml'
@@ -198,6 +202,7 @@ integratedTests:
     image: harbor.intgdc.com/staging/graphene-chrome:latest
     artifacts:
       - '**/target/screenshots/**'
+      - '**/target/videos/**'
       - '**/target/media/video/**/**_failed.mp4'
     junitArtifacts:
       - '**/target/surefire-reports/*.xml'
@@ -243,6 +248,7 @@ integratedTests:
       -Dtestng.suite.xml=testng-metadata-wdp.xml
     artifacts:
       - '**/target/screenshots/**'
+      - '**/target/videos/**'
       - '**/target/media/video/**/**_failed.mp4'
     junitArtifacts:
       - '**/target/surefire-reports/*.xml'
