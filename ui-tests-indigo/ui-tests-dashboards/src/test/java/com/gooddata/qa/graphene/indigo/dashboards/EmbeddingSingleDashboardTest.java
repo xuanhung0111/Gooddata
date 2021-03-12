@@ -21,29 +21,32 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Arrays;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.sdk.model.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.sdk.model.md.Metric;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
 
@@ -51,6 +54,9 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     private static final String TAB_OUTLOOK_IDENTIFIER = "adzD7xEmdhTx";
     private static final String EMBEDDED_ERROR_MESSAGE = "Sorry, you do not have access to this page."
             + "\nAsk your administrator to grant you permissions.";
+    private static final String DATE_CREATED = "Date (Created)";
+    List<String> listIncludeDate = Arrays.asList(DATE_DATASET_CREATED);
+    List<String> listExcludeDate = Arrays.asList(DATE_DATASET_ACTIVITY);
 
     private String dashboardOnlyUser;
     private IndigoRestRequest indigoRestRequest;
@@ -73,6 +79,39 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
             {UserRoles.EDITOR, EmbeddedType.IFRAME},
             {UserRoles.EDITOR, EmbeddedType.URL}
         };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "This test cover for ONE-4799")
+    public void embeddedDashboardWithFilterByTags(){
+        String tag = "testtag";
+        initManagePage();
+        ObjectsTable.getInstance(By.id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser)
+            .selectObject(DATE_CREATED);
+        assertTrue(DatasetDetailPage.getInstance(browser).canAddTag());
+        DatasetDetailPage.getInstance(browser).addTag(tag);
+        assertTrue(DatasetDetailPage.getInstance(browser).isAddedTagsVisible(), "Added tags successfully");
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()));
+        try {
+            initEmbeddedIndigoDashboardWithFilterByTags("excludeObjectsWithTags", tag)
+                .waitForDashboardLoad()
+                .waitForWidgetsLoading()
+                .switchToEditMode()
+                .selectFirstWidget(Kpi.class);
+            ConfigurationPanel configurationPanel = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel();
+            assertEquals(configurationPanel.getSelectedDataSet(), "-", "Exclude Date dimension show as hyphen");
+            assertEquals(configurationPanel.getDataSets(), listExcludeDate);
+            initEmbeddedIndigoDashboardWithFilterByTags("includeObjectsWithTags", tag)
+                .waitForDashboardLoad()
+                .waitForWidgetsLoading()
+                .switchToEditMode()
+                .selectFirstWidget(Kpi.class);
+            ConfigurationPanel cpFilterByInclude = indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel();
+            assertEquals(cpFilterByInclude.getSelectedDataSet(), "Created", "Include Date dimension selected Created");
+            assertEquals(configurationPanel.getDataSets(), listIncludeDate);
+        } finally {
+            logoutAndLoginAs(UserRoles.ADMIN);
+            getMdService().removeObjByUri(dashboardUri);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "editPermissionProvider")
@@ -396,7 +435,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
             takeScreenshot(browser, "Open-embedded-dashboard-after-logged-in-by-url", getClass());
             assertEquals(indigoDashboardsPage.getKpisCount(), 1);
             assertEquals(indigoDashboardsPage.getLastWidget(Kpi.class).getHeadline(), METRIC_AMOUNT);
-        } 
+        }
         finally {
             if (userRole != UserRoles.ADMIN) {
                 logoutAndLoginAs(UserRoles.ADMIN);
@@ -415,7 +454,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
             initEmbeddedIndigoDashboardPageByIframe(false);
             takeScreenshot(browser, "Show-error-message-when-embedded-dashboard-without-logged-in-by-iframe", getClass());
             assertThat(LoginFragment.getInstance(browser).getContainerLoginForm(), containsString("Login to GoodData"));
-        } 
+        }
         finally {
             signIn(true, UserRoles.ADMIN);
             getMdService().removeObjByUri(dashboardUri);

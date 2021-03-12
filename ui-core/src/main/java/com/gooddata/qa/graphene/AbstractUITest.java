@@ -535,6 +535,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return type == EmbeddedType.IFRAME ? initEmbeddedIndigoDashboardPageByIframe() : initEmbeddedIndigoDashboardWithShowNavigationByUrl(showNavigation);
     }
 
+    public IndigoDashboardsPage initEmbeddedIndigoDashboardWithFilterByTags(String tagType, String tags) {
+        openUrl(getEmbeddedIndigoDashboardFilterByTagUri(tagType, tags));
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    private String getEmbeddedIndigoDashboardFilterByTagUri(String tagType, String tags) {
+        String filterByTagParameter = "";
+        if (tagType.length() != 0 && tags.length() != 0) {
+            filterByTagParameter = "?" + tagType + "=[" + tags + "]";
+        }
+        return format(EMBEDDED_INDIGO_DASHBOARD_PAGE_URI, testParams.getProjectId() + filterByTagParameter);
+    }
+
     public EmailSchedulePage initEmailSchedulesPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
         waitForSchedulesPageLoaded(browser);
