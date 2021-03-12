@@ -84,41 +84,68 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("tab");
         dashboardEditBar.verifyGeoLayersList("Sum of Amount", attributesList);
-        dashboardEditBar.saveDashboard();
+        dashboardEditBar.saveDashboardAfterAddTab();
         dashboardsPage.deleteDashboardTab(1);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"})
-    public void verifyGeoChartTest() {
+    public void verifyGeoChartTest_first_half() {
         // logout then login is a workaround to bypass token expiration issue
         // some of time auth token expired when the geo report need to get geo result
         // refresh page does not work, the geo report keep loading
         // TODO: investigate why this happen
         logoutAndLoginAs(true, UserRoles.ADMIN);
-        for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
-            System.out.println("Verifying attribute " + attributeLayer + " ...");
-            initDashboardsPage();
-            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            dashboardsPage.addNewTab("tab_" + generateHashString());
-            dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
-            sleepTightInSeconds(2);
-            dashboardEditBar.saveDashboardAfterAddTab();
-            sleepTightInSeconds(1);
-            waitForDashboardPageLoaded(browser);
-
-            // refresh the page to fix possible differences in SVG values, e.g. AUS_STATE_NAME (M-39 instead of M-40)
-            BrowserUtils.refreshCurrentPage(browser);
-            waitForDashboardPageLoaded(browser);
-            dashboardsPage
-                    .getContent()
-                    .getGeoChart(0)
-                    .verifyGeoChart(attributeLayer.name, attributeLayer.metricName,
-                            attributeLayer.startMetricValue, attributeLayer.stopMetricValue,
-                            attributeLayer.indexList, attributeLayer.colorList,
-                            attributeLayer.svgDataList, attributeLayer.metricValues,
-                            attributeLayer.attrValues);
-            dashboardsPage.deleteDashboardTab(1);
+        initDashboardsPage().addNewDashboard("GEO_DB_FIRST_HALF");
+        GeoAttributeLabels[] labels = GeoAttributeLabels.values();
+        int size = labels.length;
+        int halfSize = size / 2;
+        for (int i = 0; i < halfSize; i++) {
+            verifyGeoChartTest(labels[i]);
         }
+        dashboardsPage.deleteDashboard();
+    }
+
+    @Test(dependsOnMethods = {"verifyGeoChartTest_first_half"})
+    public void verifyGeoChartTest_second_half() {
+        // logout then login is a workaround to bypass token expiration issue
+        // some of time auth token expired when the geo report need to get geo result
+        // refresh page does not work, the geo report keep loading
+        // TODO: investigate why this happen
+        logoutAndLoginAs(true, UserRoles.ADMIN);
+        initDashboardsPage().addNewDashboard("GEO_DB_SECOND_HALF");
+        GeoAttributeLabels[] labels = GeoAttributeLabels.values();
+        int size = labels.length;
+        int halfSize = size / 2;
+        for (int i = halfSize; i < size; i++) {
+            verifyGeoChartTest(labels[i]);
+        }
+        dashboardsPage.deleteDashboard();
+    }
+
+    private void verifyGeoChartTest(GeoAttributeLabels attributeLayer) {
+        System.out.println("Verifying attribute " + attributeLayer + " ...");
+        initDashboardsPage();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
+        dashboardsPage.addNewTab("tab_" + generateHashString());
+        dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
+        sleepTightInSeconds(2);
+        dashboardEditBar.saveDashboardAfterAddTab();
+        sleepTightInSeconds(1);
+        waitForDashboardPageLoaded(browser);
+
+        // refresh the page to fix possible differences in SVG values, e.g. AUS_STATE_NAME (M-39 instead of M-40)
+        BrowserUtils.refreshCurrentPage(browser);
+        waitForDashboardPageLoaded(browser);
+        dashboardsPage.openTab(1);
+        dashboardsPage
+            .getContent()
+            .getGeoChart(0)
+            .verifyGeoChart(attributeLayer.name, attributeLayer.metricName,
+                attributeLayer.startMetricValue, attributeLayer.stopMetricValue,
+                attributeLayer.indexList, attributeLayer.colorList,
+                attributeLayer.svgDataList, attributeLayer.metricValues,
+                attributeLayer.attrValues);
+        dashboardsPage.deleteDashboardTab(1);
     }
 
     @Test(dependsOnGroups = {"createProject"})
