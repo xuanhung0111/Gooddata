@@ -67,6 +67,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.ConfigurationOnGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.RenderGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.SwitchGeoChartToOtherChartGeoPushpinTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardDialogTest;
+import com.gooddata.qa.graphene.indigo.dashboards.GACookiesTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -172,6 +173,7 @@ public class UITestsRegistry {
             ConfigurationOnGeoPushpinTest.class,
             RenderGeoPushpinTest.class,
             SwitchGeoChartToOtherChartGeoPushpinTest.class,
+            GACookiesTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-KpiDrillTo.xml",
