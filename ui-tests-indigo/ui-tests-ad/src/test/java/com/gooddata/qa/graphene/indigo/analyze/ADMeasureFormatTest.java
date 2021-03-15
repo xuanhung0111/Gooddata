@@ -496,7 +496,7 @@ public class ADMeasureFormatTest extends AbstractAnalyseTest {
         try {
             BrowserUtils.switchToLastTab(browser);
             boolean isOpenGoodDataHelpPageNumberFormat = browser.getCurrentUrl()
-                .contains("doc/en/dashboards-and-insights/analytical-designer/work-with-measures/format-numbers");
+                .contains("doc/enterprise/en/dashboards-and-insights/analytical-designer/work-with-measures/format-numbers");
             assertTrue(isOpenGoodDataHelpPageNumberFormat, "Should open documentation of Format Numbers page");
         } finally {
             BrowserUtils.closeCurrentTab(browser);
