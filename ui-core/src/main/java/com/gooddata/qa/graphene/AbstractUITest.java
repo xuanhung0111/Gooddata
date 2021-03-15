@@ -79,6 +79,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     protected static final String PAGE_LOST_PASSWORD = "account.html#/lostPassword";
     protected static final String PAGE_REGISTRATION = "account.html#/registration";
+    protected static final String PAGE_UI_MODEL_DATA_PREFIX = "modeler/#/projects/";
+    protected static final String PAGE_UI_MODEL_DATA_SUFFIX = "?navigation=disc";
 
     protected static final String CSV_UPLOADER_PROJECT_ROOT_TEMPLATE = "data/#/projects/%s";
     protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/datasets";
@@ -538,6 +540,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public IndigoDashboardsPage initEmbeddedIndigoDashboardWithFilterByTags(String tagType, String tags) {
         openUrl(getEmbeddedIndigoDashboardFilterByTagUri(tagType, tags));
         return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    public void initModelDataPage() {
+        openUrl(PAGE_UI_MODEL_DATA_PREFIX + testParams.getProjectId() + PAGE_UI_MODEL_DATA_SUFFIX);
+        waitForModelDataPageLoaded(browser);
     }
 
     private String getEmbeddedIndigoDashboardFilterByTagUri(String tagType, String tags) {

@@ -61,6 +61,11 @@ public final class WaitUtils {
                 searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
+    public static void waitForModelDataPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@class='joint-paper-scroller joint-theme-default']"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
+    }
+
     public static void waitForProjectsAndUsersPageLoaded(SearchContext searchContext) {
         waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"),
                 searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
