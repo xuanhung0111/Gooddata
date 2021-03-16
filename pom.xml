@@ -53,6 +53,7 @@
         <host>defaultHost</host>
         <uisdkVersion>latest</uisdkVersion>
         <appType>react</appType>
+        <flavor>js</flavor>
         <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
@@ -468,6 +469,7 @@
                                     <argument>${host}</argument>
                                     <argument>${uisdkVersion}</argument>
                                     <argument>${appType}</argument>
+                                    <argument>${flavor}</argument>
                                 </arguments>
                             </configuration>
                         </plugin>
