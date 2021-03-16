@@ -16,7 +16,7 @@ import static org.openqa.selenium.By.id;
 import static java.lang.String.format;
 
 public class LogicalDataModelPage extends AbstractFragment {
-    public static final String URI_TEMPLATE = "/admin/modeler/#/projects/{projectId}";
+    public static final String URI_TEMPLATE = "/modeler/#/projects/{projectId}";
     private static final String GDC_MODELER = "app-modeler";
 
     @FindBy(className = "gdc-data-content")

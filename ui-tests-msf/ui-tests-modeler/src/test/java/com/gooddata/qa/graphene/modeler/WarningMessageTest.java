@@ -106,7 +106,7 @@ public class WarningMessageTest extends AbstractLDMPageTest {
 
         publishModel();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
-        assertThat(wrapper.getTextPublishSuccess(), containsString("Model successfully published! Load data now"));
+        assertThat(wrapper.getTextPublishSuccess(), containsString("Model published! Put your data to work. Open data load"));
         wrapper.closePublishSuccess();
     }
 

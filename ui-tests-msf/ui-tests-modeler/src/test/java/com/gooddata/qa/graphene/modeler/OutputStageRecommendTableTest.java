@@ -65,7 +65,7 @@ public class OutputStageRecommendTableTest extends AbstractLDMPageTest {
     private final String INSIGHT_NAME = "Insight Test";
     private final String DATE_DATASET = "joindate";
     private final String DASHBOARD_NAME = "Dashboard Test";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published! Load data now";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Model published! Put your data to work. Open data load";
     private String dataSourceId;
     private DataSourceRestRequest dataSourceRestRequest;
     private final String DATA_SOURCE_NAME = "Auto_datasource" + generateHashString();
