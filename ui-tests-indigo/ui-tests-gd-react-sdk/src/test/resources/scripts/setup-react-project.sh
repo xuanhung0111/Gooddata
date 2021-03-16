@@ -7,6 +7,7 @@ REACT_PROJECT_NAME=$1
 TESTING_HOST=$2
 UI_SDK_VERSION=$3
 APP_TYPE=$4
+FLAVOR=$5
 USE_BOILER_PLATE=false
 
 if [ $APP_TYPE == 'boilerplate' ]; then
@@ -17,7 +18,7 @@ fi
 mkdir /tmp/react
 cd /tmp/react
 if $USE_BOILER_PLATE; then
-   npx @gooddata/create-gooddata-react-app $REACT_PROJECT_NAME --hostname $TESTING_HOST
+   npx @gooddata/create-gooddata-react-app $REACT_PROJECT_NAME --hostname $TESTING_HOST --flavor $FLAVOR
    echo "****Using Boiler Plate****"
 else
    yarn create react-app $REACT_PROJECT_NAME
