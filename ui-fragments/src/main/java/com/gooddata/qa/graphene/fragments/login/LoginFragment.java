@@ -42,7 +42,7 @@ public class LoginFragment extends AbstractFragment {
     @FindBy(className = "s-btn-use_organization_login")
     private WebElement useOrganisationLoginButton;
 
-    @FindBy(xpath = "//button[@id='ember881']")
+    @FindBy(css = "button[class*='s-btn-login']")
     private WebElement loginServiceChanelAccount;
 
     private static final String ERROR_CLASS = "has-error";
