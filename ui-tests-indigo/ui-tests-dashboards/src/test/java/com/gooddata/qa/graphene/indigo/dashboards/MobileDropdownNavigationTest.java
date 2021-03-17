@@ -93,7 +93,8 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, dataProvider = "getUserRoles")
+    //disable because of rail-3054
+    @Test(enabled = false, dependsOnGroups = {"createProject"}, dataProvider = "getUserRoles")
     public void testMobileHamburgerMenu(UserRoles role) {
         logoutAndLoginAs(true, role);
         try {
