@@ -44,7 +44,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     private static final String PERMISSION_ERROR_MESSAGE = "SORRY, YOU DON'T HAVE ACCESS TO THIS PAGE.";
-    private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
+    private static final String IFRAME_WRAPPER_URL = "https://s3.eu-central-1.amazonaws.com/gdc.sitina.net/wrapper.html";
 
     @Override
     protected void initProperties() {

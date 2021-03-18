@@ -55,7 +55,7 @@ public class ExportVisualizedDataToXLSXAndCSVTest extends AbstractAnalyseTest {
     private final String INSIGHT_HAS_SAME_ATTRIBUTE_ON_VIEW_BY_AND_STACK_BY = "Insight5" + generateHashString();
     private final String INSIGHT_HAS_CONFIG_SETTING = "Insight6" + generateHashString();
     private static final String UNTITLED_INSIGHT = "Untitled insight";
-    private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
+    private static final String IFRAME_WRAPPER_URL = "https://s3.eu-central-1.amazonaws.com/gdc.sitina.net/wrapper.html";
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     private IndigoRestRequest indigoRestRequest;
 
