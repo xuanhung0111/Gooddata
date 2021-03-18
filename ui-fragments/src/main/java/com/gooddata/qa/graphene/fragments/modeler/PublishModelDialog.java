@@ -122,4 +122,9 @@ public class PublishModelDialog extends AbstractFragment {
     public boolean isUploadCsvChecked () {
         return waitForElementPresent(csvCheckbox).isSelected();
     }
+
+    public PublishModelDialog uncheckUploadDataCsvFile() {
+        waitForElementVisible(By.cssSelector(".input-checkbox-label span"), getRoot()).click();
+        return this;
+    }
 }
