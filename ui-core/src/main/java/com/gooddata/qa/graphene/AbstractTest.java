@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.utils.testng.listener.VideoRecorderListener;
 import com.gooddata.sdk.model.project.Project;
 import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.sdk.service.project.ProjectService;
@@ -14,12 +15,7 @@ import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 import org.apache.http.ParseException;
-import org.arquillian.extension.recorder.video.desktop.configuration.DesktopVideoConfiguration;
-import org.arquillian.extension.recorder.video.desktop.impl.DesktopVideoRecorder;
-import org.arquillian.recorder.reporter.ReporterConfiguration;
-import org.arquillian.recorder.reporter.impl.TakenResourceRegister;
 import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
 
@@ -30,21 +26,15 @@ import org.testng.annotations.*;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-@Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
+@Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class, VideoRecorderListener.class})
 public abstract class AbstractTest extends Arquillian {
 
     protected static TestParameters testParams;
-    protected static TakenResourceRegister reg = new TakenResourceRegister();
-    protected static DesktopVideoConfiguration config = new DesktopVideoConfiguration (new ReporterConfiguration());
-
-    @ArquillianResource
-    protected static DesktopVideoRecorder recorder = new DesktopVideoRecorder(reg);
 
     @Drone
     protected WebDriver browser;
@@ -64,8 +54,6 @@ public abstract class AbstractTest extends Arquillian {
     @Override
     public void arquillianBeforeSuite() throws Exception {
         super.arquillianBeforeSuite();
-        beforeSuite();
-//        loadProperties();
     }
 
     /* Viet fix to force it follows Arquillian cycle */
@@ -97,7 +85,6 @@ public abstract class AbstractTest extends Arquillian {
     @Override
     public void arquillianBeforeTest(Method testMethod) throws Exception {
         super.arquillianBeforeTest(testMethod);
-        beforeTest(testMethod);
     }
 
     /* Viet fix to force it follows Arquillian cycle */
@@ -105,34 +92,10 @@ public abstract class AbstractTest extends Arquillian {
     @Override
     public void arquillianAfterTest(Method testMethod) throws Exception {
         super.arquillianAfterTest(testMethod);
-        afterTest();
     }
 
     public static void loadProperties() {
         testParams = TestParameters.getInstance();
-    }
-
-    protected void beforeSuite(){
-        log.info("Initial recording configuration!");
-        recorder.init(config);
-    }
-
-    public void beforeTest(Method testMethod){
-        try {
-            log.info("Try to start recording");
-            recorder.startRecording(testMethod.getName() + "_" + new Date().toString().replace(" ","_"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void afterTest(){
-        try {
-            log.info("Try to stop recording!");
-            recorder.stopRecording();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     //@AfterClass(alwaysRun = true)
