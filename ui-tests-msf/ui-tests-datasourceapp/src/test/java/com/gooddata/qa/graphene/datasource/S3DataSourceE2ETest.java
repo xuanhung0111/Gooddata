@@ -31,6 +31,8 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
     private S3Configuration configuration;
     private DatasourceHeading heading;
     private String URL_DATASOURCE;
+    private static String defaultS3AccessKey;
+    private static String defaultS3SecretKey;
     private final String DATASOURCE_TYPE = "Amazon S3";
     private final String DATASOURCE_NAME = "S3_datasource_" + generateHashString();
     private final String DATASOURCE_ALIAS = "S3_alias_" + generateHashString();
@@ -42,8 +44,6 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
     private final String DUPLICATE_ERROR_MSG = "The alias is already existed";
     private final String BUCKET_PLACEHOLDER = "my-bucket/analytics";
     private final String BUCKET_VALUE = "msf-dev-grest";
-    private final String ACCESS_KEY = "AKIA4JVILUMKI4WMQYJF";
-    private final String SECRET_KEY = "1kKYFEBh4xJRLx8KCngHHdUjc+8Y5gjwNND2zv6h";
     private final String VALIDATE_MSG = "Connection succeeded";
     private final String REGION_VALUE = "Region (optional)";
     private final String BUCKET_PARAM = "Bucket";
@@ -61,6 +61,8 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
+        defaultS3AccessKey = testParams.loadProperty("s3.accesskey");
+        defaultS3SecretKey = testParams.loadProperty("s3.secretkey");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -94,8 +96,8 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         container.addConnectionTitle(DATASOURCE_NAME);
         container.addAliasTitle(DATASOURCE_ALIAS);
         configuration.addBucket(BUCKET_VALUE);
-        configuration.addAccessKey(ACCESS_KEY);
-        configuration.addSecretKey(SECRET_KEY);
+        configuration.addAccessKey(defaultS3AccessKey);
+        configuration.addSecretKey(defaultS3SecretKey);
 
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), VALIDATE_MSG);
@@ -108,7 +110,7 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         assertEquals(container.getDatasourceType(), DATASOURCE_TYPE);
 
         assertEquals(container.getBucketValue(), BUCKET_VALUE);
-        assertEquals(container.getAccessKeyValue(), ACCESS_KEY);
+        assertEquals(container.getAccessKeyValue(), defaultS3AccessKey);
         assertEquals(container.getSecretKeyValue(), "******************");
         assertEquals(container.getRegionValue(), "not set");
         assertEquals(container.getEncryptionValue(), "false");
@@ -137,23 +139,23 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         contentWrapper.waitLoadingManagePage();
 
         configuration.addBucket(BUCKET_VALUE + "_edit");
-        configuration.addAccessKey(ACCESS_KEY + "_edit");
-        configuration.addSecretKey(SECRET_KEY + "_edit");
+        configuration.addAccessKey(defaultS3AccessKey + "_edit");
+        configuration.addSecretKey(defaultS3SecretKey + "_edit");
         container.clickCancelButton();
 
         assertEquals(container.getBucketValue(), BUCKET_VALUE);
-        assertEquals(container.getAccessKeyValue(), ACCESS_KEY);
+        assertEquals(container.getAccessKeyValue(), defaultS3AccessKey);
 
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         configuration.addBucket(BUCKET_VALUE + "_edit");
-        configuration.addAccessKey(ACCESS_KEY + "_edit");
-        configuration.addSecretKey(SECRET_KEY + "_edit");
+        configuration.addAccessKey(defaultS3AccessKey + "_edit");
+        configuration.addSecretKey(defaultS3SecretKey + "_edit");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
 
         assertEquals(container.getBucketValue(), BUCKET_VALUE + "_edit");
-        assertEquals(container.getAccessKeyValue(), ACCESS_KEY + "_edit");
+        assertEquals(container.getAccessKeyValue(), defaultS3AccessKey + "_edit");
     }
 
     @Test(dependsOnMethods = "editS3DatasourceTest")
@@ -177,8 +179,8 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         container.addConnectionTitle(DATASOURCE_NAME);
         container.addAliasTitle(NEW_DATASOURCE_ALIAS);
         configuration.addBucket(BUCKET_VALUE);
-        configuration.addAccessKey(ACCESS_KEY);
-        configuration.addSecretKey(SECRET_KEY);
+        configuration.addAccessKey(defaultS3AccessKey);
+        configuration.addSecretKey(defaultS3SecretKey);
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
         assertTrue(container.isAliasErrorMessageDisplay(), "Alias error message should be displayed");
@@ -202,13 +204,13 @@ public class S3DataSourceE2ETest extends AbstractDatasourceManagementTest {
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         configuration.addBucket(BUCKET_VALUE);
-        configuration.addAccessKey(ACCESS_KEY);
-        configuration.addSecretKey(SECRET_KEY + "_invalid");
+        configuration.addAccessKey(defaultS3AccessKey);
+        configuration.addSecretKey(defaultS3SecretKey + "_invalid");
 
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(),  "Connection failed! Invalid secret key");
 
-        configuration.addSecretKey(SECRET_KEY);
+        configuration.addSecretKey(defaultS3SecretKey);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), VALIDATE_MSG);
     }

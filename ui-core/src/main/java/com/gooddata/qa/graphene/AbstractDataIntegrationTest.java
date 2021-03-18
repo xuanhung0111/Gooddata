@@ -5,6 +5,7 @@ import static java.lang.String.format;
 
 import java.time.LocalTime;
 
+import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
 import com.gooddata.qa.utils.http.RestClient;
 import org.openqa.selenium.support.FindBy;
 import com.gooddata.sdk.model.dataload.processes.DataloadProcess;
@@ -41,6 +42,17 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
     protected ProjectDetailPage initDiscProjectDetailPage() {
         openUrl(format(ProjectDetailPage.URI, testParams.getProjectId()));
         return waitForFragmentVisible(projectDetailPage);
+    }
+
+    public ProjectDetailPage initDiscPageIgnoreAlert() {
+        try {
+            return initDiscProjectDetailPage();
+        } catch (Exception handleAlert) {
+            browser.navigate().refresh();
+            browser.switchTo().alert().accept();
+            browser.switchTo().defaultContent();
+            return initDiscProjectDetailPage();
+        }
     }
 
     protected ProcessExecutionDetail executeProcess(DataloadProcess process, Parameters parameters) {
