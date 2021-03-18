@@ -21,9 +21,6 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     @FindBy(className = "ait-component-selection-dropdown-button")
     private DataSourceDropdown dataSourceDropDown;
 
-    @FindBy(className = "input-text")
-    private WebElement clientIdentifierInput;
-
     @FindBy(className = "datasource-selection-button")
     private WebElement dataSourceTitle;
 
@@ -38,6 +35,9 @@ public class DeploySDDProcessDialog extends AbstractFragment {
 
     @FindBy(css = ".csv-datadistribution-path-input .input-text")
     private WebElement inputDataPath;
+
+    @FindBy(css = ".deploy-sdd-process-distribute-data-current-project .input-text")
+    private WebElement clientIdentifierInput;
 
     public static DeploySDDProcessDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(DeploySDDProcessDialog.class,
@@ -106,6 +106,12 @@ public class DeploySDDProcessDialog extends AbstractFragment {
     public DeploySDDProcessDialog inputDatasourcePath(String path) {
         waitForElementVisible(inputDataPath).clear();
         inputDataPath.sendKeys(path);
+        return this;
+    }
+
+    public DeploySDDProcessDialog inputClientIdentifier(String path) {
+        waitForElementVisible(clientIdentifierInput).clear();
+        clientIdentifierInput.sendKeys(path);
         return this;
     }
 
