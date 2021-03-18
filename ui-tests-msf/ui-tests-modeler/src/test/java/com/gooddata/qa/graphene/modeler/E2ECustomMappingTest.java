@@ -83,8 +83,8 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     private Project project;
 
     private String fileName = "class.csv";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published! Explore data";
-    private final String MODEL_UP_TO_DATE_MESSAGE = "Model is already up-to-date! Explore data";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Model published and data uploaded! Put your data to work. Open dashboards";
+    private final String MODEL_UP_TO_DATE_MESSAGE = "Model published! Put your data to work. Open data load";
     private final String INSIGHT_NAME = "Insight Test" + generateHashString();
     private final String DASHBOARD_NAME = "Dashboard Test" + generateHashString();
     private final String CLASS_DATASET = "class";
@@ -234,7 +234,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         publishModelDialog.publishInTableView();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
-        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/dashboards/#/project/%s", testParams.getHost(),
                 testParams.getProjectId()));
         wrapper.closePublishSuccess();
 
@@ -304,7 +304,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         publishModelDialog.publishSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
-        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
                 testParams.getProjectId()));
         wrapper.closePublishSuccess();
     }
@@ -387,7 +387,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         publishModelDialog.publishSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), MODEL_UP_TO_DATE_MESSAGE);
-        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/analyze/#/%s/reportId/edit", testParams.getHost(),
+        assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
                 testParams.getProjectId()));
         wrapper.closePublishSuccess();
 

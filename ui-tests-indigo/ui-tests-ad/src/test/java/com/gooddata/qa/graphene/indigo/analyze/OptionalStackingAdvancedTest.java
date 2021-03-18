@@ -54,7 +54,7 @@ public class OptionalStackingAdvancedTest extends AbstractAnalyseTest {
     private static final String INSIGHT_HAS_SOME_METRICS = "Some metrics";
     private static final String INSIGHT_HAS_A_MEASURE_AND_AN_ATTRIBUTE_AND_A_STACK = "Measure, attribute, stack";
     private static final List<ReportType> REPORT_TYPES = asList(ReportType.COLUMN_CHART, ReportType.BAR_CHART);
-    private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
+    private static final String IFRAME_WRAPPER_URL = "https://s3.eu-central-1.amazonaws.com/gdc.sitina.net/wrapper.html";
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
     final List<ReportType> UNAPPLIED_REPORT_TYPES_OPTIONAL_STACKING = asList(ReportType.TABLE, ReportType.LINE_CHART,
         ReportType.HEAD_LINE, ReportType.SCATTER_PLOT, ReportType.BUBBLE_CHART, ReportType.PIE_CHART,
