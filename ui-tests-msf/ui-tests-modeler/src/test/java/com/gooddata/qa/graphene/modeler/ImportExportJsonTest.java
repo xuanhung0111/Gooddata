@@ -198,7 +198,7 @@ public class ImportExportJsonTest extends AbstractLDMPageTest {
     }
 
     public String getJsonContentMapping (String projectId, String fileName) {
-        return getResourceAsString(fileName).replaceFirst("PROJECTID", projectId)
-                .replaceFirst("\"dataset.people\",\"references\"", "\"dataset.people\",\"system\":{},\"references\"");
+        return getResourceAsString(fileName).replaceFirst("PROJECTID", projectId);
+//                .replaceFirst("\"dataset.people\",\"references\"", "\"dataset.people\",\"system\":{},\"references\"");
     }
 }

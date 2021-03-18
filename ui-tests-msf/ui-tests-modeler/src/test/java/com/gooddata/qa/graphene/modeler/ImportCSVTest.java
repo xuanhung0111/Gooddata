@@ -58,7 +58,7 @@ public class ImportCSVTest extends AbstractLDMPageTest {
     private static String DUPLICATED_CONTENT = "The model already contains a dataset %s with the exactly same structure."
             + " There is nothing to update.";
     private static String WARNING_MESSAGE = "There is already a dataset with such a name.";
-    private final String PUBLISH_SUCCESS_MESSAGE = "Model successfully published! Explore data";
+    private final String PUBLISH_SUCCESS_MESSAGE = "Model published and data uploaded! Put your data to work. Open dashboards";
     private final String INVALID_FILE = "The file %s could not be imported, because it is not a valid CSV file";
     private final String INCORRECT_MSG = "The header of some columns incorrect. Please check your file.";
 

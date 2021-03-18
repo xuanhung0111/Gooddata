@@ -90,7 +90,7 @@ public class OrganisingMeasureAndAttributeCatalogue extends AbstractAnalyseTest 
     private final String DISABLED = "Disabled";
     private DashboardRestRequest dashboardRequest;
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
-    private static final String IFRAME_WRAPPER_URL = "http://gdc.sitina.net/wrapper.html";
+    private static final String IFRAME_WRAPPER_URL = "https://s3.eu-central-1.amazonaws.com/gdc.sitina.net/wrapper.html";
     private static final String EXPECTED_NO_OBJECT_FOUND_BY_QUERRY_PARAMS = "No data items available.";
 
     @Override
