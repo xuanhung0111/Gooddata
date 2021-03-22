@@ -1,8 +1,12 @@
 package com.gooddata.qa.graphene.project;
 
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
+import com.gooddata.sdk.model.account.Account;
+import com.gooddata.sdk.model.md.Attribute;
+import com.gooddata.sdk.model.md.Restriction;
 import com.gooddata.sdk.model.project.Environment;
 import com.gooddata.sdk.model.project.Project;
+import com.gooddata.sdk.service.md.MetadataService;
 import com.gooddata.sdk.service.project.ProjectService;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestClient;
@@ -19,12 +23,15 @@ import org.threeten.extra.Days;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.Boolean.parseBoolean;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsNot.not;
@@ -32,8 +39,15 @@ import static org.hamcrest.core.IsNot.not;
 public class ManyProjectsDeletingTest extends AbstractTest {
     private int retentionDaysNumber;
     private Environment testingEnv = Environment.TESTING;
+    private Environment productionEnv = Environment.PRODUCTION;
     private ProjectService service;
+    private String EMAIL = "rubydev+admin@gooddata.com";
+    private String FIRST_NAME = "Ruby";
+    private String LAST_NAME = "Oh";
     private UserManagementRestRequest userManagementRestRequest;
+    private RestClient restClient;
+    private List<String> LIST_HOST = asList("staging-lcm-prod.intgdc.com", "staging2-lcm-prod.intgdc.com", "staging3-lcm-prod.intgdc.com",
+            "staging.intgdc.com", "staging2.intgdc.com", "staging3.intgdc.com");
 
     @AfterClass
     public void takeScreenShot(ITestContext context) {
@@ -53,6 +67,36 @@ public class ManyProjectsDeletingTest extends AbstractTest {
         sleepTightInSeconds(30);
 
         // Assert deleted project's id to make this test pass or fail.
+        assertDeletedProject(oldTestingProjects);
+    }
+
+    @Test(dependsOnMethods = "deleteProjects")
+    public void deleteProductionProjects () {
+        // Load and create needed test properties.
+        initTestProperties();
+
+        // Filter old projects with PRODUCTION environment.
+        if (filterDomainProject()) {
+            Collection<Project> productionProjects = this.getProductionProjects();
+
+            // BE CAREFUL! below code will delete many projects.
+            deleteManyProjects(productionProjects);
+            sleepTightInSeconds(30);
+
+            // Assert deleted project's id to make this test pass or fail.
+            assertDeletedProject(productionProjects);
+        } else {
+            log.warning("Host name: " + testParams.getHost() + "is NOT belong to the list to delete!");
+        }
+    }
+
+    @Test
+    public void clearProjectSettingsOfAccount() throws IOException {
+        userManagementRestRequest = new UserManagementRestRequest(new RestClient(getProfile(ADMIN)));
+        userManagementRestRequest.clearProjectSettings();
+    }
+
+    public void assertDeletedProject (Collection<Project> oldTestingProjects) {
         List<String> allEnabledProjectIds = convertToProjectIdCollection(service.getProjects());
         List<String> deletedProjectIds = convertToProjectIdCollection(oldTestingProjects);
 
@@ -67,12 +111,6 @@ public class ManyProjectsDeletingTest extends AbstractTest {
         });
     }
 
-    @Test
-    public void clearProjectSettingsOfAccount() throws IOException {
-        userManagementRestRequest = new UserManagementRestRequest(new RestClient(getProfile(ADMIN)));
-        userManagementRestRequest.clearProjectSettings();
-    }
-
     /**
      * Load and create properties
      */
@@ -82,9 +120,18 @@ public class ManyProjectsDeletingTest extends AbstractTest {
 
         // Create RestClient and ProjectService with domain user.
         String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
-        RestClient restClient = new RestClient(
+        restClient = new RestClient(
                 new RestClient.RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true));
         service = restClient.getProjectService();
+    }
+
+    /**
+     * Filter account belong to ATT project running
+     */
+    public boolean filterAccount (String accountUri) {
+        Account account= restClient.getAccountService().getAccountByUri(accountUri);
+        return account.getEmail().equals(EMAIL) && account.getFirstName().equals(FIRST_NAME)
+                && account.getLastName().equals(LAST_NAME);
     }
 
     /**
@@ -105,12 +152,46 @@ public class ManyProjectsDeletingTest extends AbstractTest {
         return result;
     }
 
+    private Collection<Project> getProductionProjects() {
+        // Filter projects with specific Production Environments and older than some days.
+        Collection<Project> result = service.getProjects()
+                .stream()
+                .filter(this::filterProductionProject)
+                .filter(this::filterTitleProject)
+                .filter(project -> filterAccount(project.getAuthor()))
+                .collect(Collectors.toList());
+
+        log.info("There are total " + result.size()
+                + " projects were created " + retentionDaysNumber + " days ago"
+                + " with environment is " + productionEnv);
+
+        return result;
+    }
+
     /**
      * Is project old and TESTING environment.
      */
     private boolean filterOldTestingProject(Project project) {
         return testingEnv.toString().equals(project.getEnvironment())
                 && (getProjectAge(project) >= retentionDaysNumber);
+    }
+
+    /**
+     * Is project old, PRODUCTION environment and title project belong to ATT team
+     */
+
+    private boolean filterProductionProject(Project project) {
+        return productionEnv.toString().equals(project.getEnvironment())
+                && (getProjectAge(project) >= retentionDaysNumber);
+    }
+
+    private boolean filterTitleProject(Project project) {
+        return project.getTitle().contains("att_segment_") || project.getTitle().contains("Master of") ||
+                project.getTitle().contains("MASTERPROJECT");
+    }
+
+    private boolean filterDomainProject() {
+        return LIST_HOST.contains(testParams.getHost());
     }
 
     /**
