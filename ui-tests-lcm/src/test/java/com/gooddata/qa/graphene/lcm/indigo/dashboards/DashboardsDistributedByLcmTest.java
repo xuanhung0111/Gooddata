@@ -459,7 +459,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
                 .waitForReportComputing().getChartReport();
         Screenshots.takeScreenshot(browser, "testInsightAnalyseWithHeatMapChart", getClass());
         assertEquals(chartReport.getTrackersCount(),4);
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndexHighCharts(0, 0),
                 asList(asList("Activity Type", "Web Meeting"), asList("# of Activities", "33,596")));
     }
 
