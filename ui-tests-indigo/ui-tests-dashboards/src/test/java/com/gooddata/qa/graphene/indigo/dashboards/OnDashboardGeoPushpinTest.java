@@ -46,6 +46,7 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
     private static final String ATTR_COUNTRY = "state";
     private static final String ATTR_GEO_CHART = "city";
     private static final String GEO_INSIGHT = "GeoPushpinInsight";
+    private static final String GEO_INSIGHT_RENAMED = "GeoPushpinInsightRenamed";
     private final String GEO_DASHBOARD = "GeoPushpinDashboardVersion2_" + generateHashString();
     private final String GEO_DASHBOARD_WITH_MORE_INSIGHT = "GeoDashboardWithMoreGeoInsightVersion2_" + generateHashString();
     private AnalysisPage analysisPage;
@@ -109,7 +110,25 @@ public class OnDashboardGeoPushpinTest extends AbstractGeoPushpinTest {
         drillModalDialog.close();
     }
 
-    @Test(dependsOnMethods = {"drillToGeoPushpinsChartOnKPIDashboards"}, groups = {"geoPushpinProject"})
+    @Test(dependsOnMethods = {"drillToGeoPushpinsChartOnKPIDashboards"}, groups = {"geoPushpinProject"}, description = "This test to cover ticket RAIL-2953")
+    public void renameGeoPushpinChartOnKPIDashboard(){
+        indigoDashboard.switchToEditMode()
+            .waitForWidgetsLoading()
+            .selectLastWidget(Insight.class)
+            .setHeadline(GEO_INSIGHT_RENAMED);
+        assertEquals(indigoDashboard.getLastWidget(Insight.class).getHeadline(), GEO_INSIGHT_RENAMED);
+        indigoDashboard.saveEditModeWithWidgets();
+        assertEquals(indigoDashboard.getLastWidget(Insight.class).getHeadline(), GEO_INSIGHT_RENAMED);
+
+        indigoDashboard.switchToEditMode()
+            .waitForWidgetsLoading()
+            .selectLastWidget(Insight.class)
+            .setHeadline(GEO_INSIGHT);
+        indigoDashboard.saveEditModeWithWidgets();
+        assertEquals(indigoDashboard.getLastWidget(Insight.class).getHeadline(), GEO_INSIGHT);
+    }
+
+    @Test(dependsOnMethods = {"renameGeoPushpinChartOnKPIDashboard"}, groups = {"geoPushpinProject"})
     public void getTooltipGeoChart() {
         geoChart.hoverOnGeoPushpin(-250, -70);
         assertTrue(geoChart.isGeoRenderChartDisplayed(), "Pushpin map should be have all data");
