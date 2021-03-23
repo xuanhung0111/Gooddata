@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -13,10 +14,13 @@ import static org.openqa.selenium.By.className;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
@@ -244,9 +248,7 @@ public class DashboardEditBar extends AbstractFragment {
     }
 
     public void saveDashboard() {
-        waitForElementVisible(saveButton);
-        Graphene.guardAjax(saveButton).click();
-        waitForElementNotVisible(this.getRoot());
+        clickSaveDashboardButton();
     }
 
     public void cancelDashboard() {
@@ -263,6 +265,7 @@ public class DashboardEditBar extends AbstractFragment {
     public void clickSaveDashboardButton() {
         waitForElementVisible(saveButton, 3);
         saveButton.click();
+        waitForProgressIconDisappear();
         waitForFragmentNotVisible(this);
     }
 
@@ -297,7 +300,7 @@ public class DashboardEditBar extends AbstractFragment {
         saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
         waitForFragmentNotVisible(saveAsDialog);
 
-        saveDashboard();
+        clickSaveDashboardButton();
         waitForDashboardPageLoaded(browser);
     }
 
@@ -370,5 +373,16 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(saveButton, 10).click();
         sleepTightInSeconds(3);
         waitForElementNotVisible(this.getRoot());
+    }
+
+    private void waitForProgressIconDisappear() {
+        final By progressIcon = className(".editModeButtons .progress");
+        try {
+            Function<WebDriver, Boolean> isLoadingIconVisible = browser -> isElementVisible(progressIcon, browser);
+            Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(isLoadingIconVisible);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+        waitForElementNotPresent(progressIcon);
     }
 }

@@ -324,7 +324,7 @@ public class MetricEditorDialog extends AbstractFragment {
     public MetricEditorDialog waitForElementsLoading() {
         // because .loaded is always displayed when the element finishes loading
         // we need a short break to ensure that the state is actually changed, then start waiting
-        Sleeper.sleepTightInSeconds(1);
+        Sleeper.sleepTightInSeconds(3);
 
         Function<WebDriver, Boolean> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
                 waitForElementVisible(By.className("yui3-c-simplecolumn-content"), browser));
