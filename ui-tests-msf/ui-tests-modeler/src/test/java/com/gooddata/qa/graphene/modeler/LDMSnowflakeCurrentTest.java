@@ -138,7 +138,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         snowflakeUtils = new SnowflakeUtils(connectionInfo);
         snowflakeUtils.createDatabase(DATASOURCE_DATABASE);
         snowflakeOther =  new SnowflakeUtils(connectionOther);
-        snowflakeOther.createDatabase(DATASOURCE_DATABASE_OTHER);
+        snowflakeOther.createDatabase(DATASOURCE_DATABASE_OTHER.toUpperCase());
         DATASOURCE_URL = testParams.getSnowflakeJdbcUrl();
         DATASOURCE_USERNAME = testParams.getSnowflakeUserName();
         DATASOURCE_PASSWORD = testParams.getSnowflakePassword();
@@ -372,7 +372,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
             deleteDatasource(DATASOURCE_NAME_OTHER);
             assertFalse(dsMenu.isDataSourceExist(DATASOURCE_NAME_OTHER), "Datasource " + DATASOURCE_NAME_OTHER + " should be deleted");
         }
-        snowflakeUtils.dropDatabaseIfExists(DATASOURCE_DATABASE_OTHER);
+        snowflakeUtils.dropDatabaseIfExists(DATASOURCE_DATABASE_OTHER.toUpperCase());
         snowflakeUtils.dropDatabaseIfExists(DATASOURCE_DATABASE);
         snowflakeUtils.closeSnowflakeConnection();
     }
@@ -388,7 +388,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         ConnectionConfiguration configurationOther = container.getConnectionConfiguration();
         container.addConnectionTitle(DATASOURCE_NAME_OTHER);
         configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE_OTHER, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+                DATASOURCE_DATABASE_OTHER.toLowerCase(), DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
