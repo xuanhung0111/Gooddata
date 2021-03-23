@@ -16,6 +16,7 @@ import com.gooddata.qa.graphene.account.GoodSalesMufOnUserProfileTest;
 import com.gooddata.qa.graphene.account.InviteUserInOtherDomainsTest;
 import com.gooddata.qa.graphene.account.ManageUserTest;
 import com.gooddata.qa.graphene.account.UserAccountSettingTest;
+import com.gooddata.qa.graphene.account.AccountRedirectTest;
 import com.gooddata.qa.graphene.account.UserProfileInformationTest;
 import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.DeleteDashboardHavingDrillToTabTest;
@@ -379,6 +380,7 @@ public class UITestsRegistry {
             ValidateProjectTest.class,
             GoodSalesMufOnUserProfileTest.class,
             UserAccountSettingTest.class,
+            AccountRedirectTest.class,
             LeaveProjectTest.class,
             "testng-imap-register-and-delete-user.xml",
             "testng-imap-invite-user-basic.xml",
