@@ -50,7 +50,7 @@ public class ScheduleEmailDialog extends AbstractFragment {
     @FindBy(css = ".s-gd-schedule-email-dialog-subject input")
     private WebElement subjectInput;
 
-    @FindBy(css = ".s-gd-schedule-email-dialog-attachment span")
+    @FindBy(css = ".s-attachment-name")
     private WebElement defaultAttachmentName;
 
     public static ScheduleEmailDialog getInstance(SearchContext context) {
