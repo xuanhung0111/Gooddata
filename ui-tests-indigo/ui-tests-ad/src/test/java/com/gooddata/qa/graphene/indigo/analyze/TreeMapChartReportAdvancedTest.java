@@ -179,7 +179,7 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
             assertEquals(chartReport.getDataLabels(), asList("Email (33,920)", "In Person Meeting (35,975)",
                     "Phone Call (50,780)", "Web Meeting (33,596)"));
             assertEquals(chartReport.getTrackersCount(), 4);
-            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+            assertEquals(chartReport.getTooltipTextOnTrackerByTitle("In Person Meeting (35,975)"),
                     asList(asList("Activity Type", "In Person Meeting"), asList("# of Activities", "35,975")));
         } finally {
             testParams.setProjectId(sourceProjectId);
@@ -203,7 +203,7 @@ public class TreeMapChartReportAdvancedTest extends AbstractAnalyseTest {
             assertEquals(chartReport.getDataLabels(), asList("Email (33,920)", "In Person Meeting (35,975)",
                     "Phone Call (50,780)", "Web Meeting (33,596)"));
             assertEquals(chartReport.getTrackersCount(), 4);
-            assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
+            assertEquals(chartReport.getTooltipTextOnTrackerByTitle("In Person Meeting (35,975)"),
                     asList(asList("Activity Type", "In Person Meeting"), asList("# of Activities", "35,975")));
         } finally {
             testParams.setProjectId(sourceProjectId);
