@@ -45,7 +45,7 @@
             <class name="com.gooddata.qa.graphene.datasource.ACLsE2ETest"/>
         </classes>
     </test>
-    <test name="S3DataSourceProcessesTest" enabled="true">
+    <test name="S3DataSourceProcessesTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.datasource.S3DataSourceProcessesTest"/>
         </classes>
