@@ -388,7 +388,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         ConnectionConfiguration configurationOther = container.getConnectionConfiguration();
         container.addConnectionTitle(DATASOURCE_NAME_OTHER);
         configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE_OTHER.toLowerCase(), DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+                DATASOURCE_DATABASE_OTHER.toUpperCase(), DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
@@ -400,7 +400,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         contentWrapper.waitLoadingManagePage();
         container.addConnectionTitle(DATASOURCE_NAME);
         configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+                DATASOURCE_DATABASE.toUpperCase(), DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
         configuration.clickValidateButton();
         assertEquals(configuration.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
@@ -418,7 +418,7 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         assertTrue(name.contains(DATASOURCE_NAME));
         assertEquals(url, DATASOURCE_URL);
         assertEquals(username, DATASOURCE_USERNAME);
-        assertEquals(database, DATASOURCE_DATABASE);
+        assertEquals(database, DATASOURCE_DATABASE.toUpperCase());
         assertEquals(warehouse, DATASOURCE_WAREHOUSE);
         assertEquals(prefix, DATASOURCE_PREFIX);
         assertEquals(schema, DATASOURCE_SCHEMA);
