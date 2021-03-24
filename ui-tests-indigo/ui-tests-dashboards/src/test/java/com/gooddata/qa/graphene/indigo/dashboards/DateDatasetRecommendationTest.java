@@ -6,7 +6,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_TIMELINE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_SNAPSHOT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -19,6 +22,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.FilterDate;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -42,6 +47,9 @@ import com.google.common.collect.Ordering;
 public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     private static String INSIGHT_WITHOUT_DATE_FILTER = "Insight-Without-Date-Filter";
+    private static String INSIGHT_WITH_ONLY_DATE_IN_BUCKET = "Insight-With-Only-Date-In-Bucket";
+    private static String INSIGHT_WITH_ONLY_DATE_IN_FILTER = "Insight-With-Only-Date-In-Filter";
+    private static String INSIGHT_WITH_DATE_IN_BUCKET_AND_FILTER = "Insight-With-Date-In-Bucket-And-Filter";
     private IndigoRestRequest indigoRestRequest;
     private ProjectRestRequest projectRestRequest;
 
@@ -173,6 +181,37 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
                         asList(DATE_DATASET_ACTIVITY, DATE_DATASET_CLOSED, DATE_DATASET_CREATED,
                                 DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE)),
                 "The date dimensions which belong to no group are not correct");
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "To cover RAIL-3075 selected date dimension is different than in AD")
+    public void selectDateDimensionTheSameInAD() throws ParseException, JSONException, IOException {
+        String message = "Selected date dimension is different than in AD";
+
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(INSIGHT_WITH_ONLY_DATE_IN_BUCKET, ReportType.COLUMN_CHART)
+                .setMeasureBucket(singletonList
+                    (MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT))))
+                .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket
+                     (getAttributeByTitle(ATTR_YEAR_CREATED), CategoryBucket.Type.ATTRIBUTE))));
+        indigoRestRequest.createInsight(
+            new InsightMDConfiguration(INSIGHT_WITH_DATE_IN_BUCKET_AND_FILTER, ReportType.TABLE)
+                .setMeasureBucket(singletonList
+                    (MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT))))
+                .setCategoryBucket(singletonList(CategoryBucket.createCategoryBucket
+                    (getAttributeByTitle(ATTR_YEAR_SNAPSHOT), CategoryBucket.Type.ATTRIBUTE)))
+                .setDateFilter(FilterDate.createFilterDate(getDatasetByTitle(ATTR_DATE_SNAPSHOT).getUri(),
+                    "2010-01-01", "2010-12-31")));
+        createInsightUsingDateFilter(INSIGHT_WITH_ONLY_DATE_IN_FILTER, METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
+
+        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITH_ONLY_DATE_IN_BUCKET)
+            .waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED, message);
+
+        indigoDashboardsPage.addInsight(INSIGHT_WITH_DATE_IN_BUCKET_AND_FILTER).waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_SNAPSHOT, message);
+
+        indigoDashboardsPage.addInsight(INSIGHT_WITH_ONLY_DATE_IN_FILTER).waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CLOSED, message);
     }
 
     private void createInsightUsingDateFilter(String insight, String metricName, String switchDimension) {
