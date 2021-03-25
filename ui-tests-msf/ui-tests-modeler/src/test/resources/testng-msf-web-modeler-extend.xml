@@ -50,4 +50,9 @@
             <class name="com.gooddata.qa.graphene.modeler.DescriptionOfDatasetTest" />
         </classes>
     </test>
+    <test name="LDMPostGreSegmentTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.LDMPostGreSegmentTest" />
+        </classes>
+    </test>
 </suite>

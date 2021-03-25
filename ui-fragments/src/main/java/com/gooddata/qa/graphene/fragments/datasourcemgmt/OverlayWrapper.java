@@ -19,6 +19,9 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "s-create-datasource-dialog-item-snowflake")
     private WebElement snowflakeResource;
 
+    @FindBy(className = "s-create-datasource-dialog-item-postgres")
+    private WebElement postgreResource;
+
     @FindBy(className = "s-create-datasource-dialog-item-redshift")
     private WebElement redshiftResource;
 
@@ -58,6 +61,12 @@ public class OverlayWrapper extends AbstractFragment {
         List<WebElement> wrapperList = searchContext.findElements(className(OVERLAY_WRAPPER));
         return Graphene.createPageFragment(
                 OverlayWrapper.class, wrapperList.get(index));
+    }
+
+    public void selectPostgreItem() {
+        waitForElementVisible(popupResource);
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(postgreResource).click().build().perform();
     }
 
     public void selectSnowflakeItem() {

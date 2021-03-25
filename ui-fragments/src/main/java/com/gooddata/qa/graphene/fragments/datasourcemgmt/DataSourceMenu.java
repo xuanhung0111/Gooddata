@@ -68,6 +68,11 @@ public class DataSourceMenu extends AbstractFragment {
         return originalList;
     }
 
+    public void selectPostgreResource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectPostgreItem();
+    }
+
     public boolean isListDatasourceEmpty() {
         return isElementPresent(By.className("empty-list"), browser);
     }
