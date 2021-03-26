@@ -3,10 +3,13 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.OptionalHeaderMenu;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -16,7 +19,9 @@ import com.gooddata.qa.graphene.fragments.postMessage.PostMessageKPIDashboardPag
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.sdk.model.md.Metric;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
@@ -24,6 +29,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_SUCCESS_MESSAGE_BAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 
 import org.apache.http.ParseException;
@@ -33,6 +40,7 @@ import java.io.IOException;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static java.util.Collections.singletonList;
@@ -48,13 +56,23 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardEventingTest {
     private static final String DASHBOARD_DUPLICATE_LOCK_MODE = "Duplicate Dashboard On Lock Mode";
     private static final String DASHBOARD_EMBEDDED = "Embedded Dashboard Activities";
     private static final String FRAME_KD_POST_MESSAGE_PATH_FILE = "/postMessage/frame_KD_post_message.html";
+    private static final String INSIGHT_RENAMED = "Insight Activities Renamed";
+    private static final String KPI_RENAMED = "KPI Amount Renamed";
+    private static final String DASHBOARD_DUPLICATE_IN_CASE_EDIT = "Duplicate Dashboard In Case Edit";
     private String uriActivities;
     private String identifierActivities;
     private String dashboardActivities;
+    private ProjectRestRequest projectRestRequest;
+    private String originalDateFilter;
+    private String originalAttributeFilter;
+    private String originalInsightName;
+    private String originalKPIName;
 
     @Override
     protected void customizeProject() {
         getMetricCreator().createAmountMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_EDIT_INSIGHTS_FROM_KD, false);
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
         String insightWidget = createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES, ReportType.COLUMN_CHART)
@@ -182,6 +200,45 @@ public class DuplicateKpiDashboardTest extends AbstractDashboardEventingTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"Administrator user"},
+        description = "Cover RAIL-3095 Duplicate dashboard ignores widget configuration after editing and saving")
+    public void verifyDifferenceBetweenDuplicateAndOriginalDashboards() {
+        initIndigoDashboardsPage().selectKpiDashboard(DASHBOARD_ACTIVITIES).switchToEditMode();
+        originalDateFilter = indigoDashboardsPage.getDateFilterSelection();
+        AttributeFiltersPanel panel = indigoDashboardsPage.getAttributeFiltersPanel();
+        originalAttributeFilter = panel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems();
+        originalInsightName = indigoDashboardsPage.getWidgetByIndex(Insight.class, 0).getHeadline();
+        originalKPIName = indigoDashboardsPage.getWidgetByIndex(Kpi.class, 1).getHeadline();
+
+        indigoDashboardsPage.openExtendedDateFilterPanel().selectPeriod(DateRange.THIS_YEAR).apply();
+        panel.getAttributeFilter(ATTR_ACCOUNT).clearAllCheckedValues().selectByNames("101 Financial", "123 Exteriors", "14 West");
+        indigoDashboardsPage.getWidgetByIndex(Kpi.class, 1).setHeadline(KPI_RENAMED);
+        ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
+        configurationPanel.selectComparisonByName(Kpi.ComparisonType.NO_COMPARISON.toString());
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, INSIGHT_ACTIVITIES).setHeadline(INSIGHT_RENAMED);
+        configurationPanel.drillIntoInsight(METRIC_AMOUNT, INSIGHT_ACTIVITIES);
+        waitForElementNotPresent(BY_SUCCESS_MESSAGE_BAR);
+
+        indigoDashboardsPage.saveAsDialog().enterName(DASHBOARD_DUPLICATE_IN_CASE_EDIT).clickSubmitButton();
+        String successMessage = DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText();
+        assertTrue(successMessage.equals("Great. We saved your dashboard."), "Alert success message is not exist");
+        indigoDashboardsPage.waitForWidgetsLoading();
+
+        assertEquals(indigoDashboardsPage.getDateFilterSelection(), "This year");
+        assertEquals(panel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), "101 Financial, 123 Exteriors, 14 West");
+        assertEquals(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0).getHeadline(), INSIGHT_RENAMED);
+        ChartReport chartReport = indigoDashboardsPage.getWidgetByHeadline(Insight.class, INSIGHT_RENAMED).getChartReport();
+        assertTrue(chartReport.isColumnHighlighted(Pair.of(0, 0)), "Insight should be highlighted");
+        assertEquals(indigoDashboardsPage.getWidgetByIndex(Kpi.class, 1).getHeadline(), KPI_RENAMED);
+        assertFalse(indigoDashboardsPage.getWidgetByIndex(Kpi.class, 1).hasPopSection(), "KPI shouldn't have POP section");
+
+        indigoDashboardsPage.selectKpiDashboard(DASHBOARD_ACTIVITIES).waitForWidgetsLoading();
+        assertEquals(indigoDashboardsPage.getDateFilterSelection(), originalDateFilter);
+        assertEquals(panel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), originalAttributeFilter);
+        assertEquals(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0).getHeadline(), originalInsightName);
+        assertEquals(indigoDashboardsPage.getWidgetByIndex(Kpi.class, 1).getHeadline(), originalKPIName);
     }
 
     @Override
