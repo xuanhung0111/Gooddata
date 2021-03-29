@@ -28,6 +28,7 @@ public final class ElementUtils {
     public static final By BY_SUCCESS_MESSAGE_BAR = cssSelector(".gd-message.success.gd-message-overlay");
     public static final By BY_WARNING_MESSAGE_BAR = cssSelector(".gd-message.warning.gd-message-overlay");
     public static final By BY_ERROR_MESSAGE_BAR = cssSelector(".gd-message.error.gd-message-overlay");
+    public static final By BY_ERROR_MESSAGE_LINK = cssSelector(".gd-message.error.gd-message-overlay a");
     public static final By BY_CLOSED_ICON_MESSAGE_BAR = cssSelector(".gd-message .icon-cross");
     public static final By BY_SHOW_MORE = cssSelector(".gd-message-text-showmorelink");
 

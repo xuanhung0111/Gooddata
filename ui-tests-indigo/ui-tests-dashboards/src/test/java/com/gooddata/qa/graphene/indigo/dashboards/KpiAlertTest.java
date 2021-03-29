@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.BY_ERROR_MESSAGE_BAR;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_ERROR_MESSAGE_LINK;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -428,29 +429,29 @@ public class KpiAlertTest extends AbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
-    public void removeBrokenAlert() throws JSONException, IOException {
+    public void removeBrokenAlertFromRedMessage() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboardFluidLayout(createNumOfActivitiesKpi(), 0);
 
         try {
             initIndigoDashboardsPage().switchToEditMode()
-                    .addAttributeFilter(ATTR_ACCOUNT)
-                    .addAttributeFilter(ATTR_DEPARTMENT)
-                    .saveEditModeWithWidgets();
+                .addAttributeFilter(ATTR_ACCOUNT)
+                .addAttributeFilter(ATTR_DEPARTMENT)
+                .saveEditModeWithWidgets();
 
             waitForFragmentVisible(indigoDashboardsPage);
-            getLastKpiAfterAlertsLoaded()
-                    .openAlertDialog()
-                    .setThreshold("1")
-                    .setAlert();
+            getLastKpiAfterAlertsLoaded().openAlertDialog().setThreshold("1").setAlert();
 
             indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).clickOnContent();
             indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilter(ATTR_ACCOUNT).setChecked(false);
             indigoDashboardsPage.saveEditModeWithWidgets();
             browser.navigate().refresh();
             waitForFragmentVisible(indigoDashboardsPage);
-            assertEquals(waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser).getText(),"Someone disabled or removed filters" +
-                    " that you use to watch for changes to your KPIs. To see the correct KPI values, remove the broken alerts, or update" +
-                    " the KPIs individually. Alternatively, enter edit mode and add the removed filters back, or re-enable the disabled filters.");
+            assertEquals(waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser).getText(), "Someone disabled or removed filters" +
+                " that you use to watch for changes to your KPIs. To see the correct KPI values, remove the broken alerts, or update" +
+                " the KPIs individually. Alternatively, enter edit mode and add the removed filters back, or re-enable the disabled filters.");
+            waitForElementVisible(BY_ERROR_MESSAGE_LINK, browser).click();
+            assertFalse(getLastKpiAfterAlertsLoaded().isAlertTriggered(), "Alert KPI should be triggered");
+
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
