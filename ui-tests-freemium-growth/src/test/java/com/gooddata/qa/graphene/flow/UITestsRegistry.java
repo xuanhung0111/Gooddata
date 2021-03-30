@@ -24,6 +24,12 @@ public class UITestsRegistry {
                 BasicEnterpriseTest.class
         });
 
+        suites.put("all", new HashMap<String, Object>() {{
+            put("freemium", suites.get("freemium"));
+            put("growth", suites.get("growth"));
+
+        }});
+
         TestsRegistry.getInstance()
             .register(args, suites)
             .toTextFile();
