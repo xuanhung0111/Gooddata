@@ -15,16 +15,16 @@ import java.util.List;
 
 public class Drilling extends AbstractFragment {
 
-    @FindBy(className = "drill-down")
+    @FindBy(className = "s-drill-down")
     private List<WebElement> drillDownItem;
 
-    @FindBy(className = "drill-to-dashboard")
+    @FindBy(className = "s-drill-to-dashboard")
     private WebElement drillToDashboard;
 
-    @FindBy(className = "drill-to-insight")
+    @FindBy(className = "s-drill-to-insight")
     private WebElement drillToInsight;
 
-    @FindBy(className = "icon-hyperlink-disabled")
+    @FindBy(className = "s-drill-to-url")
     private WebElement drillToURL;
 
     public static final String ROOT_CLASS = "gd-drill-modal-picker-dropdown";
