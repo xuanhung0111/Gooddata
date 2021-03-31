@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPag
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.modeler.Layout;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
 import com.gooddata.qa.graphene.fragments.modeler.ToolBar;
@@ -96,6 +97,11 @@ public class AbstractLDMPageTest extends AbstractDataIntegrationTest {
     protected ProjectDetailPage initDiscProjectDetailPage(String id) {
         openUrl(format(ProjectDetailPage.URI, id));
         return waitForFragmentVisible(projectDetailPage);
+    }
+
+    public AnalysisPage initAnalyseDetailPage(String id) {
+        openUrl(PAGE_UI_ANALYSE_PREFIX + id + "/reportId/edit");
+        return AnalysisPage.getInstance(browser);
     }
 
     protected void openEditMode() {

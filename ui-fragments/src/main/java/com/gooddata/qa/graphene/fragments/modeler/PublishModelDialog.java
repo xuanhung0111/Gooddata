@@ -95,17 +95,16 @@ public class PublishModelDialog extends AbstractFragment {
         } else {
             btnForcePublish.click();
         }
+        waitForFragmentNotVisible(this);
     }
 
     public void publishSwitchToEditMode() {
         publishModel();
-        waitForFragmentNotVisible(this);
         ToolBar.getInstance(browser).clickEditBtn();
     }
 
     public void publishInTableView() {
         publishModel();
-        waitForFragmentNotVisible(this);
         ToolBar.getInstanceInTableView(browser, 1).clickEditBtn();
     }
 
