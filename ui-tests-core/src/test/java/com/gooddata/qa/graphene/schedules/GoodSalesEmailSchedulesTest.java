@@ -162,7 +162,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
                 "Dashboard attachment has PDF content type.");
         // 50k is minimal size for dashboard that has Activities by Type report
-        verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 50000);
+        verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 40000);
     }
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws MessagingException {
