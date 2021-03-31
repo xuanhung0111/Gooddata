@@ -184,6 +184,7 @@ public class UITestsRegistry {
             "testng-desktop-MetricsAccessibility.xml",
             "testng-desktop-ProjectSwitch.xml",
             "testng-desktop-imap-KpiAlertNullValue.xml",
+            "testng-desktop-imap-KpiBrokenAlertAndFilterTest.xml",
             "testng-desktop-imap-KpiValueFormatInAlertEmail.xml",
             "testng-desktop-imap-KpiAlertSpecialCaseTest.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
@@ -231,7 +232,8 @@ public class UITestsRegistry {
             "testng-desktop-imap-KpiValueFormatInAlertEmail.xml",
             "testng-desktop-imap-KpiAlertSpecialCaseTest.xml",
             "testng-desktop-imap-KpiAlert.xml",
-            "testng-desktop-imap-KpiAlertNullValue.xml"
+            "testng-desktop-imap-KpiAlertNullValue.xml",
+            "testng-desktop-imap-KpiBrokenAlertAndFilterTest.xml"
         });
 
         suites.put("filters", new Object[] {

@@ -52,6 +52,12 @@ public class KpiAlertDialog extends AbstractFragment {
     @FindBy(className = "s-cancel")
     private WebElement discardAlertButton;
 
+    @FindBy(className = "s-update_filters")
+    private WebElement updateFilters;
+
+    @FindBy(className = "filter-section-headline")
+    protected WebElement filterSectionBrokenAlertHeader;
+
     public String getDialogHeader() {
         return waitForElementVisible(header).getText();
     }
@@ -124,5 +130,15 @@ public class KpiAlertDialog extends AbstractFragment {
 
     public boolean hasInputSuffix() {
         return isElementPresent(ALERT_DIALOG_INPUT_SUFFIX, browser);
+    }
+
+    public KpiAlertDialog updateFiltersOnBrokenAlert() {
+        waitForElementVisible(updateFilters).click();
+        waitForElementNotPresent(updateFilters);
+        return this;
+    }
+
+    public String getFilterSectionBrokenDialogHeader() {
+        return waitForElementVisible(filterSectionBrokenAlertHeader).getText();
     }
 }
