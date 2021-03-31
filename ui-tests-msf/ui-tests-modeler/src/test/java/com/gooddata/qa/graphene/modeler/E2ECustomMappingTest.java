@@ -317,7 +317,20 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
         initLogicalDataModelPage();
+        //Change mapping to UPPERCASE
+        Model modelClass = mainModelContent.getModel(CLASS_DATASET);
+        mainModelContent.focusOnDataset(CLASS_DATASET);
+        scrollElementIntoView(modelClass.getRoot(), browser);
+        modelClass.openEditDialog();
+        EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
+        DataMapping mappingTab = dialog.clickOnDataMappingTab();
+        mappingTab.editSourceColumnByName(CLASS_NAME_CHANGED, DataMapping.SOURCE_TYPE.LABEL.getName(), CLASS_NAME_CHANGED.toUpperCase(), true);
+        dialog.saveChanges();
+        toolbar.clickPublish();
         modeler.getLayout().waitForLoading();
+        PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
+        publishModelDialog.publishSwitchToEditMode();
+        initLogicalDataModelPage();
         toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + CLASS_DATASET + "." + ExportFormat.CSV.getName());

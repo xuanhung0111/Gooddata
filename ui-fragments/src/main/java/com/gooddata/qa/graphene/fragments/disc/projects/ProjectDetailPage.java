@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.Process
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -26,6 +27,9 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
 public class ProjectDetailPage extends AbstractFragment {
+
+    @FindBy (className = "logical-data-model")
+    private WebElement logicalDataModel;
 
     public static final String URI = "admin/disc/#/projects/%s";
     private static final String DATALOAD_PROCESS_NAME = "Automated Data Distribution";
@@ -60,6 +64,11 @@ public class ProjectDetailPage extends AbstractFragment {
 
     public String getProjectIdMetadata() {
         return waitForElementVisible(projectIdMetadata).getText();
+    }
+
+    public LogicalDataModelPage goToModelerPage() {
+        waitForElementVisible(logicalDataModel).click();
+        return LogicalDataModelPage.getInstance(browser);
     }
 
     public AnalysisPage goToAnalyze() {

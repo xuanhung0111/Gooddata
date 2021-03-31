@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.modeler;
 
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
+import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.modeler.LogicalDataModelPage;
 import com.gooddata.qa.graphene.fragments.modeler.Modeler;
 import com.gooddata.qa.graphene.fragments.modeler.Sidebar;
@@ -118,7 +120,9 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void initTest() {
-        ldmPage = initLogicalDataModelPage();
+        ProjectDetailPage detailDISC = initDiscProjectDetailPage(testParams.getProjectId());
+        ldmPage = detailDISC.goToModelerPage();
+        assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
         modeler = ldmPage.getDataContent().getModeler();
         sidebar = modeler.getSidebar();
         toolbar = modeler.getToolbar();
