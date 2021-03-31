@@ -146,6 +146,7 @@ public class DependentFilterTest extends AbstractDashboardTest {
 
         AttributeFiltersPanel attributeFilterPanel = indigoDashboardsPage.waitForWidgetsLoading().getAttributeFiltersPanel();
         AttributeFilter accountFilter = attributeFilterPanel.getAttributeFilter(ATTR_ACCOUNT);
+        AttributeFilter stageNameFilter = attributeFilterPanel.getAttributeFilter(ATTR_STAGE_NAME);
 
         accountFilter.ensureDropdownOpen();
         accountFilter.setDependentFilter(ATTR_PRODUCT, ATTR_STAGE_HISTORY).apply();
@@ -155,6 +156,15 @@ public class DependentFilterTest extends AbstractDashboardTest {
         assertEquals(accountInsight.getAttributeValuePresent().size(), 22);
         indigoDashboardsPage.deleteAttributeFilter(ATTR_PRODUCT);
         assertEquals(accountFilter.waitForLoading().getSelectedItems(), "All");
+
+        //cover rail-3001 elements of children filter are reloaded after removing its parent
+        accountFilter.clearAllCheckedValues().selectByNames("1000Bulbs.com", "101 Financial", "123 Exteriors").waitForLoading();
+        assertThat(stageNameFilter.getValues(), hasItems("Risk Assessment", "Closed Lost"));
+        stageNameFilter.clearAllCheckedValues().selectByNames("Risk Assessment").waitForLoading();
+        indigoDashboardsPage.deleteAttributeFilter(ATTR_ACCOUNT).waitForWidgetsLoading();
+        assertThat(attributeFilterPanel.getAttributeFilter(ATTR_STAGE_NAME).getValues(),
+            hasItems("Interest", "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won", "Closed Lost"));
+        indigoDashboardsPage.cancelEditModeWithChanges();
     }
 
     @Test(dependsOnGroups = {"editMode"})
