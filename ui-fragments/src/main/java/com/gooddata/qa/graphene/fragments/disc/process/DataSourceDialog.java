@@ -207,11 +207,11 @@ public class DataSourceDialog extends AbstractFragment {
 
     //these function use for Bigquery
     public String getTextClientEmail() {
-        return getValue("Client E-mail");
+        return getValue("Client email");
     }
 
     public String getTextProject() {
-        return getValue("Project");
+        return getValue("Google project ID");
     }
 
     public String getTextDataset() {
