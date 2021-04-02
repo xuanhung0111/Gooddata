@@ -105,7 +105,10 @@ public class DragWidgetsTest extends AbstractDashboardTest {
         String from = format(WIDGET_SELECTOR_FORMATTER, fromIndex);
 
         String to = format(WIDGET_SELECTOR_FORMATTER, toIndex);
-        String drop = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
+        int toTarget = 0;
+        if (toIndex != 0)
+            toTarget = toIndex - 1;
+        String drop = format(WIDGET_SELECTOR_FORMATTER, toTarget) + ' ' +
                 format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
         dragAndDropWithCustomBackend(browser, from, to, drop);
