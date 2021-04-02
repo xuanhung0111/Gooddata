@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
@@ -212,6 +213,7 @@ public class ExportDashboardXLSXAdvancedTest extends AbstractDashboardWidgetTest
                 createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2011 - currentYear, 2011 - currentYear));
         Screenshots.takeScreenshot(browser, "Override report filter by date filter", getClass());
         String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
+        sleepTightInSeconds(3);
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Year (Snapshot) = THIS-" + (currentYear - 2011)),
                 asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(INTEREST, "1.642738857E7"), asList(DISCOVERY, "3436167.7"),
