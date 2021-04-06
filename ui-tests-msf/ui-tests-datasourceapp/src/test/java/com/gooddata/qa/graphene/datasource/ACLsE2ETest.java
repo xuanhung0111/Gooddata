@@ -165,7 +165,7 @@ public class ACLsE2ETest extends AbstractDatasourceManagementTest {
 
     //  Login user C, F make sure that C, F can edit datasource
     //  Login user B make sure that user B  just can view datasource
-    @DataProvider (name = "emptyStatesProvider")
+    @DataProvider (name = "permissionCheckProvider")
     public Object[][] permissionCheckProvider() {
         return new Object[][] {
                 {firstUser, "Display Edit button, it should hidden !!", "Display Delete button, it should hidden !!",
@@ -180,9 +180,19 @@ public class ACLsE2ETest extends AbstractDatasourceManagementTest {
     public void permissionUserTest(String user, String messageEdit, String messageDelete, String messageAddbutton) {
         logout();
         signInAtGreyPages(user, testParams.getPassword());
-        assertFalse(canEditDatasourceOnUI(), messageEdit);
-        assertFalse(canDeleteDatasourceOnUI(), messageDelete);
-        assertTrue(snowflakeDetail.getUserHeading().isAddButtonDisable(), messageAddbutton);
+        selectDatasource();
+        UserField userField = snowflakeDetail.getUserField();
+        if (userField.getRoleOfChosenUser(user).equals("Use")) {
+            getHeading().clickMoreButton();
+            assertFalse(canEditDatasourceOnUI(), messageEdit);
+            assertFalse(canDeleteDatasourceOnUI(), messageDelete);
+            assertTrue(snowflakeDetail.getUserHeading().isAddButtonDisable(), messageAddbutton);
+        } else {
+            getHeading().clickMoreButton();
+            assertTrue(canEditDatasourceOnUI(), messageEdit);
+            assertTrue(canDeleteDatasourceOnUI(), messageDelete);
+            assertFalse(snowflakeDetail.getUserHeading().isAddButtonDisable(), messageAddbutton);
+        }
     }
 
     //    User A can:
@@ -215,11 +225,15 @@ public class ACLsE2ETest extends AbstractDatasourceManagementTest {
 
         logout();
         signInAtGreyPages(forthUser, testParams.getPassword());
+        selectDatasource();
+        getHeading().clickMoreButton();
         assertFalse(canEditDatasourceOnUI(), "Display Edit button, it should hidden !!");
         assertTrue(snowflakeDetail.getUserHeading().isAddButtonDisable(), "Add button should disable");
 
         logout();
         signInAtGreyPages(firstUser, testParams.getPassword());
+        selectDatasource();
+        getHeading().clickMoreButton();
         assertTrue(canEditDatasourceOnUI(), "Not display Edit button, it should display !!");
 
         DeleteUserDialog deleteUserDialog = userField.openDeleteUseDialog(forthUser);
@@ -245,13 +259,14 @@ public class ACLsE2ETest extends AbstractDatasourceManagementTest {
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        assertTrue(heading.isEditButtonEnable(), "Domain admin should have permission on this Datasource");
+        heading.clickMoreButton();
+        assertTrue(MoreContentDialog.getInstance(browser).isEditButtonEnable(), "Domain admin should have permission on this Datasource");
         assertTrue(canDeleteDatasourceOnUI(), "Not display Delete button, it should display !!");
     }
 
     //    Use ACLs on LCM process make sure user C can run with basic setting.
     //    Check validate error on user F when access schedule because he don't have permission on DS
-    @Test(dependsOnMethods = "changePermissionUserTest")
+    @Test(dependsOnMethods = "domainAdminPermissionTest")
     public void verifyOnLCMProcess() {
         try {
             logout();
@@ -329,20 +344,22 @@ public class ACLsE2ETest extends AbstractDatasourceManagementTest {
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
 
-    private DatasourceHeading getHeading() {
+    private void selectDatasource() {
         initDatasourceManagementPage();
         dsMenu.selectDataSource(DATASOURCE_NAME);
         contentWrapper.waitLoadingManagePage();
-        ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
+    }
+
+    private DatasourceHeading getHeading() {
         return container.getDatasourceHeading();
     }
 
     private boolean canEditDatasourceOnUI() {
-        return getHeading().isEditButtonEnable();
+        return MoreContentDialog.getInstance(browser).isEditButtonEnable();
     }
 
     private boolean canDeleteDatasourceOnUI() {
-        return getHeading().isDeleteButtonEnable();
+        return MoreContentDialog.getInstance(browser).isDeleteButtonEnable();
     }
 
     private void deleteDatasource(String datasourceName) {
