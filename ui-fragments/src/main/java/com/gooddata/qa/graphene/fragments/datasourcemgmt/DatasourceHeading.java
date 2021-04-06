@@ -41,16 +41,6 @@ public class DatasourceHeading extends AbstractFragment {
         MoreContentDialog.getInstance(browser).clickEditButton();
     }
 
-    public boolean isEditButtonEnable() {
-        waitForElementVisible(moreButton).click();
-        return MoreContentDialog.getInstance(browser).isEditButtonEnable();
-    }
-
-    public boolean isDeleteButtonEnable() {
-        waitForElementVisible(moreButton).click();
-        return MoreContentDialog.getInstance(browser).isDeleteButtonEnable();
-    }
-
     public DeleteDatasourceDialog clickDeleteButton() {
         waitForElementVisible(moreButton).click();
         return MoreContentDialog.getInstance(browser).clickDeleteButton();
