@@ -453,7 +453,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
             LoginFragment.waitForPageLoaded(browser);
             initEmbeddedIndigoDashboardPageByIframe(false);
             takeScreenshot(browser, "Show-error-message-when-embedded-dashboard-without-logged-in-by-iframe", getClass());
-            assertThat(LoginFragment.getInstance(browser).getContainerLoginForm(), containsString("Login to GoodData"));
+            assertThat(LoginFragment.getInstance(browser).getContainerLoginForm(), containsString("Log in to GoodData"));
         }
         finally {
             signIn(true, UserRoles.ADMIN);
