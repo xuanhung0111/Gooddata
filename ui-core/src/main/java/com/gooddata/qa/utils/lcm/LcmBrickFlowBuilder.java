@@ -68,7 +68,7 @@ final public class LcmBrickFlowBuilder {
                 put("segment_id", segmentId);
                 put("development_pid", devProjectId);
                 put("driver", testParams.getProjectDriver().getValue());
-                put("master_name", "Master of " + segmentId);
+                put("master_name", "ATT_Master_Of_Segment_" + segmentId);
             }});
         }};
         // when the map<String, String> clients is null , 
