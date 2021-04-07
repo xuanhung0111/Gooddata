@@ -13,8 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 

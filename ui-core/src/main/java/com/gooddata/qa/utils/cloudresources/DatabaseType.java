@@ -3,6 +3,7 @@ package com.gooddata.qa.utils.cloudresources;
 public enum DatabaseType {
     REDSHIFT("redshift"),
     SNOWFLAKE("snowflake"),
+    POSTGRE("postgres"),
     BIGQUERY("bigQuery");
 
     private String name;

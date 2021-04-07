@@ -61,6 +61,10 @@ public class DataSourceRestRequest extends CommonRestRequest {
             return setupBigQueryDataSourceRequest(connectionInfo, dataSourceName, prefix);
         }
 
+        if (connectionInfo.getDbType() == DatabaseType.POSTGRE) {
+            return setupPostgreDataSourceRequest(connectionInfo, dataSourceName, prefix);
+        }
+
         // Setup Json body of Data Source
         String finalPrefix = prefix;
         JSONObject dataSourceJson = new JSONObject() {{
@@ -84,7 +88,33 @@ public class DataSourceRestRequest extends CommonRestRequest {
                 }});
             }});
         }};
+        return RestRequest.initPostRequest(DATA_SOURCE_REST_URI, dataSourceJson.toString());
+    }
 
+    private HttpRequestBase setupPostgreDataSourceRequest(ConnectionInfo connectionInfo, String dataSourceName, String finalPrefix) {
+        // Setup Json body of Data Source
+        JSONObject dataSourceJson = new JSONObject() {{
+            put("dataSource", new JSONObject() {{
+                put("name", dataSourceName);
+                put("prefix", finalPrefix);
+                put("connectionInfo", new JSONObject() {{
+                    put(getDbType(connectionInfo), new JSONObject() {{
+                        put("url", connectionInfo.getUrl());
+                        put("authentication", new JSONObject() {{
+                                put("basic", new JSONObject() {{
+                                    put("userName", connectionInfo.getUserName());
+                                    put("password", connectionInfo.getPassword());
+                                }});
+
+                        }});
+                        put("schema", connectionInfo.getSchema());
+                        put("database", connectionInfo.getDatabase());
+                        put("sslMode","prefer");
+                    }});
+                }});
+            }});
+        }};
+        log.info("--log--" + dataSourceJson.toString());
         return RestRequest.initPostRequest(DATA_SOURCE_REST_URI, dataSourceJson.toString());
     }
 
@@ -127,6 +157,7 @@ public class DataSourceRestRequest extends CommonRestRequest {
         HttpRequestBase deleteRequest = RestRequest.initDeleteRequest(DATA_SOURCE_REST_URI + "/" + dataSourceId);
         restClient.execute(deleteRequest, HttpStatus.NO_CONTENT);
     }
+
 
     public List<String> getAllDataSourceNames() throws IOException {
         final JSONObject json = getJsonObject(

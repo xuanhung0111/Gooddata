@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.bigquery.CleanUpBigQueryTest;
+import com.gooddata.qa.graphene.postgre.PostGreCurrentLoadTest;
+import com.gooddata.qa.graphene.postgre.PostGreSegmentLoadTest;
 import com.gooddata.qa.graphene.redshift.CleanUpADSInstanceTest;
 import com.gooddata.qa.graphene.redshift.CleanUpDatasourceTest;
 import com.gooddata.qa.graphene.redshift.CleanUpRedShiftTest;
@@ -55,6 +57,8 @@ public class UITestsRegistry {
                 RedShiftSegmentLoadTest.class,
                 BigQueryCurrentLoadTest.class,
                 BigQuerySegmentLoadTest.class,
+//                PostGreCurrentLoadTest.class,
+//                PostGreSegmentLoadTest.class,
                 CleanUpSnowflakeTest.class,
                 CleanUpBigQueryTest.class,
                 CleanUpRedShiftTest.class,
