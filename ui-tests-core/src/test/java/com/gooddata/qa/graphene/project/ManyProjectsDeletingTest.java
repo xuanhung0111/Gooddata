@@ -186,8 +186,7 @@ public class ManyProjectsDeletingTest extends AbstractTest {
     }
 
     private boolean filterTitleProject(Project project) {
-        return project.getTitle().contains("att_segment_") || project.getTitle().contains("Master of") ||
-                project.getTitle().contains("MASTERPROJECT");
+        return project.getTitle().contains("att_segment_") || project.getTitle().contains("ATT_Master_Of_Segment_");
     }
 
     private boolean filterDomainProject() {
