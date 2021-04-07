@@ -12,6 +12,18 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
+    <logger name="com.gooddata.qa.graphene.AbstractTest" level="ERROR" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="com.gooddata.qa.utils.cloudresources.DataSourceRestRequest" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="com.gooddata.qa.utils.cloudresources.PostgreUtils" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
     <logger name="com.gooddata.qa.*" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>

@@ -8,6 +8,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
@@ -21,6 +22,21 @@ public class ContentDatasourceContainer extends AbstractFragment {
     public static final String CONTENT_CLASS = "create-or-edit-connection-container";
     public final String VALUE_PARAM = "generic-datasource-info-row-%s-value";
     public final String PARAMETER_ROW = "generic-datasource-info-row-%s-key";
+
+    @FindBy(className = "gd-input-field")
+    protected List<WebElement> input;
+
+    @FindBy(className = "gd-message-text")
+    private WebElement validateMessage;
+
+    @FindBy(className = "s-test_connection")
+    private WebElement validateButton;
+
+    @FindBy(className = "datasource-postgres-dropdown")
+    private WebElement postgreSSLButton;
+
+    @FindBy(className = "output-stage-section")
+    private WebElement outputStageSection;
 
     @FindBy(className = "s-save")
     private WebElement saveButton;
@@ -177,5 +193,41 @@ public class ContentDatasourceContainer extends AbstractFragment {
 
     public String getAliasErrorMessage() {
         return waitForElementVisible(aliasMessage).getText();
+    }
+
+    public void addPostgreBasicInfo(String url, String username, String password, String database
+            , String prefix, String schema) {
+        addInput("host", url);
+        addInput("username", username);
+        addInput("password", password);
+        addInput("database", database);
+        outputStageSection.click();
+        addInput("outputStagePrefix", prefix);
+        addInput("schema", schema);
+        postgreSSLButton.click();
+        WebElement dropDownSSL = browser.findElement(className("datasource-postgres-dropdown-list"));
+        waitForElementVisible(dropDownSSL);
+        waitForElementVisible(browser.findElement(className("s-prefer"))).click();
+        waitForElementNotVisible(dropDownSSL);
+    }
+
+    protected void addInput(String nameElement, String value) {
+        Actions driverActions = new Actions(browser);
+        driverActions.moveToElement(input.stream()
+                .filter(input -> input.getAttribute("name").equals(nameElement))
+                .findFirst()
+                .get()).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE).sendKeys(value).build().perform();
+
+    }
+
+    public void clickValidateButton() {
+        Graphene.waitGui()
+                .until(ExpectedConditions.elementToBeClickable(validateButton))
+                .click();
+    }
+
+    public String getValidateMessage() {
+        waitForElementVisible(validateMessage);
+        return validateMessage.getText();
     }
 }

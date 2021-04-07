@@ -47,6 +47,11 @@ public class PostgreUtils {
         logger.info("Dropped the schema with name is: " + postgreConnectionInfo.getSchema());
     }
 
+    public void dropConstrant(String tableName, String constraintName) throws SQLException {
+        executeSql(String.format("ALTER TABLE %s DROP CONSTRAINT %s;", tableName, constraintName));
+        logger.info("Dropped constraint successfully");
+    }
+
     /**
      * Copy CSV data from S3 to table.
      *
@@ -170,6 +175,26 @@ public class PostgreUtils {
         String connectStr = connectionInfo.getUrl();
         return DriverManager.getConnection(connectStr, properties);
     }
+
+    public void grantUsageSchema() {
+        try {
+            executeSql(String.format("grant usage on schema \"%s\" to public;", postgreConnectionInfo.getSchema()));
+        } catch (SQLException e) {
+            logger.error("grant usage schema failed " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void executeCommandsForSpecificWarehouse(){
+        try {
+            executeSql(String.format("set search_path = \"%s\";", postgreConnectionInfo.getSchema()));
+
+        } catch (SQLException e) {
+            logger.error("Set search_path failed : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void updateColumn(String tableName, String column, String value, boolean isSchemaCreation) {
         try {

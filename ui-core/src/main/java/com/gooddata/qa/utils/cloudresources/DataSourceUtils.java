@@ -30,6 +30,16 @@ public class DataSourceUtils {
         this.commonRestRequest = new CommonRestRequest(restClient, testParams.getProjectId());
     }
 
+    public ConnectionInfo createPostGreConnectionInfo(String database, DatabaseType dbType, String schema ) {
+        return new ConnectionInfo()
+                .setDbType(dbType)
+                .setDatabase(database)
+                .setSchema(schema)
+                .setUserName(testParams.getPostgreUserName())
+                .setPassword(testParams.getPostgrePassword())
+                .setUrl(testParams.getPostgreJdbcUrl());
+    }
+
     public ConnectionInfo createSnowflakeConnectionInfo(String database, DatabaseType dbType) {
         return new ConnectionInfo()
                 .setWarehouse(WAREHOUSE_NAME)

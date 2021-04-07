@@ -25,6 +25,9 @@ public class TestParameters {
     private String domainUser = null;
     private String user;
     private String password;
+    private String postgrePassword;
+    private String postgreUserName;
+    private String postgreJdbcUrl;
     private String snowflakePassword;
     private String snowflakeUserName;
     private String snowflakeJdbcUrl;
@@ -101,6 +104,9 @@ public class TestParameters {
         snowflakePassword = loadProperty("snowflakePassword");
         snowflakeUserName = loadProperty("snowflakeUserName");
         snowflakeJdbcUrl = loadProperty("snowflakeJdbcUrl");
+        postgreUserName = loadProperty("postgreUserName");
+        postgrePassword = loadProperty("postgrePassword");
+        postgreJdbcUrl = loadProperty("postgreJdbcUrl");
         redshiftPassword = loadProperty("redshiftPassword");
         redshiftUserName = loadProperty("redshiftUserName");
         redshiftJdbcUrl = loadProperty("redshiftJdbcUrl");
@@ -168,6 +174,19 @@ public class TestParameters {
 
     public void setCreateProjectTimeout(long createNewProjectTimeout) {
         this.createProjectTimeout = createNewProjectTimeout;
+    }
+
+
+    public String getPostgrePassword() {
+        return postgrePassword;
+    }
+
+    public String getPostgreUserName() {
+        return postgreUserName;
+    }
+
+    public String getPostgreJdbcUrl() {
+        return postgreJdbcUrl;
     }
 
     public String getHost() {
