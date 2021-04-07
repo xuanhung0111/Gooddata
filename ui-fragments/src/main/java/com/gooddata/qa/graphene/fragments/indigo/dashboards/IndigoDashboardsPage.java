@@ -525,9 +525,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage dragWidget(final Widget source, final Widget target, DropZone dropZone) {
-        final String sourceSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class"));
+        final String sourceSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class")).substring(0, 76);
         final String targetSelector = convertCSSClassTojQuerySelector(target.getRoot().getAttribute("class"));
-        final String dropZoneSelector = targetSelector + " " + dropZone.getCss();
+        final String dropZoneSelector = sourceSelector + " " + dropZone.getCss();
 
         dragAndDropWithCustomBackend(browser, sourceSelector, targetSelector, dropZoneSelector);
 
@@ -1137,11 +1137,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
             WebElement drop = waitForElementPresent(webElementWidget.findElement(By.xpath(position.getXpath())));
 
             scrollElementIntoView(drop, browser);
-            if (position.equals(DropZone.PREV)) {
-                ElementUtils.moveToElementActions(drop, 5, drop.getSize().width / 2).perform();
-            } else {
-                driverActions.moveToElement(drop).perform();
-            }
+            ElementUtils.moveToElementActions(drop, 5, drop.getSize().width / 2).perform();
+            driverActions.moveToElement(drop).perform();
         } finally {
             if (isDrop) driverActions.release().perform();
         }
