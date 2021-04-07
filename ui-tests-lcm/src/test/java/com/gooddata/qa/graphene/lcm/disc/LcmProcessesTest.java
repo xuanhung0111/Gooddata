@@ -41,7 +41,7 @@ public class LcmProcessesTest extends AbstractDataloadProcessTest {
     private final String LCM_RELEASE_PROCESS = "LCM_RELEASE_" + generateHashString();
     private final String LCM_ROLLOUT_PROCESS = "LCM_ROLLOUT_" + generateHashString();
     private final String LCM_PROVISIONING_PROCESS = "LCM_PROVISIONING_" + generateHashString();
-    private final String MASTER_NAME_PROJECT = "MASTERPROJECT" + generateHashString();
+    private final String MASTER_NAME_PROJECT = "ATT_Master_Of_Segment_" + generateHashString();
     private final String CLIENT_PROJECT = "LcmClientProject_" + generateHashString();
     private final String SEGMENT_ID = "ATTSegmentProject_" + generateHashString();
     private static String END_CODE_PARAM;
