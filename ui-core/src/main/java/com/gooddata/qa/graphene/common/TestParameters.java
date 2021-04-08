@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.boilerplate.enums.AppType;
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.sdk.model.project.Environment;
 import com.gooddata.sdk.model.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
@@ -366,7 +367,12 @@ public class TestParameters {
     }
 
     public String getDownloadFolder() {
-        return downloadFolder;
+        if(BrowserUtils.isEdge()){
+            return "/graphene-tests/Downloads";
+        }
+        else {
+            return downloadFolder;
+        }
     }
 
     public String getCsvFolder() {

@@ -247,4 +247,11 @@ public class BrowserUtils {
 
         return browserName.equals("firefox");
     }
+
+    public static boolean isEdge() {
+        String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
+            .getBrowserName().toLowerCase();
+
+        return browserName.equals("msedge");
+    }
 }
