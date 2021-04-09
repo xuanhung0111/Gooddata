@@ -57,9 +57,9 @@ public class SnowflakeUtils {
     /**
      * Get old databases which name start with ATT_DATABASE and created by Graphene.
      */
-    public ArrayList<DatabaseInfo> getOldSnowflakeDatabase() throws SQLException {
+    public ArrayList<DatabaseInfo> getOldSnowflakeDatabase(String pattern) throws SQLException {
         ArrayList<DatabaseInfo> resultArray = new ArrayList<DatabaseInfo>();
-        ResultSet resultSet = getSqlResult("SHOW TERSE DATABASES STARTS WITH 'ATT_DATABASE'");
+        ResultSet resultSet = getSqlResult("SHOW TERSE DATABASES STARTS WITH '" + pattern + "'");
         while (resultSet.next()) {
             DatabaseInfo dbinfo = new DatabaseInfo();
             dbinfo.setName(resultSet.getString("name"));

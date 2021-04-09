@@ -28,8 +28,9 @@ public class CleanUpSnowflakeTest extends AbstractTest {
         initTestProperties();
 
         // get all Snowflake database created by Graphene
-        ArrayList<SnowflakeUtils.DatabaseInfo> allSnowflakeDB = snowflakeUtils.getOldSnowflakeDatabase();
-
+        ArrayList<SnowflakeUtils.DatabaseInfo> allSnowflakeOtherDB = snowflakeUtils.getOldSnowflakeDatabase("ATT_OTHER");
+        ArrayList<SnowflakeUtils.DatabaseInfo> allSnowflakeDB = snowflakeUtils.getOldSnowflakeDatabase("ATT_DATABASE");
+        allSnowflakeDB.addAll(allSnowflakeOtherDB);
         // Filter old databases
         ArrayList<SnowflakeUtils.DatabaseInfo> filteredResult = filterOldDatabases(allSnowflakeDB);
         if (allSnowflakeDB.size() == 0 || filteredResult.size() == 0) {
@@ -42,7 +43,9 @@ public class CleanUpSnowflakeTest extends AbstractTest {
         sleepTightInSeconds(30);
 
         // Assert dropped databases to make this test pass or fail.
-        ArrayList<String> allDatabaseName = this.convertToProjectIdCollection(snowflakeUtils.getOldSnowflakeDatabase());
+        ArrayList<String> allOtherDatabaseName = this.convertToProjectIdCollection(snowflakeUtils.getOldSnowflakeDatabase("ATT_OTHER"));
+        ArrayList<String> allDatabaseName = this.convertToProjectIdCollection(snowflakeUtils.getOldSnowflakeDatabase("ATT_DATABASE"));
+        allDatabaseName.addAll(allOtherDatabaseName);
         log.info("All database names: " + allDatabaseName.toString());
 
         ArrayList<String> droppedDatabaseName = this.convertToProjectIdCollection(filteredResult);
