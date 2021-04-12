@@ -35,4 +35,9 @@
             <class name="com.gooddata.qa.graphene.modeler.SomeActionsOnModelPageTest" />
         </classes>
     </test>
+    <test name="ViewAndEditModeTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.ViewAndEditModeTest" />
+        </classes>
+    </test>
 </suite>

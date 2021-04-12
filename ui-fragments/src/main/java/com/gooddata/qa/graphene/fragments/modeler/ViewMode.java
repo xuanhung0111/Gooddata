@@ -18,6 +18,12 @@ public class ViewMode extends AbstractFragment {
     @FindBy(className = "change-to-edit-mode")
     private WebElement changeToEditModeBtn;
 
+    @FindBy(className = "initial-describe")
+    private WebElement initialDescribeContent;
+
+    @FindBy(css = ".guideline-link a")
+    private WebElement guidelineLink;
+
     public static final ViewMode getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ViewMode.class, waitForElementVisible(VIEW_MODE, searchContext));
     }
@@ -27,4 +33,13 @@ public class ViewMode extends AbstractFragment {
         actions.moveToElement(changeToEditModeBtn).click().build().perform();
         waitForLoadingIconHidden();
     }
+
+    public String getInitialDescribeText() {
+        return initialDescribeContent.getText();
+    }
+
+    public String getGuideLineLink() {
+        return guidelineLink.getAttribute("href");
+    }
+
 }
