@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 
+import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +20,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 
 public class OverviewPage extends AbstractFragment {
+    @FindBy(className = "data-sources-manage")
+    private WebElement dataSourcesManage;
 
     public static final String URI = "admin/disc/#/overview";
 
@@ -32,6 +35,11 @@ public class OverviewPage extends AbstractFragment {
         waitForElementVisible(state.getLocator(), getRoot()).findElement(By.cssSelector("div")).click();
         waitForPageLoaded();
         return this;
+    }
+
+    public DataSourceManagementPage openDatasourcePage() {
+        dataSourcesManage.click();
+        return DataSourceManagementPage.getInstance(browser);
     }
 
     public boolean isStateActive(OverviewState state) {

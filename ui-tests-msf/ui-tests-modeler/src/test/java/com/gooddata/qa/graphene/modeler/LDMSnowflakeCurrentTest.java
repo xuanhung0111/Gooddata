@@ -126,6 +126,8 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
             "Timestamp", "Deleted");
     //work around issue
     private static final List<String> DROP_DOWN_CAR_ALL_FIELDS =  asList("Id", "Color", "Year", "Price", "Person");
+    private static final String WARNING_LDM_MESSAGE = "There is no such column in the source table. Either enter a column " +
+            "that is present in the table, or add this column to the source table.";
 
     @Test(dependsOnGroups = {"createProject"})
     public void initTest() throws Throwable {
@@ -273,6 +275,8 @@ public class LDMSnowflakeCurrentTest extends AbstractLDMPageTest{
         // ON system fields
         controlLoad.toogleDistributedLoad().toogleIncrementalLoad().toogleDeletedRowsLoad();
 
+        mappingTab.editDistributedLoadMapping("invalid test", false);
+        assertEquals(mappingTab.getTextWarning(), WARNING_LDM_MESSAGE);
         mappingTab.editDistributedLoadMapping("CLIENTID", false);
         mappingTab.editIncrementalLoadMapping("TIMESTAMP", false);
         mappingTab.editDeletedRowsMapping("DELETED", false);
