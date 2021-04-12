@@ -154,6 +154,9 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         assertEquals(drillChartReport.getXaxisLabelsHighcharts(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("$40,105,983.96", "14,069,855"));
         assertEquals(drillModalDialog.getTitleInsight(), SOURCE_INSIGHT_HAS_TWO_MEASURES);
+        // This assert covers FET-621 - check tooltip in drilling overlay
+        assertEquals(drillChartReport.getCurrentHighChartsTooltipByTitle("14,069,855"),
+            asList(asList("Year (Closed)", "2011"), asList("Department", "Direct Sales"), asList("Best Case", "14,069,855")));
         drillModalDialog.close();
 
         chartReport.openDrillingPicker(Pair.of(1, 1)).drillToInsight();
@@ -165,6 +168,9 @@ public class KPIDashboardsDrillToInsightTest extends AbstractDashboardTest {
         assertEquals(drillChartReport.getXaxisLabelsHighcharts(), asList("Direct Sales", "2011"));
         assertEquals(drillChartReport.getDataLabels(), asList("13,273,818"));
         assertEquals(drillModalDialog.getTitleInsight(), TARGET_INSIGHT_FIRST);
+        // This assert covers FET-621 - check tooltip in drilling overlay
+        assertEquals(drillChartReport.getCurrentHighChartsTooltipByTitle("13,273,818"),
+            asList(asList("Year (Closed)", "2011"), asList("Department", "Direct Sales"), asList("Best Case", "13,273,818")));
         drillModalDialog.close();
 
         initAnalysePage().openInsight(SOURCE_INSIGHT_HAS_TWO_MEASURES).waitForReportComputing()
