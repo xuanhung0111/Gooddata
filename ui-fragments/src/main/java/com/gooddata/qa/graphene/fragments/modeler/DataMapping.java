@@ -11,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 
@@ -19,6 +20,12 @@ public class DataMapping extends AbstractFragment {
 
     @FindBy(className = "fixedDataTableRowLayout_rowWrapper")
     List<WebElement> rows;
+
+    @FindBy(className = "s-source-column-warning")
+    private WebElement sourceColumnWarnig;
+
+    @FindBy(className = "column-not-exist")
+    private WebElement columnNotExist;
 
     public static DataMapping getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(
@@ -83,6 +90,13 @@ public class DataMapping extends AbstractFragment {
         driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
                 .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
         return this;
+    }
+
+    public String getTextWarning() {
+        WebElement warningIcon = waitForElementPresent(columnNotExist);
+        Actions action = new Actions(browser);
+        action.moveToElement(warningIcon).build().perform();
+        return waitForElementPresent(sourceColumnWarnig).getText();
     }
 
     public DataMapping editIncrementalLoadMapping(String newName, boolean isMapping) {
