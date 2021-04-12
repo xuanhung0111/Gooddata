@@ -48,6 +48,9 @@ public class PublishModelDialog extends AbstractFragment {
     @FindBy(className = "publish-option-dropdown")
     private WebElement publishOptionBtn;
 
+    @FindBy(className = "input-checkbox-label")
+    private WebElement preserveDataCheckbox;
+
     public static final PublishModelDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PublishModelDialog.class, waitForElementVisible(SIDEBAR, searchContext));
     }
@@ -64,9 +67,18 @@ public class PublishModelDialog extends AbstractFragment {
     }
 
     public boolean isPreserveDataDisable() {
-        publishOptionBtn.click();
-        WebElement dropDownlist = waitForElementVisible(By.className("dropdown-list"), browser);
-        return isElementPresent(By.cssSelector(".s-publish_optiondotpreserve.is-disabled"), dropDownlist);
+        return !waitForElementVisible(preserveDataCheckbox).findElement(By.className("input-checkbox")).isEnabled();
+    }
+
+    public boolean isPreserveDataChecked() {
+        return waitForElementVisible(preserveDataCheckbox).findElement(By.className("input-checkbox"))
+                .getAttribute("class").contains("checked");
+    }
+
+    public void checkOnPreserveData() {
+        if (isPreserveDataChecked()) {
+            waitForElementVisible(preserveDataCheckbox).click();
+        }
     }
 
     public void choosePreserveData() {
