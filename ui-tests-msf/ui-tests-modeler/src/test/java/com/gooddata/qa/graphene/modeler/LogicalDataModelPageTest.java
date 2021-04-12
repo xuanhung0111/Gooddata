@@ -245,11 +245,10 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
         //first try publish with preserve data mode
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        assertEquals(publishModelDialog.getTextOption(), DROP_DATA);
         assertTrue(publishModelDialog.isPreserveDataDisable());
 
         //second try publish with overwrite data mode
-        publishModelDialog.chooseDropData();
+        publishModelDialog.checkOnPreserveData();
         publishModelDialog.publishSwitchToEditMode();
         OverlayWrapper wrapper = OverlayWrapper.getInstance(browser);
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
@@ -274,7 +273,7 @@ public class LogicalDataModelPageTest extends AbstractLDMPageTest {
 
         // publish with preserve mode after update model
         toolbar.clickPublish();
-        assertEquals(publishModelDialog.getTextOption(), DROP_DATA);
+        assertTrue(publishModelDialog.isPreserveDataDisable());
         publishModelDialog.publishSwitchToEditMode();
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
         assertEquals(wrapper.getLinkPublishSuccess(),format("https://%s/admin/disc/#/projects/%s", testParams.getHost(),
