@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.datasource;
 
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.*;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
+import org.openqa.selenium.By;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
@@ -59,17 +61,20 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = {"initialStageTest"})
     public void verifyFirstUIDatasourceTest() {
         if (dsMenu.isListDatasourceEmpty()) {
-            initDatasourceManagementPage();
+            OverviewPage overviewPage = initDiscOverviewPage();
+            dataSourceManagementPage = overviewPage.openDatasourcePage();
+            assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
             assertEquals(initialContent.getNumberOfCloudResourceButton(), 4);
             assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
             initialContent.openSnowflakeEdit();
-            dataSourceManagementPage = initDatasourceManagementPage();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
             dsMenu.selectSnowflakeResource();
         } else {
-            initDatasourceManagementPage();
+            OverviewPage overviewPage = initDiscOverviewPage();
+            dataSourceManagementPage = overviewPage.openDatasourcePage();
+            assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             String firstDSText = dsMenu.getListDataSources().get(0);
             ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
             DatasourceHeading heading = container.getDatasourceHeading();
