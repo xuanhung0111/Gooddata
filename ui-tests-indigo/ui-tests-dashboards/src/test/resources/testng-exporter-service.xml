@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="testng-kpi-dashboard-exporter-service">
+    <test name="ExportKPIDashboardsToPDF" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.ExportKPIDashboardsToPDF" />
+        </classes>
+    </test>
+</suite>
