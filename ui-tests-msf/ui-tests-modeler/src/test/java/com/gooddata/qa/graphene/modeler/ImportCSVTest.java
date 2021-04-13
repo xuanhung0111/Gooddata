@@ -16,17 +16,20 @@ import com.gooddata.qa.graphene.fragments.modeler.DuplicateDatasetDialog;
 import com.gooddata.qa.graphene.fragments.modeler.EditDatasetDialog;
 import com.gooddata.qa.graphene.fragments.modeler.PublishModelDialog;
 import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
+import com.gooddata.qa.graphene.fragments.modeler.TableViewDataset;
+import com.gooddata.qa.graphene.fragments.modeler.TableView;
+import com.gooddata.qa.graphene.fragments.modeler.ErrorContent;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
-
 
 public class ImportCSVTest extends AbstractLDMPageTest {
     private LogicalDataModelPage ldmPage;
@@ -39,6 +42,8 @@ public class ImportCSVTest extends AbstractLDMPageTest {
     private FileUploadDialog uploadDialog;
     private static String TXT_FILE = "outputstage_expected_1.txt";
     private static String COMPANY_DATASET = "company.csv";
+    private static String WRONG_DATE_DATASET = "wrongdate.csv";
+    private static String WRONG_DATE = "Wrongdate";
     private static String DATASET_DIFF_VALUE = "company diff value.csv";
     private static String DATASET_MORE_VALUE = "company with more 2 rows.csv";
     private static String DATASET_LESS_VALUE = "company with less rows.csv";
@@ -61,6 +66,8 @@ public class ImportCSVTest extends AbstractLDMPageTest {
     private final String PUBLISH_SUCCESS_MESSAGE = "Model published and data uploaded! Put your data to work. Open dashboards";
     private final String INVALID_FILE = "The file %s could not be imported, because it is not a valid CSV file";
     private final String INCORRECT_MSG = "The header of some columns incorrect. Please check your file.";
+    private final String WRONG_DATE_MASSAGE = "Can't parse date '%s' using format '%s'";
+    private final String WRONG_DATE_MASSSAGE_100_ROWS = "The data in the 'datecheck' column must be in 'MM/dd/yyyy' date format.";
 
 
     @Test(dependsOnGroups = {"createProject"})
@@ -100,7 +107,7 @@ public class ImportCSVTest extends AbstractLDMPageTest {
         uploadDialog.pickCsvFile(csv.getFilePath());
         DuplicateDatasetDialog duplicatedDialog =  DuplicateDatasetDialog.getInstance(browser);
         log.info("===Dialog content: " + duplicatedDialog.getDialogContent());
-        assertThat(duplicatedDialog.getDialogContent(), containsString(String.format(DUPLICATED_CONTENT, "Company")));
+        assertThat(duplicatedDialog.getDialogContent(), containsString(format(DUPLICATED_CONTENT, "Company")));
         duplicatedDialog.clickCloseDialog();
     }
 
@@ -263,15 +270,37 @@ public class ImportCSVTest extends AbstractLDMPageTest {
         assertEquals(wrapper.getTextPublishSuccess(), PUBLISH_SUCCESS_MESSAGE);
     }
 
-    @Test(dependsOnMethods = "initTest")
+    @Test(dependsOnMethods = "processImportCsvFileTest")
     public void uploadDifferentCSVFile() {
+        initLogicalDataModelPage();
         final CsvFile csv = CsvFile.loadFile(getFilePathFromResource(
                 "/" + ResourceDirectory.SQL_FILES + "/" + TXT_FILE));
         uploadDialog = sidebar.openCSVDialog();
         uploadDialog.pickCsvFile(csv.getFilePath());
-        assertThat(uploadDialog.getErrorMessage(), containsString(String.format(INVALID_FILE, TXT_FILE)));
+        assertThat(uploadDialog.getErrorMessage(), containsString(format(INVALID_FILE, TXT_FILE)));
         log.info("Header content is : " + uploadDialog.getErrorMessage());
         uploadDialog.cancelDialog();
+    }
+
+    @Test(dependsOnMethods = "uploadDifferentCSVFile")
+    public void uploadWrongDateFormatCSVFile() {
+        uploadCsvFile("/" + ResourceDirectory.UPLOAD_CSV + "/" + WRONG_DATE_DATASET);
+        dialog.clickImportButton();
+        toolbar.clickPublish();
+        PublishModelDialog  publishModelDialog = PublishModelDialog.getInstance(browser);
+        publishModelDialog.publishSwitchToEditMode();
+        initLogicalDataModelPage();
+        toolbar.switchToTableView();
+
+        //Update new invalid file <= 100 rows
+        String wrongDateMessageIn100Rows = getErrorMessageUpload(WRONG_DATE, "/wrongdate3.csv");
+        assertThat(wrongDateMessageIn100Rows, containsString(WRONG_DATE_MASSSAGE_100_ROWS));
+        OverlayWrapper.getInstanceByIndex(browser, 1).closeWaitingDialog();
+
+        //Update new invalid file > 100 rows
+        String wrongDateMessage = getErrorMessageUpload(WRONG_DATE, "/wrongdate2.csv");
+        assertThat(wrongDateMessage, containsString(format(WRONG_DATE_MASSAGE, "02.10.2001", "MM/dd/yyyy")));
+        OverlayWrapper.getInstanceByIndex(browser, 1).closeWaitingDialog();
     }
 
     public void uploadCsvFile(String csvPath) {
@@ -279,5 +308,16 @@ public class ImportCSVTest extends AbstractLDMPageTest {
         uploadDialog = sidebar.openCSVDialog();
         uploadDialog.pickCsvFile(csv.getFilePath());
         dialog = PreviewCSVDialog.getInstance(browser);
+    }
+
+    public String getErrorMessageUpload(String dataset, String csvFile) {
+        TableView tableView = TableView.getInstance(browser);
+        TableViewDataset tableViewDataset = tableView.getTableViewDataset();
+        FileUploadDialog uploadDialog = tableViewDataset.clickButtonUpdateFromFile(dataset);
+        CsvFile csv = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + csvFile));
+        uploadDialog.pickCsvFile(csv.getFilePath());
+        ErrorContent content = uploadDialog.importInvalidCSV();
+        return content.getErrorMessage();
     }
 }
