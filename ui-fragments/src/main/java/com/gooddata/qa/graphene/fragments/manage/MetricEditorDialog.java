@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static java.lang.String.format;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
@@ -282,21 +284,12 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     public MetricEditorDialog addAttributeLabelToEditor(String selectedElement) {
-        // there is no better option for now, be careful when using att has many labels
-        Sleeper.sleepTightInSeconds(2);
-
         List<WebElement> items =
                 waitForCollectionIsNotEmpty(browser.findElements(By.cssSelector(".leftArrow+h6+.elementList li")));
-
         WebElement selectedItem = waitForElementVisible(
                 items.stream().filter(e -> selectedElement.equals(e.getAttribute("title"))).findFirst().get());
-
-        selectedItem.click();
-
-        if (!selectedItem.getAttribute("class").contains("selected"))
-            throw new RuntimeException("Can't select " + selectedElement);
-
-        waitForElementVisible(addSelectedButton).click();
+        Actions action = new Actions(browser);
+        action.moveToElement(selectedItem).doubleClick().build().perform();
         return this;
     }
 
@@ -325,7 +318,7 @@ public class MetricEditorDialog extends AbstractFragment {
         // because .loaded is always displayed when the element finishes loading
         // we need a short break to ensure that the state is actually changed, then start waiting
         Sleeper.sleepTightInSeconds(3);
-
+        waitForElementNotPresent(By.className("removeItem"), browser);
         Function<WebDriver, Boolean> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
                 waitForElementVisible(By.className("yui3-c-simplecolumn-content"), browser));
         Graphene.waitGui().until(waitForLoadedState);
