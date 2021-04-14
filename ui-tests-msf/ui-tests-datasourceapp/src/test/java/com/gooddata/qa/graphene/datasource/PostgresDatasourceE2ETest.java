@@ -2,19 +2,23 @@ package com.gooddata.qa.graphene.datasource;
 
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.*;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
-import org.openqa.selenium.By;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.testng.Assert.*;
+import java.util.List;
 
-public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest {
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+public class PostgresDatasourceE2ETest extends AbstractDatasourceManagementTest {
     private DataSourceManagementPage dataSourceManagementPage;
     private ContentWrapper contentWrapper;
     private DataSourceMenu dsMenu;
@@ -23,22 +27,23 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     private String DATASOURCE_PASSWORD;
     private final String INITIAL_TEXT = "Create your first data source\n" +
             "Data source stores information about connection into a data warehouse";
-    private final String SNOWFLAKE = "Snowflake";
+    private final String POSTGRE_SQL = "PostgreSQL";
     private final String DATASOURCE_NAME = "Auto_datasource_" + generateHashString();
     private final String DATASOURCE_NAME_CHANGED = "Auto_datasource_changed" + generateHashString();
     private final String DATASOURCE_INVALID = "Auto_datasource_invalid" + generateHashString();
-    private final String DATASOURCE_WAREHOUSE = "ATT_WAREHOUSE";
-    private final String DATASOURCE_DATABASE = "ATT_DATASOURCE_TEST";
+    private final String DATASOURCE_DATABASE = "qa";
     private final String DATASOURCE_PREFIX = "PRE_";
-    private final String DATASOURCE_SCHEMA = "PUBLIC";
+    private final String DATASOURCE_SCHEMA = "qa_test";
     private final String INVALID_VALUE = "invalid value" + generateHashString();
+    private final List<String> LIST_SSL_ITEM = asList("Prefer", "Require", "Verify-full");
 
     @Override
     public void prepareProject() throws Throwable {
         super.prepareProject();
-        DATASOURCE_URL = testParams.getSnowflakeJdbcUrl();
-        DATASOURCE_USERNAME = testParams.getSnowflakeUserName();
-        DATASOURCE_PASSWORD = testParams.getSnowflakePassword();
+        DATASOURCE_URL = testParams.getPostgreJdbcUrl().replace("jdbc:postgresql://", "")
+                .replace(":5432/", "");
+        DATASOURCE_USERNAME = testParams.getPostgreUserName();
+        DATASOURCE_PASSWORD = testParams.getPostgrePassword();
         dataSourceManagementPage = initDatasourceManagementPage();
         contentWrapper = dataSourceManagementPage.getContentWrapper();
         dsMenu = dataSourceManagementPage.getMenuBar();
@@ -66,14 +71,14 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
-            assertEquals(initialContent.getNumberOfCloudResourceButton(), 4);
-            assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
-            initialContent.openSnowflakeEdit();
+            assertEquals(initialContent.getNumberOfCloudResourceButton(), 5);
+            assertEquals(initialContent.getTextOnCloudResourceButton(3), POSTGRE_SQL);
+            initialContent.openPostgresEdit();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
-            dsMenu.selectSnowflakeResource();
+            dsMenu.selectPostgreResource();
         } else {
             initDiscOverviewPage();
-            OverviewPage.getInstance(browser).openDatasourcePage();
+            dataSourceManagementPage = OverviewPage.getInstance(browser).openDatasourcePage();
             assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             String firstDSText = dsMenu.getListDataSources().get(0);
             ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
@@ -86,77 +91,70 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = "initialStageTest")
     public void checkRequiredDataSourceInformation() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectPostgreResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(configuration.getNumberOfRequiredMessage(), 6);
+        assertEquals(container.getNumberOfRequiredMessage(), 4);
     }
 
     @DataProvider
     public Object[][] invalidInformation() {
-        return new Object[][]{{DATASOURCE_NAME, INVALID_VALUE, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Cannot reach the url"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME, DATASOURCE_DATABASE,
-                        DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, INVALID_VALUE, DATASOURCE_DATABASE,
+        return new Object[][]{{DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_DATABASE,
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
-                        INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"},
-                {DATASOURCE_NAME, DATASOURCE_URL, INVALID_VALUE, DATASOURCE_USERNAME,
-                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Warehouse not found"}};
+                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME,
+                        INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"}};
+//                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME,
+//                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"}};
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation")
     public void checkInvalidPassword() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectPostgreResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(DATASOURCE_NAME);
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
-        configuration.clickValidateButton();
-        assertEquals(configuration.getValidateMessage(), "Connection failed! Incorrect credentials");
+        container.addPostgreBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, INVALID_VALUE, DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        container.clickValidateButton();
+        assertEquals(container.getValidateMessage(), "Connection failed! Incorrect credentials");
     }
 
     @Test(dependsOnMethods = "checkInvalidPassword", dataProvider = "invalidInformation")
-    public void checkInvalidDataSourceInformation(String name, String url, String warehouse, String username
-            , String database, String prefix, String schema, String validateMessage) {
+    public void checkInvalidDataSourceInformation(String name, String url, String username, String database, String prefix, String schema, String validateMessage) {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectPostgreResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
         container.addConnectionTitle(name);
-        configuration.addSnowflakeInfo(url, warehouse, username, DATASOURCE_PASSWORD, database, prefix, schema);
-        configuration.clickValidateButton();
-        assertEquals(configuration.getValidateMessage(), validateMessage);
+        container.addPostgreBasicInfo(url, username, DATASOURCE_PASSWORD, database, prefix, schema);
+        container.clickValidateButton();
+        assertEquals(container.getValidateMessage(), validateMessage);
     }
 
     //Customer input correct data and click Save button  for saving datasource
     @Test(dependsOnMethods = "checkInvalidDataSourceInformation")
     public void checkCreateNewDatasource() {
         initDatasourceManagementPage();
-        dsMenu.selectSnowflakeResource();
+        dsMenu.selectPostgreResource();
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
+        assertThat(container.listPostgreSSLItem(), containsInAnyOrder(LIST_SSL_ITEM.toArray()));
+        container.clickCancelButton();
+        contentWrapper.waitLoadingManagePage();
+        dsMenu.selectPostgreResource();
+        contentWrapper.waitLoadingManagePage();
         container.addConnectionTitle(DATASOURCE_NAME);
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
+        container.addPostgreBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
                 DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
-        configuration.clickValidateButton();
-        assertEquals(configuration.getValidateMessage(), "Connection succeeded");
+        container.clickValidateButton();
+        assertEquals(container.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail postgresDetail = container.getConnectionDetail();
+        checkPostgresDetail(container.getDatasourceHeading().getName(), postgresDetail.getTextUrl(), postgresDetail.getTextUsername(),
+                postgresDetail.getTextDatabase(), postgresDetail.getTextPrefix(), postgresDetail.getTextSchema());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME), "list data sources doesn't have created Datasource");
     }
 
@@ -166,24 +164,20 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
-        ConnectionDetail snowflakeDetail = container.getConnectionDetail();
-        checkSnowflakeDetail(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        ConnectionDetail postgresDetail = container.getConnectionDetail();
+        checkPostgresDetail(container.getDatasourceHeading().getName(), postgresDetail.getTextUrl(), postgresDetail.getTextUsername(),
+                postgresDetail.getTextDatabase(), postgresDetail.getTextPrefix(), postgresDetail.getTextSchema());
         heading.clickEditButton();
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_NAME_CHANGED);
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(DATASOURCE_URL, DATASOURCE_WAREHOUSE, DATASOURCE_USERNAME, DATASOURCE_PASSWORD,
-                DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
-        configuration.clickValidateButton();
-        assertEquals(configuration.getValidateMessage(), "Connection succeeded");
+        container.addPostgreBasicInfo(DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DATABASE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA);
+        container.clickValidateButton();
+        assertEquals(container.getValidateMessage(), "Connection succeeded");
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
-        checkSnowflakeDetailUpdate(container.getDatasourceHeading().getName(), snowflakeDetail.getTextUrl(), snowflakeDetail.getTextUsername(),
-                snowflakeDetail.getTextDatabase(), snowflakeDetail.getTextWarehouse(), snowflakeDetail.getTextPrefix(),
-                snowflakeDetail.getTextSchema());
+        checkPostgresDetailUpdate(container.getDatasourceHeading().getName(), postgresDetail.getTextUrl(), postgresDetail.getTextUsername(),
+                postgresDetail.getTextDatabase(), postgresDetail.getTextPrefix(), postgresDetail.getTextSchema());
         assertTrue(dsMenu.isDataSourceExist(DATASOURCE_NAME_CHANGED), "list data sources doesn't have created Datasource");
     }
 
@@ -194,7 +188,7 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         DatasourceHeading heading = container.getDatasourceHeading();
         GenerateOutputStageDialog generateDialog = heading.getGenerateDialog();
-        String sql = getResourceAsString("/sql.txt");
+        String sql = getResourceAsString("/sql_postgre.txt");
         assertEquals(generateDialog.getMessage(), sql);
         generateDialog.clickCopy();
         DatasourceMessageBar messageBar = DatasourceMessageBar.getInstance(browser);
@@ -206,14 +200,11 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         contentWrapper.waitLoadingManagePage();
         container = contentWrapper.getContentDatasourceContainer();
         container.addConnectionTitle(DATASOURCE_INVALID);
-        ConnectionConfiguration configuration = container.getConnectionConfiguration();
-        configuration.addSnowflakeInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE,
-                INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
+        container.addPostgreBasicInfo(INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE, INVALID_VALUE);
         container.clickSavebutton();
         contentWrapper.waitLoadingManagePage();
         DatasourceMessageBar ErrormessageBar = heading.getErrorMessageDialog();
-        assertEquals(ErrormessageBar.waitForErrorMessageBar().getText(), "Background task failed: Failed to obtain JDBC Connection: " +
-                "Connection factory returned null from createConnection");
+        assertTrue(ErrormessageBar.waitForErrorMessageBar().getText().contains("Background task failed: Failed to obtain JDBC Connection"));
     }
 
     @Test(dependsOnMethods = "createViewTable")
@@ -252,25 +243,24 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
         dsMenu.waitForDatasourceNotVisible(datasourceName);
     }
 
-    private void checkSnowflakeDetail(String name, String url, String username,
-                                      String database, String warehouse, String prefix, String schema) {
+    private void checkPostgresDetail(String name, String url, String username,
+                                      String database, String prefix, String schema) {
         assertTrue(name.contains(DATASOURCE_NAME));
-        assertEquals(url, DATASOURCE_URL);
+        assertEquals(url, "jdbc:postgresql://qa-pg.dev.intgdc.com:5432");
         assertEquals(username, DATASOURCE_USERNAME);
         assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
         assertEquals(prefix, DATASOURCE_PREFIX);
         assertEquals(schema, DATASOURCE_SCHEMA);
     }
 
-    private void checkSnowflakeDetailUpdate(String name, String url, String username,
-                                            String database, String warehouse, String prefix, String schema) {
+    private void checkPostgresDetailUpdate(String name, String url, String username,
+                                            String database, String prefix, String schema) {
         assertTrue(name.contains(DATASOURCE_NAME_CHANGED));
-        assertEquals(url, DATASOURCE_URL);
+        assertEquals(url, "jdbc:postgresql://qa-pg.dev.intgdc.com:5432");
         assertEquals(username, DATASOURCE_USERNAME);
         assertEquals(database, DATASOURCE_DATABASE);
-        assertEquals(warehouse, DATASOURCE_WAREHOUSE);
         assertEquals(prefix, DATASOURCE_PREFIX);
         assertEquals(schema, DATASOURCE_SCHEMA);
     }
+
 }

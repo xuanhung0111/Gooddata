@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.*;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -425,6 +426,12 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
             browser.switchTo().defaultContent();
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
+
+        if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER || lcmBrickFlowBuilder == null) {
+            return;
+        }
+        lcmBrickFlowBuilder.destroy();
+
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
             deleteDatasource(DATASOURCE_NAME);
