@@ -12,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -22,6 +23,9 @@ import static org.openqa.selenium.By.className;
 
 public class OverlayWrapper extends AbstractFragment {
     private static final String OVERLAY_WRAPPER = "overlay-wrapper";
+    private static final String EXPORT_MODEL_BUTTON = "actions-menu-export-model-item";
+    private static final String IMPORT_MODEL_BUTTON = "actions-menu-generate-import-model-item";
+    private static final String GENERATE_OUTPUT_STAGE_BUTTON = "actions-menu-generate-output-stage-item";
 
     @FindBy(css = ".overlay .indigo-table-dropdown-body")
     private IndigoTableDropDown indigoTableDropDown;
@@ -56,13 +60,13 @@ public class OverlayWrapper extends AbstractFragment {
     @FindBy(className = "create-output-stage-dialog")
     private OutputStage outputStage;
 
-    @FindBy(className = "actions-menu-generate-output-stage-item")
+    @FindBy(className = GENERATE_OUTPUT_STAGE_BUTTON)
     private WebElement dropDownOutputStage;
 
-    @FindBy(className = "actions-menu-export-model-item")
+    @FindBy(className = EXPORT_MODEL_BUTTON)
     private WebElement dropDownExportJson;
 
-    @FindBy(className = "actions-menu-generate-import-model-item")
+    @FindBy(className = IMPORT_MODEL_BUTTON)
     private WebElement dropDowImportJson;
 
     @FindBy(css = ".gd-message .s-message-text-header-value")
@@ -233,6 +237,18 @@ public class OverlayWrapper extends AbstractFragment {
         waitForElementVisible(outputStage.getRoot());
         outputStage.selectProperty();
         this.getRoot().findElement(By.xpath("//div[@class='gd-list-item "+ option +"']")).click();
+    }
+
+    public boolean isExportModelButtonExist() {
+        return isElementPresent(By.className(EXPORT_MODEL_BUTTON), this.getRoot());
+    }
+
+    public boolean isImportModelButtonExist() {
+        return isElementPresent(By.className(IMPORT_MODEL_BUTTON), this.getRoot());
+    }
+
+    public boolean isGenerateOutputStageItemButtonExist() {
+        return isElementPresent(By.className(GENERATE_OUTPUT_STAGE_BUTTON), this.getRoot());
     }
 
     public enum PROPERTIES_OPTION {

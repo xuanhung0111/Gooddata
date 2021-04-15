@@ -92,20 +92,20 @@ public class PublishModelDialog extends AbstractFragment {
     public void publishModel() {
         if(isElementPresent(By.cssSelector(".gd-dialog-footer .s-publish"), browser)) {
             btnPublish.click();
+            waitForFragmentNotVisible(this);
         } else {
             btnForcePublish.click();
+            waitForFragmentNotVisible(this);
         }
     }
 
     public void publishSwitchToEditMode() {
         publishModel();
-        waitForFragmentNotVisible(this);
         ToolBar.getInstance(browser).clickEditBtn();
     }
 
     public void publishInTableView() {
         publishModel();
-        waitForFragmentNotVisible(this);
         ToolBar.getInstanceInTableView(browser, 1).clickEditBtn();
     }
 
