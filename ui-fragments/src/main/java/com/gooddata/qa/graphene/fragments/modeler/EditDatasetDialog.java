@@ -27,6 +27,7 @@ import static org.openqa.selenium.By.className;
 public class EditDatasetDialog extends AbstractFragment {
     private static final String EDIT_DATASET_DIALOG = "edit-dataset-dialog";
     private static final String ROW_TABLE_CONTENT = "%s.%s.%s";
+    private static final By SAVE_CHANGE_BUTTON = By.className("s-save_changes");
 
     @FindBy(className = "s-cancel")
     WebElement cancelButton;
@@ -323,6 +324,10 @@ public class EditDatasetDialog extends AbstractFragment {
     public void clickCancel() {
         cancelButton.click();
         waitForFragmentNotVisible(this);
+    }
+
+    public boolean isSaveChangeButtonExist() {
+       return isElementVisible(SAVE_CHANGE_BUTTON, getRoot());
     }
 
     public static class MoveDeleteMenu extends AbstractFragment {
