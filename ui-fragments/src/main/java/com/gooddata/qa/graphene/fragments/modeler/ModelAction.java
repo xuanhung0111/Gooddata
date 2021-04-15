@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.modeler;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,7 +39,7 @@ public class ModelAction extends AbstractFragment {
     @FindBy(className = "delete")
     private WebElement btnDelete;
 
-    @FindBy(className = "view-detail")
+    @FindBy(xpath = "//*[@id='dataset.class']//*[@class='view-detail']//*[@class='label']//*[@class='v-line']")
     private WebElement btnViewDetail;
 
     public WebElement addAttribute() {
