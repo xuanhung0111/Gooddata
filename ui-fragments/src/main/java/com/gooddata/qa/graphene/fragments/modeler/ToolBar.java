@@ -15,6 +15,7 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForLoadingIconHidden;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -54,6 +55,15 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "change-to-edit-mode")
     private WebElement changeToEditModeBtn;
 
+    @FindBy(className = "change-to-view-mode")
+    private WebElement changeToviewModeBtn;
+
+    @FindBy(className = "view-mode-notification")
+    private WebElement viewModeNotificationContent;
+
+    @FindBy(css = ".admin-button .gd-button-link")
+    private WebElement adminButton;
+
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
     }
@@ -67,6 +77,16 @@ public class ToolBar extends AbstractFragment {
         } catch (TimeoutException e) {
             //do nothing
         }
+    }
+
+    public void clickEditOnPopUp() {
+        Actions actions = new Actions(browser);
+        actions.moveToElement(adminButton).click().build().perform();
+        waitForLoadingIconHidden();
+    }
+    
+    public String getTextNotification() {
+        return viewModeNotificationContent.getText();
     }
 
     public void saveAsDraft() {
@@ -119,6 +139,15 @@ public class ToolBar extends AbstractFragment {
     public OutputStage openOutputStagePopUp() {
         btnActionMenu.click();
         return OverlayWrapper.getInstance(browser).openOutputStage();
+    }
+
+    public void clickActionMenuButton() {
+        btnActionMenu.click();
+    }
+
+    public void clickChangeToViewModeBtn() {
+        waitForElementVisible(changeToviewModeBtn);
+        changeToviewModeBtn.click();
     }
 
     public void exportJson() {
