@@ -6,23 +6,30 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static org.openqa.selenium.By.className;
 
 public class DataMapping extends AbstractFragment {
     private static final By DATA_MAPPING = By.className("model-mapping");
+    private static final String SOURCE_COLUMN_WARNING = "s-source-column-warning";
 
     @FindBy(className = "fixedDataTableRowLayout_rowWrapper")
     List<WebElement> rows;
 
-    @FindBy(className = "s-source-column-warning")
-    private WebElement sourceColumnWarnig;
+    @FindBy(className = SOURCE_COLUMN_WARNING)
+    private WebElement sourceColumnWarning;
 
     @FindBy(className = "column-not-exist")
     private WebElement columnNotExist;
@@ -96,7 +103,18 @@ public class DataMapping extends AbstractFragment {
         WebElement warningIcon = waitForElementPresent(columnNotExist);
         Actions action = new Actions(browser);
         action.moveToElement(warningIcon).build().perform();
-        return waitForElementPresent(sourceColumnWarnig).getText();
+        waitingTooltipDisplay();
+        return browser.findElement(By.className(SOURCE_COLUMN_WARNING)).getText();
+    }
+
+    public void waitingTooltipDisplay() {
+        final By tooltip = className(SOURCE_COLUMN_WARNING);
+        try {
+            Function<WebDriver, Boolean> isDisplayTooltip = browser -> isElementVisible(tooltip, browser);
+            Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(isDisplayTooltip);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
     }
 
     public DataMapping editIncrementalLoadMapping(String newName, boolean isMapping) {

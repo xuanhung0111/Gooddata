@@ -67,7 +67,7 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public LogicalDataModelPage goToModelerPage() {
-        waitForElementVisible(logicalDataModel).click();
+        browser.findElement(By.id("logical-data-model")).click();
         return LogicalDataModelPage.getInstance(browser);
     }
 
