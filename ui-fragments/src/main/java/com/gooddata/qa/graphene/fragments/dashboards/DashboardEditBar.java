@@ -22,6 +22,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
@@ -370,9 +371,9 @@ public class DashboardEditBar extends AbstractFragment {
      *
      */
     public void saveDashboardAfterAddTab(){
-        waitForElementVisible(saveButton, 10).click();
-        sleepTightInSeconds(3);
-        waitForElementNotVisible(this.getRoot());
+        Actions action = new Actions(browser);
+        action.moveToElement(waitForElementVisible(saveButton)).click().build().perform();
+        waitForFragmentNotVisible(this);
     }
 
     private void waitForProgressIconDisappear() {

@@ -379,7 +379,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
                 .changeSelectionToOneValue();
         widgetConfigPanel.saveConfiguration();
 
-        dashboardsPage.saveDashboard();
+        dashboardsPage.getDashboardEditBar().saveDashboardAfterAddTab();
 
         TableReport tableReport = dashboardsPage.getReport(AMOUNT_SUM_BY_STATE, TableReport.class).waitForLoaded();
         List<String> attributeValues = tableReport.getAttributeValues();
