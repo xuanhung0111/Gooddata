@@ -72,8 +72,8 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
             dsMenu.selectSnowflakeResource();
         } else {
-            OverviewPage overviewPage = initDiscOverviewPage();
-            dataSourceManagementPage = overviewPage.openDatasourcePage();
+            initDiscOverviewPage();
+            OverviewPage.getInstance(browser).openDatasourcePage();
             assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             String firstDSText = dsMenu.getListDataSources().get(0);
             ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();

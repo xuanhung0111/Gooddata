@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.DataSourceManagementPage;
 import com.gooddata.qa.graphene.utils.ElementUtils;
@@ -12,15 +13,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 
 public class OverviewPage extends AbstractFragment {
-    @FindBy(className = "data-sources-manage")
+
+    private static final By LOCATOR = className("ember-application");
+
+    @FindBy(id = "data-sources-manage")
     private WebElement dataSourcesManage;
 
     public static final String URI = "admin/disc/#/overview";
@@ -35,6 +40,10 @@ public class OverviewPage extends AbstractFragment {
         waitForElementVisible(state.getLocator(), getRoot()).findElement(By.cssSelector("div")).click();
         waitForPageLoaded();
         return this;
+    }
+
+    public static final OverviewPage getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(OverviewPage.class, waitForElementVisible(LOCATOR, searchContext));
     }
 
     public DataSourceManagementPage openDatasourcePage() {
