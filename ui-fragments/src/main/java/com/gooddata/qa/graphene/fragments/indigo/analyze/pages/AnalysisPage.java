@@ -131,7 +131,18 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-cancel-edit-from-kd")
     private WebElement cancelEditFromKD;
 
+    @FindBy(className = "s-error-workspace-empty-result")
+    private WebElement emptyInsight;
+
+    @FindBy(className = "s-report-message-title")
+    private WebElement reportMessageTitle;
+
+    @FindBy(className = "s-report-message-description")
+    private WebElement reportMessageDescription;
+
     public static final String MAIN_CLASS = "adi-editor";
+    public static final String REPORT_NO_DATA_MESSAGE_TITLE = "No values to display";
+    public static final String REPORT_NO_DATA_MESSAGE_DESCRIPTION = "The measures or attributes do not contain any data. Have you loaded the data?";
     private static final By BY_TRASH_PANEL = className("s-trash");
     private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
     private static final String MEASURES_BUCKET_CLASS_NAME = "s-bucket-measures";
@@ -836,5 +847,11 @@ public class AnalysisPage extends AbstractFragment {
     
     public WebElement waitForDropToSwitchVisible () {
         return waitForElementVisible(droptoSwitch);
+    }
+
+    public boolean isEmptyInsightResult() {
+        return waitForElementPresent(emptyInsight).isDisplayed() &&
+                waitForElementVisible(reportMessageTitle).getText().toLowerCase().equals(REPORT_NO_DATA_MESSAGE_TITLE.toLowerCase()) &&
+                waitForElementVisible(reportMessageDescription).getText().equals(REPORT_NO_DATA_MESSAGE_DESCRIPTION);
     }
 }

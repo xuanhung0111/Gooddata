@@ -55,4 +55,9 @@
 <!--            <class name="com.gooddata.qa.graphene.modeler.LDMPostGreSegmentTest" />-->
 <!--        </classes>-->
 <!--    </test>-->
+    <test name="S3DataSourceSegmentTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.modeler.S3DataSourceSegmentTest" />
+        </classes>
+    </test>
 </suite>

@@ -97,6 +97,7 @@ public class PublishModelDialog extends AbstractFragment {
             btnForcePublish.click();
             waitForFragmentNotVisible(this);
         }
+        waitForFragmentNotVisible(this);
     }
 
     public void publishSwitchToEditMode() {
