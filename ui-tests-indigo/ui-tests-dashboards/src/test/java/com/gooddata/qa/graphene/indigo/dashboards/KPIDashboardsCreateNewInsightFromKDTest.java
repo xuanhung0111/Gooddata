@@ -125,7 +125,7 @@ public class KPIDashboardsCreateNewInsightFromKDTest extends AbstractDashboardTe
         assertThat(pivotTableReportKD.getBodyContentColumn(0).stream().flatMap(List::stream).collect(toList()), equalTo(expectedAttributes));
         assertThat(pivotTableReportKD.getValueMeasuresPresent(), equalTo(expectedValues));
 
-        AnalysisPage newInsight = indigoDashboardsPage.addNewInsight();
+        AnalysisPage newInsight = indigoDashboardsPage.addNewInsightToNextPosision();
         //Check enabled undo/redo/clear/cancel/save buttons
         assertFalse(newTable.isUndoInsightEnabled(), UNDO_MESSAGE + "disabled.");
         assertFalse(newTable.isRedoInsightEnabled(), REDO_MESSAGE + "disabled.");
@@ -397,7 +397,7 @@ public class KPIDashboardsCreateNewInsightFromKDTest extends AbstractDashboardTe
         assertThat(pivotTableReportKD.getBodyContentColumn(0).stream().flatMap(List::stream).collect(toList()), equalTo(expectedAttributes));
         assertThat(pivotTableReportKD.getValueMeasuresPresent(), equalTo(expectedValues));
 
-        AnalysisPage newInsight = indigoDashboardsPage.addNewInsight();
+        AnalysisPage newInsight = indigoDashboardsPage.addNewInsightToNextPosision();
         //Check enabled undo/redo/clear/cancel/save buttons
         assertFalse(newTable.isUndoInsightEnabled(), UNDO_MESSAGE + "disabled.");
         assertFalse(newTable.isRedoInsightEnabled(), REDO_MESSAGE + "disabled.");

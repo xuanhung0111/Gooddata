@@ -129,16 +129,14 @@ public class BrowserUtils {
         WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
         Actions driverActions = new Actions(driver);
 
-        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
-        // Move the mouse pointer to the top-right corner of the fragment before moving to the specific Element
-        driverActions.clickAndHold(source).moveByOffset(5,5).perform();
+        driverActions.clickAndHold(source).perform();
 
         try {
             WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
             driverActions.moveToElement(target).perform();
 
             WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
-            driverActions.moveToElement(drop).release(drop).perform();
+            driverActions.moveToElement(drop).perform();
         } finally {
             driverActions.release().perform();
         }

@@ -450,6 +450,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return AnalysisPage.getInstance(browser);
     }
 
+    public AnalysisPage addNewInsightToNextPosision() {
+        waitForElementVisible(cssSelector(ADD_INSIGHT_PLACEHOLDER), getRoot());
+        dragAddInsightToNextPlaceholder(browser, ADD_INSIGHT_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
+        sleepTightInSeconds(1);
+        browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
+        return AnalysisPage.getInstance(browser);
+    }
+
     //Add KPI by order from left to right
     public IndigoDashboardsPage addKpiToBeginningOfRow(KpiConfiguration config) {
         if (getWidgets().size() > 0) {
@@ -771,6 +779,23 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
         dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, dropZone.getCss());
 
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddInsightToNextPlaceholder(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+
+        driverActions.clickAndHold(source).moveByOffset(5, 5).perform();
+        try {
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+            driverActions.moveToElement(target).perform();
+
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+            driverActions.moveToElement(drop).release(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
         return this;
     }
 
