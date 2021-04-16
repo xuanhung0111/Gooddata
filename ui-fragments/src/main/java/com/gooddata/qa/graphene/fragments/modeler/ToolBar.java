@@ -61,8 +61,8 @@ public class ToolBar extends AbstractFragment {
     @FindBy(className = "view-mode-notification")
     private WebElement viewModeNotificationContent;
 
-    @FindBy(css = ".admin-button .gd-button-link")
-    private WebElement adminButton;
+    @FindBy(css = ".gd-message-text a")
+    private WebElement editLinkBtn;
 
     public static final ToolBar getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ToolBar.class, waitForElementVisible(TOOLBAR, searchContext));
@@ -81,7 +81,7 @@ public class ToolBar extends AbstractFragment {
 
     public void clickEditOnPopUp() {
         Actions actions = new Actions(browser);
-        actions.moveToElement(adminButton).click().build().perform();
+        actions.moveToElement(editLinkBtn).click().build().perform();
         waitForLoadingIconHidden();
     }
     
