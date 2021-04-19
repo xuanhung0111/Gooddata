@@ -19,6 +19,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -155,7 +156,7 @@ public class DrillingConfigPanel extends AbstractFragment {
     }
 
     private ItemPanel getItemPanelByIndex(int index) {
-        return Graphene.createPageFragment(ItemPanel.class, drillItemPanelList.get(index));
+        return Graphene.createPageFragment(ItemPanel.class, waitForCollectionIsNotEmpty(drillItemPanelList).get(index));
     }
 
     private ItemPanel getLastItemPanel() {

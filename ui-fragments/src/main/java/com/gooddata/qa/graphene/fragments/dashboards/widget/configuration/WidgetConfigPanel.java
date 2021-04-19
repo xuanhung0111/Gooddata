@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.BY_REPORT_LOADED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.List;
@@ -72,6 +73,7 @@ public class WidgetConfigPanel extends AbstractFragment {
     public void saveConfiguration() {
         waitForElementVisible(applyButton).click();
         waitForFragmentNotVisible(this);
+        waitForElementVisible(BY_REPORT_LOADED, browser);
     }
 
     public void discardConfiguration() {

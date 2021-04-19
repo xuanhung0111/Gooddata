@@ -52,6 +52,8 @@ import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
+
+    public static final By BY_REPORT_LOADED = By.className("yui3-c-reportdashboardwidget-loaded");
     protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
     protected static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
     protected static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' " +
@@ -72,7 +74,6 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_SETTING_EMBED = By.cssSelector(".s-embed");
     private static final By BY_SETTING_SAVES_AS = By.cssSelector(".s-save_as___");
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
-    private static final By BY_REPORT_LOADED = By.className("yui3-c-reportdashboardwidget-loaded");
     private static final By STATUS_BAR_SELECTOR = By.className("c-status");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
@@ -234,6 +235,7 @@ public class DashboardsPage extends AbstractFragment {
 
         try {
             //wait for animation for displaying dashboard edit bar finished.
+            waitForElementVisible(By.className(ApplicationHeaderBar.ROOT_LOCATOR), browser, 3);
             waitForElementNotVisible(By.className(ApplicationHeaderBar.ROOT_LOCATOR));
         } catch (TimeoutException e) { }
 
@@ -402,6 +404,8 @@ public class DashboardsPage extends AbstractFragment {
             waitForElementVisible(dashboardTabDeleteDialog);
             waitForElementVisible(dashboardTabDeleteConfirmButton).click();
             waitForElementNotPresent(dashboardTabDeleteDialog);
+        } else {
+            waitForReportLoaded(browser);
         }
         getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
