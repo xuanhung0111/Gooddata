@@ -17,13 +17,16 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.REPORT_LOADED_CLASS_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
 
@@ -54,6 +57,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
             TableReport reportOnFirstTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
             reportOnFirstTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), SECOND_TAB),
                     DrillingGroup.DASHBOARDS.getName());
+            waitForReportLoaded(reportOnFirstTab);
             dashboardsPage.saveDashboard();
 
             deleteDashboardTab(SECOND_TAB);
@@ -95,6 +99,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
             TableReport reportOnFirstTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
             reportOnFirstTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), SECOND_TAB),
                     DrillingGroup.DASHBOARDS.getName());
+            waitForReportLoaded(reportOnFirstTab);
             dashboardsPage.saveDashboard();
 
             renameDashboardTab(SECOND_TAB, RENAME_TAB);
@@ -179,5 +184,10 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
         DashboardTabs tabs = dashboardsPage.getTabs();
         tabs.getTab(name).open();
         dashboardsPage.renameTab(tabs.getSelectedTabIndex(), newName);
+    }
+
+    private void waitForReportLoaded(TableReport report) {
+        Graphene.waitGui().until(browser -> waitForElementVisible(report.getRoot()).getAttribute("class")
+            .contains(REPORT_LOADED_CLASS_NAME));
     }
 }
