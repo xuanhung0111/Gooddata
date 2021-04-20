@@ -53,7 +53,7 @@ import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
 
-    public static final By BY_REPORT_LOADED = By.className("yui3-c-reportdashboardwidget-loaded");
+    public static final String REPORT_LOADED_CLASS_NAME = "yui3-c-reportdashboardwidget-loaded";
     protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
     protected static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
     protected static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' " +
@@ -335,7 +335,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public static void waitForReportLoaded(SearchContext searchContext) {
-        waitForElementVisible(BY_REPORT_LOADED, searchContext);
+        waitForElementVisible(By.className(REPORT_LOADED_CLASS_NAME), searchContext);
     }
 
     public String getStatusMessage() {
