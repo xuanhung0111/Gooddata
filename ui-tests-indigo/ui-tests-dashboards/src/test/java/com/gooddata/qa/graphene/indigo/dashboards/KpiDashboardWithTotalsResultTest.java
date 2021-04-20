@@ -110,7 +110,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
             .addInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
             .changeDashboardTitle(KPI_DASHBOARD);
         indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
-        indigoDashboardsPage.addInsightNext(INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE).getConfigurationPanel().disableDateFilter();
+        indigoDashboardsPage.addInsightNextDropzone(INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE).getConfigurationPanel().disableDateFilter();
         indigoDashboardsPage.waitForWidgetsLoading().addAttributeFilter(ATTR_DEPARTMENT).getAttributeFiltersPanel()
             .getLastFilter().clearAllCheckedValues().selectByNames("Direct Sales");
 

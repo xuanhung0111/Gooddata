@@ -167,6 +167,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
     private static final String DELETE_DROPZONE = ".gd-dropzone-delete";
+    private static final String DASHBOARD_CONTENT = ".dash-content";
 
     private static final String ADD_ATTRIBUTE_FILTER_PLACEHOLDER = ".add-attribute-filter-placeholder";
     private static final String ADD_ATTRIBUTE_FILTER_DROPZONE = ".s-last-filter-drop-position";
@@ -872,6 +873,32 @@ public class IndigoDashboardsPage extends AbstractFragment {
                         getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
                 DASHBOARD_BODY, dropZoneType.getCss());
 
+        return this;
+    }
+
+    // QA-13004 - Update GP test for testng-desktop-KpiDashboardWithTotalsResult.xml
+    public IndigoDashboardsPage addInsightNextDropzone(final String insight) {
+        DropZone dropZoneType = DropZone.NEXT;
+        dragAddInsightNextDropzone(browser, convertCSSClassTojQuerySelector(getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
+            dropZoneType.getCss(), dropZoneType.getCss());
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddInsightNextDropzone(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+        driverActions.clickAndHold(source).moveByOffset(5, 5).perform();
+        WebElement moveInsightToCanvas = waitForElementVisible(By.cssSelector(DASHBOARD_CONTENT), driver);
+        driverActions.moveToElement(moveInsightToCanvas).perform();
+        try {
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+            driverActions.moveToElement(target).perform();
+
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+            driverActions.moveToElement(drop).release(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
         return this;
     }
 
