@@ -448,7 +448,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         dragAddInsightPlaceholder();
         sleepTightInSeconds(1);
         browser.switchTo().frame(waitForElementVisible(tagName("iframe"), browser));
-        return AnalysisPage.getInstance(browser);
+        // Add refreshCatalog() before performing some actions on AD overlay, to fix temporaryly until fixing SD-1294
+        return AnalysisPage.getInstance(browser).refreshCatalog();
     }
 
     public AnalysisPage addNewInsightToNextPosision() {

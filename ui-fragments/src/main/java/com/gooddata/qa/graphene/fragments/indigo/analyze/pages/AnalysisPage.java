@@ -140,6 +140,12 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-report-message-description")
     private WebElement reportMessageDescription;
 
+    @FindBy(className = "s-catalog-refresh-button")
+    private WebElement refreshCatalogButton;
+
+    @FindBy(className = "s-catalogue")
+    private WebElement catalogSection;
+
     public static final String MAIN_CLASS = "adi-editor";
     public static final String REPORT_NO_DATA_MESSAGE_TITLE = "No values to display";
     public static final String REPORT_NO_DATA_MESSAGE_DESCRIPTION = "The measures or attributes do not contain any data. Have you loaded the data?";
@@ -853,5 +859,11 @@ public class AnalysisPage extends AbstractFragment {
         return waitForElementPresent(emptyInsight).isDisplayed() &&
                 waitForElementVisible(reportMessageTitle).getText().toLowerCase().equals(REPORT_NO_DATA_MESSAGE_TITLE.toLowerCase()) &&
                 waitForElementVisible(reportMessageDescription).getText().equals(REPORT_NO_DATA_MESSAGE_DESCRIPTION);
+    }
+
+    public AnalysisPage refreshCatalog () {
+        waitForElementPresent(catalogSection);
+        getActions().moveToElement(catalogSection).moveToElement(refreshCatalogButton).click().build().perform();
+        return this;
     }
 }
