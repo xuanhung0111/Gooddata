@@ -97,6 +97,7 @@ public class OverlayWrapper extends AbstractFragment {
         waitForElementVisible(popupResource);
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(bigqueryResource).click().build().perform();
+        ImportBigQueryDialog.getInstance(browser).clickConnectManualLink();
     }
 
     public void selectS3Item() {
