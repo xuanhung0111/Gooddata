@@ -1,0 +1,22 @@
+{
+  "bigquery_client": {
+    "connection": {
+      "authentication": {
+        "serviceAccount": {
+          "clientEmail": "${BIGQUERY_CLIENT_EMAIL}",
+          "privateKey": "${BIGQUERY_PRIVATE_KEY}"
+        }
+      },
+      "schema": "${BIGQUERY_SCHEMA}",
+      "project": "${BIGQUERY_PROJECT}"
+    }
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "data_product": "${DATA_PRODUCT}",
+  "input_source": {
+    "type": "bigquery",
+    "query": "select login, firstname as first_name,lastname as last_name, email, sso as sso_provider, language, auth as authentication_modes, project_id, role FROM userbrick"
+  }
+}

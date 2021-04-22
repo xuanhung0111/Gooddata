@@ -1,0 +1,20 @@
+{
+  "redshift_client": {
+    "connection": {
+      "url": "${REDSHIFT_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${REDSHIFT_USER_NAME}",
+          "password": "${REDSHIFT_PASSWORD}"
+        }
+      },
+      "database": "${REDSHIFT_DATABASE}",
+      "schema": "${REDSHIFT_SCHEMA}"
+    }
+  },
+  "input_source": {
+    "type": "redshift",
+    "query": "select login, language, password, role, user_groups, clientid as client_id FROM usersbrick where id = 1"
+  },
+  "segments_filter": ["${SEGMENT_ID}"]
+}

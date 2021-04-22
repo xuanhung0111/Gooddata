@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc.schedule.add;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.*;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Objects.nonNull;
@@ -11,6 +12,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
@@ -27,6 +29,9 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
     }
 
     public RunOneOffDialog triggerRunOneOffDialog() {
+        if (!isElementVisible(runButton)) {
+            scrollElementIntoView(runButton, browser);
+        }
         waitForElementVisible(runButton).click();
         return RunOneOffDialog.getInstance(browser);
     }

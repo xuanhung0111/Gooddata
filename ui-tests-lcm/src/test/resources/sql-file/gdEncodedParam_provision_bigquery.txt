@@ -1,0 +1,28 @@
+{
+  "bigquery_client": {
+    "connection": {
+      "authentication": {
+        "serviceAccount": {
+          "clientEmail": "${BIGQUERY_CLIENT_EMAIL}",
+          "privateKey": "${BIGQUERY_PRIVATE_KEY}"
+        }
+      },
+      "schema": "${BIGQUERY_SCHEMA}",
+      "project": "${BIGQUERY_PROJECT}"
+    }
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "input_source": {
+    "type": "bigquery",
+    "query": "select client_id, segment_id, project_title from provisioning where segment_id = '${SEGMENT_ID}';"
+  },
+  "additional_hidden_params": {
+    "PARAMadd": "VALUE2"
+  },
+  "additional_params": {
+    "PARAMadd2": "VALUE1"
+  },
+  "DATA_PRODUCT": "${DATA_PRODUCT}"
+}

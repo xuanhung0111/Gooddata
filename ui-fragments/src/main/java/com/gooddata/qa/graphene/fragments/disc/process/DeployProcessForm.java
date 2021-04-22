@@ -374,7 +374,7 @@ public class DeployProcessForm extends AbstractFragment {
         INVALID_PROCESS_TYPE("invalid-process-type", "Invalid Process Type"),
         LCM_RELEASE("lcm-release", "Release"),
         LCM_ROLLOUT("lcm-rollout", "Rollout"),
-        LCM_RPOVISIONING("lcm-rollout", "Workspace Provisioning");
+        LCM_RPOVISIONING("lcm-workspace_provisioning", "Workspace Provisioning");
 
         private String value;
         private String title;
