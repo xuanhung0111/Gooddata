@@ -22,6 +22,7 @@ public class ContentDatasourceContainer extends AbstractFragment {
     public static final String CONTENT_CLASS = "create-or-edit-connection-container";
     public final String VALUE_PARAM = "generic-datasource-info-row-%s-value";
     public final String PARAMETER_ROW = "generic-datasource-info-row-%s-key";
+    public final By REQUIRED_MESSAGE = By.className("alias-required-message");
 
     @FindBy(className = "gd-input-field")
     protected List<WebElement> input;
@@ -83,9 +84,8 @@ public class ContentDatasourceContainer extends AbstractFragment {
     @FindBy(className = "s3-datasource-info-row-region-value")
     private WebElement regionValue;
 
-    @FindBy(className = "alias-required-message")
-    private WebElement aliasMessage;
-
+    @FindBy(className = "has-error")
+    private WebElement emptyField;
 
     public static final ContentDatasourceContainer getInstance(SearchContext context) {
         return Graphene.createPageFragment(ContentDatasourceContainer.class, waitForElementVisible(className(CONTENT_CLASS), context));
@@ -188,11 +188,12 @@ public class ContentDatasourceContainer extends AbstractFragment {
     }
 
     public boolean isAliasErrorMessageDisplay() {
-        return isElementVisible(aliasMessage);
+        return isElementVisible(emptyField);
     }
 
     public String getAliasErrorMessage() {
-        return waitForElementVisible(aliasMessage).getText();
+        getActions().moveToElement(emptyField).build().perform();
+        return waitForElementVisible(REQUIRED_MESSAGE, browser).getText();
     }
 
     public void addPostgreBasicInfo(String url, String username, String password, String database
