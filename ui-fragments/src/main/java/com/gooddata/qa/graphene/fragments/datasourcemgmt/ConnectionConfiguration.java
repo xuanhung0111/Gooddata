@@ -30,7 +30,7 @@ public class ConnectionConfiguration extends AbstractFragment {
     @FindBy(className = "s-test_connection")
     private WebElement validateButton;
 
-    @FindBy(className = "required-message")
+    @FindBy(className = "has-error")
     private List<WebElement> requiredMessage;
 
     @FindBy(className = "gd-message-text")
@@ -316,6 +316,7 @@ public class ConnectionConfiguration extends AbstractFragment {
     }
 
     public String getErrorMessageOnParamLine(int rowLine) {
-        return parameterInput.get(rowLine).findElement(By.className("required-message")).getText();
+        getActions().moveToElement(parameterInput.get(rowLine)).build().perform();
+        return waitForElementVisible(By.className("required-message"), browser).getText();
     }
 }

@@ -71,7 +71,7 @@ public class RedshiftDataSourceE2ETest extends AbstractDatasourceManagementTest 
             initDatasourceManagementPage();
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
-            assertEquals(initialContent.getNumberOfCloudResourceButton(), 4);
+            assertEquals(initialContent.getNumberOfCloudResourceButton(), 5);
             assertEquals(initialContent.getTextOnCloudResourceButton(2), AMAZON_REDSHIFT);
             initialContent.openRedshiftEdit();
             dataSourceManagementPage = initDatasourceManagementPage();

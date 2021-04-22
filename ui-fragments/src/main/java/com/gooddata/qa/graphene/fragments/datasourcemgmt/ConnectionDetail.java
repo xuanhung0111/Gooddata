@@ -92,11 +92,11 @@ public class ConnectionDetail extends AbstractFragment {
 
     //these function use for Bigquery
     public String getTextClientEmail() {
-        return getInput("Client e-mail");
+        return getInput("Service account email");
     }
 
     public String getTextProject() {
-        return getInput("Project");
+        return getInput("Google project ID");
     }
 
     public String getTextDataset() {
