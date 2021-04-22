@@ -16,16 +16,13 @@
   "filters_config": {
     "user_column": "login",
     "labels": [{
-      "label": "label.users.username",
+      "label": "label.geopushpin.city",
       "column": "data"
-    }, {
-      "label": "label.users.gender",
-      "column": "data2"
     }]
   },
   "input_source": {
     "type": "snowflake",
-    "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+    "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
   },
   "do_not_touch_filters_that_are_not_mentioned": "true",
   "ignore_missing_values": "true",
@@ -33,8 +30,8 @@
   "users_brick_config": {
     "input_source": {
       "type": "snowflake",
-      "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+      "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
     },
-    "SEGMENTS_FILTER": ["${SEGMENT_FILTER}"]
+    "sync_mode": "sync_multiple_projects_based_on_pid"
   }
 }

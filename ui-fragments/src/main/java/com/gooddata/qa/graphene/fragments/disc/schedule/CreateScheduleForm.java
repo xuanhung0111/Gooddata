@@ -83,6 +83,10 @@ public class CreateScheduleForm extends AbstractScheduleFragment {
         return this;
     }
 
+    public String getScheduleName() {
+        return waitForElementVisible(scheduleNameInput).getText();
+    }
+
     public boolean isScheduleNameInputError() {
         return waitForElementVisible(scheduleNameInput).getAttribute("class").contains("has-error");
     }

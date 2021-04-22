@@ -10,34 +10,29 @@
       },
       "database": "${POSTGRES_DATABASE}",
       "schema": "${POSTGRES_SCHEMA}",
-      "sslMode": "${POSTGRES_SSL}"
+      "sslMode": "${POSTGRES_SSL_MODE}"
     }
   },
   "input_source": {
     "type": "postgresql",
-    "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+    "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
   },
   "filters_config": {
     "user_column": "login",
     "labels": [{
-      "label": "label.users.username",
+      "label": "label.geopushpin.city",
       "column": "data"
-    }, {
-      "label": "label.users.gender",
-      "column": "data2"
     }]
   },
-  "SEGMENTS_FILTER": [
-    "${SEGMENT_FILTER}"
-  ],
   "do_not_touch_filters_that_are_not_mentioned": "true",
   "ignore_missing_values": "true",
   "restrict_if_missing_all_values": "false",
   "users_brick_config": {
     "input_source": {
       "type": "postgresql",
-      "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+      "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
     },
+    "sync_mode": "sync_multiple_projects_based_on_pid",
     "login_column": "login"
   }
 }

@@ -1,0 +1,36 @@
+{
+  "redshift_client": {
+    "connection": {
+      "url": "${REDSHIFT_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${REDSHIFT_USER_NAME}",
+          "password": "${REDSHIFT_PASSWORD}"
+        }
+      },
+      "database": "${REDSHIFT_DATABASE}",
+      "schema": "${REDSHIFT_SCHEMA}"
+    }
+  },
+  "filters_config": {
+    "user_column": "login",
+    "labels": [{
+      "label": "label.geopushpin.city",
+      "column": "data"
+    }]
+  },
+  "input_source": {
+    "type": "redshift",
+    "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
+  },
+  "do_not_touch_filters_that_are_not_mentioned": "true",
+  "ignore_missing_values": "true",
+  "restrict_if_missing_all_values": "false",
+  "users_brick_config": {
+    "input_source": {
+      "type": "redshift",
+      "query": "SELECT login,data, project_id FROM usersfilter where login = '${LOGIN_EMAIL}'"
+    },
+    "sync_mode": "sync_multiple_projects_based_on_pid"
+  }
+}

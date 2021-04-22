@@ -14,7 +14,8 @@
   },
   "input_source": {
     "type": "redshift",
-    "query": "select login, language, password, role, user_groups, clientid as client_id FROM usersbrick where id = 1"
+    "query": "select login, project_id, role FROM userbrick where login = '${LOGIN_EMAIL}'"
   },
-  "segments_filter": ["${SEGMENT_ID}"]
+  "do_not_touch_users_that_are_not_mentioned": true,
+  "sync_mode": "sync_multiple_projects_based_on_pid"
 }

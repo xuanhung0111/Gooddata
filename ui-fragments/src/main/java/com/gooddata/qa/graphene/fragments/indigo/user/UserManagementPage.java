@@ -10,6 +10,7 @@ import static org.openqa.selenium.By.cssSelector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import org.jboss.arquillian.graphene.Graphene;
