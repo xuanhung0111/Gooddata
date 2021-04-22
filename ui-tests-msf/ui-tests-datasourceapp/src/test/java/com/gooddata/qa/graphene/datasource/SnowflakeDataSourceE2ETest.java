@@ -61,12 +61,12 @@ public class SnowflakeDataSourceE2ETest extends AbstractDatasourceManagementTest
     @Test(dependsOnMethods = {"initialStageTest"})
     public void verifyFirstUIDatasourceTest() {
         if (dsMenu.isListDatasourceEmpty()) {
-            OverviewPage overviewPage = initDiscOverviewPage();
-            dataSourceManagementPage = overviewPage.openDatasourcePage();
+            initDiscOverviewPage();
+            dataSourceManagementPage = OverviewPage.getInstance(browser).openDatasourcePage();
             assertTrue(browser.getCurrentUrl().contains("?navigation=disc"));
             InitialContent initialContent = contentWrapper.getInitialContent();
             assertThat(initialContent.getInitialContentText(), containsString(INITIAL_TEXT));
-            assertEquals(initialContent.getNumberOfCloudResourceButton(), 4);
+            assertEquals(initialContent.getNumberOfCloudResourceButton(), 5);
             assertEquals(initialContent.getTextOnCloudResourceButton(0), SNOWFLAKE);
             initialContent.openSnowflakeEdit();
             DataSourceMenu dsMenu = dataSourceManagementPage.getMenuBar();
