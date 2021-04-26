@@ -145,6 +145,15 @@ public class UITestsRegistry {
             put("basic-extend", new Object[] {
                     "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
             });
+            put("basic-filters", new Object[] {
+                GoodSalesDashboardAllKindsFiltersTest.class
+            });
+            put("basic-drilling", new Object[] {
+                GoodSalesDrillReportTest.class
+            });
+            put("basic-manage", new Object[] {
+                GoodSalesManageObjectsTest.class
+            });
             //separate localization test into one phase so it does not affect to other tests
             put("localization", new Object[] {
                     new PredefineParameterTest(LocalizationTest.class)

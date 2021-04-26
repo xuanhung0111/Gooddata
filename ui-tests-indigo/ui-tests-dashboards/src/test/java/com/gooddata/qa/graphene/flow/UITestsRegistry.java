@@ -102,6 +102,8 @@ public class UITestsRegistry {
             DateFilteringOnInsightTest.class,
             EmbeddingDashboardPostMessageTest.class,
             MultipleAttributeFilterManipulationTest.class,
+            EventingBasicInsightTest.class,
+            ExportKPIDashboardsToPDF.class,
             "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-imap-KpiAlert.xml",
             "testng-desktop-KpiDashboardWithTotalsResult.xml",
