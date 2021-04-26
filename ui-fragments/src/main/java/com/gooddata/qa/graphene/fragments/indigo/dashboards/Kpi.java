@@ -21,7 +21,7 @@ public class Kpi extends Widget {
     // TODO: when having more widget types, separate, keep "Add widget" in mind
     public static final String MAIN_SELECTOR = ".dash-item.type-kpi";
     public static final String KPI_CSS_SELECTOR = MAIN_SELECTOR + ":not(.is-placeholder)";
-    public static final String KPI_POP_SECTION_CLASS = "kpi-pop-section";
+    public static final String KPI_POP_SECTION_CLASS = "headline-compare-section";
     public static final String KPI_ALERT_BUTTON_CLASS = "dash-item-action-alert";
     public static final String KPI_HAS_SET_ALERT_BUTTON = "has-set-alert";
     public static final String KPI_IS_ALERT_TRIGGERED = "is-alert-triggered";
@@ -200,11 +200,11 @@ public class Kpi extends Widget {
     }
 
     public boolean isBreakLineBottom(){
-        return getRoot().findElements(By.className("kpi-pop-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("wrap");
+        return getRoot().findElements(By.className("headline-compare-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("wrap");
     }
 
     public boolean isNonBreakLineBottom(){
-        return getRoot().findElements(By.className("kpi-pop-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("nowrap");
+        return getRoot().findElements(By.className("headline-compare-section")).stream().findFirst().get().getCssValue("flex-wrap").contains("nowrap");
     }
 
     public String getWidth(){
