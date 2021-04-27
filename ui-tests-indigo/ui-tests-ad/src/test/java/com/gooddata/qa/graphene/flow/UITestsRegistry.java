@@ -115,6 +115,7 @@ public class UITestsRegistry {
             FactBasedMetricsTest.class,
             StackedChartsTest.class,
             ResetButtonTest.class,
+            EventingBasicTest.class,
             "testng-ad-e2e-metrics-test.xml",
             "testng-ad-e2e-visualization-test.xml",
             "testng-ad-e2e-recommendation-test.xml",
