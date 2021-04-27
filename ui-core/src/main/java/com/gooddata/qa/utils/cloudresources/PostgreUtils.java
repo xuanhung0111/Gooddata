@@ -172,7 +172,7 @@ public class PostgreUtils {
         properties.put("db", connectionInfo.getDatabase());
         properties.put("schema", connectionInfo.getSchema());
 
-        String connectStr = connectionInfo.getUrl();
+        String connectStr = connectionInfo.getUrl() + connectionInfo.getDatabase();
         return DriverManager.getConnection(connectStr, properties);
     }
 

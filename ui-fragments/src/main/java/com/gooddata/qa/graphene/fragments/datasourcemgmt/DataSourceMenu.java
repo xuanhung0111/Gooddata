@@ -39,6 +39,11 @@ public class DataSourceMenu extends AbstractFragment {
         OverlayWrapper.getInstance(browser).selectSnowflakeItem();
     }
 
+    public void selectPostgresResource() {
+        waitForElementVisible(addButton).click();
+        OverlayWrapper.getInstance(browser).selectPostgreItem();
+    }
+
     public void selectRedshiftResource() {
         waitForElementVisible(addButton).click();
         OverlayWrapper.getInstance(browser).selectRedshiftItem();
