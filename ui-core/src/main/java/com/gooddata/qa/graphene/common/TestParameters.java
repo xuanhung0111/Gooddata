@@ -105,8 +105,8 @@ public class TestParameters {
         snowflakePassword = loadProperty("snowflakePassword");
         snowflakeUserName = loadProperty("snowflakeUserName");
         snowflakeJdbcUrl = loadProperty("snowflakeJdbcUrl");
-        postgreUserName = loadProperty("postgreUserName");
-        postgrePassword = loadProperty("postgrePassword");
+        postgreUserName = loadProperty("user");
+        postgrePassword = loadProperty("password");
         postgreJdbcUrl = loadProperty("postgreJdbcUrl");
         redshiftPassword = loadProperty("redshiftPassword");
         redshiftUserName = loadProperty("redshiftUserName");

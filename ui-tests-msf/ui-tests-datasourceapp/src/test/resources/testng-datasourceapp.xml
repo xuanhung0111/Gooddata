@@ -50,5 +50,14 @@
             <class name="com.gooddata.qa.graphene.datasource.S3DataSourceProcessesTest"/>
         </classes>
     </test>
-
+    <test name="PostgresDatasourceE2ETest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.datasource.PostgresDatasourceE2ETest"/>
+        </classes>
+    </test>
+    <test name="PostgresDatasourceAdvancedE2ETest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.datasource.PostgresDatasourceAdvancedE2ETest"/>
+        </classes>
+    </test>
 </suite>
