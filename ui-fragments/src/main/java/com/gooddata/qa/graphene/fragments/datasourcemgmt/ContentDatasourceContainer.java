@@ -10,13 +10,17 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class ContentDatasourceContainer extends AbstractFragment {
     public static final String CONTENT_CLASS = "create-or-edit-connection-container";
@@ -38,6 +42,9 @@ public class ContentDatasourceContainer extends AbstractFragment {
 
     @FindBy(className = "output-stage-section")
     private WebElement outputStageSection;
+
+    @FindBy(className = "required-message")
+    private List<WebElement> requiredMessage;
 
     @FindBy(className = "s-save")
     private WebElement saveButton;
@@ -111,6 +118,11 @@ public class ContentDatasourceContainer extends AbstractFragment {
         Actions driverActions = new Actions(browser);
         driverActions.moveToElement(connectionTitle).click().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
                 .sendKeys(Keys.DELETE).sendKeys(title).build().perform();
+    }
+
+    public int getNumberOfRequiredMessage() {
+        waitForCollectionIsNotEmpty(requiredMessage);
+        return requiredMessage.size();
     }
 
     public void addAliasTitle(String aliasTitle) {
@@ -208,8 +220,14 @@ public class ContentDatasourceContainer extends AbstractFragment {
         postgreSSLButton.click();
         WebElement dropDownSSL = browser.findElement(className("datasource-postgres-dropdown-list"));
         waitForElementVisible(dropDownSSL);
-        waitForElementVisible(browser.findElement(className("s-prefer"))).click();
+        waitForElementVisible(browser.findElement(cssSelector(".datasource-postgres-dropdown-item.s-prefer"))).click();
         waitForElementNotVisible(dropDownSSL);
+    }
+
+    public List<String> listPostgreSSLItem() {
+        postgreSSLButton.click();
+        List<WebElement> dropDownSSL = browser.findElements(cssSelector(".datasource-postgres-dropdown-item .type-name"));
+        return waitForCollectionIsNotEmpty(dropDownSSL).stream().map(el -> el.getText()).collect(Collectors.toList());
     }
 
     protected void addInput(String nameElement, String value) {

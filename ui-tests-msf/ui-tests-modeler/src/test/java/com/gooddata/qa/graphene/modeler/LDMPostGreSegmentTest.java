@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.datasourcemgmt.*;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -300,6 +301,7 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
         // add mapping custom
         mainModelContent.focusOnDataset(PERSON_DATASET);
         modelPerson.openEditDialog();
+        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelPerson.getTextDatatype(AGE_FACT));
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
         DataMapping mappingTab = dialog.clickOnDataMappingTab();
         LdmControlLoad controlLoad = LdmControlLoad.getInstance(browser);
@@ -396,6 +398,12 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
             browser.switchTo().defaultContent();
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
+
+        if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER || lcmBrickFlowBuilder == null) {
+            return;
+        }
+        lcmBrickFlowBuilder.destroy();
+
         initDatasourceManagementPage();
         if (dsMenu.isDataSourceExist(DATASOURCE_NAME)) {
             deleteDatasource(DATASOURCE_NAME);
