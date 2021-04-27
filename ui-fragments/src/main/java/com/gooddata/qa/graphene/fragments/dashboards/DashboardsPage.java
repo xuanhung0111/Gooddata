@@ -404,8 +404,6 @@ public class DashboardsPage extends AbstractFragment {
             waitForElementVisible(dashboardTabDeleteDialog);
             waitForElementVisible(dashboardTabDeleteConfirmButton).click();
             waitForElementNotPresent(dashboardTabDeleteDialog);
-        } else {
-            waitForReportLoaded(browser);
         }
         getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
