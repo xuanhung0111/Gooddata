@@ -130,19 +130,24 @@ public class S3DataSourceSegmentTest extends AbstractLDMPageTest {
                 || testParams.isPerformanceEnvironment()) {
             throw new SkipException("Initial Page is not tested on PI or Production environment");
         }
-        dataSourceManagementPage = initDatasourceManagementPage();
-        contentWrapper = dataSourceManagementPage.getContentWrapper();
-        dsMenu = dataSourceManagementPage.getMenuBar();
-        container = contentWrapper.getContentDatasourceContainer();
-        createS3Datasource();
-        createDataModel();
-        uploadCsvFile();
-        createLCM();
-        setUpDataMapping();
-        createCustomMappingForLcmProject(masterProjectId);
-        createCustomMappingForLcmProject(clientProjectId1);
-        createCustomMappingForLcmProject(clientProjectId2);
-        createCustomMappingForLcmProject(clientProjectId3);
+        if (testParams.isTestingEnvironment()) {
+            dataSourceManagementPage = initDatasourceManagementPage();
+            contentWrapper = dataSourceManagementPage.getContentWrapper();
+            dsMenu = dataSourceManagementPage.getMenuBar();
+            container = contentWrapper.getContentDatasourceContainer();
+            createS3Datasource();
+            createDataModel();
+            uploadCsvFile();
+            createLCM();
+            setUpDataMapping();
+            createCustomMappingForLcmProject(masterProjectId);
+            createCustomMappingForLcmProject(clientProjectId1);
+            createCustomMappingForLcmProject(clientProjectId2);
+            createCustomMappingForLcmProject(clientProjectId3);
+        } else {
+            log.warning("DSS token isn't configured on CI-Infa for client-demo");
+            throw new SkipException("Skip test LCM on Client demo !!");
+        }
     }
 
     @DataProvider(name = "s3SegmentTypeProcess")
@@ -397,8 +402,13 @@ public class S3DataSourceSegmentTest extends AbstractLDMPageTest {
 
     @AfterClass(alwaysRun = true)
     private void deleteClientAndProject() {
-        deleteProcessesAndDatasource();
-        deleteSegment(new RestClient(getProfile(ADMIN)), testParams.getUserDomain(), SEGMENT_ID);
-        deleteProject(serviceProjectId);
+        if (testParams.isTestingEnvironment()) {
+            deleteProcessesAndDatasource();
+            deleteSegment(new RestClient(getProfile(ADMIN)), testParams.getUserDomain(), SEGMENT_ID);
+            deleteProject(serviceProjectId);
+        } else {
+            log.warning("DSS token isn't configured on CI-Infa for client-demo");
+            throw new SkipException("Skip test LCM on Client demo !!");
+        }
     }
 }
