@@ -6,6 +6,8 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -35,6 +37,13 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
+    private final String FIRST_TAB = "First Tab";
+    private final String NON_EMPTY_TAB = "non-empty-tab";
+    private final String EMPTY_TAB = "empty-tab";
+    private final String DASH_BOARD_EMPTY_TAB_ADD = "Dashboard Empty Tab Add";
+    private final String DASH_BOARD_NON_EMPTY_TAB_ADD = "Dashboard Non Empty Tab Add";
+    private final String DASH_BOARD_EMPTY_TAB_DELETE = "Dashboard Empty Tab Delete";
+    private final String DASH_BOARD_NON_EMPTY_TAB_DELETE = "Dashboard Non Empty Tab Delete";
     private String exportedDashboardName;
     private Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
     private DashboardRestRequest dashboardRequest;
@@ -50,11 +59,29 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
             dash.addTab(targetTab);
         }).build();
 
+        Dashboard dashboardEmptyTabDelete = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASH_BOARD_EMPTY_TAB_DELETE);
+            dash.addTab(initDashboardTab(SOURCE_TAB, asList()));
+            dash.addTab(initDashboardTab(TARGET_TAB, asList()));
+            dash.addTab(initDashboardTab(EMPTY_TAB, asList()));
+        }).build();
+
+        Dashboard dashboardNonEmptyTabDelete = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASH_BOARD_NON_EMPTY_TAB_DELETE);
+            dash.addTab(initDashboardTab(SOURCE_TAB, asList()));
+            dash.addTab(initDashboardTab(TARGET_TAB, asList()));
+            dash.addTab(initDashboardTab(NON_EMPTY_TAB, singletonList(createReportItem(reportUri))));
+        }).build();
+
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         dashboardRequest.createDashboard(dashboard.getMdObject());
+        dashboardRequest.createDashboard(dashboardEmptyTabDelete.getMdObject());
+        dashboardRequest.createDashboard(dashboardNonEmptyTabDelete.getMdObject());
 
         expectedGoodSalesDashboardsAndTabs = new HashMap<>();
         expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[] {SOURCE_TAB, TARGET_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_EMPTY_TAB_DELETE, new String[] {SOURCE_TAB, TARGET_TAB, EMPTY_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_NON_EMPTY_TAB_DELETE, new String[] {SOURCE_TAB, TARGET_TAB, NON_EMPTY_TAB});
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"dashboards-verification"})
@@ -83,23 +110,23 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void addNewEmptyTab() {
-        addNewTabOnDashboard(DASH_PIPELINE_ANALYSIS, "empty-tab", "GoodSales-new-empty-tab");
+        addNewTabOnNewDashboard(DASH_BOARD_EMPTY_TAB_ADD, EMPTY_TAB, "GoodSales-new-empty-tab", true);
     }
 
     @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
     public void addNewNonEmptyTab() {
-        addNewTabOnDashboard(DASH_PIPELINE_ANALYSIS, "non-empty-tab", "GoodSales-new-non-empty-tab");
+        addNewTabOnNewDashboard(DASH_BOARD_NON_EMPTY_TAB_ADD, NON_EMPTY_TAB, "GoodSales-new-non-empty-tab", false);
         dashboardsPage.addLineToDashboard().saveDashboard();
     }
 
     @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
     public void deleteEmptyTab() {
-        deleteTab(2);
+        deleteTab(DASH_BOARD_EMPTY_TAB_DELETE,2);
     }
 
     @Test(dependsOnMethods = {"addNewNonEmptyTab"}, groups = {"dashboards-verification"})
     public void deleteNonEmptyTab() {
-        deleteTab(1);
+        deleteTab(DASH_BOARD_NON_EMPTY_TAB_DELETE,2);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification", "new-dashboard"})
@@ -109,21 +136,21 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         dashboardsPage.addNewDashboard(dashboardName);
         waitForDashboardPageLoaded(browser);
         checkRedBar(browser);
-        assertEquals(dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
+        assertEquals(dashboardsPage.getDashboardsCount(), 4, "New dashboard is not present");
         assertEquals(dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
         Screenshots.takeScreenshot(browser, "GoodSales-new-dashboard", this.getClass());
     }
 
     @Test(dependsOnMethods = {"addNewDashboard"}, groups = {"dashboards-verification", "new-dashboard"})
     public void addNewTabOnNewDashboard() {
-        addNewTabOnDashboard("test", "test2", "GoodSales-new-dashboard-new-tab");
+        addNewTabOnNewDashboard("test1", "test2", "GoodSales-new-dashboard-new-tab", true);
     }
 
     @Test(dependsOnGroups = {"new-dashboard"}, groups = {"dashboards-verification"})
     public void deleteNewDashboard() {
         initDashboardsPage();
         int dashboardsCount = dashboardsPage.getDashboardsCount();
-        dashboardsPage.selectDashboard("test");
+        dashboardsPage.selectDashboard("test1");
         dashboardsPage.deleteDashboard();
         sleepTightInSeconds(3);
         waitForDashboardPageLoaded(browser);
@@ -137,6 +164,14 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"dashboards-verification"})
     public void verifyDashboardTabsAfter() {
+        expectedGoodSalesDashboardsAndTabs = new HashMap<>();
+        expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[] {SOURCE_TAB, TARGET_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_EMPTY_TAB_ADD, new String[] {FIRST_TAB, EMPTY_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_NON_EMPTY_TAB_ADD, new String[] {FIRST_TAB, NON_EMPTY_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_EMPTY_TAB_DELETE, new String[] {SOURCE_TAB, TARGET_TAB});
+        expectedGoodSalesDashboardsAndTabs.put(DASH_BOARD_NON_EMPTY_TAB_DELETE, new String[] {SOURCE_TAB, TARGET_TAB});
+        expectedGoodSalesDashboardsAndTabs.put("test", new String[] {FIRST_TAB});
+
         verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }
 
@@ -171,13 +206,13 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void deleteTab(int offset) {
+    private void deleteTab(String dashboardName, int offset) {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
+        dashboardsPage.selectDashboard(dashboardName);
         waitForDashboardPageLoaded(browser);
         sleepTightInSeconds(5);
         int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
-        dashboardsPage.deleteDashboardTab(tabsCount - offset);
+        dashboardsPage.deleteDashboardTab(offset);
         sleepTightInSeconds(5);
         assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
     }
