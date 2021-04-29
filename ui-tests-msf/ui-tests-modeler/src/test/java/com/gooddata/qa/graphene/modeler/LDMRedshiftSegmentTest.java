@@ -396,7 +396,7 @@ public class LDMRedshiftSegmentTest extends AbstractLDMPageTest {
         String sql = getResourceAsString("/model_redshift_current.txt");
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, projectId);
         modelView = modelRestRequest.getProductionProjectModelView(false);
-        //assertEquals(modelView .toString(), sql);
+        assertEquals(modelView .toString(), sql);
     }
 
     @Test(dependsOnMethods = "editAndPublishModelTest" )

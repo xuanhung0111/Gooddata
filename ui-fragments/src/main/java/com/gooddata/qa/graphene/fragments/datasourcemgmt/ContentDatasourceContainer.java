@@ -43,7 +43,7 @@ public class ContentDatasourceContainer extends AbstractFragment {
     @FindBy(className = "output-stage-section")
     private WebElement outputStageSection;
 
-    @FindBy(className = "required-message")
+    @FindBy(className = "has-error")
     private List<WebElement> requiredMessage;
 
     @FindBy(className = "s-save")

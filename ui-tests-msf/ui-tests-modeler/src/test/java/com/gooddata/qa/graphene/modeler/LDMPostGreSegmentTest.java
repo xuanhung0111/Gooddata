@@ -118,7 +118,6 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
     private ProcessUtils processUtils;
     private DataloadProcess dataloadProcess;
     private DataloadProcess processMaster;
-    private ToastMessage toastMessage;
     private DataSourcePanelContent datasourcePanel;
     private DataSourceDropDownBar dropDownBar;
     private DataSourceContent dataSourceContent;
@@ -167,9 +166,6 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
         connectWorkSpaceDialog.searchWorkspace(projectId);
         connectWorkSpaceDialog.selectedWorkspaceOnSearchList(projectId);
         ldmPage = connectWorkSpaceDialog.clickSelect();
-        toastMessage = ToastMessage.getInstance(browser);
-        assertEquals(toastMessage.getToastMessage(), "Data Source connected. You can now use it in the model.");
-
         modeler = ldmPage.getDataContent().getModeler();
         toolbar = modeler.getToolbar();
         modeler.getLayout().waitForLoading();
@@ -301,7 +297,6 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
         // add mapping custom
         mainModelContent.focusOnDataset(PERSON_DATASET);
         modelPerson.openEditDialog();
-        assertEquals(Model.DATA_TYPE.INTEGER.getName(), modelPerson.getTextDatatype(AGE_FACT));
         EditDatasetDialog dialog = EditDatasetDialog.getInstance(browser);
         DataMapping mappingTab = dialog.clickOnDataMappingTab();
         LdmControlLoad controlLoad = LdmControlLoad.getInstance(browser);
@@ -363,12 +358,25 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
         toolbar = modeler.getToolbar();
         toolbar.clickPublish();
         PublishModelDialog publishModelDialog = PublishModelDialog.getInstance(browser);
-        publishModelDialog.publishSwitchToEditMode();
+        publishModelDialog.publishModel();
+        OverlayWrapper.getInstance(browser).closePublishSuccess();
 
-        String sql = getResourceAsString("/model_postgre_current.txt");
+        String sql = getResourceAsString("/model_postgre_current.txt").replaceAll("idChange", RANDOM_STRING);
         ModelRestRequest modelRestRequest = new ModelRestRequest(restClient, projectId);
         modelView = modelRestRequest.getProductionProjectModelView(false);
-        //assertEquals(modelView .toString(), sql);
+        assertEquals(modelView.toString(), sql);
+
+        OutputStage outputStage = toolbar.openOutputStagePopUp();
+        sleepTightInSeconds(5);
+        outputStage.selectDatasource(DATASOURCE_NAME);
+        OverlayWrapper.getInstance(browser).selectOption(OverlayWrapper.PROPERTIES_OPTION.CREATE_TABLE.getName());
+        String resultOutputStage = outputStage.createOutputStage();
+        outputStage.copyOutputStage();
+        outputStage.cancelOutputStage();
+        String outputStageString = getResourceAsString("/sql-file/outputstage_postgres.txt")
+                .replaceAll("idChange", RANDOM_STRING);
+        log.info("Recommend String: " + outputStageString);
+        assertEquals(resultOutputStage, outputStageString);
     }
 
     @Test(dependsOnMethods = "editAndPublishModelTest")
@@ -564,12 +572,12 @@ public class LDMPostGreSegmentTest extends AbstractLDMPageTest {
 
     private void prepareTables() throws SQLException {
         postgreUtils.executeSql("CREATE TABLE " + PERSON_TABLE + " (id varchar(128) primary key, name " +
-                "varchar(255), age integer, city varchar(255), birthday date, clientid varchar(255), timestamp TIMESTAMP, deleted boolean)");
+                "varchar(255), age float, city varchar(255), birthday date, clientid varchar(255), timestamp TIMESTAMP, deleted boolean)");
         postgreUtils.executeSql("CREATE TABLE " + CAR_TABLE + "(id varchar(128), color varchar(255), year date," +
                 " price integer, x__client_id varchar(255), x__timestamp TIMESTAMP , x__deleted boolean, owner varchar(128) " +
                 "REFERENCES " + PERSON_TABLE + "(id))");
         postgreUtils.executeSql("CREATE TABLE " + PRE_CAR_TABLE + "(cp__id varchar(128), a__color varchar(255), " +
-                "d__year date, f__price integer, x__client_id varchar(255), x__timestamp TIMESTAMP , x__deleted boolean," +
+                "d__year date, f__price decimal, x__client_id varchar(255), x__timestamp TIMESTAMP , x__deleted boolean," +
                 " r__" + PERSON_TABLE + " varchar(128) REFERENCES " + PERSON_TABLE + "(id))");
     }
 
