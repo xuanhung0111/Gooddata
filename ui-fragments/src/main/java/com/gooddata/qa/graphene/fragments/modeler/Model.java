@@ -272,6 +272,7 @@ public class Model extends AbstractFragment {
 
     public enum DATA_TYPE {
         INTEGER("Integer", "s-integer"),
+        DECIMAL_12_2("Decimal(12,2)", "s-decimal_12_2_"),
         TEXT_128("Text(128)", "s-text_128_"),
         BIG_INTEGER("BigInteger", "s-biginteger");
 
