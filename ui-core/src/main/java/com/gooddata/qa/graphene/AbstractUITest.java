@@ -28,6 +28,7 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.indigo.sdk.SDKAnalysisPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.PdfUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
@@ -52,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -218,7 +219,34 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
-        dashboardsPage.getDashboardEditBar().saveDashboardAfterAddTab();
+        dashboardsPage.getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
+        assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
+        assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
+        assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
+        takeScreenshot(browser, screenshotName, this.getClass());
+    }
+
+    public void addNewTabOnNewDashboard(String dashboardName, String tabName, String screenshotName, Boolean isEmptyTab) {
+        initDashboardsPage();
+        dashboardsPage.addNewDashboard(dashboardName);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
+        DashboardTabs tabs = dashboardsPage.getTabs();
+        int tabsCount = tabs.getNumberOfTabs();
+        dashboardsPage.addNewTab(tabName);
+        if (!isEmptyTab) {
+            dashboardsPage.addReportToDashboard(REPORT_AMOUNT_BY_PRODUCT);
+            dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForLoaded();
+        }
+        checkRedBar(browser);
+        waitForDashboardPageLoaded(browser);
+        sleepTightInSeconds(3);
+        assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
+        assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
+        assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
+        dashboardsPage.getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
         sleepTightInSeconds(3);
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
