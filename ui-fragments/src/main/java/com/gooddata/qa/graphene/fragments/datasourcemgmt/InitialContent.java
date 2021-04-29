@@ -29,9 +29,9 @@ public class InitialContent extends AbstractFragment {
         return ConnectionConfiguration.getInstance(browser);
     }
 
-    public ConnectionConfiguration openPostgresEdit() {
+    public ContentDatasourceContainer openPostgresEdit() {
         waitForElementVisible(cloudResourceButton.get(3)).click();
-        return ConnectionConfiguration.getInstance(browser);
+        return ContentDatasourceContainer.getInstance(browser);
     }
 
     public ConnectionConfiguration openBigQueryEdit() {
