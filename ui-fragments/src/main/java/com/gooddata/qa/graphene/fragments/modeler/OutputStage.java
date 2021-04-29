@@ -5,6 +5,8 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
@@ -21,7 +23,7 @@ public class OutputStage extends AbstractFragment {
     @FindBy(className = "warning")
     private WebElement warning;
 
-    @FindBy(className = "initial-page-select-data-source-detail-item")
+    @FindBy(css = ".initial-page-select-data-source-list .initial-page-select-data-source-detail-item")
     private List<WebElement> listDatasourceItem;
 
     @FindBy(css= ".initial-page-sql-properties-detail-dropdown")
@@ -55,11 +57,13 @@ public class OutputStage extends AbstractFragment {
     }
 
     public OutputStage selectDatasource(String datasourceName) {
+        Actions action = getActions();
         for (WebElement item : listDatasourceItem) {
+            log.info("Datasource name:" + item);
             if(item.getText().equals(datasourceName)) {
                 WebElement checkbox = item.findElement(By.className("input-radio"));
                 scrollElementIntoView(item,browser);
-                checkbox.click();
+                action.moveToElement(checkbox).click().build().perform();
             }
         }
         return this;
