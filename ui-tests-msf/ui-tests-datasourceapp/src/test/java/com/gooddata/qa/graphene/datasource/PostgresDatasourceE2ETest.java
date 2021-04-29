@@ -96,7 +96,7 @@ public class PostgresDatasourceE2ETest extends AbstractDatasourceManagementTest 
         ContentDatasourceContainer container = contentWrapper.getContentDatasourceContainer();
         container.clickSavebutton();
         // check vailidate required field
-        assertEquals(container.getNumberOfRequiredMessage(), 4);
+        assertEquals(container.getNumberOfRequiredMessage(), 5);
     }
 
     @DataProvider
@@ -105,8 +105,6 @@ public class PostgresDatasourceE2ETest extends AbstractDatasourceManagementTest 
                         DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Incorrect credentials"},
                 {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME,
                         INVALID_VALUE, DATASOURCE_PREFIX, DATASOURCE_SCHEMA, "Connection failed! Database not found"}};
-//                {DATASOURCE_NAME, DATASOURCE_URL, DATASOURCE_USERNAME,
-//                        DATASOURCE_DATABASE, DATASOURCE_PREFIX, INVALID_VALUE, "Connection failed! Schema not found"}};
     }
 
     @Test(dependsOnMethods = "checkRequiredDataSourceInformation")
