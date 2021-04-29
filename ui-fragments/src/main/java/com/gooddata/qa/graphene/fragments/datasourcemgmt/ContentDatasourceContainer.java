@@ -223,17 +223,19 @@ public class ContentDatasourceContainer extends AbstractFragment {
         waitForElementNotVisible(dropDownSSL);
     }
 
-    public WebElement getItemSSLByName(String name) {
+    public List<WebElement> getDropDown() {
         WebElement dropDownSSL = browser.findElement(className("datasource-postgres-dropdown-body"));
         waitForElementVisible(dropDownSSL);
-        List<WebElement> dropDownList = dropDownSSL.findElements(className(("datasource-postgres-dropdown-item")));
-        return dropDownList.stream().filter(item -> item.getText().equals(name)).findFirst().get();
+        return dropDownSSL.findElements(className(("datasource-postgres-dropdown-item")));
+    }
+
+    public WebElement getItemSSLByName(String name) {
+        return getDropDown().stream().filter(item -> item.getText().equals(name)).findFirst().get();
     }
 
     public List<String> listPostgreSSLItem() {
         postgreSSLButton.click();
-        List<WebElement> dropDownSSL = browser.findElements(cssSelector(".datasource-postgres-dropdown-item .type-name"));
-        return waitForCollectionIsNotEmpty(dropDownSSL).stream().map(el -> el.getText()).collect(Collectors.toList());
+        return waitForCollectionIsNotEmpty(getDropDown()).stream().map(el -> el.getText()).collect(Collectors.toList());
     }
 
     protected void addInput(String nameElement, String value) {
