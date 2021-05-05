@@ -48,7 +48,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.asserts.AssertUtils.assertIgnoreCase;
 import static com.gooddata.qa.utils.asserts.AssertUtils.assertIgnoreCaseAndIndex;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Calendar.YEAR;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -99,27 +101,27 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header shouldn't have roll up");
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Year (Snapshot)", "Stage Name"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
 
             DashboardDrillDialog drillDialog = tableReport.openDrillDialogFrom("2010", CellType.ATTRIBUTE_VALUE);
 
             tableReport = drillDialog.getReport(TableReport.class);
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Quarter/Year (Snapshot)", "Stage Name"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill report", "2010"), ">>"));
-            assertEquals(drillDialog.getChartTitles(), Arrays.asList("Table", "Line chart", "Bar chart", "Pie chart"));
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(asList("Drill report", "2010"), ">>"));
+            assertEquals(drillDialog.getChartTitles(), asList("Table", "Line chart", "Bar chart", "Pie chart"));
             assertEquals(drillDialog.getSelectedChartTitle(), "Table");
 
             drillDialog.clickOnBreadcrumbs(REPORT_NAME);
             assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header shouldn't have roll up");
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Year (Snapshot)", "Stage Name"));
             assertEquals(drillDialog.getBreadcrumbsString(), "Drill report");
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
 
             tableReport.drillOnFirstValue(CellType.METRIC_VALUE);
-            assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
+            assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Account"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount"));
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
 
@@ -127,7 +129,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             checkRedBar(browser);
             assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header shouldn't have roll up");
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Year (Snapshot)", "Stage Name"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
         } finally {
             dashboardsPage.deleteDashboard();
@@ -157,7 +159,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             drillDialog.changeChartType("grid");
             tableReport.waitForLoaded();
             checkRedBar(browser);
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Quarter/Year (Snapshot)", "Stage Name"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
             drillDialog.closeDialog();
@@ -176,7 +178,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertTrue(drillDialog.isReportInfoButtonVisible());
             ReportInfoViewPanel reportInfoPanel = drillDialog.openReportInfoViewPanel();
             assertEquals(reportInfoPanel.getReportTitle(), "");
-            assertEquals(reportInfoPanel.getAllMetricNames(), Arrays.asList("Amount", "Avg. Amount"));
+            assertEquals(reportInfoPanel.getAllMetricNames(), asList("Amount", "Avg. Amount"));
 
             String currentWindowHandle = browser.getWindowHandle();
             reportInfoPanel.clickViewReportButton();
@@ -192,7 +194,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             TableReport tableReport = Graphene.createPageFragment(TableReport.class,
                     waitForElementVisible(By.id("gridContainerTab"), browser));
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Quarter/Year (Snapshot)", "Stage Name"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
             browser.close();
@@ -271,7 +273,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             tableReport = drillDialog.getReport(TableReport.class);
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Account"));
             drillDialog.closeDialog();
         } finally {
             initDashboardsPage();
@@ -290,16 +292,18 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             dashboardsPage.editDashboard();
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            tableReport.addDrilling(Pair.of(asList("Stage Name"), "Account"));
+
+            dashboardsPage.waitForReportLoaded(singletonList(REPORT_NAME));
             dashboardsPage.saveDashboard();
 
             drillDialog = tableReport.openDrillDialogFrom("Interest", CellType.ATTRIBUTE_VALUE);
             tableReport = drillDialog.getReport(TableReport.class);
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Account"));
+            assertIgnoreCase(tableReport.getAttributeHeaders(), asList("Year (Snapshot)", "Account"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill report", "Interest"), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(asList("Drill report", "Interest"), ">>"));
         } finally {
             drillDialog.closeDialog();
             dashboardsPage.deleteDashboard();
@@ -323,39 +327,45 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
         try {
             addReportToNewDashboard(DRILL_ACTIVITY_REPORT, TEST_DASHBOAD_NAME);
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
 
             dashboardsPage.editDashboard();
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_ACTIVITY), ATTR_PRIORITY));
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_YEAR_ACTIVITY), REPORT_NAME), "Reports");
-            tableReport.addDrilling(Pair.of(Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_STATUS));
+
+            tableReport.addDrilling(Pair.of(asList(ATTR_ACTIVITY), ATTR_PRIORITY));
+            dashboardsPage.waitForReportLoaded(singletonList(DRILL_ACTIVITY_REPORT));
+
+            tableReport.addDrilling(Pair.of(asList(ATTR_YEAR_ACTIVITY), REPORT_NAME), "Reports");
+            dashboardsPage.waitForReportLoaded(singletonList(DRILL_ACTIVITY_REPORT));
+
+            tableReport.addDrilling(Pair.of(asList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_STATUS));
+            dashboardsPage.waitForReportLoaded(singletonList(DRILL_ACTIVITY_REPORT));
+
             dashboardsPage.saveDashboard();
             checkRedBar(browser);
-
-            DashboardDrillDialog drillDialog = tableReport
+            DashboardDrillDialog drillDialog = tableReport.waitForLoaded()
                     .openDrillDialogFrom("Email with AirSplat on Apr-21-11", CellType.ATTRIBUTE_VALUE);
-            TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
+            TableReport tableReportInDialog = drillDialog.getReport(TableReport.class).waitForLoaded();
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
             tableReport.hoverAndOpenDrillDialogFrom("1", CellType.METRIC_VALUE);
-            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_STATUS));
+            assertTrue(tableReportInDialog.waitForLoaded().hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_STATUS));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.openDrillDialogFrom("2011", CellType.ATTRIBUTE_VALUE);
-            assertFalse(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header shouldn't have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
+            assertFalse(tableReportInDialog.waitForLoaded().hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header shouldn't have roll up");
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
             assertEquals(drillDialog.getBreadcrumbsString(),
-                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
+                    StringUtils.join(asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -370,8 +380,11 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             TableReport tableReport = dashboardsPage.getReport(DRILL_ACTIVITY_REPORT, TableReport.class);
             DashboardWidgetDirection.LEFT.moveElementToRightPlace(tableReport.getRoot());
-            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACTIVITY)
-                    .saveDashboard();
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACTIVITY);
+
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_ACTIVITY));
+            dashboardsPage.waitForReportLoaded(singletonList(DRILL_ACTIVITY_REPORT));
+            dashboardsPage.saveDashboard();
 
             dashboardsPage.getFirstFilter().changeAttributeFilterValues("Email with Bulbs.com on Aug-06-10");
 
@@ -379,26 +392,26 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     .openDrillDialogFrom("Email with Bulbs.com on Aug-06-10", CellType.ATTRIBUTE_VALUE);
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
-                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
+                    StringUtils.join(asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.hoverAndOpenDrillDialogFrom("1", CellType.METRIC_VALUE);
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_ACCOUNT));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_ACCOUNT));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
-                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
+                    StringUtils.join(asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.openDrillDialogFrom("2010", CellType.ATTRIBUTE_VALUE);
             assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER), "Total header should have roll up");
-            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_QUARTER_YEAR_ACTIVITY, ATTR_ACTIVITY));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), asList(ATTR_QUARTER_YEAR_ACTIVITY, ATTR_ACTIVITY));
             assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
-                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2010"), ">>"));
+                    StringUtils.join(asList(DRILL_ACTIVITY_REPORT, "2010"), ">>"));
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -416,8 +429,9 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     .selectDashboard(TEST_DASHBOAD_NAME)
                     .editDashboard();
 
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            tableReport.addDrilling(Pair.of(asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            dashboardsPage.waitForReportLoaded(singletonList(REPORT_NAME));
             dashboardsPage.saveDashboard();
 
             tableReport.drillOn("Interest", CellType.ATTRIBUTE_VALUE);
@@ -448,12 +462,16 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                             DashboardWidgetDirection.LEFT)
                     .getFilterWidgetByName(ATTR_STAGE_NAME).changeSelectionToOneValue();
 
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            tableReport.addDrilling(Pair.of(asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+
+            dashboardsPage.waitForFilterLoaded(asList(ATTR_STAGE_NAME, ATTR_STAGE_NAME));
+            dashboardsPage.waitForReportLoaded(singletonList(REPORT_NAME));
+
             dashboardsPage.saveDashboard();
 
             //setup for target tab
-            dashboardsPage.selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
+            initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
                     .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACCOUNT,
                             DashboardWidgetDirection.RIGHT)
                     .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME,
@@ -461,10 +479,12 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     .getFilterWidgetByName(ATTR_STAGE_NAME).changeSelectionToOneValue();
 
             dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT,
-                    DashboardWidgetDirection.MIDDLE)
-                    .saveDashboard();
+                    DashboardWidgetDirection.MIDDLE);
 
-            dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME)
+            dashboardsPage.waitForFilterLoaded(asList(ATTR_ACCOUNT, ATTR_STAGE_NAME, ATTR_PRODUCT));
+            dashboardsPage.saveDashboard();
+
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME)
                     .getFilterWidgetByName(ATTR_ACCOUNT).changeAttributeFilterValues("101 Financial", "14 West");
             dashboardsPage.getFilterWidgetByName(ATTR_STAGE_NAME).changeAttributeFilterValues("Risk Assessment");
 
@@ -497,17 +517,23 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                             format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_2010),
                             DashboardWidgetDirection.RIGHT);
 
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            tableReport.addDrilling(Pair.of(asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+
+            dashboardsPage.waitForFilterLoaded(singletonList(DATE_DIMENSION_CREATED));
+            dashboardsPage.waitForReportLoaded(singletonList(REPORT_NAME));
+
             dashboardsPage.saveDashboard();
 
             //setup for target tab
-            dashboardsPage.selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
+            initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
                     .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, TimeFilterPanel.DateGranularity.YEAR,
-                            format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_2011))
-                    .saveDashboard();
+                            format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_2011));
 
-            dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME)
+            dashboardsPage.waitForFilterLoaded(singletonList(DATE_DIMENSION_CREATED));
+            dashboardsPage.saveDashboard();
+
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME)
                     .getFilterWidgetByName(DATE_DIMENSION_CREATED)
                     .changeTimeFilterValueByClickInTimeLine(YEAR_2012);
 
