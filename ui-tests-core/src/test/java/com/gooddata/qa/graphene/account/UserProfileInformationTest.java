@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.account;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.sdk.model.md.Restriction.title;
 import static com.gooddata.sdk.model.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
@@ -244,6 +245,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
             LoginFragment loginPage = LoginFragment.getInstance(browser);
             loginPage.login(testParams.getDomainUser(), testParams.getPassword(), true);
+            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
             List<String> metrics = initMetricPage().getDataPageRowsByTitle(metricName);
             assertEquals(metrics, asList(metricName, StringUtils.EMPTY));
