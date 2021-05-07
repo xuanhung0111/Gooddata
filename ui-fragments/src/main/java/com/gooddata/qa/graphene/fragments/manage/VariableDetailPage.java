@@ -168,7 +168,7 @@ public class VariableDetailPage extends ObjectPropertiesPage {
         return this;
     }
 
-    private VariableDetailPage waitForLoaded() {
+    public VariableDetailPage waitForLoaded() {
         By loadingIcon = By.className("loading-icon");
         try {
             waitForElementPresent(loadingIcon, getRoot());
