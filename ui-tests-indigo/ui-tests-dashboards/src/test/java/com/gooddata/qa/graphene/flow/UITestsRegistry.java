@@ -78,6 +78,12 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
+        suites.put("sanity-prod", new Object[] {
+            VisualizationDrillableWidgetTest.class,
+            ExportKPIDashboardsToPDF.class,
+            "testng-desktop-imap-KpiAlertEvaluate.xml"
+        });
+
         suites.put("sanity-aws", new Object[] {
                 EventingBasicInsightTest.class,
                 EventingWidgetDrillToDashboardTest.class,
