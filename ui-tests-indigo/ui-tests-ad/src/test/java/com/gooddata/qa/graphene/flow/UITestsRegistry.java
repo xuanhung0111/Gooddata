@@ -104,6 +104,11 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
+        suites.put("sanity-prod", new Object[] {
+            AnalyticalDesignerSanityTest.class,
+            VisualizationMeasureAttributeTest.class
+        });
+
         suites.put("e2e", new Object[] {
             EmptyCatalogueTest.class,
             RecommendationsWithoutDateDimensionTest.class,
