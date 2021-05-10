@@ -27,6 +27,10 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
+        suites.put("sanity-prod", new Object[] {
+            CsvUploaderSanityTest.class
+        });
+
         suites.put("extended", new Object[] {
             DatasetDetailTest.class,
             DataPreviewAfterUploadTest.class,

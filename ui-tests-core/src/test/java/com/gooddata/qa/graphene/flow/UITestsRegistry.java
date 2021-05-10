@@ -132,6 +132,11 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
+        suites.put("sanity-prod", new Object[] {
+            GoodSalesDashboardTest.class,
+            "testng-imap-GoodSales-email-schedule.xml",
+        });
+
         suites.put("basic-aws", new Object[] {
                 SimpleProjectEtlTest.class,
                 GoodSalesDashboardTest.class,
