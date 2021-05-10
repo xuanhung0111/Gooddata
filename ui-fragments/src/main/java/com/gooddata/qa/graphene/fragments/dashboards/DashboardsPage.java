@@ -22,6 +22,7 @@ import java.util.function.Function;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -781,6 +782,16 @@ public class DashboardsPage extends AbstractFragment {
 
     public String getDashboardNoPermissionAccessText(){
         return waitForElementVisible(By.cssSelector("#strictAccessControl > p.noPermissionAccess"), browser).getText();
+    }
+
+    public void waitForFilterLoaded(List<String> filtersName) {
+        filtersName.forEach(name -> Graphene.waitGui().until(browser ->
+            !getFilterWidgetByName(name).getCurrentValue().contains("...")));
+    }
+
+    public void waitForReportLoaded(List<String> reportsName) {
+        reportsName.forEach(report -> Graphene.waitGui().until().element(getReport(report, TableReport.class).getRoot())
+            .attribute("class").contains(REPORT_LOADED_CLASS_NAME));
     }
 
     private DashboardMenu openDashboardMenu() {

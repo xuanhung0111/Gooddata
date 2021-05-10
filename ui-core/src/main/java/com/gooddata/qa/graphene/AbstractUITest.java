@@ -58,6 +58,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
@@ -258,8 +259,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void addReportToNewDashboard(String reportName, String dashboardName) {
         initDashboardsPage()
                 .addNewDashboard(dashboardName)
-                .addReportToDashboard(reportName)
-                .saveDashboard();
+                .addReportToDashboard(reportName);
+        dashboardsPage.waitForReportLoaded(singletonList(reportName));
+        dashboardsPage.saveDashboard();
         checkRedBar(browser);
     }
 

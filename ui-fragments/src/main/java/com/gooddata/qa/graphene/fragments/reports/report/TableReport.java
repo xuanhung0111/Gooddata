@@ -309,6 +309,8 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     private TableReport drillOn(WebElement element) {
+        Graphene.waitGui().until().element(element).attribute("class").contains("drillable");
+
         if (!isDrillable(element)) {
             throw new RuntimeException("Could not drill on undrillable element");
         }
