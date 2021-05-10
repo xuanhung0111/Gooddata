@@ -14,6 +14,8 @@ import static java.util.stream.Collectors.toList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+
+import com.gooddata.qa.browser.BrowserUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -107,7 +109,8 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
     }
 
     public ObjectPropertiesPage addTag(String tag) {
-        waitForElementVisible(addTagButton).click();
+        //Click action on element does not clickable sometimes , so switch to use java script executor.
+        BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(addTagButton));
         IpeEditor.getInstance(browser).setText(tag);
 
         return this;
@@ -186,7 +189,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         return deleteButton.getAttribute("class").contains("disabled");
     }
 
-    private ObjectPropertiesPage waitForLoaded() {
+    public ObjectPropertiesPage waitForLoaded() {
         By busyMask = By.className("gdc-busy-mask-visible");
         try {
             Function<WebDriver, Boolean> isBusyMaskPresent = browser -> isElementPresent(busyMask, browser);

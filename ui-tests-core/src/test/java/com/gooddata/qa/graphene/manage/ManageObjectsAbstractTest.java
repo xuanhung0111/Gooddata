@@ -220,7 +220,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         waitForObjectPageLoaded(browser);
         for (String tagName : tagsList) {
             Graphene.createPageFragment(objectType.getDetailPage(),
-                    waitForElementVisible(ObjectPropertiesPage.LOCATOR, browser)).addTag(tagName);
+                    waitForElementVisible(ObjectPropertiesPage.LOCATOR, browser)).waitForLoaded().addTag(tagName);
         }
     }
 
