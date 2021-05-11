@@ -60,8 +60,6 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         getMetricCreator().createAmountBOPMetric();
         getMetricCreator().createWonMetric();
 
-        today = DateRange.getCurrentDate();
-
         kpiAmount = new KpiConfiguration.Builder().metric(METRIC_AMOUNT).dataSet(DATE_DATASET_CREATED)
             .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).build();
         factRestRequest = new FactRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
@@ -200,6 +198,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
 
     @DataProvider(name = "getWidgetNameAndExpectedDataProvider")
     public Object[][] getWidgetNameAndExpectedDataProvider() {
+        today = DateRange.getCurrentDate();
         return new Object[][]{
             { KD_HAS_ONLY_KPI_WIDGETS,
                 asList("$116,625,456.54", METRIC_AMOUNT, KD_HAS_ONLY_KPI_WIDGETS + " " + today, "Page 1/1") },
@@ -239,6 +238,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
                 .openExtendedDateFilterPanel().selectPeriod(DateRange.ALL_TIME).apply();
             indigoDashboardsPage.exportDashboardToPDF();
 
+            today = DateRange.getCurrentDate();
             List<String> contents = asList(getContentFrom(KD_HAS_PROTECTED_ATTRIBUTE_RESTRICTED_FACT).split("\n"));
             takeScreenshot(browser, roles.toString(), getClass());
             log.info(KD_HAS_PROTECTED_ATTRIBUTE_RESTRICTED_FACT + contents.toString());
@@ -269,7 +269,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
         logoutAndLoginAs(true, roles);
         try {
             initIndigoDashboardsPage().selectKpiDashboard(KD_ALL_ROLES).exportDashboardToPDF();
-
+            today = DateRange.getCurrentDate();
             List<String> contents = asList(getContentFrom("KPI all roles").split("\n"));
             takeScreenshot(browser, roles.toString(), getClass());
             log.info("KPI all roles" + contents.toString());
@@ -354,6 +354,7 @@ public class ExportKPIDashboardsToPDF extends AbstractDashboardTest {
             importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
             initIndigoDashboardsPageWithWidgets().selectKpiDashboard(KD_HAS_INVALID_DATA).waitForWidgetsLoading()
                 .exportDashboardToPDF();
+            today = DateRange.getCurrentDate();
             List<String> contents = asList(getContentFrom(KD_HAS_INVALID_DATA).split("\n"));
             assertThat(contents, hasItems("Error", METRIC_AMOUNT, KD_HAS_INVALID_DATA + " " + today, "Page 1/1"));
         } finally {
