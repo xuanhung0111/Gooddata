@@ -72,13 +72,21 @@ public class DateDimensionSelect extends AbstractReactDropDown {
                 browser);
     }
 
+    public boolean isDateGranularitySwitchPresent() {
+        return isElementPresent(By.cssSelector(".overlay.dropdown-body"), browser);
+    }
+
     public String getSelectionColor() {
         return waitForElementVisible(By.tagName("span"), getDropdownButton()).getCssValue("color");
     }
 
     @Override
     protected String getDropdownCssSelector() {
-        return ".overlay.dropdown-body";
+        if (!isDateGranularitySwitchPresent()) {
+            return ".gd-menuOpener";
+        } else {
+            return ".overlay.dropdown-body";
+        }
     }
 
     @Override
