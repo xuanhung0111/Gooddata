@@ -12,6 +12,12 @@
         </classes>
     </test>
 
+    <test name="GoodSalesDashboardExtendedTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardExtendedTest"/>
+        </classes>
+    </test>
+
     <test name="DashboardDateFilterSelectRangeTest" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest"/>

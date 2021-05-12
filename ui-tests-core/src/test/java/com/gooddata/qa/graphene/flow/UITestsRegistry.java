@@ -39,6 +39,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardExtendedTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
@@ -134,12 +135,14 @@ public class UITestsRegistry {
 
         suites.put("sanity-prod", new Object[] {
             GoodSalesDashboardTest.class,
+            GoodSalesDashboardExtendedTest.class,
             "testng-imap-GoodSales-email-schedule.xml",
         });
 
         suites.put("basic-aws", new Object[] {
                 SimpleProjectEtlTest.class,
                 GoodSalesDashboardTest.class,
+                GoodSalesDashboardExtendedTest.class,
                 GoodSalesReportsTest.class,
                 "testng-imap-GoodSales-email-schedule.xml",
                 "testng-imap-project-n-users-sanity-test.xml"
@@ -169,6 +172,7 @@ public class UITestsRegistry {
         suites.put("basic-vertica", new Object[] {
             SimpleProjectEtlTest.class,
             GoodSalesDashboardTest.class,
+            GoodSalesDashboardExtendedTest.class,
             GoodSalesReportsTest.class
         });
 
