@@ -1,0 +1,21 @@
+{
+  "postgresql_client": {
+    "connection": {
+      "url": "${POSTGRES_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "qa",
+          "password": "changeit"
+        }
+      },
+      "database": "qa",
+      "schema": "public",
+      "sslMode": "prefer"
+    }
+  },
+  "input_source": {
+    "type": "postgresql",
+    "query": "select login, language, password, role, clientid as client_id, user_groups FROM usersbrick"
+  },
+  "segments_filter": ["${SEGMENT_ID}"]
+}

@@ -1,0 +1,22 @@
+{
+  "snowflake_client": {
+    "connection": {
+      "url": "${SNOWFLAKE_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${SNOWFLAKE_USER_NAME}",
+          "password": "${SNOWFLAKE_PASSWORD}"
+        }
+      },
+      "database": "${SNOWFLAKE_DATABASE}",
+      "schema": "${SNOWFLAKE_SCHEMA}",
+      "warehouse": "${SNOWFLAKE_WAREHOUSE}"
+    }
+  },
+  "input_source": {
+    "type": "snowflake",
+    "query": "select login, first_name,lastname as last_name, email, sso as sso_provider, language, auth as authentication_modes, project_id, role FROM userbrick where id in (3)"
+  },
+  "SEGMENTS_FILTER": ["${SEGMENT_ID}"],
+  "whitelists": ["nmphong@lhv.vn"]
+}

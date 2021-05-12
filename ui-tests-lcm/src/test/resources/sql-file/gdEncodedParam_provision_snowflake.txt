@@ -1,0 +1,35 @@
+{
+  "TOKENS": {
+    "pg": "${TOKEN}",
+    "vertica": "INT00VDWH01STG2LCMPROD"
+  },
+  "snowflake_client": {
+    "connection": {
+      "url": "${SNOWFLAKE_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${SNOWFLAKE_USER_NAME}",
+          "password": "${SNOWFLAKE_PASSWORD}"
+        }
+      },
+      "database": "${SNOWFLAKE_DATABASE}",
+      "schema": "${SNOWFLAKE_SCHEMA}",
+      "warehouse": "${SNOWFLAKE_WAREHOUSE}"
+    }
+  },
+    "input_source": {
+      "type": "snowflake",
+      "query": "select client_id, segment_id, project_title from provisioning where segment_id = '${SEGMENT_ID}';"
+   },
+  "additional_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "additional_hidden_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "SEGMENTS_FILTER": ["${SEGMENT_ID}"],
+  "DATA_PRODUCT": "${DATA_PRODUCT}",
+  "technical_user": ["nmphong@lhv.vn"]
+}

@@ -1,0 +1,31 @@
+{
+  "update_preference": {
+    "keep_data": "false",
+    "allow_cascade_drops": "true"
+  },
+  "postgresql_client": {
+    "connection": {
+      "url": "${POSTRES_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${POSTGRES_USER_NAME}",
+          "password": "${POSRGRES_PASSWORD}"
+        }
+      },
+      "database": "${POSTGRES_DATABASE}",
+      "schema": "${POSTGRES_SCHEMA}",
+      "sslMode": "${POSTGRES_SSL_MODE}"
+    }
+  },
+  "additional_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "additional_hidden_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "SEGMENTS_FILTER": ["${SEGMENT_ID}"],
+  "DATA_PRODUCT": "${DATA_PRODUCT}",
+  "technical_user": ["nmphong@lhv.vn"]
+}

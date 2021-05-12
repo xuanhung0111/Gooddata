@@ -1,0 +1,36 @@
+{
+  "SEGMENTS": [{
+    "segment_id": "${SEGMENT_ID}",
+    "development_pid": "${DEVELOPMENT_PID}",
+    "driver": "pg",
+    "master_name": "${mstpn} ##{version}"
+      }],
+  "TOKENS": {
+    "pg": "${TOKEN}",
+    "vertica": "INT00VDWH01STG2LCMPROD"
+  },
+  "redshift_client": {
+    "connection": {
+      "url": "${REDSHIFT_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${REDSHIFT_USER_NAME}",
+          "password": "${REDSHIFT_PASSWORD}"
+        }
+      },
+      "database": "${REDSHIFT_DATABASE}",
+      "schema": "${REDSHIFT_SCHEMA}"
+    }
+  },
+  "additional_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "additional_hidden_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "DATA_PRODUCT": "${DATA_PRODUCT}",
+  "SEGMENTS_FILTER": ["${SEGMENT_ID}"],
+  "technical_user": ["nmphong@lhv.vn"]
+}

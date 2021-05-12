@@ -1,0 +1,38 @@
+{
+  "bigquery_client": {
+    "connection": {
+      "authentication": {
+        "serviceAccount": {
+          "clientEmail": "${BIGQUERY_CLIENT_EMAIL}",
+          "privateKey": "${PRIVATE_KEY}"
+        }
+      },
+      "schema": "${BIGQUERY_SCHEMA}",
+      "project": "${BIGQUERY_PROJECT}"
+    }
+  },
+  "SEGMENTS": [{
+    "segment_id": "${SEGMENT_ID}",
+    "development_pid": "${DEVELOPMENT_PID}",
+    "driver": "pg",
+    "master_name": "${mstpn} ##{version}"
+  }],
+  "TOKENS": {
+    "pg": "${TOKEN}",
+    "vertica": "INT00VDWH01STG2LCMPROD"
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "DATA_PRODUCT": "${DATA_PRODUCT}",
+  "technical_user": ["nmphong@lhv.vn"],
+  "additional_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "additional_hidden_params": {
+    "PARAM1": "VALUE1",
+    "PARAM2": "VALUE2"
+  },
+  "schedule_title_column": "schedule_name"
+}

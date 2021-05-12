@@ -1,0 +1,43 @@
+{
+  "postgresql_client": {
+    "connection": {
+      "url": "${POSTGRES_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${POSTGRES_USER_NAME}",
+          "password": "${POSTGRES_PASSWORD}"
+        }
+      },
+      "database": "${POSTGRES_DATABASE}",
+      "schema": "${POSTGRES_SCHEMA}",
+      "sslMode": "${POSTGRES_SSL}"
+    }
+  },
+  "input_source": {
+    "type": "postgresql",
+    "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+  },
+  "filters_config": {
+    "user_column": "login",
+    "labels": [{
+      "label": "label.users.username",
+      "column": "data"
+    }, {
+      "label": "label.users.gender",
+      "column": "data2"
+    }]
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_FILTER}"
+  ],
+  "do_not_touch_filters_that_are_not_mentioned": "true",
+  "ignore_missing_values": "true",
+  "restrict_if_missing_all_values": "false",
+  "users_brick_config": {
+    "input_source": {
+      "type": "postgresql",
+      "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+    },
+    "login_column": "login"
+  }
+}
