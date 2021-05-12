@@ -199,10 +199,23 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     protected enum TxtFile {
         CREATE_LDM("createLdm.txt"),
         ADS_TABLE("adsTable.txt"),
+        ADS_CLOUD_RESOURCE("adsCloudResource.txt"),
         LARGE_ADS_TABLE("largeAdsTable.txt"),
         GD_ENDCODE_PARAM_RELEASE("gdEndcodeParam.txt"),
         GD_ENDCODE_PARAM_PROVISIONING("gdEndcodeParamProvision.txt"),
-        GD_ENDCODE_PARAM_ROLLOUT("gdEndcodeParamRollout.txt");
+        GD_ENDCODE_PARAM_ROLLOUT("gdEndcodeParamRollout.txt"),
+        GD_ENDCODE_RELEASE_SNOWFLAKE("gdEncodedParam_snowflake.txt"),
+        GD_ENDCODE_RELEASE_REDSHIFT("gdEncodedParam_redshift.txt"),
+        GD_ENDCODE_RELEASE_BIGQUERY("gdEncodedParam_bigquery.txt"),
+        GD_ENDCODE_RELEASE_POSTGRES("gdEncodedParam_postgre.txt"),
+        GD_ENDCODE_PROVISIONING_SNOWFLAKE("gdEncodedParam_provision_snowflake.txt"),
+        GD_ENDCODE_PROVISIONING_REDSHIFT("gdEncodedParam_provision_redshift.txt"),
+        GD_ENDCODE_PROVISIONING_BIGQUERY("gdEncodedParam_provision_bigquery.txt"),
+        GD_ENDCODE_PROVISIONING_POSTGRES("gdEncodedParam_provision_postgre.txt"),
+        GD_ENDCODE_ROLLOUT_SNOWFLAKE("gdEncodedParam_rollout_snowflake.txt"),
+        GD_ENDCODE_ROLLOUT_REDSHIFT("gdEncodedParam_rollout_redshift.txt"),
+        GD_ENDCODE_ROLLOUT_BIGQUERY("gdEncodedParam_rollout_bigquery.txt"),
+        GD_ENDCODE_ROLLOUT_POSTGRES("gdEncodedParam_rollout_postgre.txt");
 
         private final String name;
 

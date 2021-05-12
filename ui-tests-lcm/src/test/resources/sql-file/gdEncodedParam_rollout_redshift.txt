@@ -1,0 +1,23 @@
+{
+  "redshift_client": {
+    "connection": {
+      "url": "${REDSHIFT_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${REDSHIFT_USER_NAME}",
+          "password": "${REDSHIFT_PASSWORD}"
+        }
+      },
+      "database": "${REDSHIFT_DATABASE}",
+      "schema": "${REDSHIFT_SCHEMA}"
+    }
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "data_product": "${DATA_PRODUCT}",
+  "update_preference": {
+    "keep_data": false,
+    "allow_cascade_drops": true
+  }
+}

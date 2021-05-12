@@ -1,0 +1,22 @@
+{
+  "bigquery_client": {
+    "connection": {
+      "authentication": {
+        "serviceAccount": {
+          "clientEmail": "${BIGQUERY_CLIENT_EMAIL}",
+          "privateKey": "${PRIVATE_KEY}"
+        }
+      },
+      "schema": "${BIGQUERY_SCHEMA}",
+      "project": "${BIGQUERY_PROJECT}"
+    }
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "data_product": "${DATA_PRODUCT}",
+  "update_preference": {
+    "keep_data": false,
+    "allow_cascade_drops": true
+  }
+}

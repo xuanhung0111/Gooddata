@@ -1,0 +1,30 @@
+{
+  "redshift_client": {
+    "connection": {
+      "url": "${REDSHIFT_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${REDSHIFT_USER_NAME}",
+          "password": "${REDSHIFT_PASSWORD}"
+        }
+      },
+      "database": "${REDSHIFT_DATABASE}",
+      "schema": "${REDSHIFT_SCHEMA}"
+    }
+  },
+
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "DATA_PRODUCT": "${DATA_PRODUCT}",
+  "input_source": {
+    "type": "redshift",
+    "query": "select client_id, segment_id, project_title from provisioning where segment_id = '${SEGMENT_ID}';"
+  },
+  "additional_hidden_params": {
+    "PARAM2": "VALUE2"
+  },
+  "additional_params": {
+    "PARAM1": "VALUE1"
+  }
+}

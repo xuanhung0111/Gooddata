@@ -1,0 +1,40 @@
+{
+  "snowflake_client": {
+    "connection": {
+      "url": "${SNOWFLAKE_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${SNOWFLAKE_USER_NAME}",
+          "password": "${SNOWFLAKE_PASSWORD}"
+        }
+      },
+      "database": "${SNOWFLAKE_DATABASE}",
+      "schema": "${SNOWFLAKE_SCHEMA}",
+      "warehouse": "${SNOWFLAKE_WAREHOUSE}"
+    }
+  },
+  "filters_config": {
+    "user_column": "login",
+    "labels": [{
+      "label": "label.users.username",
+      "column": "data"
+    }, {
+      "label": "label.users.gender",
+      "column": "data2"
+    }]
+  },
+  "input_source": {
+    "type": "snowflake",
+    "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+  },
+  "do_not_touch_filters_that_are_not_mentioned": "true",
+  "ignore_missing_values": "true",
+  "restrict_if_missing_all_values": "false",
+  "users_brick_config": {
+    "input_source": {
+      "type": "snowflake",
+      "query": "SELECT login,data,data2,clientid as client_id FROM usersfilter"
+    },
+    "SEGMENTS_FILTER": ["${SEGMENT_FILTER}"]
+  }
+}

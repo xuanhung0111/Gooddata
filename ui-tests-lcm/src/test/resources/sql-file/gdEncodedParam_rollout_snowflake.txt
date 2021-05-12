@@ -1,0 +1,24 @@
+{
+  "snowflake_client": {
+    "connection": {
+      "url": "${SNOWFLAKE_URL}",
+      "authentication": {
+        "basic": {
+          "userName": "${SNOWFLAKE_USER_NAME}",
+          "password": "${SNOWFLAKE_PASSWORD}"
+        }
+      },
+      "database": "${SNOWFLAKE_DATABASE}",
+      "schema": "${SNOWFLAKE_SCHEMA}",
+      "warehouse": "${SNOWFLAKE_WAREHOUSE}"
+    }
+  },
+  "SEGMENTS_FILTER": [
+    "${SEGMENT_ID}"
+  ],
+  "data_product": "${DATA_PRODUCT}",
+  "update_preference": {
+    "keep_data": false,
+    "allow_cascade_drops": true
+  }
+}
