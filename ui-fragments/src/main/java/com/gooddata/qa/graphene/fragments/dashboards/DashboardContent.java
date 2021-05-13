@@ -43,7 +43,7 @@ public class DashboardContent extends AbstractFragment {
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
     private List<WebElement> widgets;
 
-    private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
+    public static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
     private static final By REPORT_LOCATOR =
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget");
 
@@ -189,6 +189,10 @@ public class DashboardContent extends AbstractFragment {
         waitForElementAttributeNotContainValue(getLastKeyMetricElement(), "class", "reloading");
     }
 
+    public List<WebElement> getReports() {
+        return getRoot().findElements(REPORT_LOCATOR);
+    }
+
     private WebElement getLastKeyMetricElement() {
         return Iterables.getLast(browser.findElements(HEADLINE_WIDGET_LOCATOR));
     }
@@ -199,9 +203,5 @@ public class DashboardContent extends AbstractFragment {
                 .map(e -> waitForElementVisible(e))
                 .map(e -> Graphene.createPageFragment(EmbeddedWidget.class, e))
                 .collect(toList());
-    }
-
-    private List<WebElement> getReports() {
-        return getRoot().findElements(REPORT_LOCATOR);
     }
 }

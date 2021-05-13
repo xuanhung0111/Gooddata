@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardVariableFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardExtendedTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
@@ -154,7 +155,8 @@ public class UITestsRegistry {
                     "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
             });
             put("basic-filters", new Object[] {
-                GoodSalesDashboardAllKindsFiltersTest.class
+                GoodSalesDashboardAllKindsFiltersTest.class,
+                GoodSalesDashboardVariableFiltersTest.class
             });
             put("basic-drilling", new Object[] {
                 GoodSalesDrillReportTest.class
@@ -178,6 +180,7 @@ public class UITestsRegistry {
 
         suites.put("filters", new Object[] {
             GoodSalesDashboardAllKindsFiltersTest.class,
+            GoodSalesDashboardVariableFiltersTest.class,
             GoodSalesFilterDropdownAttributeValueTest.class,
             GoodSalesCascadingFilterTest.class,
             GoodSalesConnectingFilterTest.class,
@@ -241,6 +244,7 @@ public class UITestsRegistry {
                     DashboardAndTabManipulationTest.class,
                     GoodSalesDrillReportTest.class,
                     GoodSalesDashboardAllKindsFiltersTest.class,
+                    GoodSalesDashboardVariableFiltersTest.class,
                     GoodSalesFilterDropdownAttributeValueTest.class,
                     GoodSalesCascadingFilterTest.class,
                     GoodSalesConnectingFilterTest.class,
