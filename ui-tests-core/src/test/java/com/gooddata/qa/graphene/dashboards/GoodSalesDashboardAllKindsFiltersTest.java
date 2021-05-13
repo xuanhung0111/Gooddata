@@ -1,14 +1,11 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.sdk.model.md.Metric;
-import com.gooddata.sdk.model.project.Project;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
@@ -16,11 +13,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
-import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -28,23 +23,23 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardContent.REPORT_TITLE_LOCATOR;
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.REPORT_LOADED_CLASS_NAME;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest {
@@ -80,15 +75,62 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createTestingReport"})
+    public void verifyFilterConnectedWithReport() {
+        try {
+            addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
+
+            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(ATTR_STAGE_NAME));
+
+            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
+            assertEquals(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME));
+            dashboardEditBar.saveDashboard();
+
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_STAGE_NAME));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
+            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
+
+            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
+
+            // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
+            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            assertEquals(getRowElementsFrom(report).size(), 1);
+
+            dashboardsPage.editDashboard();
+            report.removeFilters(ATTR_STAGE_NAME);
+            dashboardEditBar.saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_STAGE_NAME));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
+
+            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
+
+            // reload table report
+            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
+            assertTrue(report.openReportInfoViewPanel().getAllFilterNames().isEmpty(), "Report should have no filter");
+        } finally {
+            dashboardsPage.deleteDashboard();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createTestingReport"})
     public void testSingleOptionAttributeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
             addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
 
-            dashboardsPage.editDashboard();
+            initDashboardsPage().editDashboard();
             FilterWidget filter = getFilterWidget(STAGE_NAME_FILTER);
             filter.changeSelectionToOneValue();
+
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_STAGE_NAME));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
+
             dashboardsPage.saveDashboard();
+
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_STAGE_NAME));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
 
             assertEquals(filter.getCurrentValue(), "Interest");
 
@@ -105,41 +147,6 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createTestingReport"})
-    public void verifyFilterConnectedWithReport() {
-        try {
-            addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
-            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
-
-            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(ATTR_STAGE_NAME));
-
-            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            assertEquals(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME));
-            dashboardEditBar.saveDashboard();
-            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
-
-            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
-
-            // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
-            report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
-            assertEquals(getRowElementsFrom(report).size(), 1);
-
-            dashboardsPage.editDashboard();
-            report.removeFilters(ATTR_STAGE_NAME);
-            dashboardEditBar.saveDashboard();
-
-            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
-
-            // reload table report
-            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
-            assertTrue(report.openReportInfoViewPanel().getAllFilterNames().isEmpty(), "Report should have no filter");
-        } finally {
-            dashboardsPage.deleteDashboard();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createTestingReport"})
     public void timeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
@@ -148,6 +155,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                     .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR,
                             String.format("%s ago", Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA))
                     .saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList(DATE_DIMENSION_SNAPSHOT));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(DATE_DIMENSION_SNAPSHOT));
@@ -170,6 +179,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             report.removeFilters(DATE_DIMENSION_SNAPSHOT);
             dashboardsPage.saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList(DATE_DIMENSION_SNAPSHOT));
+            dashboardsPage.waitForReportLoaded(singletonList(TESTING_REPORT));
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed(),
@@ -190,6 +201,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage
                     .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account")
                     .saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList(ATTR_ACCOUNT));
             checkRedBar(browser);
             assertEquals(getFilterWidget("account").getTitle(), "ACCOUNT");
 
@@ -201,144 +213,28 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             dashboardsPage.editDashboard();
             getFilterWidget("account_edit").changeTitle("Filter Account");
+
+            //Work around for saving dashboard with changing title filter filter not successfully
+            waitForElementVisible(By.id("footerCopyright"), browser).click();
             dashboardsPage.saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList("FILTER ACCOUNT"));
             assertEquals(getFilterWidget("filter_account").getTitle(), "FILTER ACCOUNT");
 
             dashboardsPage.editDashboard();
             getFilterWidget("filter_account").changeTitle("");
+
+            //Work around for saving dashboard with changing title filter filter not successfully
+            waitForElementVisible(By.id("footerCopyright"), browser).click();
+
+            assertEquals(getFilterWidget("filter_account").getTitle(), "ACCOUNT EDIT");
+
             dashboardsPage.saveDashboard();
+            dashboardsPage.waitForFilterLoaded(singletonList("ACCOUNT EDIT"));
             assertEquals(getFilterWidget("account_edit").getTitle(), "ACCOUNT EDIT");
         } finally {
             dashboardsPage.deleteDashboard();
             initAttributePage().initAttribute("Account Edit")
                 .changeName("Account");
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void createVariables() {
-        initVariablePage().createVariable(new AttributeVariable("FStageName").withAttribute(ATTR_STAGE_NAME));
-
-        VariableDetailPage.getInstance(browser)
-                .goToVariablesPage()
-                .createVariable(new AttributeVariable("FQuarter/Year")
-                        .withAttribute("Quarter/Year (Snapshot)")
-                        .withAttributeValues("Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012"));
-
-        nVariableUri = VariableDetailPage.getInstance(browser)
-                .goToVariablesPage()
-                .createVariable(new NumericVariable("NVariable").withDefaultNumber(123456));
-    }
-
-    @Test(dependsOnMethods = {"createVariables"})
-    public void createReportsWithVariableFilter() {
-        initReportsPage();
-        UiReportDefinition rd =
-                new UiReportDefinition().withName(REPORT_1).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
-                        .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, HowItem.Position.TOP));
-        createReport(rd, REPORT_1);
-        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FStageName", "2010", "2011", "2012",
-                "Interest", "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation",
-                "Closed Won", "Closed Lost"));
-        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FQuarter/Year", "2012", "Interest",
-                "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won",
-                "Closed Lost"));
-        reportPage.saveReport();
-
-        initReportsPage();
-        rd.withName(REPORT_2);
-        createReport(rd, REPORT_2);
-        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FQuarter/Year", "2012", "Interest",
-                "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won",
-                "Closed Lost"));
-        reportPage.saveReport();
-    }
-
-    @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
-    public void testVariableFilters() {
-        try {
-            addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
-            addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.UP);
-            addAttributeFilterToDashboard("FStageName", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
-
-            dashboardsPage.editDashboard();
-            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertEquals(report.getAllFilterNames(), asList("FQuarter/Year", "FStageName"));
-            dashboardsPage.saveDashboard();
-            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), asList("FQuarter/Year", "FStageName"));
-
-            getFilterWidget("fstagename").changeAttributeFilterValues("Short List");
-            assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
-            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1,
-                    "Report should have records");
-        } finally {
-            dashboardsPage.deleteDashboard();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
-    public void testSingleOptionVariableFilter() {
-        try {
-            addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
-            addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.UP);
-            addAttributeFilterToDashboard("FStageName", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
-
-            dashboardsPage.editDashboard();
-            FilterWidget filter = getFilterWidget("fstagename");
-            filter.changeSelectionToOneValue();
-            filter.openPanel();
-            assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
-                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode(),
-                    "Attribute filter panel should be on single mode");
-            dashboardsPage.saveDashboard();
-
-            assertEquals(filter.getCurrentValue(), "Interest");
-            assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
-            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1,
-                    "Report should have records");
-        } finally {
-            dashboardsPage.deleteDashboard();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createVariables"})
-    public void testReportWithNumericalVariableInMetricSentence() {
-        initVariablePage()
-                .openVariableFromList("NVariable")
-                .setDefaultNumericValue(2011)
-                .saveChange();
-
-        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
-        Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
-        String metric = "GREATER-NVariable";
-        String expression = "SELECT [" + getMetricByTitle(METRIC_AMOUNT).getUri() + "]" +
-                " WHERE [" + getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri() + "] > [" + nVariableUri + "]";
-        restClient.getMetadataService().createObj(project, new Metric(metric,
-                expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
-
-        initReportsPage();
-        createReport(new UiReportDefinition().withName("Report 4").withWhats(METRIC_AMOUNT, metric)
-                .withHows(ATTR_YEAR_SNAPSHOT), "Report 4");
-
-        try {
-            addReportToDashboard("Report 4");
-            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            List<String> years = report.getAttributeValues();
-            List<String> nVarValues = report.getRawMetricValues().subList(3, 3 + years.size());
-            Iterator<String> yearsIterator = years.iterator();
-            Iterator<String> nVarIterator = nVarValues.iterator();
-
-            while (yearsIterator.hasNext() && nVarIterator.hasNext()) {
-                if (Integer.parseInt(yearsIterator.next()) > 2011) {
-                    assertNotEquals(nVarIterator.next(), "");
-                } else {
-                    assertEquals(nVarIterator.next(), "");
-                }
-            }
-        } finally {
-            dashboardsPage.deleteDashboard();
         }
     }
 
@@ -405,12 +301,15 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardEditBar.addReportToDashboard(name);
 
-        WebElement latestReport = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
+        WebElement latestReport = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded().getRoot();
+        dashboardsPage.waitForReportLoaded(singletonList(name));
+
         if (direction != null) {
             direction.moveElementToRightPlace(latestReport);
         }
         dashboardEditBar.saveDashboard();
         checkRedBar(browser);
+        dashboardsPage.waitForReportLoaded(singletonList(name));
     }
 
     private void addAttributeFilterToDashboard(String attribute, DashAttributeFilterTypes type,
@@ -429,8 +328,19 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         // get focus
         filter.click();
         direction.moveElementToRightPlace(filter);
+        DashboardContent dashboardContent = dashboardsPage.getContent();
+        if(dashboardContent.getNumberOfReports() > 0) {
+            dashboardContent.getReports().stream().forEach(report -> {
+                Graphene.waitGui().until().element(report).attribute("class").contains(REPORT_LOADED_CLASS_NAME);
+                dashboardContent.getReport(report.findElement(REPORT_TITLE_LOCATOR).getText(), TableReport.class).waitForLoaded();
+            });
+        }
+
+        dashboardsPage.waitForFilterLoaded(singletonList(attribute));
+
         dashboardsPage.saveDashboard();
         checkRedBar(browser);
+        dashboardsPage.waitForFilterLoaded(singletonList(attribute));
     }
 
     private void addAttributeFilterToDashboard(String attribute, DashAttributeFilterTypes type) {

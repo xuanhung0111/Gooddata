@@ -54,6 +54,12 @@
         </classes>
     </test>
 
+    <test name="GoodSalesDashboardVariableFiltersTest" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardVariableFiltersTest"/>
+        </classes>
+    </test>
+
     <test name="DragAndDropMetricsOrAttributesColumnOnReportTest" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.reports.DragAndDropMetricsOrAttributesColumnOnReportTest"/>
