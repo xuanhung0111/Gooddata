@@ -29,11 +29,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.gooddata.qa.browser.BrowserUtils.refreshCurrentPage;
 import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.REPORT_LOADED_CLASS_NAME;
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.waitForReportLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
@@ -177,13 +181,17 @@ public class GoodSalesDashboardVariableFiltersTest extends GoodSalesAbstractTest
             initDashboardsPage().editDashboard();
             FilterWidget filter = getFilterWidget("fstagename");
             filter.changeSelectionToOneValue();
+            waitForReportLoaded(browser);
+
             filter.openPanel();
             assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
                 waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode(),
                 "Attribute filter panel should be on single mode");
             dashboardsPage.saveDashboard();
-            dashboardsPage.waitForFilterLoaded(asList("FQuarter/Year", "FStageName"));
-            dashboardsPage.waitForReportLoaded(asList(REPORT_1, REPORT_2));
+            waitForDashboardPageLoaded(browser);
+
+            refreshCurrentPage(browser);
+            waitForDashboardPageLoaded(browser);
 
             assertEquals(filter.getCurrentValue(), "Interest");
             assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
@@ -226,6 +234,8 @@ public class GoodSalesDashboardVariableFiltersTest extends GoodSalesAbstractTest
 
         if (direction == null) {
             dashboardsPage.saveDashboard();
+            waitForReportsPageLoaded(browser);
+            waitForDashboardPageLoaded(browser);
             checkRedBar(browser);
             return;
         }
@@ -242,6 +252,7 @@ public class GoodSalesDashboardVariableFiltersTest extends GoodSalesAbstractTest
         }
 
         dashboardsPage.saveDashboard();
+        waitForDashboardPageLoaded(browser);
         checkRedBar(browser);
     }
 
