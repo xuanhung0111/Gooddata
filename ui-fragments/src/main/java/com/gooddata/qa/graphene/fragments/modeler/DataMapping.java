@@ -84,7 +84,7 @@ public class DataMapping extends AbstractFragment {
         WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
                 : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+        driverActions.moveToElement(sourceColumn).moveByOffset(5,5).click().pause(1000).sendKeys(Keys.DELETE)
                 .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).pause(1000).build().perform();
         return this;
     }
@@ -94,7 +94,7 @@ public class DataMapping extends AbstractFragment {
         WebElement sourceColumn = (isMapping == true) ? row.findElement(By.className("s-editable-label"))
                 : row.findElement(By.cssSelector(".sourceColumnWarning .s-editable-label"));
         Actions driverActions = new Actions(browser);
-        driverActions.moveToElement(sourceColumn).click().pause(1000).sendKeys(Keys.DELETE)
+        driverActions.moveToElement(sourceColumn).moveByOffset(5,5).click().pause(1000).sendKeys(Keys.DELETE)
                 .sendKeys(newName).pause(1000).sendKeys(Keys.ENTER).build().perform();
         return this;
     }
