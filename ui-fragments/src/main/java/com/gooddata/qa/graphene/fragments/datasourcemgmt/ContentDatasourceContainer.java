@@ -131,7 +131,8 @@ public class ContentDatasourceContainer extends AbstractFragment {
     }
 
     public void clickSavebutton() {
-        waitForElementVisible(saveButton).click();
+        waitForElementVisible(saveButton);
+        Graphene.waitGui().until(ExpectedConditions.elementToBeClickable(saveButton)).click();
     }
 
     public void clickCancelButton () {
