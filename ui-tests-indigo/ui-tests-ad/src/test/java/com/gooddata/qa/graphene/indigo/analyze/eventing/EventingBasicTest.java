@@ -389,6 +389,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_STAGE_NAME, 0).click();
         JSONObject content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+        embeddedAnalysisPage.clear();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -417,6 +418,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         embeddedAnalysisPage.getPivotTableReport().getCellElement(ATTR_YEAR_ACTIVITY, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
+        embeddedAnalysisPage.clear();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -472,6 +474,7 @@ public class EventingBasicTest extends AbstractEventingTest {
         embeddedAnalysisPage.getPivotTableReport().getCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
         content = getLatestPostMessageObj();
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        embeddedAnalysisPage.clear();
     }
 
     @Test(dependsOnGroups = {"createProject"})
