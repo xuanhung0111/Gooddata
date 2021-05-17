@@ -44,6 +44,8 @@ import java.util.stream.Stream;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+
+import static com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage.waitForReportLoaded;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -188,12 +190,21 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             TableReport reportOnSourceTab = dashboardsPage.getContent().getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
 
             reportOnSourceTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), "Dashboards");
+            reportOnSourceTab.waitForLoaded();
+            waitForReportLoaded(browser);
+            waitForDashboardPageLoaded(browser);
+
             dashboardsPage.saveDashboard();
 
-
+            //refresh to make sure drill settings are applied
+            browser.navigate().refresh();
+            waitForDashboardPageLoaded(browser);
+            
             if (!filterValuesToChange.isEmpty()) {
                 for (Pair<String, List<String>> entry : filterValuesToChange) {
                     changeFilterValues(entry.getLeft(), entry.getRight());
+                    reportOnSourceTab.waitForLoaded();
+                    waitForReportLoaded(browser);
                 }
             }
 
@@ -336,7 +347,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         createAndAddUserToProject(UserRoles.VIEWER_DISABLED_EXPORT);
     }
 
-    /**
+     /**
      * senario 11
      * https://docs.google.com/document/d/1FtJ-Q2Q-SfbUh5Cp7dD75tVVKdgDEbPeBqdkgj9Rfh8
      */
@@ -446,8 +457,16 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                     .addDrilling(Pair.of(singletonList(ATTR_PRODUCT), REPORT_TOP_5_OPEN_BY_CASH), REPORTS_DRILLING_GROUP)
                     .addInnerDrillToLastItemPanel(Pair.of(singletonList(METRIC_TOP_5_OF_BEST_CASE), SECOND_TAB));
             widgetConfigPanel.saveConfiguration();
+            tableOnFirstTab.waitForLoaded();
+            waitForReportLoaded(browser);
+
             dashboardsPage.saveDashboard();
-            tableOnFirstTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+
+            //refresh to make sure drill settings are applied
+            browser.navigate().refresh();
+            waitForDashboardPageLoaded(browser);
+
+            tableOnFirstTab.waitForLoaded().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             TableReport reportAfterDrillAction = DashboardDrillDialog.getInstance(browser)
                     .getReport(TableReport.class).waitForLoaded();
 
