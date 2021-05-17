@@ -18,6 +18,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginFragment extends AbstractFragment {
 
@@ -116,14 +117,20 @@ public class LoginFragment extends AbstractFragment {
     public void registerNewAccount() {
         // Use href to detect the environment instead of text which may be depend on user locale
         String href = waitForElementVisible(registrationLink).getAttribute("href");
-        registrationLink.click();
+        Graphene.waitGui().until(ExpectedConditions.elementToBeClickable(registrationLink)).click();
 
-        if (href.endsWith("request-a-demo")) {
-            Function<WebDriver, Boolean> requestADemoPageDisplayed = browser ->
-                    browser.getCurrentUrl().startsWith("https://www.gooddata.com/request-a-demo");
-            Graphene.waitGui().until(requestADemoPageDisplayed);
-        } else {
-            RegistrationPage.getInstance(browser);
+        try {
+            if (href.endsWith("request-a-demo")) {
+                Function<WebDriver, Boolean> requestADemoPageDisplayed = browser ->
+                        browser.getCurrentUrl().startsWith("https://www.gooddata.com/request-a-demo");
+                Graphene.waitGui().until(requestADemoPageDisplayed);
+            } else {
+                RegistrationPage.getInstance(browser);
+            }
+        } catch (Exception noSuchElement) {
+            log.warning("System loading forever !!!. Refresh page");
+            browser.navigate().refresh();
+            Graphene.waitGui().until(ExpectedConditions.elementToBeClickable(registrationLink)).click();
         }
     }
 
