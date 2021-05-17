@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -40,6 +41,7 @@ public class DataSourceSchemaContent extends AbstractFragment {
     public BubleContent openPopUpTable(String name) {
         WebElement table = getTablesByName(name);
         Actions action = new Actions(browser);
+        scrollElementIntoView(table, browser);
         action.moveToElement(table.findElement(By.className("type-name"))).click().build().perform();
         waitForElementVisible(table.findElement(By.className("icon-circle-question")));
         action.moveToElement(table.findElement(By.className("icon-circle-question"))).click().build().perform();
@@ -50,6 +52,7 @@ public class DataSourceSchemaContent extends AbstractFragment {
 //        dragDropUseJS(table, jsFile) -> Using in cases can not drag and drop by Selenium and JS
         WebElement from = getTablesByName(name);
         waitForElementVisible(from);
+        scrollElementIntoView(from, browser);
         Actions driverActions = new Actions(browser);
         driverActions.clickAndHold(from).moveByOffset(100, 100).perform();
         try {
