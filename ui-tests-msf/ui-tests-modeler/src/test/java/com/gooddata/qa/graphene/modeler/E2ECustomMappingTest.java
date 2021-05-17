@@ -31,6 +31,7 @@ import com.gooddata.qa.graphene.fragments.modeler.EditDatasetDialog;
 import com.gooddata.qa.graphene.fragments.modeler.OverlayWrapper;
 import com.gooddata.qa.graphene.fragments.modeler.DateModel;
 import com.gooddata.qa.graphene.fragments.modeler.EditDateDimensionDialog;
+import com.gooddata.qa.graphene.fragments.modeler.LdmWaitingDialog;
 
 
 import com.gooddata.qa.utils.CSVUtils;
@@ -262,11 +263,9 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
         modeler.getLayout().waitForLoading();
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
-        initModelerPageContent();
-        modeler.getLayout().waitForLoading();
-        toolbar.switchToTableView();
         File exportFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + CLASS_DATASET + "." + ExportFormat.CSV.getName());
+        LdmWaitingDialog.getInstance(browser).waitForLoading().closeDialog();
         waitForExporting(exportFile);
         List<String> downloadContent = CSVUtils.readCsvFile(exportFile).stream()
                 .flatMap(Collection::stream)
@@ -316,6 +315,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
     public void downloadTemplateAfterEditAndLoadData() throws IOException {
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(CLASS_TITLE);
+        LdmWaitingDialog.getInstance(browser).waitForLoading().closeDialog();
         initLogicalDataModelPage();
         //Change mapping to UPPERCASE
         Model modelClass = mainModelContent.getModel(CLASS_DATASET);
@@ -406,6 +406,7 @@ public class E2ECustomMappingTest extends AbstractLDMPageTest {
 
         toolbar.switchToTableView();
         tableViewDataset.clickButtonDownloadTemplate(datasetName);
+        LdmWaitingDialog.getInstance(browser).waitForLoading().closeDialog();
         initModelerPageContent();
         modeler.getLayout().waitForLoading();
         toolbar.switchToTableView();

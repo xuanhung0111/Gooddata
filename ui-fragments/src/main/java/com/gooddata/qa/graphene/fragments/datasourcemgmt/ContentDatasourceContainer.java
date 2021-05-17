@@ -204,7 +204,7 @@ public class ContentDatasourceContainer extends AbstractFragment {
     }
 
     public String getAliasErrorMessage() {
-        getActions().moveToElement(emptyField).build().perform();
+        getActions().moveToElement(emptyField).moveByOffset(5,5).build().perform();
         return waitForElementVisible(REQUIRED_MESSAGE, browser).getText();
     }
 
