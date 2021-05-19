@@ -17,6 +17,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public class PublishModelDialog extends AbstractFragment {
     private static final By SIDEBAR = By.className("publish-model");
+    private static final String DELETE_DEPENDENCIES_DIALOG = "delete-dependencies-confirm-dialog";
 
     @FindBy(css = ".gd-dialog-footer .s-publish")
     private WebElement btnPublish;
@@ -102,6 +103,10 @@ public class PublishModelDialog extends AbstractFragment {
 
     public void publishSwitchToEditMode() {
         publishModel();
+        if (isElementPresent(By.className(DELETE_DEPENDENCIES_DIALOG), browser)) {
+            DeleteDependencyDialog.getInstance(browser).clickPublishAnyway();
+            waitForFragmentNotVisible(this);
+        }
         ToolBar.getInstance(browser).clickEditBtn();
     }
 
