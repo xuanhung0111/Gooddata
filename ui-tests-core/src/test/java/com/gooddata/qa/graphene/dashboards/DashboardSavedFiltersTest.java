@@ -391,8 +391,9 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME)
                 .addNewTab("second tab")
                 .turnSavedViewOption(true)
-                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Firstname")
-                .saveDashboard();
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Firstname");
+        sleepTightInSeconds(1);
+        dashboardsPage.saveDashboard();
 
         dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValues("Adam");
         dashboardsPage.getTabs().openTab(0);
