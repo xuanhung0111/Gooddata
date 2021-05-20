@@ -215,7 +215,15 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         GD_ENDCODE_ROLLOUT_SNOWFLAKE("gdEncodedParam_rollout_snowflake.txt"),
         GD_ENDCODE_ROLLOUT_REDSHIFT("gdEncodedParam_rollout_redshift.txt"),
         GD_ENDCODE_ROLLOUT_BIGQUERY("gdEncodedParam_rollout_bigquery.txt"),
-        GD_ENDCODE_ROLLOUT_POSTGRES("gdEncodedParam_rollout_postgre.txt");
+        GD_ENDCODE_ROLLOUT_POSTGRES("gdEncodedParam_rollout_postgre.txt"),
+        GD_ENDCODE_USER_SNOWFLAKE("gdEncodedParam_user_snowflake.txt"),
+        GD_ENDCODE_USER_REDSHIFT("gdEncodedParam_user_redshift.txt"),
+        GD_ENDCODE_USER_BIGQUERY("gdEncodedParam_user_bigquery.txt"),
+        GD_ENDCODE_USER_POSTGRES("gdEncodedParam_user_postgres.txt"),
+        GD_ENDCODE_USERFILTER_SNOWFLAKE("gdEncodedParam_userfilter_snowflake.txt"),
+        GD_ENDCODE_USERFILTER_REDSHIFT("gdEncodedParam_userfilter_redshift.txt"),
+        GD_ENDCODE_USERFILTER_BIGQUERY("gdEncodedParam_userfilter_bigquery.txt"),
+        GD_ENDCODE_USERFILTER_POSTGRES("gdEncodedParam_userfilter_postgres.txt");
 
         private final String name;
 

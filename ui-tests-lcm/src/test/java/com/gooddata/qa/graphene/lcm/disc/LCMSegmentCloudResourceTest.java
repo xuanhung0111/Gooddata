@@ -301,7 +301,7 @@ public class LCMSegmentCloudResourceTest extends AbstractDataloadProcessTest {
         initDiscProjectsPage().searchProject(clientProject).clickOnProjectTitleLink(clientProject);
 
         assertFalse(projectDetailPage.goToAnalyze().getPageHeader().expandInsightSelection().isExist(INSIGHT_LCM),
-                    "Insight still existed");
+                "Insight still existed");
     }
 
     private void deleteInsightOnDev() {
@@ -337,7 +337,7 @@ public class LCMSegmentCloudResourceTest extends AbstractDataloadProcessTest {
     }
 
     private void createProcess(String processTypeName, String endcodeParam, String segmentId,
-                                     String provisionScheduleName) {
+                               String provisionScheduleName) {
         addParamScheduleProcess(processTypeName, segmentId, "");
         createProcess(endcodeParam, provisionScheduleName);
     }
@@ -348,7 +348,7 @@ public class LCMSegmentCloudResourceTest extends AbstractDataloadProcessTest {
         scheduleForm.enterScheduleName(releaseScheduleName);
         scheduleForm.schedule();
     }
-    
+
     private void createProcess(String endcodeParam, String provisionScheduleName) {
         scheduleForm.addParameter(LcmDirectoryConfiguration.GD_ENDCODE_PARAM.getParamName(), endcodeParam);
         scheduleForm.enterScheduleName(provisionScheduleName);

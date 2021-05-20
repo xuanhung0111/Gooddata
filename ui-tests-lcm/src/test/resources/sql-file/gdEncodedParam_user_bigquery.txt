@@ -11,12 +11,10 @@
       "project": "${BIGQUERY_PROJECT}"
     }
   },
-  "SEGMENTS_FILTER": [
-    "${SEGMENT_ID}"
-  ],
-  "data_product": "${DATA_PRODUCT}",
   "input_source": {
     "type": "bigquery",
-    "query": "select login, firstname as first_name,lastname as last_name, email, sso as sso_provider, language, auth as authentication_modes, project_id, role FROM userbrick"
-  }
+    "query": "select login, project_id, role FROM userbrick where login = '${LOGIN_EMAIL}'"
+  },
+  "do_not_touch_users_that_are_not_mentioned": true,
+  "sync_mode": "sync_multiple_projects_based_on_pid"
 }

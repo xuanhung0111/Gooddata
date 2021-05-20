@@ -40,7 +40,8 @@ public enum LcmDirectoryConfiguration {
     BIGQUERY_PRIVATE_KEY("BIGQUERY_PRIVATE_KEY", "BIGQUERY_PRIVATE_KEY"),
     BIGQUERY_SCHEMA("BIGQUERY_SCHEMA", "BIGQUERY_SCHEMA"),
     BIGQUERY_PROJECT("BIGQUERY_PROJECT", "BIGQUERY_PROJECT"),
-    DATA_PRODUCT("DATA_PRODUCT", "att_lcm_default_data_product");
+    DATA_PRODUCT("DATA_PRODUCT", "att_lcm_default_data_product"),
+    LOGIN_EMAIL("LOGIN_EMAIL", "LOGIN_EMAIL");
 
     private String paramName;
     private String paramValue;

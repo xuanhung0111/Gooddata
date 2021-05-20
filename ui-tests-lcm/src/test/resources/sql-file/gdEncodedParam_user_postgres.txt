@@ -4,8 +4,8 @@
       "url": "${POSTGRES_URL}",
       "authentication": {
         "basic": {
-          "userName": "qa",
-          "password": "changeit"
+          "userName": "${POSTGRES_USER_NAME}",
+          "password": "${POSTGRES_PASSWORD}"
         }
       },
       "database": "qa",
@@ -15,7 +15,8 @@
   },
   "input_source": {
     "type": "postgresql",
-    "query": "select login, language, password, role, clientid as client_id, user_groups FROM usersbrick"
+    "query": "select login, project_id, role FROM userbrick where login = '${LOGIN_EMAIL}'"
   },
-  "segments_filter": ["${SEGMENT_ID}"]
+  "do_not_touch_users_that_are_not_mentioned": true,
+  "sync_mode": "sync_multiple_projects_based_on_pid"
 }
